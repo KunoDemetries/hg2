@@ -18,9 +18,9 @@ remains sustained natural host playback/presentation cadence. It is NOT reached.
 Continue through checkpoints when session resources permit; no new permission is
 needed for authorized local work. AOT only, no changed guest waits or time budgets.
 
-- Retained performance reference: replay37,1066 OPENING CSC conversions spanning
-  35.611639modeled seconds in51.8379host seconds (median48.0ms). Earlier22 takes
-  77.9186host seconds: about50.3% more throughput, currently68.7% modeled rate.
+- Retained performance reference: replay42 (EE instruction history OFF),1066 OPENING CSC conversions spanning
+  35.611639modeled seconds in50.2381host seconds (median46.3ms). Earlier22 takes
+  77.9186host seconds: about55.1% more throughput, currently70.9% modeled rate.
   These are conversion events, not displayed FPS or physical-console parity.
 - Retained changes: checked RGB24 sprite reduction; aligned CSC byte-lane reads;
   X-inner separable IDCT with original per-output sum order; indexed existing DCT
@@ -66,22 +66,31 @@ needed for authorized local work. AOT only, no changed guest waits or time budge
   EE/GS/machine state and1311shared images, but57.5964host seconds. Raster total
   slightly improved (12.4892s vs12.6544s37) while whole playback worsened. Keep
   whole-sequence comparison authoritative over local counters.
-- Current candidate42 makes HG-DIAG-001 a build-time EE history option. Default
-  HG_EE_INSTRUCTION_TRACE=ON retains existing tracing. Local throughput build
-  OFF removes only history calls and explicitly rejects PC watches. Separate
-  synthetic no-trace target verifies branch state and preserved unknown-PC fault.
-  Diagnostic OFF build7403 completed. Fresh source-only Release build passes
-  all16CTest entries (including87Python cases and explicit trace-disabled checks),
-  using Python3.11 under %TEMP%/haunting-source-release-20260913. Python3.14
-  encountered sandbox temporary-directory permissions;3.11 passes unchanged tests.
-  Next run prepared42 against37; no build concurrent with timing.
-- User requested a SOURCE repository push, confirmed explicitly, to
-  https://github.com/KunoDemetries/hg2.git. Remote empty; SSH publickey failed,
-  HTTPS read works and GCM account KunoDemetries exists. Initial source snapshot prepared on codex/console-speed-checks, origin HTTPS.
-  Fresh16-test source-only validation passes; explicit source/doc/config file
-  list reviewed and secret-pattern scan clear. .gitattributes normalizes text
-  line endings. Publish normally and verify remote commit. Original data/emu/
-  generated outputs remain ignored; no executable release requested.
+- Retained42 makes HG-DIAG-001 a build-time EE history option. Default
+  HG_EE_INSTRUCTION_TRACE=ON retains tracing; local throughput build OFF removes
+  only history calls and explicitly rejects PC watches. Full60M42 completes
+  native-iop-budget:1066events across35.611639guest seconds in50.2381host seconds,
+  median46.3ms. Exact guest timestamps, EE/GS/machine state and1311images match37.
+  This is a bounded opening segment, not proof the entire movie/game completes.
+- Fresh source-only Release build passes all16CTest entries (including87Python
+  cases and explicit trace-disabled branch/watch/fault checks), using Python3.11
+  under %TEMP%/haunting-source-release-20260913. Auto-selected Python3.14 hit
+  sandbox temporary-directory permissions;3.11 passes unchanged tests. Source
+  build log validation-python311.log; connected evidence speed-opening-replay42.json.
+- SOURCE repository published as requested to https://github.com/KunoDemetries/hg2.git,
+  branch codex/console-speed-checks. Initial verified commit e50192b57b0649e5c56b7f133178d5af5818a365;
+  remote SHA confirmed,108text source/config/doc files, no game/emu/generated
+  outputs. HTTPS uses existing GCM account; SSH publickey access is unavailable.
+  .gitattributes normalizes source text. No executable release was requested.
+- No active diagnostic/build session remains; OpenGL viewer retained. Next major
+  milestone remains sustained1:1 natural playback. Native profile39 shows texture
+  sampling/pixel addressing/raster overhead alongside EE execution. Next inspect
+  the active movie draw's original TEX0/TFX/CLAMP state and independently prove a
+  narrow live-VRAM texture/shading reduction before implementation; retain full
+  masks/feedback/fault equivalence. Do not repeat rejected framebuffer-address41.
+  IOP default-on history is separately accounted for, not yet gated. Any further
+  native sampling needs a freshly matched linker map: CMake regeneration for42
+  removed the ignored map override; the earlier map must not be reused with42.
 - Separate native IDCT AVX2 benchmark has matching sampled checksums and about10%
   speed gain, external %TEMP%/haunting-ipu-arch-bench/results.json. No project
   architecture flags changed and no whole-game gain established from this.

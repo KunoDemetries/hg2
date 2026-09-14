@@ -407,3 +407,13 @@ This includes87Python cases and the new trace-disabled synthetic execution test.
 The first auto-selected Python3.14 run hit sandbox temporary-file permission
 errors; the unchanged tests pass with the project's verified3.11 interpreter.
 No new Linux or physical-console verification is claimed.
+
+
+Isolated trace-disabled42 improves the bounded opening segment from51.8379s37
+to50.2381s (1066 conversions,35.611639modeled seconds, median46.3ms,~70.9%
+modeled rate). Exact guest timestamps, final EE RAM/GS/machine state and all1311
+sampled images match37. This is an approximately3.2% measured throughput gain;
+physical-console parity and presentation FPS remain unverified. Unlike combined
+rejected40, this change only compiles disabled EE history calls out. Default
+source configuration keeps tracing ON; local throughput configuration is OFF.
+External evidence: speed-opening-replay42.json and startup-clock-bursts-42 files.

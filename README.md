@@ -2,7 +2,8 @@
 
 Independent AOT tools and native runtime source. **Not playable yet.** The verified
 Windows diagnostic reaches the original menus and opening movie. Best retained
-opening measurement:35.611639 modeled seconds in51.8379 host seconds (~68.7%).
+opening-segment measurement:35.611639 modeled seconds in50.2381 host seconds
+(~70.9%), using the experimental clock profile and EE instruction history OFF.
 This is not physical-console parity or displayed FPS. See
 [performance evidence](docs/PERFORMANCE.md) and [diagnostic inventory](docs/DIAGNOSTICS.md).
 
