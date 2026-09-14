@@ -1,0 +1,2668 @@
+schema_version = 1
+
+[image]
+path = "../Haunting Ground (USA)/SLUS_210.75"
+sha256 = "3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8"
+
+[analysis]
+max_instructions = 200000
+# Follow syscall wrappers only when an immediately preceding addiu v1,zero,N
+# proves one of these returning services. This does not bypass runtime handling.
+returning_syscalls = [0x02,0x45,0x6b,-120,-119,-118,-67,-52,-49,-47,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x20,0x22,0x29,0x2b,0x2f,0x30,0x32,0x33,0x35,0x37,0x39,0x3c,0x3d,0x3e,0x40,0x41,0x42,0x44,0x4a,0x4b,0x5a,0x5b,0x64,0x70,0x71,0x74,0x76,0x77,0x78,0x79,0x7a,0x7c,0x7f,0x83]
+
+# Addresses are virtual EE byte addresses. End is exclusive. Function ranges
+# bound discovery, not proof that every word inside them is executable.
+[[functions]]
+name = "entry"
+address = 0x00100008
+
+# Connected EE clock dispatches registered INTC11 handler277110 at227303us.
+# Original body reads T2_MODE/COUNT and acknowledges its timer flags.
+[[functions]]
+name = "registered_ee_timer2_interrupt"
+address = 0x00277110
+
+# Original1115a8/1115bc passes this completion callback in a7 to SIFRPC1115cc.
+[[functions]]
+name = "memory_card_info_completion"
+address = 0x00111450
+
+# Original3842e0/3842e4 loads44af10;38430c..384318 installs object+4 member.
+[[functions]]
+name = "memory_card_prompt_state"
+address = 0x00383550
+
+# Original 0x23ac64 supplies this callback to registration at 0x2400e8;
+# connected startup dispatches it through 0x1e5c10.
+[[functions]]
+name = "registered_startup_service_callback"
+address = 0x00240990
+
+# Original21fd80/21fda0 passes this completion callback in a7 to SIFRPC21fda4.
+[[functions]]
+name = "sound_rpc_completion_enable_interrupts"
+address = 0x0021f280
+
+# Original21fac8/21faf4 selects these completion callbacks for SIFRPC.
+[[functions]]
+name = "sound_rpc_completion_bit1"
+address = 0x0021f290
+[[functions]]
+name = "sound_rpc_completion_bit0"
+address = 0x0021f2b0
+# end = 0x00100100  # optional boundary after independent verification
+
+# Callback pointers installed by original SIF initialization at0x26f104..0x26f188.
+[[functions]]
+name = "sif0_dma_callback"
+address = 0x0026f568
+
+[[functions]]
+name = "sif_command_set_register"
+address = 0x0026ef88
+
+[[functions]]
+name = "sif_command_change_address"
+address = 0x0026efa8
+
+# RPC command pointers installed at0x26f804..0x26f86c.
+[[functions]]
+name = "rpc_request_complete"
+address = 0x0026fa60
+[[functions]]
+name = "rpc_bind_request"
+address = 0x0026fe38
+[[functions]]
+name = "rpc_call_request"
+address = 0x00270058
+[[functions]]
+name = "rpc_receive_request"
+address = 0x0026fb70
+
+# Continuation roots derived directly from the ELF startup sequence. The syscall
+# remains a runtime boundary until its service is independently implemented.
+[[functions]]
+name = "startup_after_thread_setup"
+address = 0x001001cc
+
+[[functions]]
+name = "startup_after_heap_setup"
+address = 0x001001e8
+
+[[functions]]
+name = "startup_thread_exit"
+address = 0x00100220
+
+# First connected dispatch after the statically linked CRI_ADXI worker chain;
+# the runtime observed this exact EE target with return PC 0x001d6a78.
+[[functions]]
+name = "post_iop_audio_startup_callback"
+address = 0x001df068
+
+# Companion callback reached from the same original startup owner, observed
+# with return PC 0x001d6a44 after CRI_ADXI initialization.
+[[functions]]
+name = "post_iop_audio_state_callback"
+address = 0x001df220
+
+# Next observed callback from the same startup dispatch table.
+[[functions]]
+name = "post_iop_stream_startup_callback"
+address = 0x001dac20
+
+[[functions]]
+name = "post_iop_stream_state_callback"
+address = 0x001dae68
+
+# First dispatch from the post-module EE service initialization at 0x001e5390.
+[[functions]]
+name = "post_iop_ee_service_startup"
+address = 0x001caf60
+
+[[functions]]
+name = "post_iop_ee_service_poll"
+address = 0x001cafe8
+
+# Live object-table +0x20 dispatch after the first CRI_ADXI SPU transfer;
+# observed from the translated EE call at 0x001e07dc.
+[[functions]]
+name = "post_iop_audio_object_method_20"
+address = 0x001e41b0
+
+# Constructor-created object dispatch at 0x001e8210; the live first slot is
+# this original zero-return method.
+[[functions]]
+name = "post_iop_service_object_method_0"
+address = 0x001eae58
+
+# Next constructor callback selected by the startup owner at 0x001d6a70.
+[[functions]]
+name = "post_iop_service_constructor_callback"
+address = 0x001ed1a0
+
+# Observed constructor dispatch at0x1d6a70 after successful DATA.CVM search.
+# Original three-instruction callback returns the static address0x3d5b80.
+[[functions]]
+name = "post_iop_service_state_address"
+address = 0x001ed1d0
+
+# Connected startup reached this original function through the game's generic
+# indirect-call helper at 0x00100b40 (caller return PC 0x0011fb04).  The ELF
+# bytes at 0x002c8c70 independently verify a normal function prologue.
+[[functions]]
+name = "observed_indirect_2c8c70"
+address = 0x002c8c70
+
+# Vtable entries reached from the live startup object at 0x007fe384 via vptr
+# 0x0046c740 (object discovered in startup-root-2c8c70). These are concrete
+# call targets observed by runtime and independently verified as normal MIPS
+# function bodies in the original ELF.
+[[functions]]
+name = "observed_vtable_2265d0"
+address = 0x002265d0
+
+[[functions]]
+name = "observed_vtable_226620"
+address = 0x00226620
+
+[[functions]]
+name = "observed_vtable_226640"
+address = 0x00226640
+
+[[functions]]
+name = "observed_vtable_226680"
+address = 0x00226680
+
+[[functions]]
+name = "observed_vtable_2266d0"
+address = 0x002266d0
+
+# Connected startup 0x2563fc reads slot 0x45998c: live RAM and original ELF
+# both contain 0x246fd0. Original two-instruction callback returns zero.
+[[functions]]
+name = "observed_startup_callback_246fd0"
+address = 0x00246fd0
+
+# Same bounded nine-record loop (0x256398..0x256430), selector 3. Live records
+# at 0x1009d68+i*0x44 contain seven nonzero tables. Remaining selected slots
+# 4599c4/459a0c/459754/459eec/4597ac/459eb4 match the original ELF exactly.
+[[functions]]
+name = "startup_registry_slot3_248c08"
+address = 0x00248c08
+[[functions]]
+name = "startup_registry_slot3_24d708"
+address = 0x0024d708
+[[functions]]
+name = "startup_registry_slot3_2425f8"
+address = 0x002425f8
+[[functions]]
+# Original242988..29a4 registers2429c8 at object+d28+2*4 via255158.
+# Native startup-cri-switch object1007e40, slot1008b70, JALR254b58.
+name = "observed_registered_worker_2429c8"
+address = 0x002429c8
+[[functions]]
+# Live object94fb40 descriptor at+4 is {0,-1,2b6bb0}; original descriptors
+# (including4126a8..b0) match. Member thunk100b40 dispatches via100b6c.
+name = "observed_member_callback_2b6bb0"
+address = 0x002b6bb0
+[[functions]]
+# Original2b6c98..cd4 copies descriptor4126b8 {0,-1,2b69b0} to object+4;
+# startup-stream-record live object94fb40 agrees. That body copies descriptor
+# 4126d8 {0,-1,2b68b0} at2b6b54..b90, covering its next callback transition.
+name = "observed_member_callback_2b69b0"
+address = 0x002b69b0
+[[functions]]
+name = "verified_member_transition_2b68b0"
+address = 0x002b68b0
+[[functions]]
+# Original2b6954..6994 copies descriptor4126e8 {0,-1,2b6710}; that body
+# later copies4126f8 {0,0x1c,0}, selecting live/original vtable46ecc0 slot1c.
+name = "verified_member_transition_2b6710"
+address = 0x002b6710
+[[functions]]
+# Original1cbe44..54 registers index6 callback1cb140 with argument0;
+# native startup-spr table480fd0 agrees, dispatched at1e5b20.
+name = "observed_registered_callback_1cb140"
+address = 0x001cb140
+[[functions]]
+# Original23ac74..90 registers these adjacent service callbacks through240198/
+# 240148. Live startup-spr-callback records480f18/480f40 confirm both targets.
+name = "observed_service_callback_2409d8"
+address = 0x002409d8
+[[functions]]
+name = "observed_service_callback_240a58"
+address = 0x00240a58
+[[functions]]
+# Original233bc8..bd8 installs231840 at object+d4; live1983f44 agrees.
+# startup-registry-slot2-stack stopped at its indirect call231818.
+name = "observed_parser_callback_231840"
+address = 0x00231840
+[[functions]]
+# Original242690..2714 constructs/stores this callback family. Live six-word
+# record100b414 in startup-service-callbacks-retry confirms slots1..5.
+name = "observed_record_241540"
+address = 0x00241540
+[[functions]]
+name = "observed_record_241560"
+address = 0x00241560
+[[functions]]
+name = "observed_record_241580"
+address = 0x00241580
+[[functions]]
+name = "observed_record_2415a0"
+address = 0x002415a0
+[[functions]]
+name = "observed_record_2415c0"
+address = 0x002415c0
+[[functions]]
+name = "startup_registry_slot3_2576c8"
+address = 0x002576c8
+[[functions]]
+name = "startup_registry_slot3_243390"
+address = 0x00243390
+[[functions]]
+name = "startup_registry_slot3_257370"
+address = 0x00257370
+
+# startup-registry-slot3 live global3e8284 contains230e38; original wrapper
+# 22b270 loads it and22b280 calls it. Own ELF decoder verifies the body.
+[[functions]]
+name = "startup_registered_callback_230e38"
+address = 0x00230e38
+
+# Live registered callback globals3e8274..3e82ac from startup-visible-230e38.
+# Original wrappers22b1d0..22b424 load/call these slots; own decoder verifies
+# each body. This compiles the captured targets without replacing registration.
+[[functions]]
+name = "startup_global_callback_230b48"
+address = 0x00230b48
+[[functions]]
+name = "startup_global_callback_230b58"
+address = 0x00230b58
+[[functions]]
+name = "startup_global_callback_230e30"
+address = 0x00230e30
+[[functions]]
+name = "startup_global_callback_230f80"
+address = 0x00230f80
+[[functions]]
+name = "startup_global_callback_230fd8"
+address = 0x00230fd8
+[[functions]]
+name = "startup_global_callback_230fd0"
+address = 0x00230fd0
+[[functions]]
+name = "startup_global_callback_22b530"
+address = 0x0022b530
+[[functions]]
+name = "startup_global_callback_22b5a0"
+address = 0x0022b5a0
+[[functions]]
+name = "startup_global_callback_22b760"
+address = 0x0022b760
+[[functions]]
+name = "startup_global_callback_22b6a8"
+address = 0x0022b6a8
+[[functions]]
+name = "startup_global_callback_22ba78"
+address = 0x0022ba78
+[[functions]]
+name = "startup_global_callback_22baa0"
+address = 0x0022baa0
+[[functions]]
+name = "startup_global_callback_22bab0"
+address = 0x0022bab0
+
+# Final five callback stores in original initializer230ad4..230b3c,
+# independently matching live globals3e82b0..3e82c0.
+[[functions]]
+name = "startup_global_callback_22bad8"
+address = 0x0022bad8
+[[functions]]
+name = "startup_global_callback_22b768"
+address = 0x0022b768
+[[functions]]
+name = "startup_global_callback_22b868"
+address = 0x0022b868
+[[functions]]
+name = "startup_global_callback_22b8c8"
+address = 0x0022b8c8
+[[functions]]
+name = "startup_global_callback_22b958"
+address = 0x0022b958
+
+# Original object +0x18 dispatch at0x1e6d48, observed after archive discovery.
+[[functions]]
+name = "post_iop_archive_object_method_18"
+address = 0x001e8580
+
+# Wrapper0x1eae88 dispatched here in the connected startup; original
+# static backend table0x4555c8 also contains this target at+0x18.
+[[functions]]
+name = "archive_backend_method_18"
+address = 0x001e6078
+
+
+# Companion no-op callback reached from the same startup owner (return PC
+# 0x001d6a44) after the constructor callback completed.
+[[functions]]
+name = "post_iop_service_constructor_noop"
+address = 0x001ed1f8
+
+
+# Live +0x60 service callback selected at 0x001d8590 during the next startup
+# phase; its checked command switch begins at this entry.
+[[functions]]
+name = "post_iop_service_command_callback"
+address = 0x001db790
+
+
+# Next live callback at 0x001d6fb0. Independent ELF inspection confirms a
+# clean prologue here after the preceding function's return; no supplied map
+# boundary is consumed by discovery.
+[[functions]]
+name = "post_iop_service_callback_1db098"
+address = 0x001db098
+
+
+# Live callback loaded from the original global at 0x003c3bbc and dispatched
+# at 0x001d67b0. The ELF body is a complete stack-restoring tail adapter.
+[[functions]]
+name = "post_iop_global_callback_1d20b8"
+address = 0x001d20b8
+
+
+# Live +0x60 callback at 0x001d847c. The original bytes independently show a
+# clean prologue followed by a checked command selector.
+[[functions]]
+name = "post_iop_service_command_callback_1ed4d0"
+address = 0x001ed4d0
+
+
+# Live object slot +0x38 selected at 0x001e7344. The original entry validates
+# its destination and constructs the service record through translated calls.
+[[functions]]
+name = "post_iop_service_object_method_38"
+address = 0x001e96d8
+
+
+# Live object +0x0c constructor dispatch at 0x001aadf4. Independent ELF
+# inspection confirms a clean aligned prologue and translated direct-call body.
+[[functions]]
+name = "post_iop_object_constructor_2266f0"
+address = 0x002266f0
+
+# Live object vtable slot +0x10 called at 0x00244cd0 after the allocator at
+# 0x001e2fe0 returns object 0x003cffa8. The target is a one-load getter whose
+# original delay slot returns the object's +0x08 word.
+[[functions]]
+name = "post_iop_object_getter_1e31b0"
+address = 0x001e31b0
+
+# Live vtable slot +0x0c called at 0x00244ce8 for the same object. Independent
+# decoding shows the ordinary release/destructor chain and guarded +0x04 block.
+[[functions]]
+name = "post_iop_object_release_1e3108"
+address = 0x001e3108
+
+# Live vtable slot +0x10 called at 0x00244d08 for the companion object returned
+# by 0x001e26a0. The original body is another checked release/destructor chain.
+[[functions]]
+name = "post_iop_companion_release_1e2858"
+address = 0x001e2858
+
+# Live vtable slot +0x0c called at 0x00244d20 for that companion object. The
+# independently decoded body releases its guarded +0x04 allocation.
+[[functions]]
+name = "post_iop_companion_destructor_1e27b0"
+address = 0x001e27b0
+
+# Live callback selected by the original 15-entry table walk at 0x00255e00.
+# The exact target is a leaf returning zero in its delay slot.
+[[functions]]
+name = "post_iop_table_callback_246f98"
+address = 0x00246f98
+
+# Next live callback from the same original 15-entry table walk. Its decoded
+# body performs a guarded subsystem registration and publishes initialized state.
+[[functions]]
+name = "post_iop_table_callback_247170"
+address = 0x00247170
+
+# Third live callback from the original 15-entry startup table. Independent
+# decoding shows guarded allocation/registration and publication at 0x003ea180.
+[[functions]]
+name = "post_iop_table_callback_249720"
+address = 0x00249720
+
+# Live callback read from original global 0x003f827c and dispatched at
+# 0x0022b22c. Its decoded body initializes the guarded 0x01976fa0 subsystem.
+[[functions]]
+name = "post_iop_global_callback_230c08"
+address = 0x00230c08
+
+# Later live callback from the same 15-entry startup table; the exact target is
+# a leaf returning zero and is observed at table dispatch 0x00255e00.
+[[functions]]
+name = "post_iop_table_callback_257508"
+address = 0x00257508
+
+# Live startup-table callback at 0x00255e00. Its independently decoded body
+# initializes two subsystems and registers the seven-entry record at 0x01982b90.
+[[functions]]
+name = "post_iop_table_callback_2416d0"
+address = 0x002416d0
+
+# Another observed entry in the original 15-slot startup table; this exact
+# callback is a leaf returning zero.
+[[functions]]
+name = "post_iop_table_callback_243230"
+address = 0x00243230
+
+# Observed original startup-table leaf at the same 0x00255e00 dispatch.
+[[functions]]
+name = "post_iop_table_callback_257200"
+address = 0x00257200
+
+# Live indirect callback from the independently decoded formatter/stream walk
+# at 0x0026ec18 (return PC 0x0026ec20).
+[[functions]]
+name = "ee_stream_format_callback"
+address = 0x0026ecf8
+
+# Live formatter sink dispatched at 0x0026ec18. It decrements the remaining
+# byte count and appends one checked byte through the original cursor record.
+[[functions]]
+name = "ee_stream_format_byte_callback"
+address = 0x0026eca0
+
+# Live formatter continuation selected through the indirect transfer at
+# 0x0026ec18 (return 0x0026ec20). It enters the original uppercase-hex path;
+# keep the exact observed block explicit rather than guessing a whole table.
+[[functions]]
+name = "ee_formatter_upper_hex_target_26e22c"
+address = 0x0026e22c
+
+# Helper bodies assigned to syscall slots by the game's startup. Names describe
+# independently decoded behavior, not PCSX2's function discovery.
+[[functions]]
+name = "kernel_copy_words"
+address = 0x00276348
+
+[[functions]]
+name = "kernel_find_word"
+address = 0x00276380
+
+[[functions]]
+name = "kernel_patch_copy_words"
+address = 0x002769b0
+
+# Game-supplied code copied by startup at 0x00276a40..0x00276a6c.
+# These blobs are statically decoded at their destination virtual addresses.
+[[overlays]]
+name = "alarm_kernel_patch"
+source = 0x003eb8a8
+address = 0x80076000
+size = 0x740
+entry_offsets = [0]
+
+[[overlays]]
+name = "alarm_thread_trampoline"
+source = 0x003ebfe8
+address = 0x00082000
+size = 0x28
+entry_offsets = [0]
+
+# Add functions missed by discovery as additional [[functions]] entries.
+# [[functions]]
+# name = "independently_verified_name"
+# address = 0x00123400
+# end = 0x00123500
+
+# Enumerate proven destinations of a jr/jalr instruction. These are additive
+# discovery seeds, not runtime substitutions; the actual register selects target.
+# [[indirect_targets]]
+# site = 0x00123410
+# targets = [0x00125000, 0x00126000]
+
+# The formatter/parser dispatch at 0x0011a5b0 performs an explicit unsigned
+# index <89 check, then loads one pointer from this file-backed table.
+[[indirect_targets]]
+site = 0x0011a5b0
+table_start = 0x0044dda0
+table_end = 0x0044df04
+
+# Exclude verified embedded data; reachable edges into it are reported.
+# [[data_ranges]]
+# start = 0x00127000
+# end = 0x00127100
+
+# File-backed callback globals contain these exact executable pointers in the
+# input image. The wrappers load the word and dispatch through it.
+# Original1d5f40 bounds selector below5; native startup-cri-buffer capture
+# confirms all five table words match the ELF, including observed1d5f98.
+[[indirect_targets]]
+site = 0x001d5f5c
+table_start = 0x00451d10
+table_end = 0x00451d24
+
+# Original selector bounds at2509c4 (<7) and2408c4 (<5). Every table word
+# matches startup-worker-retry EE RAM and is executable in the original ELF.
+[[indirect_targets]]
+site = 0x002509e0
+table_start = 0x00459c70
+table_end = 0x00459c8c
+
+[[indirect_targets]]
+site = 0x002408dc
+table_start = 0x00459660
+table_end = 0x00459674
+
+[[indirect_targets]]
+site = 0x001009b0
+targets = [0x00100a00]
+
+[[indirect_targets]]
+site = 0x001009e0
+targets = [0x00100a30]
+
+# The adjacent wrapper reads the same initialized callback global.
+[[indirect_targets]]
+site = 0x00100a10
+targets = [0x00100a30]
+
+# File-backed method descriptor at 0x004558ac contains 0x001e8180; startup
+# installs the descriptor address in 0x003d5a00 immediately before this call.
+[[indirect_targets]]
+site = 0x001e6c34
+targets = [0x001e8180]
+
+
+# Descriptor constructed by the game at 0x0026cfe0 before CreateThread.
+[[functions]]
+name = "startup_worker_thread"
+address = 0x0026cea0
+
+# Copy helper registered in ELF table at 0x003eadf0.
+[[functions]]
+name = "kernel_memory_patch_copy"
+address = 0x00275ad8
+
+# Startup copy at 0x00275b60, length 0x330, before handler registration.
+[[overlays]]
+name = "kernel_memory_patch"
+source = 0x003eaa70
+address = 0x80075000
+size = 0x330
+entry_offsets = [0]
+
+# Startup iterates this exact half-open constructor table through 0x00100b0c.
+[[indirect_targets]]
+site = 0x00100b0c
+table_start = 0x00469460
+table_end = 0x0046969c
+
+# Native execution: constructor object vtable slot +0x1c calls this leaf.
+[[indirect_targets]]
+site = 0x00105ad4
+targets = [0x00104ba0]
+
+# Constructor object vtable +0x1c, observed in native translated execution.
+[[indirect_targets]]
+site = 0x001042e0
+targets = [0x0010b4a0]
+
+# Object at 0x0047b6e0 has vptr 0x00469860; this call reads slot +0x10.
+[[indirect_targets]]
+site = 0x00102fd4
+table_start = 0x00469870
+table_end = 0x00469874
+
+# Native object vptr 0x004698a0, virtual slot +0x1c.
+[[indirect_targets]]
+site = 0x00106be4
+table_start = 0x004698bc
+table_end = 0x004698c0
+
+# Native object vptr 0x00469900, virtual slot +0x2c.
+[[indirect_targets]]
+site = 0x00104430
+table_start = 0x0046992c
+table_end = 0x00469930
+
+# Native object vptr 0x00469790, virtual slot +0x10.
+[[indirect_targets]]
+site = 0x00103544
+table_start = 0x004697a0
+table_end = 0x004697a4
+
+# Constructor writes vptr 0x0046f4f0, calls +0x0c, whose body calls +0x10.
+[[indirect_targets]]
+site = 0x002d4658
+table_start = 0x0046f4fc
+table_end = 0x0046f500
+
+[[indirect_targets]]
+site = 0x002d4604
+table_start = 0x0046f500
+table_end = 0x0046f504
+
+# Native constructor object vptr 0x0046ac50, slot +0x1c.
+[[indirect_targets]]
+site = 0x001b81ec
+table_start = 0x0046ac6c
+table_end = 0x0046ac70
+
+# Array-constructor helper saves incoming a1 in s5, calls it at this site.
+# First target observed in native constructor execution; destructor stays separate.
+[[indirect_targets]]
+site = 0x00100414
+targets = [0x0020e7d0, 0x0020e7b0, 0x0020e240, 0x0020e210]
+
+# Native constructor object vptr 0x0046ab50, slot +0x0c.
+[[indirect_targets]]
+site = 0x001a48e8
+table_start = 0x0046ab5c
+table_end = 0x0046ab60
+
+# Native tail call: object vptr 0x0046a1c0, slot +0x0c.
+[[indirect_targets]]
+site = 0x00169278
+table_start = 0x0046a1cc
+table_end = 0x0046a1d0
+
+# Independently decoded array helper 0x00100340: a1 is constructor;
+# a2 is destructor for partial construction cleanup. Only track proven constants.
+[[callback_bindings]]
+callee = 0x00100340
+argument = 5
+site = 0x00100414
+
+[[callback_bindings]]
+callee = 0x00100340
+argument = 6
+site = 0x001003ec
+
+# Native game-object vptr 0x0046ac50, slot +0x3c.
+[[indirect_targets]]
+site = 0x001f46a0
+table_start = 0x0046ac8c
+table_end = 0x0046ac90
+
+# Member-pointer helper: native descriptor at object +0x4009cc contains
+# {this adjustment=0, virtual offset=-1, direct target=0x002d1e40}.
+# The helper branches directly when its second descriptor word is negative.
+[[indirect_targets]]
+site = 0x00100b6c
+# Original static descriptors414370/414380 also contain {0,-1,target}.
+targets = [0x002d1e40,0x002d1b20,0x002d1aa0]
+
+# Native embedded object vptr 0x0046adf0, slot +0x0c.
+[[indirect_targets]]
+site = 0x002d1e64
+table_start = 0x0046adfc
+table_end = 0x0046ae00
+
+
+# Native startup call at 0x2104cc reaches 0x20f070 through object +0x130.
+# The original ELF retains this target word at 0x46c050.
+[[indirect_targets]]
+site = 0x002104cc
+table_start = 0x0046c050
+table_end = 0x0046c054
+
+# Original EE CreateThread descriptors observed during native startup.
+[[functions]]
+name = "worker_1cb1a8"
+address = 0x001cb1a8
+
+[[functions]]
+name = "worker_1cb298"
+address = 0x001cb298
+
+[[functions]]
+name = "worker_1cb3a0"
+address = 0x001cb3a0
+
+[[functions]]
+name = "worker_1cb480"
+address = 0x001cb480
+
+[[functions]]
+name = "sound_reverse_rpc_worker"
+address = 0x0021f210
+
+
+# Native startup object virtual slot +0x170, retained original ELF pointer.
+[[indirect_targets]]
+site = 0x002105a0
+table_start = 0x0046c090
+table_end = 0x0046c094
+
+# Same startup object's clamped-volume method tails through slot +0x178.
+[[indirect_targets]]
+site = 0x0020e9e0
+table_start = 0x0046c098
+table_end = 0x0046c09c
+
+# Live startup virtual call: original ELF slot 0x46ac60 contains 0x1bbc20.
+[[indirect_targets]]
+site = 0x001b71fc
+table_start = 0x0046ac60
+table_end = 0x0046ac64
+
+# Original object slot +0x14, called by the preceding startup method.
+[[indirect_targets]]
+site = 0x001bbcd8
+table_start = 0x0046ac64
+table_end = 0x0046ac68
+
+# Original startup object's slot +0x18 and its nested same-object slot +0x10.
+[[indirect_targets]]
+site = 0x001b8478
+table_start = 0x0046ab68
+table_end = 0x0046ab6c
+
+[[indirect_targets]]
+site = 0x001a4520
+table_start = 0x0046ab60
+table_end = 0x0046ab64
+
+# Original startup object's slot +0x0c at 0x46b05c points to 0x1c2970.
+[[indirect_targets]]
+site = 0x001bf174
+table_start = 0x0046b05c
+table_end = 0x0046b060
+
+# Same initialized object's slot +0x14 and unchanged-this tail call +0x18.
+[[indirect_targets]]
+site = 0x001b82d0
+table_start = 0x0046b064
+table_end = 0x0046b068
+
+[[indirect_targets]]
+site = 0x001c2954
+table_start = 0x0046b068
+table_end = 0x0046b06c
+
+# Remaining calls on the retained s0 object in original startup 0x1b8250.
+[[indirect_targets]]
+site = 0x001b82f8
+table_start = 0x0046b074
+table_end = 0x0046b078
+
+[[indirect_targets]]
+site = 0x001b8340
+table_start = 0x0046b068
+table_end = 0x0046b06c
+
+[[indirect_targets]]
+site = 0x001b836c
+table_start = 0x0046b074
+table_end = 0x0046b078
+
+[[indirect_targets]]
+site = 0x001b839c
+table_start = 0x0046b068
+table_end = 0x0046b06c
+
+# Original callback table +0x3c: 0x4558dc contains live target 0x1e9760.
+[[indirect_targets]]
+site = 0x001e73c8
+table_start = 0x004558dc
+table_end = 0x004558e0
+
+# Original 15-entry service wrapper table at0x455c38, terminated by zero.
+# Slot2 was reached at0x1e7dc4; retain the related service wrappers together.
+[[functions]]
+name = "archive_service_wrapper_1"
+address = 0x001eae60
+
+[[functions]]
+name = "archive_service_wrapper_2"
+address = 0x001eae68
+
+[[functions]]
+name = "archive_service_wrapper_3"
+address = 0x001eaec8
+
+[[functions]]
+name = "archive_service_wrapper_4"
+address = 0x001eaf28
+
+[[functions]]
+name = "archive_service_wrapper_5"
+address = 0x001eaf88
+
+[[functions]]
+name = "archive_service_wrapper_6"
+address = 0x001eafc0
+
+[[functions]]
+name = "archive_service_wrapper_7"
+address = 0x001eaff8
+
+[[functions]]
+name = "archive_service_wrapper_8"
+address = 0x001eb058
+
+[[functions]]
+name = "archive_service_wrapper_9"
+address = 0x001eb0b8
+
+[[functions]]
+name = "archive_service_wrapper_10"
+address = 0x001eb178
+
+[[functions]]
+name = "archive_service_wrapper_11"
+address = 0x001eb2f8
+
+[[functions]]
+name = "archive_service_wrapper_12"
+address = 0x001eb3b0
+
+[[functions]]
+name = "archive_service_wrapper_13"
+address = 0x001eb3d8
+
+[[functions]]
+name = "archive_service_wrapper_14"
+address = 0x001eb118
+
+
+# Original archive stream table0x3c5098: observed seek slot+0x18 at0x1d7360.
+# Retain its non-null callbacks through+0x40 together from original ELF.
+[[functions]]
+name = "archive_stream_slot_0"
+address = 0x001dadf0
+
+[[functions]]
+name = "archive_stream_slot_2"
+address = 0x001daf80
+
+[[functions]]
+name = "archive_stream_slot_5"
+address = 0x001db210
+
+[[functions]]
+name = "archive_stream_slot_6"
+address = 0x001db268
+
+[[functions]]
+name = "archive_stream_slot_7"
+address = 0x001db300
+
+[[functions]]
+name = "archive_stream_slot_8"
+address = 0x001db338
+
+[[functions]]
+name = "archive_stream_slot_10"
+address = 0x001db4e0
+
+[[functions]]
+name = "archive_stream_slot_11"
+address = 0x001db5c8
+
+[[functions]]
+name = "archive_stream_slot_12"
+address = 0x001db600
+
+[[functions]]
+name = "archive_stream_slot_14"
+address = 0x001db608
+
+[[functions]]
+name = "archive_stream_slot_16"
+address = 0x001daef8
+
+
+# Original backend table 0x4555c8 through +0x38; slot +0x30 observed at 0x1eb078.
+
+[[functions]]
+name = "archive_backend_slot_0"
+address = 0x001e61b0
+
+[[functions]]
+name = "archive_backend_slot_7"
+address = 0x001e60d0
+
+[[functions]]
+name = "archive_backend_slot_8"
+address = 0x001e60e8
+
+[[functions]]
+name = "archive_backend_slot_10"
+address = 0x001e6100
+
+[[functions]]
+name = "archive_backend_slot_11"
+address = 0x001e6118
+
+[[functions]]
+name = "archive_backend_slot_12"
+address = 0x001e6168
+
+[[functions]]
+name = "archive_backend_slot_14"
+address = 0x001e6180
+
+# Original archive worker table 0x3cacc0; slot 0 observed at 0x1d74ec.
+
+[[functions]]
+name = "archive_worker_slot_0"
+address = 0x001df1c8
+
+[[functions]]
+name = "archive_worker_slot_2"
+address = 0x001df238
+
+[[functions]]
+name = "archive_worker_slot_4"
+address = 0x001df340
+
+[[functions]]
+name = "archive_worker_slot_5"
+address = 0x001df3e0
+
+[[functions]]
+name = "archive_worker_slot_6"
+address = 0x001df428
+
+[[functions]]
+name = "archive_worker_slot_7"
+address = 0x001df4e8
+
+[[functions]]
+name = "archive_worker_slot_8"
+address = 0x001df520
+
+[[functions]]
+name = "archive_worker_slot_10"
+address = 0x001df6a8
+
+[[functions]]
+name = "archive_worker_slot_11"
+address = 0x001df6f8
+
+[[functions]]
+name = "archive_worker_slot_12"
+address = 0x001df730
+
+[[functions]]
+name = "archive_worker_slot_13"
+address = 0x001df768
+
+[[functions]]
+name = "archive_worker_slot_14"
+address = 0x001df7e8
+
+# Original stream status switch: unsigned status <10 at0x1dad58.
+[[indirect_targets]]
+site = 0x001dad74
+table_start = 0x00453090
+table_end = 0x004530b8
+
+# Original archive service table 0x3d5b18 through +0x48; slot0 reached via0x1d74ec.
+
+[[functions]]
+name = "archive_service_backend_slot_0"
+address = 0x001ed1e0
+
+[[functions]]
+name = "archive_service_backend_slot_2"
+address = 0x001ed200
+
+[[functions]]
+name = "archive_service_backend_slot_4"
+address = 0x001ed218
+
+[[functions]]
+name = "archive_service_backend_slot_5"
+address = 0x001ed230
+
+[[functions]]
+name = "archive_service_backend_slot_6"
+address = 0x001ed248
+
+[[functions]]
+name = "archive_service_backend_slot_7"
+address = 0x001ed288
+
+[[functions]]
+name = "archive_service_backend_slot_8"
+address = 0x001ed2a0
+
+[[functions]]
+name = "archive_service_backend_slot_10"
+address = 0x001ed2b8
+
+[[functions]]
+name = "archive_service_backend_slot_11"
+address = 0x001ed2d0
+
+[[functions]]
+name = "archive_service_backend_slot_12"
+address = 0x001ed320
+
+[[functions]]
+name = "archive_service_backend_slot_14"
+address = 0x001ed338
+
+[[functions]]
+name = "archive_service_backend_slot_15"
+address = 0x001ed350
+
+[[functions]]
+name = "archive_service_backend_slot_16"
+address = 0x001ed378
+
+[[functions]]
+name = "archive_service_backend_slot_17"
+address = 0x001ed390
+
+[[functions]]
+name = "archive_service_backend_slot_18"
+address = 0x001ed398
+
+# Original archive dispatch table0x4558a0, installed at0x1e6c2c.
+# Poll slot+0x30 reached via0x1e70b8; non-null methods end at+0x60.
+
+[[functions]]
+name = "archive_dispatch_slot_3"
+address = 0x001e8180
+
+[[functions]]
+name = "archive_dispatch_slot_4"
+address = 0x001e8418
+
+[[functions]]
+name = "archive_dispatch_slot_5"
+address = 0x001e8508
+
+[[functions]]
+name = "archive_dispatch_slot_7"
+address = 0x001e8a00
+
+[[functions]]
+name = "archive_dispatch_slot_8"
+address = 0x001e8ba8
+
+[[functions]]
+name = "archive_dispatch_slot_9"
+address = 0x001e8c90
+
+[[functions]]
+name = "archive_dispatch_slot_10"
+address = 0x001e8cb0
+
+[[functions]]
+name = "archive_dispatch_slot_11"
+address = 0x001e8ee0
+
+[[functions]]
+name = "archive_dispatch_slot_12"
+address = 0x001e9260
+
+[[functions]]
+name = "archive_dispatch_slot_13"
+address = 0x001e94a8
+
+[[functions]]
+name = "archive_dispatch_slot_15"
+address = 0x001e9760
+
+[[functions]]
+name = "archive_dispatch_slot_16"
+address = 0x001e9980
+
+[[functions]]
+name = "archive_dispatch_slot_17"
+address = 0x001e9b58
+
+[[functions]]
+name = "archive_dispatch_slot_18"
+address = 0x001e9c08
+
+[[functions]]
+name = "archive_dispatch_slot_19"
+address = 0x001e9cb8
+
+[[functions]]
+name = "archive_dispatch_slot_20"
+address = 0x001e9d48
+
+[[functions]]
+name = "archive_dispatch_slot_21"
+address = 0x001e9e40
+
+[[functions]]
+name = "archive_dispatch_slot_22"
+address = 0x001e94f0
+
+[[functions]]
+name = "archive_dispatch_slot_23"
+address = 0x001ea550
+
+[[functions]]
+name = "archive_dispatch_slot_24"
+address = 0x001ea6b8
+
+# Original backend extended slot+0x68 at0x455630, reached via0x1eb138.
+[[functions]]
+name = "archive_backend_slot_26"
+address = 0x001e6198
+
+# Original CD read completion callback reached via SIFRPC0x26facc.
+[[functions]]
+name = "cd_read_completion_callback"
+address = 0x0010f0a8
+
+# Original formatter bounds adjusted byte to unsigned <89 at0x26e01c.
+[[indirect_targets]]
+site = 0x0026e03c
+table_start = 0x0045ae00
+table_end = 0x0045af64
+
+# Observed two-flag wait method: original object slot+0x1c at0x46ae0c.
+[[functions]]
+name = "startup_two_flag_wait"
+address = 0x001bed00
+
+# Original registered INTC callback; independent ELF verification.
+[[functions]]
+name = "vblank_start_callback"
+address = 0x001beda0
+
+# Original registered INTC callback; independent ELF verification.
+[[functions]]
+name = "vblank_end_callback"
+address = 0x001bed80
+
+# Original registered INTC callback; independent ELF verification.
+[[functions]]
+name = "vblank_end_service_callback"
+address = 0x001aac30
+
+# Native startup-pressure-60m dispatches original callback at jalr0x1e5c10.
+[[functions]]
+name = "startup_service_callback_1ca660"
+address = 0x001ca660
+
+# Original service registrars store callback/context pairs at 0x1e5918/1c
+# and0x1e5a78/7c; wrappers preserve the callback ABI below.
+[[callback_bindings]]
+callee = 0x001e5898
+argument = 5
+site = 0x001e5c10
+[[callback_bindings]]
+callee = 0x001e59e0
+argument = 6
+site = 0x001e5c10
+[[callback_bindings]]
+callee = 0x002400e8
+argument = 5
+site = 0x001e5c10
+[[callback_bindings]]
+callee = 0x00240198
+argument = 4
+site = 0x001e5c10
+# Original setters write callback a1 and argument a2 into object slots20/24
+# and28/2c; the paired dispatcher loads those slots at these jalr sites.
+[[callback_bindings]]
+callee = 0x001da7d0
+argument = 5
+site = 0x001da860
+[[callback_bindings]]
+callee = 0x001da7e0
+argument = 5
+site = 0x001da8b4
+
+# Original constructor1e3c28 publishes table3d3fa8; observed slot18 at1e4f94.
+# Retain all nine original non-null service methods together.
+[[functions]]
+name = "service_table_3d3fa8_slot_3"
+address = 0x001e3c60
+[[functions]]
+name = "service_table_3d3fa8_slot_4"
+address = 0x001e3d08
+[[functions]]
+name = "service_table_3d3fa8_slot_5"
+address = 0x001e3e28
+[[functions]]
+name = "service_table_3d3fa8_slot_6"
+address = 0x001e4010
+[[functions]]
+name = "service_table_3d3fa8_slot_7"
+address = 0x001e4318
+[[functions]]
+name = "service_table_3d3fa8_slot_9"
+address = 0x001e3f20
+[[functions]]
+name = "service_table_3d3fa8_slot_10"
+address = 0x001e4478
+[[functions]]
+name = "service_table_3d3fa8_slot_11"
+address = 0x001e3d88
+
+# Original object table46a1e0, observed slot30 at2cfa3c; all non-null methods.
+[[functions]]
+name = "object_46a1e0_slot_2"
+address = 0x00169280
+[[functions]]
+name = "object_46a1e0_slot_3"
+address = 0x0016bbd0
+[[functions]]
+name = "object_46a1e0_slot_4"
+address = 0x0016ba70
+[[functions]]
+name = "object_46a1e0_slot_5"
+address = 0x0016b8e0
+[[functions]]
+name = "object_46a1e0_slot_6"
+address = 0x0016b750
+[[functions]]
+name = "object_46a1e0_slot_7"
+address = 0x0016b600
+[[functions]]
+name = "object_46a1e0_slot_8"
+address = 0x0016b550
+[[functions]]
+name = "object_46a1e0_slot_9"
+address = 0x0016b510
+[[functions]]
+name = "object_46a1e0_slot_10"
+address = 0x0016b470
+[[functions]]
+name = "object_46a1e0_slot_11"
+address = 0x00169450
+[[functions]]
+name = "object_46a1e0_slot_12"
+address = 0x00169420
+[[functions]]
+name = "object_46a1e0_slot_13"
+address = 0x001692f0
+[[functions]]
+name = "object_46a1e0_slot_14"
+address = 0x0016b420
+[[functions]]
+name = "object_46a1e0_slot_15"
+address = 0x0016b1f0
+
+# Original ctor1e30d0 publishes table3cff70; slot24 reached at1d1f98.
+[[functions]]
+name = "object_3cff70_slot_5"
+address = 0x001e31c8
+[[functions]]
+name = "object_3cff70_slot_6"
+address = 0x001e32b8
+[[functions]]
+name = "object_3cff70_slot_7"
+address = 0x001e3660
+[[functions]]
+name = "object_3cff70_slot_8"
+address = 0x001e34a0
+[[functions]]
+name = "object_3cff70_slot_9"
+address = 0x001e3268
+[[functions]]
+name = "object_3cff70_slot_10"
+address = 0x001e3878
+[[functions]]
+name = "object_3cff70_slot_11"
+address = 0x001e31b8
+
+# Original constructor20e038 publishes secondary vptr46bf2c.
+# Native2cfa98 reaches slot4c; retain all non-null methods through46c09c.
+[[functions]]
+name = "object_46bf2c_method_002108e0"
+address = 0x002108e0
+
+[[functions]]
+name = "object_46bf2c_method_002108d0"
+address = 0x002108d0
+
+[[functions]]
+name = "object_46bf2c_method_002108c0"
+address = 0x002108c0
+
+[[functions]]
+name = "object_46bf2c_method_002108b0"
+address = 0x002108b0
+
+[[functions]]
+name = "object_46bf2c_method_002108a0"
+address = 0x002108a0
+
+[[functions]]
+name = "object_46bf2c_method_00210890"
+address = 0x00210890
+
+[[functions]]
+name = "object_46bf2c_method_00210880"
+address = 0x00210880
+
+[[functions]]
+name = "object_46bf2c_method_00210870"
+address = 0x00210870
+
+[[functions]]
+name = "object_46bf2c_method_00210860"
+address = 0x00210860
+
+[[functions]]
+name = "object_46bf2c_method_00210840"
+address = 0x00210840
+
+[[functions]]
+name = "object_46bf2c_method_00210850"
+address = 0x00210850
+
+[[functions]]
+name = "object_46bf2c_method_00210830"
+address = 0x00210830
+
+[[functions]]
+name = "object_46bf2c_method_00210820"
+address = 0x00210820
+
+[[functions]]
+name = "object_46bf2c_method_00210810"
+address = 0x00210810
+
+[[functions]]
+name = "object_46bf2c_method_00210800"
+address = 0x00210800
+
+[[functions]]
+name = "object_46bf2c_method_002107f0"
+address = 0x002107f0
+
+[[functions]]
+name = "object_46bf2c_method_002107e0"
+address = 0x002107e0
+
+[[functions]]
+name = "object_46bf2c_method_002107d0"
+address = 0x002107d0
+
+[[functions]]
+name = "object_46bf2c_method_002107c0"
+address = 0x002107c0
+
+[[functions]]
+name = "object_46bf2c_method_002107b0"
+address = 0x002107b0
+
+[[functions]]
+name = "object_46bf2c_method_002107a0"
+address = 0x002107a0
+
+[[functions]]
+name = "object_46bf2c_method_00210790"
+address = 0x00210790
+
+[[functions]]
+name = "object_46bf2c_method_00210780"
+address = 0x00210780
+
+[[functions]]
+name = "object_46bf2c_method_00210770"
+address = 0x00210770
+
+[[functions]]
+name = "object_46bf2c_method_00210760"
+address = 0x00210760
+
+[[functions]]
+name = "object_46bf2c_method_00210750"
+address = 0x00210750
+
+[[functions]]
+name = "object_46bf2c_method_00210740"
+address = 0x00210740
+
+[[functions]]
+name = "object_46bf2c_method_00210730"
+address = 0x00210730
+
+[[functions]]
+name = "object_46bf2c_method_00210720"
+address = 0x00210720
+
+[[functions]]
+name = "object_46bf2c_method_00210710"
+address = 0x00210710
+
+[[functions]]
+name = "object_46bf2c_method_00210700"
+address = 0x00210700
+
+[[functions]]
+name = "object_46bf2c_method_002106e0"
+address = 0x002106e0
+
+[[functions]]
+name = "object_46bf2c_method_002106d0"
+address = 0x002106d0
+
+[[functions]]
+name = "object_46bf2c_method_002106f0"
+address = 0x002106f0
+
+[[functions]]
+name = "object_46bf2c_method_002106c0"
+address = 0x002106c0
+
+[[functions]]
+name = "object_46bf2c_method_002106b0"
+address = 0x002106b0
+
+[[functions]]
+name = "object_46bf2c_method_002106a0"
+address = 0x002106a0
+
+[[functions]]
+name = "object_46bf2c_method_00210690"
+address = 0x00210690
+
+[[functions]]
+name = "object_46bf2c_method_00210680"
+address = 0x00210680
+
+[[functions]]
+name = "object_46bf2c_method_00210670"
+address = 0x00210670
+
+[[functions]]
+name = "object_46bf2c_method_00210650"
+address = 0x00210650
+
+[[functions]]
+name = "object_46bf2c_method_00210640"
+address = 0x00210640
+
+[[functions]]
+name = "object_46bf2c_method_00210630"
+address = 0x00210630
+
+[[functions]]
+name = "object_46bf2c_method_00210620"
+address = 0x00210620
+
+[[functions]]
+name = "object_46bf2c_method_00210660"
+address = 0x00210660
+
+[[functions]]
+name = "object_46bf2c_method_00210610"
+address = 0x00210610
+
+[[functions]]
+name = "object_46bf2c_method_00210160"
+address = 0x00210160
+
+[[functions]]
+name = "object_46bf2c_method_00210120"
+address = 0x00210120
+
+[[functions]]
+name = "object_46bf2c_method_00210070"
+address = 0x00210070
+
+[[functions]]
+name = "object_46bf2c_method_0020fea0"
+address = 0x0020fea0
+
+[[functions]]
+name = "object_46bf2c_method_0020fe30"
+address = 0x0020fe30
+
+[[functions]]
+name = "object_46bf2c_method_0020fd90"
+address = 0x0020fd90
+
+[[functions]]
+name = "object_46bf2c_method_0020fd20"
+address = 0x0020fd20
+
+[[functions]]
+name = "object_46bf2c_method_0020fc40"
+address = 0x0020fc40
+
+[[functions]]
+name = "object_46bf2c_method_0020fbd0"
+address = 0x0020fbd0
+
+[[functions]]
+name = "object_46bf2c_method_0020fb50"
+address = 0x0020fb50
+
+[[functions]]
+name = "object_46bf2c_method_0020fb20"
+address = 0x0020fb20
+
+[[functions]]
+name = "object_46bf2c_method_0020fab0"
+address = 0x0020fab0
+
+[[functions]]
+name = "object_46bf2c_method_0020fa30"
+address = 0x0020fa30
+
+[[functions]]
+name = "object_46bf2c_method_0020f9c0"
+address = 0x0020f9c0
+
+[[functions]]
+name = "object_46bf2c_method_0020f950"
+address = 0x0020f950
+
+[[functions]]
+name = "object_46bf2c_method_0020f8e0"
+address = 0x0020f8e0
+
+[[functions]]
+name = "object_46bf2c_method_0020f870"
+address = 0x0020f870
+
+[[functions]]
+name = "object_46bf2c_method_0020e870"
+address = 0x0020e870
+
+[[functions]]
+name = "object_46bf2c_method_0020f810"
+address = 0x0020f810
+
+[[functions]]
+name = "object_46bf2c_method_0020f740"
+address = 0x0020f740
+
+[[functions]]
+name = "object_46bf2c_method_0020f6c0"
+address = 0x0020f6c0
+
+[[functions]]
+name = "object_46bf2c_method_0020f570"
+address = 0x0020f570
+
+[[functions]]
+name = "object_46bf2c_method_0020f4d0"
+address = 0x0020f4d0
+
+[[functions]]
+name = "object_46bf2c_method_0020f1b0"
+address = 0x0020f1b0
+
+[[functions]]
+name = "object_46bf2c_method_0020f0d0"
+address = 0x0020f0d0
+
+[[functions]]
+name = "object_46bf2c_method_0020f070"
+address = 0x0020f070
+
+[[functions]]
+name = "object_46bf2c_method_0020e8c0"
+address = 0x0020e8c0
+
+[[functions]]
+name = "object_46bf2c_method_0020e8a0"
+address = 0x0020e8a0
+
+[[functions]]
+name = "object_46bf2c_method_0020f000"
+address = 0x0020f000
+
+[[functions]]
+name = "object_46bf2c_method_0020efd0"
+address = 0x0020efd0
+
+[[functions]]
+name = "object_46bf2c_method_0020ef50"
+address = 0x0020ef50
+
+[[functions]]
+name = "object_46bf2c_method_0020eed0"
+address = 0x0020eed0
+
+[[functions]]
+name = "object_46bf2c_method_0020ee60"
+address = 0x0020ee60
+
+[[functions]]
+name = "object_46bf2c_method_0020edf0"
+address = 0x0020edf0
+
+[[functions]]
+name = "object_46bf2c_method_0020ed30"
+address = 0x0020ed30
+
+[[functions]]
+name = "object_46bf2c_method_0020ecf0"
+address = 0x0020ecf0
+
+[[functions]]
+name = "object_46bf2c_method_0020ec70"
+address = 0x0020ec70
+
+[[functions]]
+name = "object_46bf2c_method_0020ec00"
+address = 0x0020ec00
+
+[[functions]]
+name = "object_46bf2c_method_0020eb70"
+address = 0x0020eb70
+
+[[functions]]
+name = "object_46bf2c_method_0020eb30"
+address = 0x0020eb30
+
+[[functions]]
+name = "object_46bf2c_method_0020e9f0"
+address = 0x0020e9f0
+
+[[functions]]
+name = "object_46bf2c_method_0020e9a0"
+address = 0x0020e9a0
+
+[[functions]]
+name = "object_46bf2c_method_0020e950"
+address = 0x0020e950
+
+[[functions]]
+name = "object_46bf2c_method_0020e8d0"
+address = 0x0020e8d0
+
+[[functions]]
+name = "object_46bf2c_method_0020e880"
+address = 0x0020e880
+
+# Original method1aae34 publishes vptr46ac50; native2a7ae0 reaches slot28.
+# Retain all original non-null methods46ac58..46ace4.
+[[functions]]
+name = "object_46ac50_method_001aae10"
+address = 0x001aae10
+
+[[functions]]
+name = "object_46ac50_method_001bbe60"
+address = 0x001bbe60
+
+[[functions]]
+name = "object_46ac50_method_001bbc20"
+address = 0x001bbc20
+
+[[functions]]
+name = "object_46ac50_method_001bbbb0"
+address = 0x001bbbb0
+
+[[functions]]
+name = "object_46ac50_method_001bbb40"
+address = 0x001bbb40
+
+[[functions]]
+name = "object_46ac50_method_001bbb20"
+address = 0x001bbb20
+
+[[functions]]
+name = "object_46ac50_method_001bbaa0"
+address = 0x001bbaa0
+
+[[functions]]
+name = "object_46ac50_method_001bb9e0"
+address = 0x001bb9e0
+
+[[functions]]
+name = "object_46ac50_method_001bb9d0"
+address = 0x001bb9d0
+
+[[functions]]
+name = "object_46ac50_method_001bb9c0"
+address = 0x001bb9c0
+
+[[functions]]
+name = "object_46ac50_method_001bb9a0"
+address = 0x001bb9a0
+
+[[functions]]
+name = "object_46ac50_method_001bb990"
+address = 0x001bb990
+
+[[functions]]
+name = "object_46ac50_method_001bb980"
+address = 0x001bb980
+
+[[functions]]
+name = "object_46ac50_method_001bb950"
+address = 0x001bb950
+
+[[functions]]
+name = "object_46ac50_method_001bb780"
+address = 0x001bb780
+
+[[functions]]
+name = "object_46ac50_method_001bb470"
+address = 0x001bb470
+
+[[functions]]
+name = "object_46ac50_method_001bb230"
+address = 0x001bb230
+
+[[functions]]
+name = "object_46ac50_method_001bb010"
+address = 0x001bb010
+
+[[functions]]
+name = "object_46ac50_method_001bab80"
+address = 0x001bab80
+
+[[functions]]
+name = "object_46ac50_method_001ba970"
+address = 0x001ba970
+
+[[functions]]
+name = "object_46ac50_method_001ba260"
+address = 0x001ba260
+
+[[functions]]
+name = "object_46ac50_method_001ba090"
+address = 0x001ba090
+
+[[functions]]
+name = "object_46ac50_method_001ba070"
+address = 0x001ba070
+
+[[functions]]
+name = "object_46ac50_method_001ba010"
+address = 0x001ba010
+
+[[functions]]
+name = "object_46ac50_method_001ba000"
+address = 0x001ba000
+
+[[functions]]
+name = "object_46ac50_method_001b9d50"
+address = 0x001b9d50
+
+[[functions]]
+name = "object_46ac50_method_001b9d40"
+address = 0x001b9d40
+
+[[functions]]
+name = "object_46ac50_method_001b9d30"
+address = 0x001b9d30
+
+[[functions]]
+name = "object_46ac50_method_001b9d20"
+address = 0x001b9d20
+
+[[functions]]
+name = "object_46ac50_method_001b9880"
+address = 0x001b9880
+
+[[functions]]
+name = "object_46ac50_method_001b9810"
+address = 0x001b9810
+
+[[functions]]
+name = "object_46ac50_method_001b92f0"
+address = 0x001b92f0
+
+[[functions]]
+name = "object_46ac50_method_001b9260"
+address = 0x001b9260
+
+[[functions]]
+name = "object_46ac50_method_001b9250"
+address = 0x001b9250
+
+[[functions]]
+name = "object_46ac50_method_001b9000"
+address = 0x001b9000
+
+[[functions]]
+name = "object_46ac50_method_001b8d30"
+address = 0x001b8d30
+
+# Original20dbcc constructs vptr46f360; native2d1c2c reaches slot24.
+# Retain eight original methods46f368..46f384.
+[[functions]]
+name = "object_46f360_method_0020dba0"
+address = 0x0020dba0
+
+[[functions]]
+name = "object_46f360_method_0037e310"
+address = 0x0037e310
+
+[[functions]]
+name = "object_46f360_method_0037e300"
+address = 0x0037e300
+
+[[functions]]
+name = "object_46f360_method_0037e2f0"
+address = 0x0037e2f0
+
+[[functions]]
+name = "object_46f360_method_002cf9e0"
+address = 0x002cf9e0
+
+[[functions]]
+name = "object_46f360_method_002cf9f0"
+address = 0x002cf9f0
+
+[[functions]]
+name = "object_46f360_method_002cfa00"
+address = 0x002cfa00
+
+[[functions]]
+name = "object_46f360_method_002cfbd0"
+address = 0x002cfbd0
+
+# Original vptr46a1c0 is published at168c44; startup2cfc3c calls slot10.
+# Retain all four non-null methods from original46a1c8..46a1d4.
+[[functions]]
+name = "object_46a1c0_method_00168c20"
+address = 0x00168c20
+
+[[functions]]
+name = "object_46a1c0_method_001691c0"
+address = 0x001691c0
+
+[[functions]]
+name = "object_46a1c0_method_00168fc0"
+address = 0x00168fc0
+
+[[functions]]
+name = "object_46a1c0_method_00168c80"
+address = 0x00168c80
+
+
+# Original1be7d4 publishes vptr46adf0; startup2d1c48 calls slot10.
+# Six contiguous non-null methods46adf8..46ae0c, derived only from ELF.
+[[functions]]
+name = "object_46adf0_method_001be7a0"
+address = 0x001be7a0
+
+[[functions]]
+name = "object_46adf0_method_001bf080"
+address = 0x001bf080
+
+[[functions]]
+name = "object_46adf0_method_001beef0"
+address = 0x001beef0
+
+[[functions]]
+name = "object_46adf0_method_001bee70"
+address = 0x001bee70
+
+[[functions]]
+name = "object_46adf0_method_001bedd0"
+address = 0x001bedd0
+
+
+# Original1ca7cc selects service callback1ca610 before registrar1ca7d8.
+# The join at1ca7d8 loses the path-specific constant during discovery.
+[[functions]]
+name = "startup_service_callback_1ca610"
+address = 0x001ca610
+
+# Original1be178 publishes vptr46adb0;2d440c calls slot0c.
+[[functions]]
+name = "object_46adb0_method_001be150"
+address = 0x001be150
+
+[[functions]]
+name = "object_46adb0_method_001be1f0"
+address = 0x001be1f0
+
+[[functions]]
+name = "object_46adb0_method_001be220"
+address = 0x001be220
+
+
+# Native2d1bc0 invokes shared original object-state method11f9c0 at slot0c.
+# Original ELF stores this target in multiple derived vtables (e.g.4699ac).
+[[functions]]
+name = "object_state_dispatch_11f9c0"
+address = 0x0011f9c0
+
+# Original37f174 publishes47a770; startup object888440 reaches380920
+# via original member helper100b40. Retain remaining table methods.
+[[functions]]
+name = "object_47a770_method_0037f140"
+address = 0x0037f140
+
+[[functions]]
+name = "object_47a770_method_00380920"
+address = 0x00380920
+
+[[functions]]
+name = "object_47a770_method_0011f990"
+address = 0x0011f990
+
+
+# Original380740/4c loads44aee0;38076c..78 installs object+4.
+# All12 bytes match original ELF, static RAM and live888444 in long-intro-2.
+[[functions]]
+name = "member_state_00380480"
+address = 0x00380480
+
+# Original member-state descriptors44ae40/50/60 contain direct targets.
+# 380920 installs44ae40; observed helper100b40 dispatch reaches380790.
+[[functions]]
+name = "member_state_00380790"
+address = 0x00380790
+
+[[functions]]
+name = "member_state_00380510"
+address = 0x00380510
+
+[[functions]]
+name = "member_state_00380410"
+address = 0x00380410
+
+
+# Original3807e8 calls slot8, target26bb00 at table46d7d8.
+# Retain contiguous original methods46d7d8..46d7f8.
+[[functions]]
+name = "object_46d7d0_method_0026bb00"
+address = 0x0026bb00
+
+[[functions]]
+name = "object_46d7d0_method_0026b9c0"
+address = 0x0026b9c0
+
+[[functions]]
+name = "object_46d7d0_method_0026b950"
+address = 0x0026b950
+
+[[functions]]
+name = "object_46d7d0_method_0026b4a0"
+address = 0x0026b4a0
+
+[[functions]]
+name = "object_46d7d0_method_0026b4d0"
+address = 0x0026b4d0
+
+[[functions]]
+name = "object_46d7d0_method_0026b520"
+address = 0x0026b520
+
+[[functions]]
+name = "object_46d7d0_method_001762a0"
+address = 0x001762a0
+
+[[functions]]
+name = "object_46d7d0_method_0026b860"
+address = 0x0026b860
+
+[[functions]]
+name = "object_46d7d0_method_0026b7b0"
+address = 0x0026b7b0
+
+
+# Original26bbe4 calls slot10; original table46b1d0 supplies1f4420.
+# Retain five non-null entries46b1d8..46b1e8.
+[[functions]]
+name = "object_46b1d0_method_001f41a0"
+address = 0x001f41a0
+
+[[functions]]
+name = "object_46b1d0_method_001f4160"
+address = 0x001f4160
+
+[[functions]]
+name = "object_46b1d0_method_001f4420"
+address = 0x001f4420
+
+[[functions]]
+name = "object_46b1d0_method_001f43c0"
+address = 0x001f43c0
+
+[[functions]]
+name = "object_46b1d0_method_001f44a0"
+address = 0x001f44a0
+
+
+# Original16c03c bounds index<8;16c05c dispatches eight file-backed labels.
+[[indirect_targets]]
+site = 0x0016c05c
+table_start = 0x0044f7d0
+table_end = 0x0044f7f0
+
+# Original1bb53c slot6c reaches1bfdb0 at table46b050.
+# Retain 26 contiguous original table entries46b058..46b0bc.
+[[functions]]
+name = "object_46b050_method_001bf880"
+address = 0x001bf880
+
+[[functions]]
+name = "object_46b050_method_001c2970"
+address = 0x001c2970
+
+[[functions]]
+name = "object_46b050_method_001c2960"
+address = 0x001c2960
+
+[[functions]]
+name = "object_46b050_method_001c2930"
+address = 0x001c2930
+
+[[functions]]
+name = "object_46b050_method_001c1e00"
+address = 0x001c1e00
+
+[[functions]]
+name = "object_46b050_method_001c1520"
+address = 0x001c1520
+
+[[functions]]
+name = "object_46b050_method_001c14a0"
+address = 0x001c14a0
+
+[[functions]]
+name = "object_46b050_method_001c1460"
+address = 0x001c1460
+
+[[functions]]
+name = "object_46b050_method_001c12e0"
+address = 0x001c12e0
+
+[[functions]]
+name = "object_46b050_method_001c1160"
+address = 0x001c1160
+
+[[functions]]
+name = "object_46b050_method_001c0fe0"
+address = 0x001c0fe0
+
+[[functions]]
+name = "object_46b050_method_001c0f40"
+address = 0x001c0f40
+
+[[functions]]
+name = "object_46b050_method_001c0f10"
+address = 0x001c0f10
+
+[[functions]]
+name = "object_46b050_method_001c0ee0"
+address = 0x001c0ee0
+
+[[functions]]
+name = "object_46b050_method_001c0eb0"
+address = 0x001c0eb0
+
+[[functions]]
+name = "object_46b050_method_001c0e80"
+address = 0x001c0e80
+
+[[functions]]
+name = "object_46b050_method_001c02a0"
+address = 0x001c02a0
+
+[[functions]]
+name = "object_46b050_method_001c0190"
+address = 0x001c0190
+
+[[functions]]
+name = "object_46b050_method_001c0080"
+address = 0x001c0080
+
+[[functions]]
+name = "object_46b050_method_001c0020"
+address = 0x001c0020
+
+[[functions]]
+name = "object_46b050_method_001bffc0"
+address = 0x001bffc0
+
+[[functions]]
+name = "object_46b050_method_001bfec0"
+address = 0x001bfec0
+
+[[functions]]
+name = "object_46b050_method_001bfea0"
+address = 0x001bfea0
+
+[[functions]]
+name = "object_46b050_method_001bfe80"
+address = 0x001bfe80
+
+[[functions]]
+name = "object_46b050_method_001bfe10"
+address = 0x001bfe10
+
+[[functions]]
+name = "object_46b050_method_001bfdb0"
+address = 0x001bfdb0
+
+
+# Original380510 copies member descriptors44ae70..44aed8 into its local
+# dispatch array; helper100b40 is selected at3806bc (observed37fef0).
+[[functions]]
+name = "member_state_0037fef0"
+address = 0x0037fef0
+
+[[functions]]
+name = "member_state_00380050"
+address = 0x00380050
+
+[[functions]]
+name = "member_state_0037fe50"
+address = 0x0037fe50
+
+[[functions]]
+name = "member_state_0037fc60"
+address = 0x0037fc60
+
+[[functions]]
+name = "member_state_0037fac0"
+address = 0x0037fac0
+
+[[functions]]
+name = "member_state_0037f980"
+address = 0x0037f980
+
+[[functions]]
+name = "member_state_0037f7d0"
+address = 0x0037f7d0
+
+
+# Original384538/384544 loads44aef0 descriptor;38456c..78 installs object+4.
+[[functions]]
+name = "member_default_00383440"
+address = 0x00383440
+
+# Original2d1050..5c installs vtable46f350; observed1bbed0 calls slot0c.
+[[functions]]
+name = "object_46f350_method_0016cc40"
+address = 0x0016cc40
+
+[[functions]]
+name = "object_46f350_method_002cf8c0"
+address = 0x002cf8c0
+
+
+# Original2cf8f0/2cf904/2cf918/2cf97c selects slots24/a4/a0/20
+# from vtable469a60, installed at original1218b8..c4.
+[[functions]]
+name = "object_469a60_method_001225c0"
+address = 0x001225c0
+
+[[functions]]
+name = "object_469a60_method_00121970"
+address = 0x00121970
+
+[[functions]]
+name = "object_469a60_method_00121960"
+address = 0x00121960
+
+[[functions]]
+name = "object_469a60_method_001225d0"
+address = 0x001225d0
+
+
+# Original1bf568..84 installs primary46ae90 and secondary46aeb4 tables.
+# Native2bf414 calls primary slot0c, target1bf340.
+[[functions]]
+name = "object_46ae90_method_001bf550"
+address = 0x001bf550
+
+[[functions]]
+name = "object_46ae90_method_001bf340"
+address = 0x001bf340
+
+[[functions]]
+name = "object_46ae90_method_001bf390"
+address = 0x001bf390
+
+[[functions]]
+name = "object_46ae90_method_001bf3f0"
+address = 0x001bf3f0
+
+[[functions]]
+name = "object_46ae90_method_001bf450"
+address = 0x001bf450
+
+[[functions]]
+name = "object_46ae90_method_001bf4b0"
+address = 0x001bf4b0
+
+[[functions]]
+name = "object_46ae90_method_001bf500"
+address = 0x001bf500
+
+[[functions]]
+name = "object_46ae90_method_001bf870"
+address = 0x001bf870
+
+
+# Original3821f8 bounds byte selector<30 before table463bd0 dispatch.
+[[indirect_targets]]
+site = 0x00382218
+table_start = 0x00463bd0
+table_end = 0x00463c48
+
+# Original1bf350..80 installs member descriptor3b3028 at object+14.
+# Connected22653c/100b40 reaches226220 through that descriptor.
+[[functions]]
+name = "member_service_00226220"
+address = 0x00226220
+
+ # Original vtable3e8758, live object3e893c; observed slot18 at2b6bf4.
+ # All fourteen method words at3e8764..3e8798 match original ELF/native RAM.
+[[functions]]
+name = "observed_vtable_3e8758_240b00"
+address = 0x00240b00
+[[functions]]
+name = "observed_vtable_3e8758_240d88"
+address = 0x00240d88
+[[functions]]
+name = "observed_vtable_3e8758_239160"
+address = 0x00239160
+[[functions]]
+name = "observed_vtable_3e8758_23b618"
+address = 0x0023b618
+[[functions]]
+name = "observed_vtable_3e8758_23b8e8"
+address = 0x0023b8e8
+[[functions]]
+name = "observed_vtable_3e8758_23c9a8"
+address = 0x0023c9a8
+[[functions]]
+name = "observed_vtable_3e8758_23cd70"
+address = 0x0023cd70
+[[functions]]
+name = "observed_vtable_3e8758_23b950"
+address = 0x0023b950
+[[functions]]
+name = "observed_vtable_3e8758_23ce78"
+address = 0x0023ce78
+[[functions]]
+name = "observed_vtable_3e8758_23cee8"
+address = 0x0023cee8
+[[functions]]
+name = "observed_vtable_3e8758_23cf60"
+address = 0x0023cf60
+[[functions]]
+name = "observed_vtable_3e8758_23cfd0"
+address = 0x0023cfd0
+[[functions]]
+name = "observed_vtable_3e8758_23b7d0"
+address = 0x0023b7d0
+[[functions]]
+name = "observed_vtable_3e8758_23b720"
+address = 0x0023b720
+
+# Live object94fb40 vtable46ecc0: slots0c..24 all match original ELF.
+[[functions]]
+name = "verified_vtable_46ecc0_2b6e50"
+address = 0x002b6e50
+[[functions]]
+name = "verified_vtable_46ecc0_2b6330"
+address = 0x002b6330
+[[functions]]
+name = "verified_vtable_46ecc0_2b6510"
+address = 0x002b6510
+[[functions]]
+name = "verified_vtable_46ecc0_2b64b0"
+address = 0x002b64b0
+[[functions]]
+name = "verified_vtable_46ecc0_2b64a0"
+address = 0x002b64a0
+
+# Live nine-record registry1009d68, stride0x44; selected slot2 at2563fc.
+# Seven populated original table+8 words match native RAM (startup-object-family).
+[[functions]]
+name = "verified_registry_slot2_246fa8"
+address = 0x00246fa8
+[[functions]]
+name = "verified_registry_slot2_247208"
+address = 0x00247208
+[[functions]]
+name = "verified_registry_slot2_249828"
+address = 0x00249828
+[[functions]]
+name = "verified_registry_slot2_2417c8"
+address = 0x002417c8
+[[functions]]
+name = "verified_registry_slot2_257518"
+address = 0x00257518
+[[functions]]
+name = "verified_registry_slot2_243240"
+address = 0x00243240
+[[functions]]
+name = "verified_registry_slot2_257210"
+address = 0x00257210
+
+# Original241b1c..28 / 241ca4..ac install service+3c; native100b39c agrees.
+[[functions]]
+name = "verified_stream_copy_callback_2419d0"
+address = 0x002419d0
+
+# Original247a04..14 dispatches through4599f0; observed index3 selects248138.
+# These four original pointers4599f0..fc match startup-div1 native RAM.
+# Additive roots do not constrain or replace the guest's actual selection.
+[[functions]]
+name = "verified_parser_dispatch_247ad8"
+address = 0x00247ad8
+[[functions]]
+name = "verified_parser_dispatch_247c48"
+address = 0x00247c48
+[[functions]]
+name = "verified_parser_dispatch_247ea8"
+address = 0x00247ea8
+[[functions]]
+name = "verified_parser_dispatch_248138"
+address = 0x00248138
+
+# Original23a694..b8 registers callback property4b;246194 dispatches it.
+[[functions]]
+name = "verified_stream_property_4b_callback"
+address = 0x0023a6e0
+
+# Original23a560 bounds index<9; all nine words match startup-stream-property.
+[[indirect_targets]]
+site = 0x0023a57c
+table_start = 0x00457e70
+table_end = 0x00457e94
+
+# Original2387d8 bounds index<6; all six words match the same native capture.
+[[indirect_targets]]
+site = 0x002387f4
+table_start = 0x00457840
+table_end = 0x00457858
+
+# Original246590..66b8 constructs each literal callback argument to246980.
+# Native startup-stream-switches observes258080 at the adapter's JALR.
+[[indirect_targets]]
+site = 0x0024698c
+targets = [0x00258080,0x002580d0,0x00258120,0x00258170,0x002582a8,0x002582f8,0x00258348,0x00258398,0x00258450,0x002584a0,0x002584f0]
+
+# Original246750..6954 constructs each literal callback argument to2469b8.
+[[indirect_targets]]
+site = 0x002469c8
+targets = [0x002586f8,0x00258768,0x002587e8,0x00258858,0x002588c8,0x00258938,0x00258a60,0x00258ad0,0x00258b40,0x00258bb0,0x00258c20,0x00258c98,0x00258d08,0x00258d90]
+
+# Newly reached getter258ea8 bounds input-1<8; original/live table agrees.
+[[indirect_targets]]
+site = 0x00258ec8
+table_start = 0x00459fc0
+table_end = 0x00459fe0
+
+# Original22cfc8 bounds selector-1<10; original/live startup-stream-getters agree.
+[[indirect_targets]]
+site = 0x0022cfe4
+table_start = 0x00457490
+table_end = 0x004574b8
+
+# Original255190..1ec selects conversion callback by two metadata fields.
+# Seven nonzero destinations in459cb8..9d00 match startup-video-header RAM.
+[[indirect_targets]]
+site = 0x002551ec
+targets = [0x00255208,0x00255298,0x002552d0,0x00255308,0x00255340,0x002553e0,0x00255478]
+
+# Original2a471c..4774 copies11 entries45b9f8..ba24 to stack.
+# 2a47e4 clamps unsigned index>10 to0; all entries match startup-fdec RAM/stack.
+[[indirect_targets]]
+site = 0x002a47f8
+targets = [0x2a42a8,0x2a43e8,0x2a44d0,0x2a44e0,0x2a44f0,0x2a46d8,0x2a46e8,0x2a4ab8,0x2a4b48,0x2a4be0]
+
+# Original2a5250/5270 bounds index<5; table agrees with startup-movie-extensions.
+[[indirect_targets]]
+site = 0x002a5288
+table_start = 0x0045bb60
+table_end = 0x0045bb74
+
+# Original24f9a0..fa00 registers four literal movie callbacks through2a5bc0.
+# Registration/dispatch bytes and all four live slots match startup-movie-pack.
+[[indirect_targets]]
+site = 0x002a5c90
+targets = [0x0024fac0,0x0024fbc8,0x0024fc70,0x0024fc98]
+
+# Original2a0dd4..e6c loads3ed6d0/3ed6f0 and stores prediction callbacks
+# at context+5c8/+5d8, consumed by2a0f20/34. All16 entries match startup-csc RAM.
+[[indirect_targets]]
+site = 0x002a0f20
+table_start = 0x003ed6d0
+table_end = 0x003ed6f0
+[[indirect_targets]]
+site = 0x002a0f34
+table_start = 0x003ed6f0
+table_end = 0x003ed710
+
+# Original254134..419c installs default worker callbacks atcontext+d28;
+# exact registration code and live slots match startup-motion-spr.
+[[indirect_targets]]
+site = 0x00254b58
+targets = [0x00254b90,0x00254bd8,0x002429c8,0x00254c38,0x00254c58]
+
+# Original2d1b78 calls object slot8; startup-long-intro-1 object94fb40
+# points to46ecc0, whose original/live slot8 agrees on this destructor.
+[[functions]]
+name = "movie_object_destructor_002c8c10"
+address = 0x002c8c10
+
+# Original2d1640 installs46a040 in object888440; long-intro-3 live table
+# matches ELF, slot0x10 dispatches130810 through member helper100b40.
+# Bounded four-method table ends before two zero words;11f9c0 already compiled.
+[[functions]]
+name = "scene_table_0046a040_destructor"
+address = 0x0012c220
+
+[[functions]]
+name = "scene_table_0046a040_initialize"
+address = 0x00130810
+
+[[functions]]
+name = "scene_table_0046a040_method"
+address = 0x0012e1b0
+
+# Live object8fe0d0 uses original4699c0; four slots match ELF exactly,
+# followed by zero words. Original120ee8 tail-dispatches slot0xc (120e80).
+[[functions]]
+name = "scene_buffer_table_destructor"
+address = 0x00120d00
+[[functions]]
+name = "scene_buffer_table_clear"
+address = 0x00120e80
+[[functions]]
+name = "scene_buffer_table_method_10"
+address = 0x00120e10
+[[functions]]
+name = "scene_buffer_table_method_14"
+address = 0x00120db0
+
+# Original live nine-record registry: seven14-entry service tables agree with ELF.
+# Adjacent base459980->4599b8 and459ea8->459ee0 delimit14 entries; other
+# table boundaries also include non-code values after slot13. Evidence: movie-service-tables.json.
+[[indirect_targets]]
+site = 0x0025646c
+targets = [0x2416d0,0x241710,0x2417c8,0x2425f8,0x242b30,0x242c38,0x242c40,0x242c60,0x242c88,0x242ea0,0x242ec0,0x242ee0,0x242f00,0x242f20,0x243230,0x243238,0x243240,0x243390,0x2433d8,0x2433e0,0x243428,0x243470,0x2434b8,0x243510,0x243530,0x243550,0x243570,0x243590,0x246f98,0x246fa0,0x246fa8,0x246fd0,0x246fd8,0x246fe0,0x246fe8,0x246ff0,0x246ff8,0x247000,0x247020,0x247048,0x247068,0x247088,0x247170,0x2471e8,0x247208,0x248c08,0x248d70,0x248dd8,0x248de0,0x248de8,0x248df0,0x248df8,0x248e18,0x248e38,0x248e58,0x248e78,0x249720,0x249808,0x249828,0x24d708,0x24dc80,0x24de28,0x24de30,0x24de38,0x24de40,0x24de48,0x24de68,0x24de88,0x24e130,0x24e258,0x257200,0x257208,0x257210,0x257370,0x257458,0x257460,0x257468,0x257470,0x257478,0x257480,0x2574a0,0x2574c0,0x2574e0,0x257500,0x257508,0x257510,0x257518,0x2576c8,0x2576d0,0x2576d8,0x2576e0,0x2576e8,0x2576f0,0x2576f8,0x257718,0x257738,0x2577b0,0x2577d0]
+
+# Live object8fcec0 / original47a790 agree for14 methods and trailing zeros.
+# Original3921c8 calls slot0x34; provenance: external scene-table-47a790.json.
+[[functions]]
+name = "scene_actor_table_002d0110"
+address = 0x002d0110
+[[functions]]
+name = "scene_actor_table_00394200"
+address = 0x00394200
+[[functions]]
+name = "scene_actor_table_003854b0"
+address = 0x003854b0
+[[functions]]
+name = "scene_actor_table_00385410"
+address = 0x00385410
+[[functions]]
+name = "scene_actor_table_00385370"
+address = 0x00385370
+[[functions]]
+name = "scene_actor_table_00384c20"
+address = 0x00384c20
+[[functions]]
+name = "scene_actor_table_00384e60"
+address = 0x00384e60
+[[functions]]
+name = "scene_actor_table_00384ce0"
+address = 0x00384ce0
+[[functions]]
+name = "scene_actor_table_00384c30"
+address = 0x00384c30
+[[functions]]
+name = "scene_actor_table_00384c50"
+address = 0x00384c50
+[[functions]]
+name = "scene_actor_table_00384c60"
+address = 0x00384c60
+[[functions]]
+name = "scene_actor_table_003913b0"
+address = 0x003913b0
+[[functions]]
+name = "scene_actor_table_00384c70"
+address = 0x00384c70
+[[functions]]
+name = "scene_actor_table_00384cb0"
+address = 0x00384cb0
+
+# Original/live46f4f0 methods plus next392238/392250 calls via44e560.
+# Captured pointers and ELF slots independently agree; scene-next-callbacks.json.
+[[functions]]
+name = "scene_next_callback_002d3fa0"
+address = 0x002d3fa0
+[[functions]]
+name = "scene_next_callback_002d3fc0"
+address = 0x002d3fc0
+[[functions]]
+name = "scene_next_callback_002d4020"
+address = 0x002d4020
+[[functions]]
+name = "scene_next_callback_002d4070"
+address = 0x002d4070
+[[functions]]
+name = "scene_next_callback_002d41b0"
+address = 0x002d41b0
+[[functions]]
+name = "scene_next_callback_002d4220"
+address = 0x002d4220
+[[functions]]
+name = "scene_next_callback_002d4260"
+address = 0x002d4260
+
+# Original1306e0 installs three succeeding descriptors via13072c/774/79c.
+# First descriptor3b0070 matches active888444; all four original/live records agree.
+[[functions]]
+name = "scene_member_transition_001306e0"
+address = 0x001306e0
+[[functions]]
+name = "scene_member_transition_00130520"
+address = 0x00130520
+[[functions]]
+name = "scene_member_transition_0012fb50"
+address = 0x0012fb50
+[[functions]]
+name = "scene_member_transition_0012f720"
+address = 0x0012f720
+
+# Follow-on scene records installed by1305d8 and12fa68/12fadc.
+# Original12-byte descriptors and captured static memory agree.
+[[functions]]
+name = "scene_follow_on_00130460"
+address = 0x00130460
+[[functions]]
+name = "scene_follow_on_0012f290"
+address = 0x0012f290
+[[functions]]
+name = "scene_follow_on_0012f500"
+address = 0x0012f500
+
+# Bounded scene-state descriptor closure: loaded original (0,-1,target)
+# records match captured RAM; adds native coverage only, no dispatch substitution.
+[[functions]]
+name = "scene_verified_descriptor_00130170"
+address = 0x00130170
+[[functions]]
+name = "scene_verified_descriptor_0012ee30"
+address = 0x0012ee30
+[[functions]]
+name = "scene_verified_descriptor_0012e450"
+address = 0x0012e450
+
+# Bounded scene-state descriptor closure: loaded original (0,-1,target)
+# records match captured RAM; adds native coverage only, no dispatch substitution.
+[[functions]]
+name = "scene_verified_descriptor_0012e8c0"
+address = 0x0012e8c0
+
+# Bounded scene-state descriptor closure: loaded original (0,-1,target)
+# records match captured RAM; adds native coverage only, no dispatch substitution.
+[[functions]]
+name = "scene_verified_descriptor_0012e270"
+address = 0x0012e270
+[[functions]]
+name = "scene_verified_descriptor_0012e780"
+address = 0x0012e780
+[[functions]]
+name = "scene_verified_descriptor_0012e6c0"
+address = 0x0012e6c0
+
+# Original1cd4e8/f4 forms callback;1c5388 installs at object+78.
+# Replay10 live3b373c and original indirect consumer1c5cfc agree.
+[[functions]]
+name = "stream_completion_001cda10"
+address = 0x001cda10
+
+# Original1c4dc8..1c4e08 installs these defaults at+78/+80.
+# Replay11 dispatches the latter at1c5dd4 from live3b3744.
+[[functions]]
+name = "stream_default_001c4cb8"
+address = 0x001c4cb8
+[[functions]]
+name = "stream_default_001c4ce8"
+address = 0x001c4ce8
+
+# Original1d5590..1d55a0 registers callback via1ce638 at object+48;
+# replay10 stream object3bfcc0+48 agrees. Batched downstream static coverage.
+[[functions]]
+name = "stream_registered_001d4ff0"
+address = 0x001d4ff0
+
+# Original12c31c installs46a110; replay15 object9c90e4 agrees.
+# Two-method table ends at the next RTTI prefix46a120.
+[[functions]]
+name = "menu_state_00130a40"
+address = 0x00130a40
+[[functions]]
+name = "menu_state_destructor_001309d0"
+address = 0x001309d0
+
+# Original12e4c8 bounds the menu selector below7 before12e4e8 dispatches.
+# Replay17 EE RAM matches all seven original table words (menu-selection-switch.json).
+[[indirect_targets]]
+site = 0x0012e4e8
+table_start = 0x0044e8a0
+table_end = 0x0044e8bc
+
+# Original menu cases copy3b0220/230/240 into the scene member at+4.
+# Their movie-start bodies copy3b00f0/260 there; original/live descriptors agree.
+[[functions]]
+name = "menu_movie_start_0012cb30"
+address = 0x0012cb30
+[[functions]]
+name = "menu_movie_wait_0012ca70"
+address = 0x0012ca70
+[[functions]]
+name = "menu_demo_start_0012ff60"
+address = 0x0012ff60
+[[functions]]
+name = "menu_demo_wait_0012fea0"
+address = 0x0012fea0
+
+# Original wait states install3b0270/100 at12cb10..1c/12ff40..4c.
+[[functions]]
+name = "menu_movie_end_0012c7b0"
+address = 0x0012c7b0
+[[functions]]
+name = "menu_demo_end_0012fbb0"
+address = 0x0012fbb0

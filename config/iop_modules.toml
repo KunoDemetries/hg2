@@ -1,0 +1,625 @@
+# Independent native IOP module placement; not original BIOS addresses.
+# Imports without an explicitly available provider remain unresolved.
+schema_version = 1
+ram_size = 0x200000
+reserved_low = 0xffd0 # Includes the first module's 0x30-byte loader header.
+reserved_high = 0x1f0000
+
+library_providers=[{library="stdio",version=0x103,module="rom_stdio"}]
+
+native_imports=[
+ {library="heaplib",version=0x101,ordinal=4,handler="create_heap"},
+ {library="heaplib",version=0x101,ordinal=5,handler="delete_heap"},
+ {library="heaplib",version=0x101,ordinal=6,handler="alloc_heap_memory"},
+ {library="heaplib",version=0x101,ordinal=7,handler="free_heap_memory"},
+ {library="heaplib",version=0x101,ordinal=8,handler="heap_total_free_size"},
+
+ {library="secrman",version=0x103,ordinal=4,handler="set_secrman_mc_command_callback"},
+ {library="secrman",version=0x103,ordinal=5,handler="set_secrman_mc_devid_callback"},
+ {library="secrman",version=0x103,ordinal=6,handler="authenticate_card"},
+
+ {library="vblank",version=0x101,ordinal=4,handler="wait_vblank_start"},
+ {library="vblank",version=0x101,ordinal=5,handler="wait_vblank_end"},
+
+ {library="dmacman",version=0x102,ordinal=4,handler="set_dma_madr"},
+ {library="dmacman",version=0x102,ordinal=5,handler="get_dma_madr"},
+ {library="dmacman",version=0x102,ordinal=6,handler="set_dma_bcr"},
+ {library="dmacman",version=0x102,ordinal=8,handler="set_dma_chcr"},
+ {library="dmacman",version=0x102,ordinal=9,handler="get_dma_chcr"},
+
+ {library="dmacman",version=0x102,ordinal=14,handler="set_dma_priority_control"},
+ {library="dmacman",version=0x102,ordinal=15,handler="get_dma_priority_control"},
+ {library="dmacman",version=0x102,ordinal=28,handler="set_slice_dma"},
+ {library="dmacman",version=0x102,ordinal=32,handler="start_dma"},
+ {library="dmacman",version=0x102,ordinal=33,handler="set_dma_priority"},
+ {library="dmacman",version=0x102,ordinal=34,handler="enable_dma_channel"},
+ {library="dmacman",version=0x102,ordinal=35,handler="disable_dma_channel"},
+{library="intrman",version=0x102,ordinal=9,handler="enable_cpu_interrupts"},
+{library="intrman",version=0x102,ordinal=8,handler="disable_cpu_interrupts"},
+{library="intrman",version=0x102,ordinal=4,handler="register_interrupt"},
+ {library="intrman",version=0x102,ordinal=5,handler="release_interrupt"},
+ {library="intrman",version=0x102,ordinal=6,handler="enable_interrupt"},
+ {library="intrman",version=0x102,ordinal=7,handler="disable_interrupt"},
+ {library="intrman",version=0x102,ordinal=14,handler="invoke_in_kmode"},
+ {library="intrman",version=0x102,ordinal=17,handler="suspend_interrupts"},
+ {library="intrman",version=0x102,ordinal=18,handler="resume_interrupts"},
+ {library="intrman",version=0x102,ordinal=23,handler="query_interrupt_context"},
+ {library="intrman",version=0x102,ordinal=28,handler="set_new_context_callback"},
+ {library="intrman",version=0x102,ordinal=30,handler="set_should_preempt_callback"},
+]
+
+[[modules]]
+name = "cri_adxi"
+path = "../Haunting Ground (USA)/MODULES/CRI_ADXI.IRX"
+sha256 = "65e4ef1f223eb7f988e28b1e5cda14aee48a7844a561d8a42f31847b6fbbe4c1"
+base = 0x00010000
+# Original +0xef4 bounds the transfer command below14 before +0xf0c.
+# All14 relocated table words agree with connected replay20 RAM.
+indirect_targets = [{site=0xf0c,table_offset=0xaaa0,table_count=14}]
+# The original entry creates these workers; their connected dispatches were
+# observed after the module linked successfully.
+functions = [
+  {name="registered_transfer_callback",offset=0xe90},
+  # Original +0x81e0 chooses these seven rate-dependent callbacks for object
+  # +0x40; connected replay21 reaches the equal-rate callback at +0x8e38.
+  {name="cri_audio_rate_equal",offset=0x8e38},
+  {name="cri_audio_rate_double",offset=0x8eb4},
+  {name="cri_audio_rate_triple",offset=0x926c},
+  {name="cri_audio_rate_quadruple",offset=0x93e8},
+  {name="cri_audio_rate_fraction_up",offset=0x9590},
+  {name="cri_audio_rate_fraction_down",offset=0x9640},
+  {name="cri_audio_rate_integral_down",offset=0x9730},
+  # Original registration at 0x17dfc/0x17e14 through 0x10b0c/0x10b18.
+  {name="registered_command_transfer_callback",offset=0x7af0},
+  {name="registered_command_receive_callback",offset=0x7b9c},
+  {name="registered_receive_callback",offset=0x10e8},
+  {name="cri_adxi_worker_0",offset=0x88},
+  {name="cri_adxi_worker_1",offset=0x7d4},
+  # Original SIFCMD dispatch reached this aligned callback after SYSMEM
+  # initialization allowed the module to finish registering its handlers.
+  {name="cri_adxi_sif_callback",offset=0x720},
+  # The callback's live command table dispatched command zero here.
+  {name="cri_adxi_command_0",offset=0x14b8},
+  # Command zero creates and wakes this worker; the native scheduler then
+  # dispatched its original entry directly.
+  {name="cri_adxi_stream_worker",offset=0x43c0},
+  # The stream worker called this method through the original object table's
+  # +0x20 slot during its first read setup.
+  # The native connected RAM image exposes the original object's complete
+  # non-null method table.  Keep every callable slot explicit for AOT reachability.
+  {name="cri_adxi_stream_method_0c",offset=0x67c4},
+  {name="cri_adxi_stream_method_10",offset=0x6864},
+  {name="cri_adxi_stream_method_14",offset=0x69a8},
+  {name="cri_adxi_stream_method_18",offset=0x6b94},
+  {name="cri_adxi_stream_method_1c",offset=0x6ed8},
+  {name="cri_adxi_stream_method_20",offset=0x6d3c},
+  {name="cri_adxi_stream_method_24",offset=0x6aa4},
+  {name="cri_adxi_stream_method_28",offset=0x7060},
+  {name="cri_adxi_stream_method_2c",offset=0x68f8},
+  # Live object21500 -> table1c460, called +0x24 at1241c (RA12424).
+  # All nine method words match independently relocated original CRI_ADXI data;
+  # startup-sqrt-rounded.ram records the first missing target158e4.
+  {name="cri_adxi_buffer_method_0c",offset=0x5650},
+  {name="cri_adxi_buffer_method_10",offset=0x56f0},
+  {name="cri_adxi_buffer_method_14",offset=0x5834},
+  {name="cri_adxi_buffer_method_18",offset=0x59c8},
+  {name="cri_adxi_buffer_method_1c",offset=0x5e28},
+  {name="cri_adxi_buffer_method_20",offset=0x5c44},
+  {name="cri_adxi_buffer_method_24",offset=0x58e4},
+  {name="cri_adxi_buffer_method_28",offset=0x60e4},
+  {name="cri_adxi_buffer_method_2c",offset=0x5784},
+  # LIBSD retains this original CRI callback in its per-core DMA completion
+  # slot; the connected SPU2 IRQ path called runtime address 0x14870 from
+  # LIBSD 0x31e4c after the first core-0 DMA completion.
+  {name="cri_adxi_spu_dma_callback",offset=0x4870},
+  # The paced input path invokes the original stream completion callback from
+  # object +0x20 via runtime 0x1429c; native capture stopped at 0x11d5c.
+  {name="cri_adxi_stream_completion",offset=0x1d5c},
+  # Next live SIF command dispatch after the first SPU transfer completed.
+  {name="cri_adxi_sif_command_3",offset=0x76ec},
+  # Complete non-null entries from the callback table retained by the native
+  # connected IOP state; several are thin command adapters sharing helpers.
+  {name="cri_adxi_command_adapter_0",offset=0x7cdc},
+  {name="cri_adxi_command_adapter_1",offset=0x7d9c},
+  {name="cri_adxi_command_adapter_2",offset=0x7da8},
+  {name="cri_adxi_command_adapter_3",offset=0x7db8},
+  {name="cri_adxi_command_adapter_8",offset=0x12a8},
+  {name="cri_adxi_command_adapter_9",offset=0x13c0},
+  {name="cri_adxi_command_adapter_10",offset=0x13f8},
+  {name="cri_adxi_command_adapter_11",offset=0x1484},
+  {name="cri_adxi_command_adapter_13",offset=0x14fc},
+  {name="cri_adxi_command_adapter_14",offset=0x151c},
+  {name="cri_adxi_command_adapter_15",offset=0x153c},
+]
+
+[[modules]]
+name = "dbcman"
+path = "../Haunting Ground (USA)/MODULES/DBCMAN.IRX"
+sha256 = "60bfea7d0877df3af370676666e5f1043b6e71723fab94cdff790c19e75e12e7"
+base = 0x00026000
+# Original RPC selector is bounded below99 at +0x1ca0 before table dispatch.
+indirect_targets = [{site=0x1cc0,table_offset=0x2560,table_count=99}]
+# The connected scheduler dispatches the workers created by the original
+# module entry at relocated +0x1d94, +0x1e2c, and +0x1ec4.
+functions = [
+  {name="dbcman_sif_callback",offset=0x1c88},
+  # Original +0x3c8/+0x3cc forms this callback for registration at +0x3d0.
+  {name="dbcman_completion_callback",offset=0x2f4},
+  {name="dbcman_sif_callback_0",offset=0x1cc8},
+  {name="dbcman_sif_callback_1",offset=0x1d68},
+  # Original relocated pointer at +0x2560; live SIFRPC dispatch ra=0x998bc.
+  {name="dbcman_rpc_callback",offset=0x1cd8},
+  {name="dbcman_worker_0",offset=0x1d94},
+  {name="dbcman_worker_1",offset=0x1e2c},
+  {name="dbcman_worker_2",offset=0x1ec4},
+]
+
+[[modules]]
+name = "ds2o_s1"
+path = "../Haunting Ground (USA)/MODULES/DS2O_S1.IRX"
+sha256 = "68f5bcbaba9afad15a2393b7069e5b00dad7d5ab10aef6028327d7a32f632fbc"
+base = 0x0002c000
+# Original entry writes this callback into its CreateThread descriptor at +0x40.
+# SIO2D dispatches original DS2O table pointers +0x1f9c and +0x1fa0.
+# Original controller state byte is bounded <14 before jr+0x2b8.
+indirect_targets = [{site=0x2b8,table_offset=0x1f10,table_count=14}]
+# Original +0x1a60..+0x1aa4 fills six driver callbacks at relocated 0x2e1a0.
+functions = [{name="ds2o_worker",offset=0x164},{name="ds2o_poll_callback",offset=0x1944},{name="ds2o_attach_callback",offset=0x19d8},
+ {name="ds2o_driver_0",offset=0x1b80},{name="ds2o_driver_1",offset=0x1b88},{name="ds2o_driver_2",offset=0x1b90},
+ {name="ds2o_driver_3",offset=0x1bb0},{name="ds2o_driver_4",offset=0x1be4},{name="ds2o_driver_5",offset=0x1c1c}]
+
+[[modules]]
+name = "libsd"
+path = "../Haunting Ground (USA)/MODULES/LIBSD.IRX"
+sha256 = "94915a3d9673e8a370e144ae493552d5e1f3956bb9ae5bd91e2da5f36c83ce7d"
+base = 0x0002f000
+# LIBSD installs these exact callback pointers with RegisterIntrHandler during
+# its original initialization.  The first handles both SPU2 DMA completions;
+# the second is the separately registered SPU interrupt callback.
+functions = [
+  {name="libsd_dma_interrupt",offset=0x29ec},
+  {name="libsd_spu_interrupt",offset=0x4220},
+]
+# Four original selectors perform explicit unsigned bounds checks before these
+# relocated tables.
+indirect_targets = [
+  {site=0x23e4,table_offset=0x4bd0,table_count=9},
+  {site=0x40dc,table_offset=0x4d50,table_count=9},
+  {site=0x3660,table_offset=0x4c50,table_count=20},
+  {site=0x3470,table_offset=0x4c00,table_count=20},
+]
+
+[[modules]]
+name = "mcman"
+path = "../Haunting Ground (USA)/MODULES/MCMAN.IRX"
+sha256 = "b4df4061f8fdc9c7cf06a329b96227ad6ca69d008df475c1fc4d3e8d06fe3fa4"
+base = 0x00035000
+# Original driver operations table +0x11fa0; IOMAN invokes init in connected startup.
+# Original +0xa13c/+0xa140 constructs +0x9f84 for thbase ordinal35.
+functions = [{name="mcman_driver_init",offset=0xfc10},{name="mcman_alarm_callback",offset=0x9f84}]
+# The command selector is checked unsigned <16 before this relocated table.
+indirect_targets = [{site=0x2464,table_offset=0x11c60,table_count=16}]
+
+[[modules]]
+name = "mcserv"
+path = "../Haunting Ground (USA)/MODULES/MCSERV.IRX"
+sha256 = "5006b0dd650fa416d03a559bc8e3bae8a7ae95be81f3e4f3fd9bd524fa27e000"
+base = 0x0005d000
+# Original entry +0x10c/+0x110 builds CreateThread entry, stored at +0x120.
+# Worker +0x2ec/+0x2f0 installs RPC handler +0x324 for service 0x80000400.
+functions = [{name="mcserv_worker",offset=0x280},{name="mcserv_rpc_handler",offset=0x324}]
+
+[[modules]]
+name = "modhsyn"
+path = "../Haunting Ground (USA)/MODULES/MODHSYN.IRX"
+sha256 = "804a40a38d620ecc88b81b90afb8aab262f0540187e8db25eed1ede69131fed1"
+base = 0x00061000
+functions = []
+# Original selectors bound these relocated jump tables before indexing.  Every
+# listed table resolves entirely to executable words in this module.  At
+# +0x9918, selectors 0..9 select six executable targets while selector 10 holds
+# a non-code value; compile only the proven targets so that value still faults.
+indirect_targets = [
+  {site=0x9b1c,table_offset=0xc140,table_count=5},
+  {site=0x97ac,table_offset=0xc260,table_count=11},
+  {site=0xa190,table_offset=0xc178,table_count=7},
+  {site=0x9d94,table_offset=0xc158,table_count=7},
+  {site=0x3014,table_offset=0xc0b0,table_count=35},
+  {site=0x11c8,table_offset=0xbec0,table_count=124},
+  {site=0xb704,table_offset=0xc1a0,table_count=14},
+  {site=0x9918,targets=[0x97c4,0x97cc,0x97dc,0x9820,0x9848,0x987c]},
+]
+
+[[modules]]
+name = "modmidi"
+path = "../Haunting Ground (USA)/MODULES/MODMIDI.IRX"
+sha256 = "c22df1c868d4baa4f51ab45e319e6b76fcab7fe0be7f0d5493a9f60285501489"
+base = 0x00072000
+functions = []
+# Original byte-command selectors enforce these exact table extents before the
+# relocated loads; all entries point into MODMIDI executable sections.
+indirect_targets = [
+  {site=0x14a8,table_offset=0x3988,table_count=100},
+  {site=0x2c38,table_offset=0x3bf0,table_count=128},
+]
+
+[[modules]]
+name = "modmsin"
+path = "../Haunting Ground (USA)/MODULES/MODMSIN.IRX"
+sha256 = "b1a46d7ff1379222af01662b03a972b8e7d23cf2360cbe20c44569df788821ba"
+base = 0x00076000
+functions = []
+
+[[modules]]
+name = "sio2d"
+path = "../Haunting Ground (USA)/MODULES/SIO2D.IRX"
+sha256 = "b07339d0b6ef6021ebb2bd8dba1138f3159b2cdfbf1b29df799694107107d330"
+base = 0x00077000
+# The original module entry creates this worker; the connected native scheduler
+# first dispatched it at relocated +0xae4 after the successful LOADFILE reply.
+functions = [{name="sio2d_worker",offset=0xae4}]
+
+[[modules]]
+name = "sio2man"
+path = "../Haunting Ground (USA)/MODULES/SIO2MAN.IRX"
+sha256 = "565ec77e75f174cfddf72c41ccc446c1c07a3d5fb0a2ccfefad337cb8a7d0728"
+base = 0x00079fd0 # Leave SIO2MAN BSS clear of SNDDRV's loader header at 0x7afd0.
+# Original module entry creates and starts this worker; the native scheduler's
+# live first dispatch reaches relocated +0x39c with a zero argument.
+# Original +0x77c/+0x780 installs this callback for IRQ17 at +0x784.
+functions = [{name="sio2_worker",offset=0x39c},{name="sio2_interrupt",offset=0x584}]
+
+[[modules]]
+name = "snddrv"
+path = "../Haunting Ground (USA)/MODULES/SNDDRV.IRX"
+sha256 = "3b8e76b6fcaa1b3fbe59848a6094bd230d5fe9643496e3aff5f3b969730404bf"
+base = 0x0007b000
+# The original entry creates this worker; the connected native scheduler first
+# dispatched relocated +0x9fcc after LOADFILE linked SNDDRV successfully.
+functions = [
+ {name="snddrv_worker",offset=0x9fcc},
+ {name="snddrv_worker_2",offset=0xa400},
+ {name="snddrv_worker_3",offset=0xa4f4},
+ {name="snddrv_worker_4",offset=0xa5e8},
+ {name="snddrv_rpc_handler",offset=0xa7b4},
+ # Original 0x85540 registers RPC server0x77777778 with handler0x86018.
+ {name="snddrv_bank_rpc_handler",offset=0xb018},
+ # Original timer setup at 0x84c54 passes callback 0x84b80.
+ {name="snddrv_timer_callback",offset=0x9b80},
+]
+
+# Embedded libraries supplied by the game reboot image.
+
+[[modules]]
+name="rom_sysmem"
+native_functions=[{offset=0xfc0,handler="print_console"}]
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="SYSMEM"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="78951a48a2e1179e41b7141a30812c73991040e716a4d04ef76782166947ec1b"
+base=0x94000
+functions=[]
+
+[[modules]]
+name="rom_loadcore"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="LOADCORE"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="f78836df50893f625746b1bc8ff0ff964c44c29e1019dcb23c0b9d1dc50b2e38"
+base=0x96000
+functions=[{name="boot_mode_table_setup",offset=0xcc}]
+# Native startup watch at the GetToc boundary observed LOADCORE's callback
+# argument at +0x076c targeting the original EESYNC entry +0x0080. Unknown
+# runtime values retain the generated dispatch fault.
+indirect_targets=[{site=0x76c,target_refs=[{module="rom_eesync",offset=0x80}]}]
+
+# Public FlushIcache/FlushDcache ABI; native execution uses coherent memory.
+native_functions=[
+ {offset=0xcac,handler="link_static_iop_module"},
+ {offset=0x1bf0,handler="flush_instruction_cache"},
+ {offset=0x1cf4,handler="flush_data_cache"},
+]
+
+[[modules]]
+name="rom_sifcmd"
+## Original initialization stores these command/IRQ function pointers.
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="SIFCMD"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="7874b008124038a4bfb70d4069c037f4ded2d0a452133233cf67df8b0066cc47"
+base=0x98000
+functions=[{name="command_change_address",offset=0},
+           {name="command_set_register",offset=0x1c},
+           {name="command_initialize",offset=0x6c},
+           {name="sif1_interrupt",offset=0x6e8},
+           {name="rpc_request_complete",offset=0xbf0},
+           {name="rpc_bind_request",offset=0x1024},
+           {name="rpc_call_request",offset=0x1264},
+           {name="rpc_receive_request",offset=0xd18}]
+# Native startup provenance observed these two registered callbacks before the
+# GetToc gate. The actual guest register remains runtime-dispatched and any
+# target outside these proven values faults.
+indirect_targets=[
+ {site=0x18b4,target_refs=[{module="rom_loadfile",offset=0x57c}]},
+ {site=0x804,target_refs=[{module="rom_sifcmd",offset=0x1264}]},
+]
+
+[[modules]]
+name="rom_sifman"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="SIFMAN"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="e37e0af7bcce87de48408e7a517a93128c2c2551889c13fb0a50f9e1aea3f4de"
+base=0x9c000
+functions=[{name="sif0_interrupt",offset=0x348}]
+
+[[modules]]
+name="rom_threadman"
+native_functions=[
+ {offset=0x37f0,handler="create_semaphore"},
+ {offset=0x3a1c,handler="signal_semaphore"},
+ {offset=0x3b04,handler="signal_semaphore"},
+ {offset=0x3bd4,handler="wait_semaphore"},
+ {offset=0x2bcc,handler="delay_thread"},
+ {offset=0x1754,handler="change_thread_priority"},
+ {offset=0x22f0,handler="refer_thread_status"},
+ {offset=0xc90,handler="create_thread"},
+ {offset=0xe44,handler="delete_thread"},
+ {offset=0x1288,handler="exit_thread"},
+ {offset=0x1e94,handler="get_thread_id"},
+ {offset=0x2788,handler="sleep_thread"},
+ {offset=0x286c,handler="wakeup_thread"},
+ {offset=0x298c,handler="wakeup_thread"},
+ {offset=0x1074,handler="start_thread"},
+ {offset=0x2490,handler="get_system_status_flag"},
+ {offset=0x2cf0,handler="create_event_flag"},
+ {offset=0x2f18,handler="set_event_flag"},
+ {offset=0x30f0,handler="set_event_flag"},
+ {offset=0x324c,handler="clear_event_flag"},
+ {offset=0x3360,handler="wait_event_flag"},
+ # Original THREADMAN status wrappers share the five-word copier at +0x36a0.
+ {offset=0x36dc,handler="refer_event_status"},
+ {offset=0x3774,handler="irefer_event_status"},
+]
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="THREADMAN"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="d9b5c8c30173338554e637a269680c4d13c8972f6406666e386ad524ca8593d6"
+base=0x9e000
+functions=[{name="threadman_timer_setup",offset=0x3e8},{name="threadman_timer_callback",offset=0x418},{name="threadman_timer_interrupt",offset=0x5a2c}]
+# The original wrapper at +0x6640 selects Threadman's ordinary (+0x5c) or
+# interrupt/preemption (+0x60) scheduling slot from a3, stores it at +0x54,
+# then invokes BIOS context-transfer selector 32. The native scheduler owns the
+# corresponding contexts, so this checked adapter requests its next boundary.
+syscall_handlers=[{site=0x665c,number=32,handler="threadman_reschedule"}]
+# Original selector is checked unsigned <8 before the relocated table.
+indirect_targets=[{site=0x2660,table_offset=0x6ef8,table_count=8}]
+
+[[modules]]
+name="rom_ioman"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="IOMAN"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="2194e7d0eaefaea9d4e4c0c3d2e129cec08481c6c990df9e57048607847aa0d1"
+base=0xa6000
+functions=[{name="builtin_device_operation",offset=0x18e0}]
+# At the native GetToc boundary the original list contains tty and cdrom. These
+# are the exact live operation-vector entries for IOMAN's two-level callbacks.
+# Any later driver target remains a guarded fault until independently observed.
+indirect_targets=[
+ {site=0x19a8,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0xb0}]},
+ {site=0x1ae4,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x390}]},
+ {site=0x1564,target_refs=[{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x1458,target_refs=[{module="rom_cdvdman",offset=0x2c44}]},
+ {site=0x1338,target_refs=[{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x123c,target_refs=[{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x10c0,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x10e8,target_refs=[{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0xee0,target_refs=[{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0xd48,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0xbe8,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x964}]},
+ {site=0xbbc,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0xa7c,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x9c0,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0xb28}]},
+ {site=0x920,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x658}]},
+ {site=0x860,target_refs=[{module="rom_cdvdman",offset=0x2a7c}]},
+ {site=0x790,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x2a2c}]},
+ {site=0x6f8,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x1ef0}]},
+ {site=0x644,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x33d4}]},
+ {site=0x5a4,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x2828}]},
+ {site=0x4b8,target_refs=[{module="rom_cdvdman",offset=0x33fc}]},
+ {site=0x3a4,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x321c}]},
+ {site=0x2f4,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x19e0}]},
+ {site=0xf4,target_refs=[{module="rom_ioman",offset=0x18e0},{module="rom_cdvdman",offset=0x390}]},
+]
+
+[[modules]]
+name="rom_modload"
+entry_hooks=[{offset=0x440,handler="prepare_buffered_module"}]
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="MODLOAD"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="8a70343332d45654e4995fa6f75b5c309ef3cd37cc58db2d372f488b00e9acde"
+base=0xa9000
+# Original LOADFILE dispatch starts this MODLOAD worker at its relocated offset0xca0.
+functions=[{name="modload_worker",offset=0xca0},{name="modload_request_worker",offset=0x295c},{name="modload_return_success",offset=0x2964}]
+# The original wrapper at +0x2e70 loads selector 12 immediately before its
+# syscall.  Its caller passes function,a0,a1 in a0,a1,a2; the selected callback
+# receives the shifted arguments and returns through the caller's preserved ra.
+syscall_handlers=[{site=0x2e74,number=12,handler="invoke_in_kmode"}]
+# MODLOAD's own temporary/object allocations use the public SYSMEM ABI. The
+# connected adapter delegates ordinary storage to original AOT SYSMEM, shared
+# with SIF heap clients; exact preplanned module addresses stay reserved.
+# It never makes arbitrary loaded code executable.
+native_functions=[
+ {offset=0x311c,handler="alloc_system_memory"},
+ {offset=0x3124,handler="free_system_memory"},
+]
+# Original selectors bound their indices before loading these relocated
+# read-only dispatch tables.
+indirect_targets=[
+ {site=0xbdc,table_offset=0x35b0,table_count=8},
+ {site=0x14c8,table_offset=0x3650,table_count=7},
+ {site=0x2910,target_refs=[{module="rom_modload",offset=0x295c}]},
+ # Live post-open request vector at +0x3728 selects +0x29ec here.
+ {site=0x22a4,target_refs=[{module="rom_modload",offset=0x29ec}]},
+ # The following LOADFILE stage selects request-vector slot +8.
+ {site=0x2368,target_refs=[{module="rom_modload",offset=0x296c}]},
+ # Loaded-object copy stage selects request-vector slot +0x18.
+ {site=0x243c,target_refs=[{module="rom_modload",offset=0x29c4}]},
+ # Post-copy cleanup selects request-vector slot +0x14.
+ {site=0x2464,target_refs=[{module="rom_modload",offset=0x299c}]},
+]
+
+[[modules]]
+name="rom_fileio"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="FILEIO"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="270c6408794d7817c5e016dc7f0fba6df4e93db6cb31058dec480fd8270cdb42"
+base=0xad000
+functions=[{name="file_request_worker",offset=0x2298},{name="file_worker",offset=0x2384},{name="rpc_worker",offset=0x290c},{name="rpc_dispatch",offset=0x27d4}]
+# Original RPC selector is checked unsigned <9 before the relocated table.
+indirect_targets=[{site=0x2808,table_offset=0x3188,table_count=9}]
+
+[[modules]]
+name="rom_cdvdman"
+# sceCdSC bounds (code+26)<29 before the relocated dispatch table.
+indirect_targets=[
+ {site=0x4d4c,table_offset=0xcf18,table_count=29},
+ {site=0x2ce0,table_offset=0xc9c0,table_count=140},
+ # Additional original selectors bound these relocated tables directly.
+ {site=0x9508,table_offset=0xd4e0,table_count=33},
+ {site=0x71ec,table_offset=0xd200,table_count=21},
+ {site=0x5ec,table_offset=0xc570,table_count=21},
+ {site=0x2220,table_offset=0xc930,table_count=6},
+]
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="CDVDMAN"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="4262983b6470897a7e015120ab1883685e9821300469f6a325c99ae72a1db856"
+base=0xb2000
+# Original GetToc alarm setup at +0x7040 passes module+0x6ebc.
+# Original setup at +0x505c passes module+0x4288 as the callback while
+# registering hardware interrupt cause 2. Keep it as an explicit AOT root.
+functions=[{name="cdvd_device_init",offset=0xb0},{name="cdvd_device_control",offset=0x2c44},{name="cdvd_loadfile_request",offset=0x19e0},{name="cdvd_finish_request",offset=0x6224},{name="cdvd_interrupt_callback",offset=0x4288},{name="cdvd_toc_timeout",offset=0x6ebc},{name="cdvd_dvd_dma_callback",offset=0x78cc}]
+# The registered IOMAN operation vector at module +0xdb6c identifies these
+# exact read-only file callbacks.  Native storage is backed by the configured
+# identity-checked ISO; unsupported operations remain translated faults.
+native_functions=[
+ {offset=0x19e0,handler="cdvd_open"},
+ {offset=0x1ef0,handler="cdvd_close"},
+ {offset=0x2828,handler="cdvd_read"},
+ {offset=0x321c,handler="cdvd_lseek"},
+]
+
+[[modules]]
+name="rom_cdvdfsv"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="CDVDFSV"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="7bf9682c1ab36bd060c6785080c6529165d00641454d11366cf9c7eb2db9b23f"
+base=0xce000
+# S-command RPC dispatch: unsigned(command-1)<39, scaled by four.
+# N-command handler is registered at+0x4508..+0x4520 with ID0x80000595.
+# Its unsigned(command-1)<19 switch is original table+0x53d0.
+indirect_targets=[{site=0x4060,table_offset=0x5480,table_count=39},
+ {site=0x3cac,table_offset=0x53d0,table_count=19}]
+functions=[{name="cdvd_rpc_n_command",offset=0x3c1c},{name="cdvd_rpc_s_command",offset=0x3ff8},{name="cdvd_rpc_initialize",offset=0x694},{name="cdvd_rpc_bootstrap",offset=0x394},{name="cdvd_rpc_worker_a",offset=0x4354},{name="cdvd_rpc_worker_b",offset=0x44a4},{name="cdvd_rpc_worker_c",offset=0x442c},
+ {name="cdvd_rpc_command_callback",offset=0x7ac},
+ {name="cdvd_rpc_read_dma_callback",offset=0xb58},
+ # Original registration cf150/cfba4 supplies ce920 as callback a1.
+ {name="cdvd_rpc_read_timeout_callback",offset=0x920}]
+
+[[modules]]
+name="rom_loadfile"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="LOADFILE"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="79dbd79942cb241af3116b9ffec425420cdfddf3529b52e8ad3ff3805a32f7a1"
+base=0xd5000
+# Entry creates a server worker whose function begins at entry+0xc8.  Its
+# original RegisterRpc record supplies the handler at offset0x57c.
+functions=[{name="loadfile_worker",offset=0xc8},{name="loadfile_rpc_handler",offset=0x57c}]
+# Handler command is checked unsigned <11 before its relocated dispatch table.
+indirect_targets=[{site=0x5a0,table_offset=0x1ca8,table_count=11}]
+
+[[modules]]
+name="rom_timemani"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="TIMEMANI"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="603d4f54409682d538b7005e0ce396e4a993feafb04ee58d3fd7444f8fb7b291"
+base=0xd7000
+# Native timer interrupt dispatch reached this original callback.
+functions=[{name="timemani_timer_callback",offset=0x878}]
+# Original timer selector is checked unsigned <8 before the relocated table.
+indirect_targets=[{site=0xa80,table_offset=0xed0,table_count=8}]
+
+[[modules]]
+name="rom_romdrv"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="ROMDRV"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="8518392c81f6c8238bf72cc47559c7b9b4a5699449c10690649ae6dcadcf1b24"
+base=0xd9000
+functions=[]
+
+[[modules]]
+name="rom_eesync"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="EESYNC"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="65badfb985e5bba0a0356b5325181137af2d39a7d12c42061b9f19e6cd0f5452"
+base=0xda000
+# Original entry passes this completion callback to LOADCORE export20.
+functions=[{name="boot_complete",offset=0x80}]
+
+[[modules]]
+name="rom_sysclib"
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="SYSCLIB"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="96e8bf4a2cb888c2d81ea7280588ae3afb17ea34802c5d9de80984715631988c"
+base=0xdb000
+functions=[]
+
+# sprintf/vsprintf pass offset0x16b0 to prnt; prnt indexes 121 relocated format targets.
+indirect_targets=[
+  {site=0x230,targets=[0x16b0]},
+  {site=0x260,targets=[0x16b0]},
+  {site=0x860,targets=[0x16b0]},
+  {site=0x890,targets=[0x16b0]},
+  {site=0x6ac,targets=[0x16b0]},
+  {site=0x6dc,targets=[0x16b0]},
+  {site=0x6fc,targets=[0x16b0]},
+  {site=0x714,targets=[0x16b0]},
+  {site=0x740,targets=[0x16b0]},
+  {site=0x778,targets=[0x16b0]},
+  {site=0x7b4,targets=[0x16b0]},
+  {site=0x7d8,targets=[0x16b0]},
+  {site=0x814,targets=[0x16b0]},
+  {site=0x2b8,table_offset=0x18c0,table_count=121},
+]
+
+[[modules]]
+name="rom_stdio"
+native_functions=[{offset=0x1e4,handler="print_console"}]
+path="../Haunting Ground (USA)/MODULES/IOPRP300.IMG"
+member="STDIO"
+container_sha256="8e11fc76bbdd5770a47a56549d861c0caebc9f9190a1cf936990dcff9e5a86c5"
+sha256="fcd9f4edf55578083675940da2e48e7436c19ad32b69e9910c2ed2faaf1f69ff"
+base=0xdd000
+functions=[]
+
+
+# Original CK01 ELF embedded in the verified EE executable.
+[[modules]]
+name="ck01"
+path="../Haunting Ground (USA)/SLUS_210.75"
+offset=0x34aa20
+size=0x359
+container_sha256="3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8"
+sha256="4ca27d8c457807cd6bcf5a8b4fb79f51b4a1ba00b8c10a0dc94936be9339ec51"
+base=0xe0030
+functions=[]
