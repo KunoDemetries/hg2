@@ -51,10 +51,11 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 		libudev1 \
 	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# The editor side.
+# The editor side. linux-perf samples native replays (`perf record -g`); user-space
+# sampling of our own processes needs no extra capabilities in docker-compose.yml.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get install -y --no-install-recommends \
-		gdb less procps sudo bash-completion openssh-client ripgrep \
+		gdb less procps sudo bash-completion openssh-client ripgrep linux-perf \
 	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # XDG_RUNTIME_DIR for root; docker-compose.yml binds the host sockets into it.
