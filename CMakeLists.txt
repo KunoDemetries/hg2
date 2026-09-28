@@ -18,6 +18,9 @@ if(MSVC AND (CMAKE_GENERATOR_PLATFORM STREQUAL "x64" OR
    (NOT CMAKE_GENERATOR_PLATFORM AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$")))
   set_source_files_properties(runtime/fpu_add4_avx2.cpp PROPERTIES COMPILE_OPTIONS /arch:AVX2)
   set_source_files_properties(runtime/fpu_madd4_er.cpp PROPERTIES COMPILE_OPTIONS /arch:AVX512)
+elseif(NOT MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$")
+  # GCC/Clang lambdas do not inherit target("avx2"); callers are CPU-guarded.
+  set_source_files_properties(runtime/fpu_add4_avx2.cpp PROPERTIES COMPILE_OPTIONS -mavx2)
 endif()
 target_include_directories(hg_vu_products PUBLIC runtime/include)
 add_library(hg_runtime INTERFACE)

@@ -2032,7 +2032,7 @@ int main() {
             hg::GsRegisterState gs;gs.ensure_vram();
             for(unsigned n=0;n<gs.vram.size();++n)gs.vram[n]=0xb3729401u+n*2654435761u;
             gs.value[0x4c+context]=(wrap?511ull:0ull)|(2ull<<16)|(1ull<<24)|(std::uint64_t(mask)<<32);
-            gs.value[0x4e+context]=1ull<<32;
+            gs.value[0x4e + context]=1ull<<32;
             gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
             gs.value[0x40+context]=9ull|(94ull<<16)|(7ull<<32)|(44ull<<48);
             gs.value[6+context]=(wrap?16370ull:0ull)|(2ull<<14)|(6ull<<26)|(5ull<<30)|(1ull<<34);
@@ -2065,7 +2065,7 @@ int main() {
             for(unsigned n=0;n<gs.vram.size();++n)gs.vram[n]=0x7963c15bu+n*2654435761u;
             for(unsigned n=0;n<512;++n){gs.clut[n]=std::uint16_t(n*197+93);gs.clut_valid[n]=true;}
             gs.value[0x4c+context]=(2ull<<16)|(std::uint64_t(scenario&2?0x00aa5500u:0u)<<32);
-            gs.value[0x4e+context]=1ull<<32;gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
+            gs.value[0x4e + context]=1ull<<32;gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
             gs.value[0x40+context]=(31ull<<16)|(15ull<<48);
             gs.value[6+context]=(alias?0ull:16370ull)|(3ull<<14)|(0x14ull<<20)|
                 (5ull<<26)|(4ull<<30)|(1ull<<34)|(std::uint64_t((scenario>>3)&3)<<35)|(std::uint64_t(csa)<<56);

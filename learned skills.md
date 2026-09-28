@@ -904,3 +904,7 @@ The candidate preserved the established frame/EE/GS/VU/normalized-IOP hashes and
 ### HG-FAIL-044 - Exact CPU micro-optimizations inside the qualified drift band are not wins
 
 Two low-level candidates preserved the fixed gameplay verifier but failed to clear current host variance. IOP straight-line switch fallthrough kept every original dispatch budget/trace/load-delay boundary and measured12.963275FPS. Replacing IPU/GIF/VIF1/SIF1 source-qword byte assembly with portable native64-bit loads passed runtime/translation/VU tests and exact retained state, but measured13.005903FPS. Adjacent clean qualified runs span12.913251..13.083097FPS. Both candidates were restored byte-exactly. Do not stack tiny dispatch/load changes whose only evidence sits inside that band; target a measured cost large enough to produce a repeatable paired gain.
+
+### HG-LEARN-054 - Keep source portable to GCC/Clang pp-number and target-attribute rules
+
+MSVC accepts `0x4e+context`, but GCC/Clang lex it as one invalid preprocessing number because hex digit `e` followed by `+`/`-` looks like an exponent. Put spaces around `+`/`-` after any hex literal ending in `e`/`E` (grep `0[xX][0-9a-fA-F]*[eE][+-]`). GCC lambdas also do not inherit a surrounding `__attribute__((target("avx2")))`, so always-inline AVX2 helpers called from lambdas fail to inline; compile AVX2-only, CPU-guarded dispatch files with per-file `-mavx2` (mirroring MSVC `/arch:AVX2`). Evidence: 2026-09-28 Debian trixie GCC build of the base runtime and full `hg_game`.

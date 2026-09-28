@@ -875,7 +875,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
     // Reduce the existing pixel pipeline only when its tests always pass,
     // depth is masked and blending is disabled. RGB24 preserves the high
     // byte and ignores FBA. Keep live texture reads and row-major writes.
-    const auto frame=value[0x4c+context],test=value[0x47+context],zbuf=value[0x4e+context];
+    const auto frame=value[0x4c+context],test=value[0x47+context],zbuf=value[0x4e + context];
     const auto frame_width=std::uint32_t((frame>>16)&0x3f)*64;
     const auto zpsm=unsigned((zbuf>>24)&15);
     const bool direct_rgb24=((frame>>24)&63)==1 && frame_width &&
@@ -1291,7 +1291,7 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
     --first_covered_y;
     if(gs_triangle_accelerator&&(!textured||(!fst&&perspective.ready))&&!(draw.prim_state&(1u<<5))) {
         const auto submit=[&] {
-            const auto frame=value[0x4c+context],zbuf=value[0x4e+context],test=value[0x47+context];
+            const auto frame=value[0x4c+context],zbuf=value[0x4e + context],test=value[0x47+context];
             const auto tex0=value[6+context],clamp=value[8+context],alpha=value[0x42+context];
             const auto width=unsigned((frame>>16)&63)*64,format=unsigned((tex0>>20)&63);
             const auto zformat=unsigned((zbuf>>24)&15);
