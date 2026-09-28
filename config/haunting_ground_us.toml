@@ -5,16 +5,249 @@ path = "../Haunting Ground (USA)/SLUS_210.75"
 sha256 = "3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8"
 
 [analysis]
-max_instructions = 200000
+# Original post-movie direct discovery exceeds200000; the old cap omitted
+# startup fall-through16af48 in candidate71. Keep a bounded larger work limit.
+max_instructions = 400000
 # Follow syscall wrappers only when an immediately preceding addiu v1,zero,N
 # proves one of these returning services. This does not bypass runtime handling.
 returning_syscalls = [0x02,0x45,0x6b,-120,-119,-118,-67,-52,-49,-47,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x20,0x22,0x29,0x2b,0x2f,0x30,0x32,0x33,0x35,0x37,0x39,0x3c,0x3d,0x3e,0x40,0x41,0x42,0x44,0x4a,0x4b,0x5a,0x5b,0x64,0x70,0x71,0x74,0x76,0x77,0x78,0x79,0x7a,0x7c,0x7f,0x83]
+
+# Candidate80 original VIF packet independently proves an MPG upload of 95
+# pairs from this file-backed ELF address to VU1 MicroMem 0, followed by MSCAL 0.
+# Game-derived words remain generated only under out/; this records provenance.
+[[vu1_programs]]
+name = "opening_mscal0"
+source = 0x003ac418
+micro_address = 0x0000
+pair_count = 95
+entries = [0x0000, 0x0060, 0x02e0]
+
+# Fresh post-opening VU1 fault capture proves MicroMem[0..83) exactly equals the
+# original file-backed payload after VIF code 0x4a530000 at3a7554: MPG NUM=0x53,
+# destination0, source3a7558. The live AOT fault reports MSCAL entry0. Structural
+# analysis keeps all reachable control flow inside these83 pairs; the later stale
+# tail belongs to the prior opening program and is unreachable from this entry.
+[[vu1_programs]]
+name = "post_opening_mscal0"
+source = 0x003a7558
+micro_address = 0x0000
+pair_count = 83
+entries = [0x0000, 0x0060, 0x0288]
+
+# Fresh post-PSMZ24 replay proves original3a7814 VIF code4a000000 uploads
+# 256 pairs from3a7818 to MicroMem0. Original3a801c code4a140100 then uploads
+# 20 pairs from3a8020 at MicroMem byte0x800. Entry0 first ends at0x48; MSCNT
+# resumes at0x58 and its independently decoded branch0x7a8 reaches0x870 inside
+# the second upload. Match and compile the exact final contiguous 276-pair image.
+[[vu1_programs]]
+name = "scene_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0890]
+[[vu1_programs.uploads]]
+source = 0x003a7818
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a8020
+micro_address = 0x0800
+pair_count = 20
+
+# Fresh continue-vu1-pipeline capture proves the next live MicroMem image is
+# original3a80e4 VIF code4a000000 (MPG256 to0 from source3a80e8) followed by
+# original3a88ec code4a300100 (MPG48 to pair0x100 from source3a88f0). Entry0
+# reaches the early END at0x48; later continuation entries must still be observed
+# before adding them. The complete304-pair image has no external direct target.
+[[vu1_programs]]
+name = "scene2_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0970]
+[[vu1_programs.uploads]]
+source = 0x003a80e8
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a88f0
+micro_address = 0x0800
+pair_count = 48
+
+# Fresh continue-vu1-scene2-loop capture proves original3a8a94 VIF code
+# 4a000000 uploads256 pairs from3a8a98 to MicroMem0, followed by original
+# 3a929c code4a500100 uploading80 pairs from3a92a0 at pair0x100. Entry0
+# is independently observed and compiles inside this exact336-pair image.
+[[vu1_programs]]
+name = "scene3_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0a70]
+[[vu1_programs.uploads]]
+source = 0x003a8a98
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a92a0
+micro_address = 0x0800
+pair_count = 80
+
+# Fresh continue-stq-late-fix capture proves original3a38e4 VIF code
+# 4a000000 uploads256 pairs from3a38e8 to MicroMem0, followed by original
+# 3a40ec code4a540100 uploading84 pairs from3a40f0 at pair0x100. Entry0 is
+# independently observed and terminates before later unsupported paths.
+[[vu1_programs]]
+name = "scene4_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0a90]
+[[vu1_programs.uploads]]
+source = 0x003a38e8
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a40f0
+micro_address = 0x0800
+pair_count = 84
+
+# Fresh continue-vu1-scene4-loop capture proves original3a43b4 VIF code
+# 4a000000 uploads256 pairs from3a43b8 to MicroMem0, followed by original
+# 3a4bbc code4a700100 uploading112 pairs from3a4bc0 at pair0x100. Entry0
+# is independently observed; the exact368-pair image has no external direct
+# control target or unsupported decoded pair.
+[[vu1_programs]]
+name = "scene5_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0b70]
+[[vu1_programs.uploads]]
+source = 0x003a43b8
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a4bc0
+micro_address = 0x0800
+pair_count = 112
+
+# Fresh continue-vu1-scene5-loop capture proves original3a6c34 VIF code
+# 4a000000 uploads256 pairs from3a6c38 to MicroMem0, followed by original
+# 3a743c code4a1e0100 uploading30 pairs from3a7440 at pair0x100. Bytes above
+# MicroMem0x8f0 remain stale from the prior program and are intentionally not
+# part of this program identity unless live control later proves they are used.
+[[vu1_programs]]
+name = "scene6_mscal0_composite"
+entries = [0x0000, 0x0058, 0x08d8]
+[[vu1_programs.uploads]]
+source = 0x003a6c38
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a7440
+micro_address = 0x0800
+pair_count = 30
+
+# Fresh continue-vu1-scene6-loop capture proves original3ab3c4 VIF code
+# 4a000000 uploads256 pairs from3ab3c8 to MicroMem0, followed by original
+# 3abbcc code4a240100 uploading36 pairs from3abbd0 at pair0x100. Entry0
+# is independently observed; the exact292-pair uploaded image has no external
+# direct target or unsupported decoded pair.
+[[vu1_programs]]
+name = "scene7_mscal0_composite"
+entries = [0x0000, 0x0010, 0x0908]
+[[vu1_programs.uploads]]
+source = 0x003ab3c8
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003abbd0
+micro_address = 0x0800
+pair_count = 36
+
+# Fresh continue-vu1-scene7-defined capture proves original3a2014 VIF code
+# 4a000000 uploads256 pairs from3a2018 to MicroMem0, followed by original
+# 3a281c code4ada0100 uploading218 pairs from3a2820 at pair0x100. Entry0
+# is independently observed; the exact474-pair image has no external direct
+# target or unsupported decoded pair.
+[[vu1_programs]]
+name = "scene8_mscal0_composite"
+entries = [0x0000, 0x0080, 0x0ec0]
+[[vu1_programs.uploads]]
+source = 0x003a2018
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a2820
+micro_address = 0x0800
+pair_count = 218
+
+# Fresh continue-vu1-scene8-loop capture proves original3a58c4 VIF code
+# 4a730000 uploads115 pairs from3a58c8 to MicroMem0. The previously loaded
+# scene8 tail remains stale above this range and is intentionally excluded.
+# Entry0 is independently observed; the exact115-pair image has no external
+# direct target or unsupported decoded pair.
+[[vu1_programs]]
+name = "scene9_mscal0_main115"
+source = 0x003a58c8
+micro_address = 0x0000
+pair_count = 115
+entries = [0x0000, 0x00a8, 0x0380]
+
+# Fresh continue-vu1-scene9-loop capture proves original3a4f64 VIF code
+# 4a000000 uploads256 pairs from3a4f68 to MicroMem0, followed by original
+# 3a576c code4a260100 uploading38 pairs from3a5770 at pair0x100. Entry0
+# is independently observed; the exact294-pair image has no external direct
+# target or unsupported decoded pair.
+[[vu1_programs]]
+name = "scene10_mscal0_composite"
+entries = [0x0000, 0x0058, 0x0920]
+[[vu1_programs.uploads]]
+source = 0x003a4f68
+micro_address = 0x0000
+pair_count = 256
+[[vu1_programs.uploads]]
+source = 0x003a5770
+micro_address = 0x0800
+pair_count = 38
+
+# Fresh continue-vu1-scene10-loop capture proves original3abd14 VIF code
+# 4adb0000 uploads219 pairs from3abd18 to MicroMem0. The previously loaded
+# tail above0x6d8 is stale and intentionally excluded. Entry0 is independently
+# observed; the exact219-pair image has no external target or unsupported pair.
+[[vu1_programs]]
+name = "scene11_mscal0_main219"
+source = 0x003abd18
+micro_address = 0x0000
+pair_count = 219
+entries = [0x0000, 0x0010, 0x06c0]
 
 # Addresses are virtual EE byte addresses. End is exclusive. Function ranges
 # bound discovery, not proof that every word inside them is executable.
 [[functions]]
 name = "entry"
 address = 0x00100008
+
+# Original descriptor records 0x003af290..0x003af2c8 use the member-call
+# helper profile (adjustment=0, selector=-1, target) and are copied by original
+# initializer 0x00464860 into the active descriptor block. Fresh live EE RAM
+# contains the same four target words; each target is independently decoded.
+[[functions]]
+name = "intro_member_callback_1291c0"
+address = 0x001291c0
+[[functions]]
+name = "intro_member_callback_128db0"
+address = 0x00128db0
+[[functions]]
+name = "intro_member_callback_1287b0"
+address = 0x001287b0
+[[functions]]
+name = "intro_member_callback_1284c0"
+address = 0x001284c0
+
+# Expanded original member family made reachable by the four roots above.
+# Fresh direct-member evidence and live EE RAM prove these additional descriptors.
+[[functions]]
+name = "intro_member_callback_129090"
+address = 0x00129090
+[[functions]]
+name = "intro_member_callback_128ca0"
+address = 0x00128ca0
+[[functions]]
+name = "intro_member_callback_128970"
+address = 0x00128970
+[[functions]]
+name = "intro_member_callback_1286f0"
+address = 0x001286f0
+[[functions]]
+name = "intro_member_callback_128390"
+address = 0x00128390
 
 # Connected EE clock dispatches registered INTC11 handler277110 at227303us.
 # Original body reads T2_MODE/COUNT and acknowledges its timer flags.
@@ -483,6 +716,141 @@ address = 0x0026eca0
 name = "ee_formatter_upper_hex_target_26e22c"
 address = 0x0026e22c
 
+# Original installer 0x0020a868..0x0020a874 publishes the file-backed table
+# 0x0046e4c0.  The following installer at 0x0020a878 begins the next table at
+# 0x0046e500, independently bounding this family.  Connected execution at
+# 0x0020956c..0x00209578 selected slot +0x0c -> 0x002b1100.  The remaining
+# non-null entries are rooted in the same batch to avoid one rebuild per
+# virtual slot; every word below is an initialized executable pointer in the
+# original USA ELF.  The supplied non-rendering function list was consulted
+# only afterward to corroborate boundaries.
+[[functions]]
+name = "object_table_46e4c0_slot08"
+address = 0x002b10a0
+
+[[functions]]
+name = "object_table_46e4c0_slot0c"
+address = 0x002b1100
+
+[[functions]]
+name = "object_table_46e4c0_slot10"
+address = 0x002b1120
+
+[[functions]]
+name = "object_table_46e4c0_slot14"
+address = 0x002b1130
+
+[[functions]]
+name = "object_table_46e4c0_slot18"
+address = 0x00209800
+
+[[functions]]
+name = "object_table_46e4c0_slot1c"
+address = 0x002097f0
+
+[[functions]]
+name = "object_table_46e4c0_slot20"
+address = 0x002b1140
+
+[[functions]]
+name = "object_table_46e4c0_slot24"
+address = 0x002b1150
+
+[[functions]]
+name = "object_table_46e4c0_slot28"
+address = 0x002b11a0
+
+[[functions]]
+name = "object_table_46e4c0_slot2c"
+address = 0x002a8940
+
+[[functions]]
+name = "object_table_46e4c0_slot30"
+address = 0x002b1110
+
+[[functions]]
+name = "object_table_46e4c0_slot34"
+address = 0x002b1180
+
+[[functions]]
+name = "object_table_46e4c0_slot38"
+address = 0x002b1170
+
+[[functions]]
+name = "object_table_46e4c0_slot3c"
+address = 0x00128080
+
+# Original member-dispatch adapter2b11a0 indexes runtime descriptors at1990bd0
+# with a12-byte stride and tail-calls the generic member helper100b40. Fresh
+# connected execution selects direct target2b12d0. Original466350..466400
+# independently constructs descriptors0..3 at1990bd0..1990bfc from initialized
+# static records4055d0..405608; original466410..466430 constructs descriptor4
+# at1990c00..1990c08 from initialized record405a90. Original466440 begins a
+# different initializer at1990c10, bounding this family to exactly five direct
+# descriptors:2b14a0,2b1400,2b12d0,2b11d0,2b1700. Root all five together.
+[[functions]]
+name = "member_descriptor_1990bd0_target_002b14a0"
+address = 0x002b14a0
+[[functions]]
+name = "member_descriptor_1990bdc_target_002b1400"
+address = 0x002b1400
+[[functions]]
+name = "member_descriptor_1990be8_target_002b12d0"
+address = 0x002b12d0
+[[functions]]
+name = "member_descriptor_1990bf4_target_002b11d0"
+address = 0x002b11d0
+[[functions]]
+name = "member_descriptor_1990c00_target_002b1700"
+address = 0x002b1700
+
+# Fresh connected execution inside2b12d0 initializes object17f6640 and reaches
+# slot+0x0c ->322430. Original2b1338..1348 materializes474000 and stores it at
+# object+0. Live EE RAM and initialized USA ELF agree on primary table474000:
+# two null prefix words, six executable methods474008..47401c, then null words
+# at474020/474024 before the distinct adjacent table beginning at474020.
+# All six primary methods were missing from the generated image; root together.
+[[functions]]
+name = "object_474000_method_00321910"
+address = 0x00321910
+[[functions]]
+name = "object_474000_method_00322430"
+address = 0x00322430
+[[functions]]
+name = "object_474000_method_00321fe0"
+address = 0x00321fe0
+[[functions]]
+name = "object_474000_method_00321e30"
+address = 0x00321e30
+[[functions]]
+name = "object_474000_method_00321d20"
+address = 0x00321d20
+[[functions]]
+name = "object_474000_method_002d63d0"
+address = 0x002d63d0
+
+# Fresh replay after the474000 batch advances to350a10 from original2b1264..78.
+# Original2b1240..48 materializes478bc0 and installs it at the newly allocated
+# object+0. Live EE RAM agrees with initialized USA ELF data:478bc0/4 are null,
+# executable methods occupy478bc8..478bdc, then478be0/4 are null before the
+# distinct adjacent table at478be8. Method2d63d0 is already reachable through
+# the474000 family, so root only the five missing methods from this bounded table.
+[[functions]]
+name = "object_478bc0_method_003507b0"
+address = 0x003507b0
+[[functions]]
+name = "object_478bc0_method_00350a10"
+address = 0x00350a10
+[[functions]]
+name = "object_478bc0_method_00350910"
+address = 0x00350910
+[[functions]]
+name = "object_478bc0_method_00350860"
+address = 0x00350860
+[[functions]]
+name = "object_478bc0_method_00350810"
+address = 0x00350810
+
 # Helper bodies assigned to syscall slots by the game's startup. Names describe
 # independently decoded behavior, not PCSX2's function discovery.
 [[functions]]
@@ -531,6 +899,378 @@ entry_offsets = [0]
 site = 0x0011a5b0
 table_start = 0x0044dda0
 table_end = 0x0044df04
+
+# Original10ccfc bounds selector to <59, then10cd08..1c indexes the original
+# 59-word table44d480..44d568 and jumps to labels inside the same function.
+# Connected execution selected table entry19 ->10cd50.
+[[indirect_targets]]
+site = 0x0010cd1c
+table_start = 0x0044d480
+table_end = 0x0044d56c
+
+# Original1ff9e4 loads an unsigned byte selector,1ff9e8 bounds it below0xdb,
+# and1ff9f4..1ffa08 indexes the original initialized word table4565f0 before
+# jumping through the selected entry. The exact219-word extent ends at45695c;
+# all entries are executable labels inside1ffa10..1ffb50 (21 unique targets).
+# Fresh connected execution reached this dispatcher after rooting primary
+# object table46b3a0, so compile the complete independently bounded switch.
+[[indirect_targets]]
+site = 0x001ffa08
+table_start = 0x004565f0
+table_end = 0x0045695c
+
+# Original2003dc loads the record command byte and2003e0 bounds it below0x13.
+# Original2003ec..200400 then indexes the initialized19-word table4569c0..456a0c
+# and jumps through it. All19 entries are distinct executable labels local to the
+# original2003c0 body (200408..200814). Fresh connected execution selected2004a8.
+[[indirect_targets]]
+site = 0x00200400
+table_start = 0x004569c0
+table_end = 0x00456a0c
+
+# Original1ffcc8 loads an unsigned selector and1ffccc bounds it below6;
+# 1ffcd8..1ffcec indexes initialized table456960 and jumps through it.
+# The six executable case labels1ffcf4..1ffd94 end at null456978/7c.
+# Fresh gameplay continuation selected entry2 ->1ffd2c.
+[[indirect_targets]]
+site = 0x001ffcec
+table_start = 0x00456960
+table_end = 0x00456978
+
+# Original2029e4 loads an unsigned command byte and2029e8 bounds it below0xdb.
+# Original2029f4..202a08 then indexes initialized table456a60 and jumps through
+# the selected word. The exact219-entry extent ends at456dcc; all entries are
+# executable original labels, with148 unique targets spanning202a10..2073f4.
+# Fresh gameplay continuation selected entry5 ->202bc4. Repeated2073f4 entries
+# are the original common fallback path, so retain the complete bounded table.
+[[indirect_targets]]
+site = 0x00202a08
+table_start = 0x00456a60
+table_end = 0x00456dcc
+
+# Original1213a4 loads the command byte. For values >=0xf0,1213b4 subtracts
+# 0xf0 and1213b8 bounds the normalized selector below0x0c.1213c4..d8 indexes
+# the initialized12-word table44e500..44e530 and jumps through it. All entries
+# are local labels inside121380 (1213e0,121408,121430,121448,121470); fresh
+# connected execution selected121408. The exclusive end is also the independently
+# verified start of the neighboring seven-word table below.
+[[indirect_targets]]
+site = 0x001213d8
+table_start = 0x0044e500
+table_end = 0x0044e530
+
+# Original12151c loads an unsigned command byte,121520 subtracts0xf0 and121524
+# bounds the normalized selector below7. Original121530..544 then indexes the
+# initialized seven-word table44e530..44e54c and jumps through it. All seven
+# entries are distinct executable labels local to1214f0 (121550,121568,121580,
+# 1215b0,1215e8,121618,121650). Fresh connected execution selected121568.
+[[indirect_targets]]
+site = 0x00121544
+table_start = 0x0044e530
+table_end = 0x0044e54c
+
+# Original1fc794 loads the command byte,1fc79c bounds it below0x66, and
+# 1fc7a8..1fc7bc indexes initialized table456450 before jumping through the
+# selected entry. The exact102-word table ends at4565e8; all102 entries are
+# distinct executable labels inside the same1fc760 method body (1fc7c4..1ff328).
+# Fresh connected execution selected the first missing local case at1fc7c4.
+[[indirect_targets]]
+site = 0x001fc7bc
+table_start = 0x00456450
+table_end = 0x004565e8
+
+# Original2093b0 masks the selector to8 bits and2093b8/2093e8 bounds it
+# below6 before2093f4..209404 indexes the initialized six-word table456dd0.
+# Every table entry is executable in the original ELF; connected execution
+# selected entry0 ->20940c.
+[[indirect_targets]]
+site = 0x00209404
+table_start = 0x00456dd0
+table_end = 0x00456de8
+
+# Fresh replay after rooting478bc0 reaches2ef5f4 inside original2ef580.
+# Original2ef5c8 loads an unsigned selector,2ef5cc bounds it below6, and
+# 2ef5d8..2ef5ec indexes the initialized six-word table45e2a0. The original
+# entries are2ef5f4,2ef618,2ef618,2ef618,2ef730,2ef77c; the exact exclusive
+# end is45e2b8. Compile the complete independently bounded local switch.
+[[indirect_targets]]
+site = 0x002ef5ec
+table_start = 0x0045e2a0
+table_end = 0x0045e2b8
+
+# Fresh gameplay continuation reaches39c520 through the local switch inside the
+# already-rooted39c4c0 method. Original39c4c4 masks selector a2 to8 bits,
+# 39c4cc bounds it below6, and39c4f4..39c508 indexes initialized table464400.
+# The USA ELF and fresh connected EE RAM agree exactly on the six entries:
+# 39c510,39c518,39c520,39c520,39c520,39c520. The immediate following words
+# 464418/1c are null, independently bounding this table.
+[[indirect_targets]]
+site = 0x0039c508
+table_start = 0x00464400
+table_end = 0x00464418
+
+# Fresh gameplay continuation reaches314250 through slot+0x0c of live object
+# cba300, whose vptr is472700. Original1704e8..f4 materializes472700 and stores
+# it to the newly initialized object. The USA ELF and fresh connected EE RAM
+# agree on two null prefix words,44 executable method pointers at472708..4727b4,
+# then four null words4727b8..c4 before the neighboring table begins at4727c8.
+# Root the complete independently bounded interface; runtime dispatch still uses
+# the guest-loaded slot at29ef54.
+[[indirect_targets]]
+site = 0x0029ef54
+table_start = 0x00472708
+table_end = 0x004727b8
+
+# Fresh replay after the44c7a0 scene-state batch reaches171198 inside171160.
+# Original171164 masks the selector to8 bits,17116c bounds it below40, and
+# 17117c..171190 indexes the initialized40-word table44f960 before jumping.
+# All40 original entries are executable labels inside the same171160 routine;
+# entry2 selects171198 in the connected replay. Exact exclusive end is44fa00.
+[[indirect_targets]]
+site = 0x00171190
+table_start = 0x0044f960
+table_end = 0x0044fa00
+
+# Fresh replay after the44f960 dispatcher reaches1278c0 from16d1b0 through
+# startup objecta86780. Original173624..40 materializes469d10 and stores it at
+# object+0. Live EE RAM and initialized USA ELF agree on the complete bounded
+# interface: two null prefix words469d10/14,201 unique executable pointers
+# 469d18..46a038, then the immediate null boundary46a03c. The selected call is
+# fixed slot+0xfc ->1278c0, but this table is used here only as additive AOT
+# discovery roots; runtime execution still follows the guest jalr register.
+[[indirect_targets]]
+site = 0x0016d1b0
+table_start = 0x00469d18
+table_end = 0x0046a03c
+
+# Fresh replay after the469d10 interface reaches16e294 inside16d6d0.
+# Original16d6d4 masks the selector,16d6dc bounds it below40, and16d6f8..70c
+# indexes the initialized40-word table44f8c0. All entries are executable labels
+# inside the16d6d0 routine family; the next independently verified table starts
+# exactly at44f960. Fresh execution selected index14 ->16e294.
+[[indirect_targets]]
+site = 0x0016d70c
+table_start = 0x0044f8c0
+table_end = 0x0044f960
+
+# Startup object#3 uses derived vptr46d810. Original12770c..24 transitions the
+# object from base469d10 to46d810 and immediately dispatches through its vptr at
+# 127730; independent original1710b4..cc also constructs46d810. Live EE RAM and
+# the USA ELF agree on two null prefix words followed by201 unique executable
+# targets46d818..46db38 and the immediate null boundary46db3c. Most shared
+# methods are already reachable from469d10; this additive root covers the
+# remaining derived-interface methods while runtime still follows the guest jalr.
+[[indirect_targets]]
+site = 0x00127730
+table_start = 0x0046d818
+table_end = 0x0046db3c
+
+# Startup object#3 then enters29f690 through derived-table slot+0xfc. Original
+# 29f6a8 loads object byte+153c,29f6ac bounds it below40, and29f6b8..6cc
+# indexes the initialized40-word local table45b590. Fresh execution selects
+# index14 ->29f794. The exclusive end45b630 is the neighboring switch below.
+[[indirect_targets]]
+site = 0x0029f6cc
+table_start = 0x0045b590
+table_end = 0x0045b630
+
+# Original29f8d8/29f8dc applies the same <40 bound before29f8e8..8fc indexes
+# the adjacent40-word table45b630. All entries are executable labels inside
+# the same29f8c0 state routine;45b6d0 begins non-pointer string data and is
+# the independently verified exclusive end.
+[[indirect_targets]]
+site = 0x0029f8fc
+table_start = 0x0045b630
+table_end = 0x0045b6d0
+
+# Fresh replay after the29f690/29f8c0 switch pair reaches17810c from39c654.
+# Original1780c4 masks selector a2,1780cc bounds it below6, and1780e0..f4
+# indexes the initialized six-word table44fa40. Entries select1780fc,178104,
+# or17810c;44fa58/5c are null and independently bound the table.
+[[indirect_targets]]
+site = 0x001780f4
+table_start = 0x0044fa40
+table_end = 0x0044fa58
+
+# Fresh connected execution reaches224770 through generic member helper100b40
+# from wrapper224c20. The live object at17f4ff0 contains descriptor
+# {0,-1,224770} at +0xe8 (17f50d8), exactly matching the unique initialized
+# USA ELF descriptor at3e5240. Root the observed direct member target.
+[[functions]]
+name = "scene_member_descriptor_00224770"
+address = 0x00224770
+
+# Fresh connected execution reaches18b600 through generic member helper100b40
+# from1a3674. Startup object1510c80 contains live descriptor
+# {0,-1,18b600} at +0xa0 (1510d20). The verified USA ELF contains four
+# bit-identical direct-member descriptor records carrying that exact target
+# (3b25b8,3b25c8,3b2698,3b26b8); the source-instance ambiguity does not alter
+# the direct callback identity, so root only the observed target.
+[[functions]]
+name = "startup_member_descriptor_0018b600"
+address = 0x0018b600
+
+# Fresh gameplay continuation reaches19c600 through generic member helper100b40
+# from1a2ed8. Live object1510c80 contains {0,-1,19c600} at +0xa0
+# (1510d20). Original static record3b25a8 contains that exact direct-member
+# descriptor; original19a374..380 loads all12 bytes and19a394..3a8 copies them
+# into object+0xa0/+0xa4/+0xa8. Root only the independently verified target.
+[[functions]]
+name = "gameplay_member_descriptor_0019c600"
+address = 0x0019c600
+
+# Live door continuation reaches197640 through generic member helper100b40
+# from1a3674. Live object1510c80 contains {0,-1,197640} at +0xa0
+# (1510d20). Four initialized original descriptor records carry that exact
+# callback (3b2608,3b26c8,3b26d8,3b2e98). Original/live body197640..197fe8 is
+# byte-identical and independently bounded by return/delay197fe0/197fe4 and
+# the next prologue197ff0. Root only the observed callback; no shared mapping.
+[[functions]]
+name = "door_member_descriptor_00197640"
+address = 0x00197640
+
+# The next live door state reaches196fc0 through the same helper/caller and
+# object+a0 descriptor. Captured descriptor{0,-1,196fc0} exactly matches the
+# unique initialized original record3b28e8. Original/live body196fc0..197640 is
+# byte-identical and independently bounded by return/delay197638/19763c and the
+# already proved197640 prologue. Root only this observed sequential callback.
+[[functions]]
+name = "door_member_descriptor_00196fc0"
+address = 0x00196fc0
+
+# Live door-transition virtual dispatch observed at caller 0x001271b4.
+# The concrete object vtable selected slot +0x0c = 0x001aa040; the body
+# boundary was independently verified against the original ELF bytes.
+[[functions]]
+name = "door_transition_virtual_001aa040"
+address = 0x001aa040
+
+# Live door-transition virtual dispatch observed at caller 0x001271e0.
+# The concrete object vtable selected slot +0x14 = 0x001a9f90; adjacent
+# initialized methods are not implied targets and remain outside this root.
+[[functions]]
+name = "door_transition_virtual_001a9f90"
+address = 0x001a9f90
+
+# Live direct-member callback observed from 0x001a9fb8 through the existing
+# 0x00100b40 helper. Dynamic descriptor 0x017c1bdc and initialized original
+# descriptor 0x003b2f28 both select exactly 0x001a4c60.
+[[functions]]
+name = "door_transition_member_001a4c60"
+address = 0x001a4c60
+
+# Fresh gameplay continuation reaches2c2ed0 through generic member helper100b40
+# from2c35c0. Live s2=18eca40; [s2+0x834]=s2+0x474, and the caller passes
+# that pointer+4, selecting descriptor {0,-1,2c2ed0} at s2+0x478.
+# Original static record412890 contains that exact descriptor; original
+# 2c3414..341c loads all three words and2c3428..3434 stores them to each
+# record's +0x478/+0x47c/+0x480. Root only the independently verified target.
+[[functions]]
+name = "gameplay_member_descriptor_002c2ed0"
+address = 0x002c2ed0
+
+# Fresh replay after18b600 reaches1f3998 inside original1f36b0. That routine
+# normalizes the mode, bounds it below10 at1f36e0, then1f36ec..1f3700 indexes
+# the initialized ten-word table456280. All entries are executable case labels
+# inside the same routine family;4562a8 begins the zero/string boundary.
+[[indirect_targets]]
+site = 0x001f3700
+table_start = 0x00456280
+table_end = 0x004562a8
+
+# Later in the same1f36b0 routine, original1f3acc bounds another selector
+# below10 and1f3ad8..1f3aec indexes the adjacent ten-word table456250.
+# Fresh connected execution selects1f3da4. Exact table end456278 is followed
+# by two null words before the already-proven456280 dispatcher.
+[[indirect_targets]]
+site = 0x001f3aec
+table_start = 0x00456250
+table_end = 0x00456278
+
+# Fresh replay after the456280 mode switch reaches1f0e50 from2116e4.
+# Original16fc4c..60 installs46b0d0 into resource-object fields+928/+988.
+# The initialized table has null prefix46b0d0/4, executable slots+8/+c
+# (1f0e50,1f0af0), then null46b0e0/e4 before the distinct neighboring table.
+# Root the exact two-method interface through the connected jalr site.
+[[indirect_targets]]
+site = 0x002116e4
+table_start = 0x0046b0d8
+table_end = 0x0046b0e0
+
+# Fresh replay after adding COP1 MSUBA.S reaches2ee570 from the linked-list
+# traversal at2ee8c8. Every one of the six live list nodes uses table4703a0
+# at node+0x30. Original16fb90..9c materializes and installs4703a0 there;
+# bulk initialization at1701dc..170228 installs the same table into the list.
+# The original table has null prefix4703a0/a4, executable slots+8/+c
+# (2ee5c0,2ee570), then null4703b0/b4 before the distinct next table.
+[[indirect_targets]]
+site = 0x002ee8c8
+table_start = 0x004703a8
+table_end = 0x004703b0
+
+# The following traversal at2ee928 walks the +0x28 chain and dispatches through
+# node+0x30 slot+0x10. Fresh RAM shows every sampled live node uses472bd0.
+# Original208e4c..60 installs472bd0 at object+0x30. The table has null prefix
+# 472bd0/d4, four executable methods472bd8..e4
+# (2ee6d0,2ee6c0,315f00,315e00), then null472be8/ec.
+[[indirect_targets]]
+site = 0x002ee928
+table_start = 0x00472bd8
+table_end = 0x00472be8
+
+# The same traversal later reaches a node whose +0x30 table is4703d0.
+# Original170140/17030c/170674 all independently materialize/install4703d0.
+# The table has null prefix4703d0/d4, four executable methods4703d8..e4
+# (2ee6d0,2ee6c0,2ee970,2ee710), then null4703e8/ec. The shared jalr site
+# is already occupied by the independently bounded472bd0 table above, so add
+# only the two methods from4703d0 that are not already reachable.
+[[functions]]
+name = "object_4703d0_method_002ee970"
+address = 0x002ee970
+[[functions]]
+name = "object_4703d0_method_002ee710"
+address = 0x002ee710
+
+# Fresh traversal after the4703d0 subtype reaches nodea863c0 whose +0x30
+# table is4702b0. Original16fbcc/16fc14 independently materialize and install
+# 4702b0 at object+0x30. The table is bounded by null prefix4702b0/b4,
+# executable slots4702b8..c4 (2ee6d0,2ee6c0,2ece50,2ee710), then
+# null4702c8/cc. Only2ece50 remains missing in the current translated image.
+[[functions]]
+name = "object_4702b0_method_002ece50"
+address = 0x002ece50
+
+# Fresh traversal after4702b0 reaches tail nodea866c0 whose +0x30 table is
+# 470440. Original170254/170654 independently materialize/install470440.
+# The table has null prefix470440/44, executable slots470448..54
+# (2ee6d0,2ee6c0,2eeda0,2eed20), then null470458/5c. Only the latter
+# two methods remain missing in the current translated image.
+[[functions]]
+name = "object_470440_method_002eeda0"
+address = 0x002eeda0
+[[functions]]
+name = "object_470440_method_002eed20"
+address = 0x002eed20
+
+# Fresh execution after the linked-list traversal reaches2c9730 from2bb2c8.
+# Live object17f3d28 has vptr46ed30; original2d0c8c/2d100c independently
+# install that table at object+0. Live RAM and initialized USA ELF match across
+# the complete bounded interface: null prefix46ed30/34,32 unique executable
+# methods46ed38..46edb4, then null46edb8/bc. Root the full table through the
+# connected jalr site; runtime execution still follows the guest-selected slot.
+[[indirect_targets]]
+site = 0x002bb2c8
+table_start = 0x0046ed38
+table_end = 0x0046edb8
+
+# Connected gameplay transition reaches29f25c with objecta87f80 and vptr46c0a0;
+# slot+c selects210ce0. Original171024..30 independently installs46c0a0 at
+# object+0. Initialized USA ELF and live EE RAM agree: null prefix46c0a0/a4,
+# 44 unique executable methods46c0a8..46c154, then four null words46c158..64.
+[[indirect_targets]]
+site = 0x0029f25c
+table_start = 0x0046c0a8
+table_end = 0x0046c158
 
 # Exclude verified embedded data; reachable edges into it are reported.
 # [[data_ranges]]
@@ -695,7 +1435,43 @@ table_end = 0x0046ac90
 [[indirect_targets]]
 site = 0x00100b6c
 # Original static descriptors414370/414380 also contain {0,-1,target}.
-targets = [0x002d1e40,0x002d1b20,0x002d1aa0]
+# Live direct descriptors at17f3afc/8fe5bc match original44af30/44b050.
+# Options transition: original44b160 descriptor; original398724..39875c installs44b180.
+# Start input fault: live object fc6fe0 has {0,-1,2f5c80} at object+0x110;
+# original2f6094 calls100b40 with that descriptor and returns to2f609c.
+# Continued recorded Start path later changes that live descriptor to {0,-1,2f59a0};
+# same helper/caller reaches2f59a0 and original body returns at2f5c70/2f5c74.
+# Manual unpause20260922: the same fc70f0 descriptor becomes {0,-1,2f55c0};
+# saved fault has a0fc6fe0/ra2f609c. Original caller2f6094/98 and helper100b40
+# prove this direct JR100b6c target. Original/live992-byte body2f55c0..599c
+# agrees exactly; JRra2f5998 restores the stack in delay slot2f599c.
+# Manual Select20260922: object180f680+1708 holds {0,-1,396900};
+# original397f5c calls100b40 with descriptor397f60, returning397f64.
+# Original/live1996-byte target396900..3970c8 agrees; JRra3970c4
+# restores the stack in its delay slot. Preserve all prior member targets.
+# Same original body installs primary member descriptors at object+1708:
+# 396e3c/40/48 from44b200 ->394e40;396ed0/d4/d8 from44b210 ->395630;
+# 396fdc/e0/e8 from44b220 ->394670. Each original/live descriptor is
+# {0,-1,target}, passes original100bd0 nonzero check, and feeds397f5c.
+# These are bounded, statically proven successors, not claimed live hits.
+# Menu-close20260922: saved object180f680+16fc={0,-1,3977d0}; original
+# 3999d0/3999d4 calls100b40 with that descriptor, returning3999d8.
+# Original/live724-byte body3977d0..397aa0 agrees. Its397924/28/2c
+# installs44b1d0={0,-1,3974a0} into the same consumed+16fc field.
+# Original/live812-byte successor3974a0..3977c8 also agrees; its
+# 397714/18/20 installs44b1e0={0,-1,398850}, already statically compiled.
+# Stairs20260922: reached2ac5d0 with a1=0 selects BSS01990900={0,-1,2ac600}.
+# Original dispatcher masks index to8bits, scales by12, and tail-jumps100b40.
+# Captured selector/descriptor prove only this next target, not all256 entries.
+# Original/live2ac600..664 instructions match; preserve original virtual call,
+# branch/store effects, JRra2ac660 and stack-restore delay2ac664.
+targets = [0x002d1e40,0x002d1b20,0x002d1aa0,0x003838f0,0x00399920,0x003984d0,0x00397f00,0x00393bd0,0x00397d60,0x00398100,0x00393880,0x00393480,0x003930c0,0x00392b50,0x00392670,0x00392360,0x002f5c80,0x002f59a0,0x002f55c0,0x00396900,0x00394e40,0x00395630,0x00394670,0x003977d0,0x003974a0,0x002ac600]
+
+# Original398878 bounds the state byte below16;398898 dispatches its word table.
+[[indirect_targets]]
+site = 0x00398898
+table_start = 0x004643a0
+table_end = 0x004643e0
 
 # Native embedded object vptr 0x0046adf0, slot +0x0c.
 [[indirect_targets]]
@@ -731,6 +1507,12 @@ address = 0x001cb480
 [[functions]]
 name = "sound_reverse_rpc_worker"
 address = 0x0021f210
+
+# Original 0x21f230/0x21f244 constructs handler 0x0021f0e0 in a2 for reverse RPC registration at 0x2703c0.
+# Live/manual dispatch reaches it through the generic request callback jalr at 0x270640 (return 0x270648).
+[[functions]]
+name = "sound_reverse_rpc_handler"
+address = 0x0021f0e0
 
 
 # Native startup object virtual slot +0x170, retained original ELF pointer.
@@ -1859,6 +2641,553 @@ address = 0x002cfa00
 name = "object_46f360_method_002cfbd0"
 address = 0x002cfbd0
 
+# Original ctor2d0770..2d078c constructs 0x0046aab0 and publishes it through
+# object register a2.  The original table's non-null method words span
+# 0x0046aab8..0x0046ab48; connected jalr176614 reaches slot+0x1c ->1a3ee0.
+# Retain the independently verified table family together.  Methods already
+# rooted elsewhere are intentionally not duplicated here.
+[[functions]]
+name = "object_46aab0_method_0017fcd0"
+address = 0x0017fcd0
+[[functions]]
+name = "object_46aab0_method_001a4330"
+address = 0x001a4330
+[[functions]]
+name = "object_46aab0_method_001a3ee0"
+address = 0x001a3ee0
+[[functions]]
+name = "object_46aab0_method_001a3e60"
+address = 0x001a3e60
+[[functions]]
+name = "object_46aab0_method_001a2cc0"
+address = 0x001a2cc0
+[[functions]]
+name = "object_46aab0_method_001a3a80"
+address = 0x001a3a80
+[[functions]]
+name = "object_46aab0_method_001a38e0"
+address = 0x001a38e0
+[[functions]]
+name = "object_46aab0_method_001a3110"
+address = 0x001a3110
+[[functions]]
+name = "object_46aab0_method_0019b4f0"
+address = 0x0019b4f0
+[[functions]]
+name = "object_46aab0_method_0019af20"
+address = 0x0019af20
+[[functions]]
+name = "object_46aab0_method_0019be70"
+address = 0x0019be70
+[[functions]]
+name = "object_46aab0_method_001a2d00"
+address = 0x001a2d00
+[[functions]]
+name = "object_46aab0_method_001a3000"
+address = 0x001a3000
+[[functions]]
+name = "object_46aab0_method_0019aac0"
+address = 0x0019aac0
+[[functions]]
+name = "object_46aab0_method_0019aa20"
+address = 0x0019aa20
+[[functions]]
+name = "object_46aab0_method_001a4080"
+address = 0x001a4080
+[[functions]]
+name = "object_46aab0_method_0019af10"
+address = 0x0019af10
+[[functions]]
+name = "object_46aab0_method_0019a8c0"
+address = 0x0019a8c0
+[[functions]]
+name = "object_46aab0_method_0019a670"
+address = 0x0019a670
+[[functions]]
+name = "object_46aab0_method_00125ab0"
+address = 0x00125ab0
+[[functions]]
+name = "object_46aab0_method_00125aa0"
+address = 0x00125aa0
+[[functions]]
+name = "object_46aab0_method_0019a450"
+address = 0x0019a450
+[[functions]]
+name = "object_46aab0_method_001258e0"
+address = 0x001258e0
+[[functions]]
+name = "object_46aab0_method_0019a300"
+address = 0x0019a300
+[[functions]]
+name = "object_46aab0_method_001a0370"
+address = 0x001a0370
+[[functions]]
+name = "object_46aab0_method_0019f8a0"
+address = 0x0019f8a0
+[[functions]]
+name = "object_46aab0_method_0019d2b0"
+address = 0x0019d2b0
+[[functions]]
+name = "object_46aab0_method_0019d190"
+address = 0x0019d190
+[[functions]]
+name = "object_46aab0_method_00124ed0"
+address = 0x00124ed0
+
+# Original ctor2d07b0..2d07ec constructs 0x0046a120 and publishes it through
+# object register t2.  The original table's non-null method words span
+# 0x0046a128..0x0046a1b8; connected jalr1771d8 reaches slot+0x5c ->165d40.
+# Retain the independently verified table family together.  Two methods were
+# already rooted elsewhere and are intentionally not duplicated here.
+[[functions]]
+name = "object_46a120_method_00130a70"
+address = 0x00130a70
+[[functions]]
+name = "object_46a120_method_00168a00"
+address = 0x00168a00
+[[functions]]
+name = "object_46a120_method_00124d80"
+address = 0x00124d80
+[[functions]]
+name = "object_46a120_method_00168700"
+address = 0x00168700
+[[functions]]
+name = "object_46a120_method_00168680"
+address = 0x00168680
+[[functions]]
+name = "object_46a120_method_00168360"
+address = 0x00168360
+[[functions]]
+name = "object_46a120_method_001683d0"
+address = 0x001683d0
+[[functions]]
+name = "object_46a120_method_00168600"
+address = 0x00168600
+[[functions]]
+name = "object_46a120_method_00167bc0"
+address = 0x00167bc0
+[[functions]]
+name = "object_46a120_method_00166df0"
+address = 0x00166df0
+[[functions]]
+name = "object_46a120_method_00166ce0"
+address = 0x00166ce0
+[[functions]]
+name = "object_46a120_method_00123d00"
+address = 0x00123d00
+[[functions]]
+name = "object_46a120_method_00167620"
+address = 0x00167620
+[[functions]]
+name = "object_46a120_method_00167760"
+address = 0x00167760
+[[functions]]
+name = "object_46a120_method_00167af0"
+address = 0x00167af0
+[[functions]]
+name = "object_46a120_method_00165cd0"
+address = 0x00165cd0
+[[functions]]
+name = "object_46a120_method_00165c50"
+address = 0x00165c50
+[[functions]]
+name = "object_46a120_method_00124ec0"
+address = 0x00124ec0
+[[functions]]
+name = "object_46a120_method_00166140"
+address = 0x00166140
+[[functions]]
+name = "object_46a120_method_00165d40"
+address = 0x00165d40
+[[functions]]
+name = "object_46a120_method_00165d00"
+address = 0x00165d00
+[[functions]]
+name = "object_46a120_method_00166530"
+address = 0x00166530
+[[functions]]
+name = "object_46a120_method_00165a40"
+address = 0x00165a40
+[[functions]]
+name = "object_46a120_method_00165890"
+address = 0x00165890
+[[functions]]
+name = "object_46a120_method_001656c0"
+address = 0x001656c0
+[[functions]]
+name = "object_46a120_method_0013d420"
+address = 0x0013d420
+[[functions]]
+name = "object_46a120_method_0015fb30"
+address = 0x0015fb30
+[[functions]]
+name = "object_46a120_method_0013d190"
+address = 0x0013d190
+[[functions]]
+name = "object_46a120_method_001254b0"
+address = 0x001254b0
+[[functions]]
+name = "object_46a120_method_00163dc0"
+address = 0x00163dc0
+[[functions]]
+name = "object_46a120_method_001635b0"
+address = 0x001635b0
+[[functions]]
+name = "object_46a120_method_0015fc60"
+address = 0x0015fc60
+[[functions]]
+name = "object_46a120_method_0015fbe0"
+address = 0x0015fbe0
+[[functions]]
+name = "object_46a120_method_0015fa20"
+address = 0x0015fa20
+[[functions]]
+name = "object_46a120_method_00130ae0"
+address = 0x00130ae0
+
+# Original ctor3a18d0..3a18e4 constructs 0x00470620 and publishes it through
+# object register s0.  The original table has two null prefix words followed by
+# non-null method words 0x00470628..0x004706f0; connected jalr1a3fb4 reaches
+# slot+0x0c ->2f8330.  Retain the independently verified table family together.
+# Three methods were already rooted elsewhere and are intentionally not duplicated.
+[[functions]]
+name = "object_470620_method_002f7a30"
+address = 0x002f7a30
+[[functions]]
+name = "object_470620_method_002f8330"
+address = 0x002f8330
+[[functions]]
+name = "object_470620_method_002f8320"
+address = 0x002f8320
+[[functions]]
+name = "object_470620_method_002117c0"
+address = 0x002117c0
+[[functions]]
+name = "object_470620_method_001f1ed0"
+address = 0x001f1ed0
+[[functions]]
+name = "object_470620_method_001f4700"
+address = 0x001f4700
+[[functions]]
+name = "object_470620_method_001f46f0"
+address = 0x001f46f0
+[[functions]]
+name = "object_470620_method_001f46e0"
+address = 0x001f46e0
+[[functions]]
+name = "object_470620_method_001f6e00"
+address = 0x001f6e00
+[[functions]]
+name = "object_470620_method_00194fb0"
+address = 0x00194fb0
+[[functions]]
+name = "object_470620_method_00195ed0"
+address = 0x00195ed0
+[[functions]]
+name = "object_470620_method_001f1e70"
+address = 0x001f1e70
+[[functions]]
+name = "object_470620_method_002ddac0"
+address = 0x002ddac0
+[[functions]]
+name = "object_470620_method_002f81a0"
+address = 0x002f81a0
+[[functions]]
+name = "object_470620_method_00210e00"
+address = 0x00210e00
+[[functions]]
+name = "object_470620_method_002dd980"
+address = 0x002dd980
+[[functions]]
+name = "object_470620_method_002dd970"
+address = 0x002dd970
+[[functions]]
+name = "object_470620_method_00211190"
+address = 0x00211190
+[[functions]]
+name = "object_470620_method_002dd020"
+address = 0x002dd020
+[[functions]]
+name = "object_470620_method_00211160"
+address = 0x00211160
+[[functions]]
+name = "object_470620_method_00211180"
+address = 0x00211180
+[[functions]]
+name = "object_470620_method_002dcf10"
+address = 0x002dcf10
+[[functions]]
+name = "object_470620_method_001f1de0"
+address = 0x001f1de0
+[[functions]]
+name = "object_470620_method_002dcde0"
+address = 0x002dcde0
+[[functions]]
+name = "object_470620_method_001f1da0"
+address = 0x001f1da0
+[[functions]]
+name = "object_470620_method_002dca50"
+address = 0x002dca50
+[[functions]]
+name = "object_470620_method_001f1e90"
+address = 0x001f1e90
+[[functions]]
+name = "object_470620_method_001f1e30"
+address = 0x001f1e30
+[[functions]]
+name = "object_470620_method_001f1e40"
+address = 0x001f1e40
+[[functions]]
+name = "object_470620_method_001f1e50"
+address = 0x001f1e50
+[[functions]]
+name = "object_470620_method_001f1e60"
+address = 0x001f1e60
+[[functions]]
+name = "object_470620_method_001800d0"
+address = 0x001800d0
+[[functions]]
+name = "object_470620_method_001800c0"
+address = 0x001800c0
+[[functions]]
+name = "object_470620_method_001800b0"
+address = 0x001800b0
+[[functions]]
+name = "object_470620_method_001800a0"
+address = 0x001800a0
+[[functions]]
+name = "object_470620_method_001f1ea0"
+address = 0x001f1ea0
+[[functions]]
+name = "object_470620_method_001f1eb0"
+address = 0x001f1eb0
+[[functions]]
+name = "object_470620_method_001f1ec0"
+address = 0x001f1ec0
+[[functions]]
+name = "object_470620_method_002f7b40"
+address = 0x002f7b40
+[[functions]]
+name = "object_470620_method_002f7b50"
+address = 0x002f7b50
+[[functions]]
+name = "object_470620_method_001f1d90"
+address = 0x001f1d90
+[[functions]]
+name = "object_470620_method_002f8430"
+address = 0x002f8430
+[[functions]]
+name = "object_470620_method_001f1fc0"
+address = 0x001f1fc0
+[[functions]]
+name = "object_470620_method_001f1f20"
+address = 0x001f1f20
+[[functions]]
+name = "object_470620_method_001f1f10"
+address = 0x001f1f10
+[[functions]]
+name = "object_470620_method_002f7b60"
+address = 0x002f7b60
+[[functions]]
+name = "object_470620_method_001f1ef0"
+address = 0x001f1ef0
+[[functions]]
+name = "object_470620_method_001f1ee0"
+address = 0x001f1ee0
+
+# Original constructors2218ac..2218bc and2d1204..2d1224 construct 0x0046c540
+# and publish it through object registers s1/a0.  The original table has two null
+# prefix words followed by non-null method words 0x0046c548..0x0046c5c8;
+# connected jalr1a3fe0 reaches slot+0x4c ->221e80.  Retain the independently
+# verified table family together.  Method221e70 was already rooted elsewhere.
+[[functions]]
+name = "object_46c540_method_00221890"
+address = 0x00221890
+[[functions]]
+name = "object_46c540_method_002237e0"
+address = 0x002237e0
+[[functions]]
+name = "object_46c540_method_00223520"
+address = 0x00223520
+[[functions]]
+name = "object_46c540_method_002231a0"
+address = 0x002231a0
+[[functions]]
+name = "object_46c540_method_002230a0"
+address = 0x002230a0
+[[functions]]
+name = "object_46c540_method_00221b40"
+address = 0x00221b40
+[[functions]]
+name = "object_46c540_method_00221b60"
+address = 0x00221b60
+[[functions]]
+name = "object_46c540_method_00222f60"
+address = 0x00222f60
+[[functions]]
+name = "object_46c540_method_00222e40"
+address = 0x00222e40
+[[functions]]
+name = "object_46c540_method_00222d30"
+address = 0x00222d30
+[[functions]]
+name = "object_46c540_method_00221b80"
+address = 0x00221b80
+[[functions]]
+name = "object_46c540_method_00221c00"
+address = 0x00221c00
+[[functions]]
+name = "object_46c540_method_00221c90"
+address = 0x00221c90
+[[functions]]
+name = "object_46c540_method_00221d20"
+address = 0x00221d20
+[[functions]]
+name = "object_46c540_method_00221da0"
+address = 0x00221da0
+[[functions]]
+name = "object_46c540_method_00221df0"
+address = 0x00221df0
+[[functions]]
+name = "object_46c540_method_00221e80"
+address = 0x00221e80
+[[functions]]
+name = "object_46c540_method_00222d00"
+address = 0x00222d00
+[[functions]]
+name = "object_46c540_method_00222cd0"
+address = 0x00222cd0
+[[functions]]
+name = "object_46c540_method_00222ca0"
+address = 0x00222ca0
+[[functions]]
+name = "object_46c540_method_00222960"
+address = 0x00222960
+[[functions]]
+name = "object_46c540_method_00222850"
+address = 0x00222850
+[[functions]]
+name = "object_46c540_method_00221eb0"
+address = 0x00221eb0
+[[functions]]
+name = "object_46c540_method_002226e0"
+address = 0x002226e0
+[[functions]]
+name = "object_46c540_method_00222480"
+address = 0x00222480
+[[functions]]
+name = "object_46c540_method_00221f30"
+address = 0x00221f30
+[[functions]]
+name = "object_46c540_method_002219d0"
+address = 0x002219d0
+[[functions]]
+name = "object_46c540_method_00221a90"
+address = 0x00221a90
+[[functions]]
+name = "object_46c540_method_00222230"
+address = 0x00222230
+[[functions]]
+name = "object_46c540_method_002220c0"
+address = 0x002220c0
+[[functions]]
+name = "object_46c540_method_00221fd0"
+address = 0x00221fd0
+[[functions]]
+name = "object_46c540_method_00221fb0"
+address = 0x00221fb0
+
+# Original constructors2080ec..2080fc and3a1118..3a1128 construct 0x0046b240
+# and publish it through object registers s1/s0.  The original image has two null
+# prefix words, non-null methods 0x0046b248..0x0046b2f4, then four null words at
+# 0x0046b2f8..0x0046b304.  Connected object0xa84380 was previously verified live
+# against this table; jalr1687d8 reaches slot+0x0c ->1f9570.  Retain the missing
+# independently verified methods together; sixteen entries were already rooted.
+[[functions]]
+name = "object_46b240_method_001f7d40"
+address = 0x001f7d40
+[[functions]]
+name = "object_46b240_method_001f9570"
+address = 0x001f9570
+[[functions]]
+name = "object_46b240_method_001f9560"
+address = 0x001f9560
+[[functions]]
+name = "object_46b240_method_001f8d40"
+address = 0x001f8d40
+[[functions]]
+name = "object_46b240_method_001f7fa0"
+address = 0x001f7fa0
+[[functions]]
+name = "object_46b240_method_001f7f10"
+address = 0x001f7f10
+[[functions]]
+name = "object_46b240_method_0019c200"
+address = 0x0019c200
+[[functions]]
+name = "object_46b240_method_001f8650"
+address = 0x001f8650
+[[functions]]
+name = "object_46b240_method_001f8910"
+address = 0x001f8910
+[[functions]]
+name = "object_46b240_method_001f81d0"
+address = 0x001f81d0
+[[functions]]
+name = "object_46b240_method_001f81b0"
+address = 0x001f81b0
+[[functions]]
+name = "object_46b240_method_001f8190"
+address = 0x001f8190
+[[functions]]
+name = "object_46b240_method_002ddab0"
+address = 0x002ddab0
+[[functions]]
+name = "object_46b240_method_001f7ec0"
+address = 0x001f7ec0
+[[functions]]
+name = "object_46b240_method_001f8b50"
+address = 0x001f8b50
+[[functions]]
+name = "object_46b240_method_002dca70"
+address = 0x002dca70
+[[functions]]
+name = "object_46b240_method_001f8110"
+address = 0x001f8110
+[[functions]]
+name = "object_46b240_method_00195c60"
+address = 0x00195c60
+[[functions]]
+name = "object_46b240_method_0018cc90"
+address = 0x0018cc90
+[[functions]]
+name = "object_46b240_method_001f7f90"
+address = 0x001f7f90
+[[functions]]
+name = "object_46b240_method_001f7eb0"
+address = 0x001f7eb0
+[[functions]]
+name = "object_46b240_method_001f7f50"
+address = 0x001f7f50
+[[functions]]
+name = "object_46b240_method_001f7f60"
+address = 0x001f7f60
+[[functions]]
+name = "object_46b240_method_001f7f70"
+address = 0x001f7f70
+[[functions]]
+name = "object_46b240_method_001f7f80"
+address = 0x001f7f80
+[[functions]]
+name = "object_46b240_method_0016d040"
+address = 0x0016d040
+[[functions]]
+name = "object_46b240_method_0016d170"
+address = 0x0016d170
+[[functions]]
+name = "object_46b240_method_001f7ea0"
+address = 0x001f7ea0
+
 # Original vptr46a1c0 is published at168c44; startup2cfc3c calls slot10.
 # Retain all four non-null methods from original46a1c8..46a1d4.
 [[functions]]
@@ -2184,8 +3513,164 @@ name = "object_46f350_method_002cf8c0"
 address = 0x002cf8c0
 
 
-# Original2cf8f0/2cf904/2cf918/2cf97c selects slots24/a4/a0/20
-# from vtable469a60, installed at original1218b8..c4.
+# Original20e260..20e270 publishes vptr469a60. Connected225584 loads slot+6c,
+# which is original121ff0. Original table has null prefix469a60..64, non-null
+# methods469a68..469b34, then four zero words469b38..469b44. Retain the
+# independently verified family while preserving earlier rooted entries below.
+[[functions]]
+name = "object_469a60_method_001218a0"
+address = 0x001218a0
+
+[[functions]]
+name = "object_469a60_method_00122a20"
+address = 0x00122a20
+
+[[functions]]
+name = "object_469a60_method_001225a0"
+address = 0x001225a0
+
+[[functions]]
+name = "object_469a60_method_00122550"
+address = 0x00122550
+
+[[functions]]
+name = "object_469a60_method_00122500"
+address = 0x00122500
+
+[[functions]]
+name = "object_469a60_method_00122370"
+address = 0x00122370
+
+[[functions]]
+name = "object_469a60_method_001221e0"
+address = 0x001221e0
+
+[[functions]]
+name = "object_469a60_method_001220a0"
+address = 0x001220a0
+
+[[functions]]
+name = "object_469a60_method_00122050"
+address = 0x00122050
+
+[[functions]]
+name = "object_469a60_method_00122070"
+address = 0x00122070
+
+[[functions]]
+name = "object_469a60_method_00122060"
+address = 0x00122060
+
+[[functions]]
+name = "object_469a60_method_00122040"
+address = 0x00122040
+
+[[functions]]
+name = "object_469a60_method_00122020"
+address = 0x00122020
+
+[[functions]]
+name = "object_469a60_method_00122010"
+address = 0x00122010
+
+[[functions]]
+name = "object_469a60_method_00122000"
+address = 0x00122000
+
+[[functions]]
+name = "object_469a60_method_00121ff0"
+address = 0x00121ff0
+
+[[functions]]
+name = "object_469a60_method_00121910"
+address = 0x00121910
+
+[[functions]]
+name = "object_469a60_method_00121920"
+address = 0x00121920
+
+[[functions]]
+name = "object_469a60_method_00121fc0"
+address = 0x00121fc0
+
+[[functions]]
+name = "object_469a60_method_00121f80"
+address = 0x00121f80
+
+[[functions]]
+name = "object_469a60_method_00121d90"
+address = 0x00121d90
+
+[[functions]]
+name = "object_469a60_method_00121d00"
+address = 0x00121d00
+
+[[functions]]
+name = "object_469a60_method_00121cb0"
+address = 0x00121cb0
+
+[[functions]]
+name = "object_469a60_method_00121930"
+address = 0x00121930
+
+[[functions]]
+name = "object_469a60_method_00121940"
+address = 0x00121940
+
+[[functions]]
+name = "object_469a60_method_00121950"
+address = 0x00121950
+
+[[functions]]
+name = "object_469a60_method_00121ca0"
+address = 0x00121ca0
+
+[[functions]]
+name = "object_469a60_method_00121990"
+address = 0x00121990
+
+[[functions]]
+name = "object_469a60_method_001219a0"
+address = 0x001219a0
+
+[[functions]]
+name = "object_469a60_method_001219b0"
+address = 0x001219b0
+
+[[functions]]
+name = "object_469a60_method_001219c0"
+address = 0x001219c0
+
+[[functions]]
+name = "object_469a60_method_00121c50"
+address = 0x00121c50
+
+[[functions]]
+name = "object_469a60_method_00121b30"
+address = 0x00121b30
+
+[[functions]]
+name = "object_469a60_method_001219d0"
+address = 0x001219d0
+
+[[functions]]
+name = "object_469a60_method_00121b20"
+address = 0x00121b20
+
+[[functions]]
+name = "object_469a60_method_001219e0"
+address = 0x001219e0
+
+[[functions]]
+name = "object_469a60_method_001219f0"
+address = 0x001219f0
+
+[[functions]]
+name = "object_469a60_method_00121a00"
+address = 0x00121a00
+
+# Earlier independently verified calls2cf8f0/2cf904/2cf918/2cf97c select
+# slots24/a4/a0/20 from this same table, installed at original1218b8..c4.
 [[functions]]
 name = "object_469a60_method_001225c0"
 address = 0x001225c0
@@ -2201,6 +3686,408 @@ address = 0x00121960
 [[functions]]
 name = "object_469a60_method_001225d0"
 address = 0x001225d0
+
+
+# Original399ca0 keeps the scene relocation base in s3. Its branch at399dcc
+# reaches39a000 when object+s3+f6cbb0 is present;39a010 writes vptr46c660 to
+# that object's +0x64 and39a034 writes secondary vptr46c668 to +0x60.
+# Original3a0190 later passes the same base+f6cbb0 object to225550, whose
+# 2255f4..225600 dispatches primary slot+0x78. Original46c6d8 is224380.
+# The original table has zero prefix46c660..46c66c, non-null methods
+# 46c670..46c6e4, then four zero words46c6e8..46c6f4.
+[[functions]]
+name = "object_46c660_method_00225760"
+address = 0x00225760
+
+[[functions]]
+name = "object_46c660_method_00225750"
+address = 0x00225750
+
+[[functions]]
+name = "object_46c660_method_00225740"
+address = 0x00225740
+
+[[functions]]
+name = "object_46c660_method_00225730"
+address = 0x00225730
+
+[[functions]]
+name = "object_46c660_method_00225720"
+address = 0x00225720
+
+[[functions]]
+name = "object_46c660_method_00225710"
+address = 0x00225710
+
+[[functions]]
+name = "object_46c660_method_00225700"
+address = 0x00225700
+
+[[functions]]
+name = "object_46c660_method_002256f0"
+address = 0x002256f0
+
+[[functions]]
+name = "object_46c660_method_002256e0"
+address = 0x002256e0
+
+[[functions]]
+name = "object_46c660_method_002256d0"
+address = 0x002256d0
+
+[[functions]]
+name = "object_46c660_method_002256c0"
+address = 0x002256c0
+
+[[functions]]
+name = "object_46c660_method_002256b0"
+address = 0x002256b0
+
+[[functions]]
+name = "object_46c660_method_002256a0"
+address = 0x002256a0
+
+[[functions]]
+name = "object_46c660_method_00225690"
+address = 0x00225690
+
+[[functions]]
+name = "object_46c660_method_00225680"
+address = 0x00225680
+
+[[functions]]
+name = "object_46c660_method_00223e40"
+address = 0x00223e40
+
+[[functions]]
+name = "object_46c660_method_002251c0"
+address = 0x002251c0
+
+[[functions]]
+name = "object_46c660_method_002246f0"
+address = 0x002246f0
+
+[[functions]]
+name = "object_46c660_method_002246b0"
+address = 0x002246b0
+
+[[functions]]
+name = "object_46c660_method_00224680"
+address = 0x00224680
+
+[[functions]]
+name = "object_46c660_method_00224650"
+address = 0x00224650
+
+[[functions]]
+name = "object_46c660_method_00223e30"
+address = 0x00223e30
+
+[[functions]]
+name = "object_46c660_method_00224300"
+address = 0x00224300
+
+[[functions]]
+name = "object_46c660_method_00223e20"
+address = 0x00223e20
+
+[[functions]]
+name = "object_46c660_method_00223f00"
+address = 0x00223f00
+
+[[functions]]
+name = "object_46c660_method_00223de0"
+address = 0x00223de0
+
+[[functions]]
+name = "object_46c660_method_00224380"
+address = 0x00224380
+
+[[functions]]
+name = "object_46c660_method_00224330"
+address = 0x00224330
+
+[[functions]]
+name = "object_46c660_method_002241c0"
+address = 0x002241c0
+
+[[functions]]
+name = "object_46c660_method_00224190"
+address = 0x00224190
+
+
+# Connected replay stops at17b660 with ra12008c. Original12007c loads the
+# object+0 vptr from s18+3e0,120080 selects slot+0x4c, and120084 dispatches it.
+# The only initialized ELF word17b660 is46aa1c, implying vptr46a9d0.
+# Original179f78..179f80 and2d12e8..2d12f0 independently construct46a9d0 and
+# store it at object+0. The bounded original table has two zero words at
+# 46a9d0..46a9d4, non-null methods46a9d8..46aa38, then zeros46aa3c..46aa44.
+[[functions]]
+name = "object_46a9d0_method_00179f60"
+address = 0x00179f60
+
+[[functions]]
+name = "object_46a9d0_method_0017cb60"
+address = 0x0017cb60
+
+[[functions]]
+name = "object_46a9d0_method_0017ca80"
+address = 0x0017ca80
+
+[[functions]]
+name = "object_46a9d0_method_0017c9d0"
+address = 0x0017c9d0
+
+[[functions]]
+name = "object_46a9d0_method_0017c8c0"
+address = 0x0017c8c0
+
+[[functions]]
+name = "object_46a9d0_method_0017c7b0"
+address = 0x0017c7b0
+
+[[functions]]
+name = "object_46a9d0_method_0017c750"
+address = 0x0017c750
+
+[[functions]]
+name = "object_46a9d0_method_0017c6f0"
+address = 0x0017c6f0
+
+[[functions]]
+name = "object_46a9d0_method_0017c690"
+address = 0x0017c690
+
+[[functions]]
+name = "object_46a9d0_method_0017c5c0"
+address = 0x0017c5c0
+
+[[functions]]
+name = "object_46a9d0_method_0017c550"
+address = 0x0017c550
+
+[[functions]]
+name = "object_46a9d0_method_0017c4f0"
+address = 0x0017c4f0
+
+[[functions]]
+name = "object_46a9d0_method_0017c410"
+address = 0x0017c410
+
+[[functions]]
+name = "object_46a9d0_method_0017c2a0"
+address = 0x0017c2a0
+
+[[functions]]
+name = "object_46a9d0_method_0017c050"
+address = 0x0017c050
+
+[[functions]]
+name = "object_46a9d0_method_0017bd60"
+address = 0x0017bd60
+
+[[functions]]
+name = "object_46a9d0_method_0017b9b0"
+address = 0x0017b9b0
+
+[[functions]]
+name = "object_46a9d0_method_0017b660"
+address = 0x0017b660
+
+[[functions]]
+name = "object_46a9d0_method_0017b540"
+address = 0x0017b540
+
+[[functions]]
+name = "object_46a9d0_method_0017a010"
+address = 0x0017a010
+
+[[functions]]
+name = "object_46a9d0_method_0017a090"
+address = 0x0017a090
+
+[[functions]]
+name = "object_46a9d0_method_0017a110"
+address = 0x0017a110
+
+[[functions]]
+name = "object_46a9d0_method_0017b380"
+address = 0x0017b380
+
+[[functions]]
+name = "object_46a9d0_method_0017b160"
+address = 0x0017b160
+
+[[functions]]
+name = "object_46a9d0_method_0017b060"
+address = 0x0017b060
+
+
+# Fresh current-build replay reaches1ff9e0 from20740c..14 through object
+# 017f33f0 vptr slot+0x0c. Live EE RAM and the original ELF both contain
+# 46b3a0={0,0,1fb250,1ff9e0,1fc760,1fc700,0,0}; the target1ff9e0 occurs
+# exactly once in initialized ELF data at46b3ac. Original1fb26c..288 and
+# 2d0810..82c independently install primary46b3a0 at object+0 and the distinct
+# secondary46b3b8 table at object+0x0c. The two trailing zeros bound this
+# four-method primary family before the already verified46b3b8 adapter region.
+[[functions]]
+name = "object_46b3a0_method_001fb250"
+address = 0x001fb250
+[[functions]]
+name = "object_46b3a0_method_001ff9e0"
+address = 0x001ff9e0
+[[functions]]
+name = "object_46b3a0_method_001fc760"
+address = 0x001fc760
+[[functions]]
+name = "object_46b3a0_method_001fc700"
+address = 0x001fc700
+
+# Fresh connected execution at203240 dispatches global456e00's live object
+# through vptr slot+0x0c and reaches2a8590. Live EE RAM and initialized ELF data
+# agree on primary table46db40={0,0,2a8520,2a8590,2a85b0,2a86b0,2a85d0,
+# 2a8640,0,0}. Original2d1130..1150 publishes the object globally, installs
+# 46db40 at word0 and clears+4/+8; original2a8538..54 also installs46db40 before
+# transitioning the same object to the distinct adjacent46db60 state. The two
+# trailing zeros bound this six-method primary family.2a8520 is already reachable,
+# so root only the five missing executable methods.
+[[functions]]
+name = "object_46db40_method_002a8590"
+address = 0x002a8590
+[[functions]]
+name = "object_46db40_method_002a85b0"
+address = 0x002a85b0
+[[functions]]
+name = "object_46db40_method_002a86b0"
+address = 0x002a86b0
+[[functions]]
+name = "object_46db40_method_002a85d0"
+address = 0x002a85d0
+[[functions]]
+name = "object_46db40_method_002a8640"
+address = 0x002a8640
+
+# Connected replay reaches20c380 from1200c8. Original1200bc loads the global
+# object's word0 vptr and1200c4 selects slot+0x0c. The only initialized ELF
+# word20c380 is46b3c4, fixing that live vptr at46b3b8. Original1fb26c..1fb288
+# and2d0810..2d082c independently construct46b3b8 and store it at subobject
+# +0x0c. The original table begins with zeros46b3b8..46b3bc followed by the
+# contiguous 16-byte adapter family46b3c0..46b430 (20c390..20c1d0).
+[[functions]]
+name = "object_46b3b8_adapter_0020c390"
+address = 0x0020c390
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c380"
+address = 0x0020c380
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c360"
+address = 0x0020c360
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c370"
+address = 0x0020c370
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c350"
+address = 0x0020c350
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c340"
+address = 0x0020c340
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c330"
+address = 0x0020c330
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c320"
+address = 0x0020c320
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c310"
+address = 0x0020c310
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c300"
+address = 0x0020c300
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2f0"
+address = 0x0020c2f0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2e0"
+address = 0x0020c2e0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2d0"
+address = 0x0020c2d0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2c0"
+address = 0x0020c2c0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2b0"
+address = 0x0020c2b0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c2a0"
+address = 0x0020c2a0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c290"
+address = 0x0020c290
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c280"
+address = 0x0020c280
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c270"
+address = 0x0020c270
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c260"
+address = 0x0020c260
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c250"
+address = 0x0020c250
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c240"
+address = 0x0020c240
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c230"
+address = 0x0020c230
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c220"
+address = 0x0020c220
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c210"
+address = 0x0020c210
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c200"
+address = 0x0020c200
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c1f0"
+address = 0x0020c1f0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c1e0"
+address = 0x0020c1e0
+
+[[functions]]
+name = "object_46b3b8_adapter_0020c1d0"
+address = 0x0020c1d0
 
 
 # Original1bf568..84 installs primary46ae90 and secondary46aeb4 tables.
@@ -2628,6 +4515,30 @@ address = 0x001c4ce8
 name = "stream_registered_001d4ff0"
 address = 0x001d4ff0
 
+# Fresh gameplay continuation reaches1d4ca8 through1cdb60/7c from the same
+# object callback pair at+0x48/+0x4c. Original1d5534..5544 materializes1d4ca8
+# and calls1ce638; that setter writes a1 to object+0x48 and a2 to object+0x4c.
+# Fresh live object3bfc18 contains1d4ca8/3b7238 at those exact slots.
+[[functions]]
+name = "stream_registered_001d4ca8"
+address = 0x001d4ca8
+
+# Fresh continuation reaches1d4ef8 through1d1894 from object callback+0x38,
+# with object+0x3c loaded as the callback argument. Original1d54e8..54f8
+# materializes1d4ef8 and calls setter1d1770; that setter writes a1 to+0x38
+# and a2 to+0x3c. Fresh object3c2850 contains1d4ef8/3b7238 at those slots.
+[[functions]]
+name = "stream_registered_001d4ef8"
+address = 0x001d4ef8
+
+# Fresh continuation reaches1d4d60 through1cdb7c from object callback+0x48.
+# The already-verified1d4ca8 callback itself transitions this state at its tail:
+# 1d4d30/48 materializes1d4d60 and1d4d58 tail-calls setter1ce638, which writes
+# callback/context to+0x48/+0x4c. Fresh object3bfc18 contains1d4d60/3b7238.
+[[functions]]
+name = "stream_registered_001d4d60"
+address = 0x001d4d60
+
 # Original12c31c installs46a110; replay15 object9c90e4 agrees.
 # Two-method table ends at the next RTTI prefix46a120.
 [[functions]]
@@ -2666,3 +4577,915 @@ address = 0x0012c7b0
 [[functions]]
 name = "menu_demo_end_0012fbb0"
 address = 0x0012fbb0
+
+# Original2d1184 installs46ecf0;61full live objectfcda00 agrees.
+# Original120ca0 dispatches slot+8 to2c9480 after all6300 OPENING frames.
+# The eleven original/live methods end at null46ed24; next table is46ed30.
+# Independently verified in external post-opening-table-61full.json.
+[[functions]]
+name = "post_opening_pool_002c9480"
+address = 0x002c9480
+[[functions]]
+name = "post_opening_pool_002c9470"
+address = 0x002c9470
+[[functions]]
+name = "post_opening_pool_00120530"
+address = 0x00120530
+[[functions]]
+name = "post_opening_pool_002c92a0"
+address = 0x002c92a0
+[[functions]]
+name = "post_opening_pool_002c91d0"
+address = 0x002c91d0
+[[functions]]
+name = "post_opening_pool_002c90f0"
+address = 0x002c90f0
+[[functions]]
+name = "post_opening_pool_002c9010"
+address = 0x002c9010
+[[functions]]
+name = "post_opening_pool_002c8e50"
+address = 0x002c8e50
+[[functions]]
+name = "post_opening_pool_002c8dc0"
+address = 0x002c8dc0
+[[functions]]
+name = "post_opening_pool_002c9460"
+address = 0x002c9460
+[[functions]]
+name = "post_opening_pool_002c8d90"
+address = 0x002c8d90
+
+# Original2d06e0 installs47a7d0;63skip live object888440 agrees.
+# Four methods end at the separate +0x40 subobject table prefix47a7e8.
+# Original2d1bc0 dispatches slot+0x0c to3a1990; original/live words agree.
+[[functions]]
+name = "post_opening_scene_00399ca0"
+address = 0x00399ca0
+[[functions]]
+name = "post_opening_scene_003a1990"
+address = 0x003a1990
+[[functions]]
+name = "post_opening_scene_003a07d0"
+address = 0x003a07d0
+[[functions]]
+name = "post_opening_scene_0039fd30"
+address = 0x0039fd30
+
+# Original2d05e8 forms the parent+0x40 subobject and2d05ec passes that exact
+# pointer to2d15c0, which stores it in global44e4d8. Original2d06dc forms
+# table47a7e8 and2d06e8 installs it at the same parent+0x40 address; independent
+# original39dcc4..39dce8 installs the same47a7e8 vptr at object+0x40. Fresh
+# gameplay continuation reaches slot+0x68 ->3a1a30 from this live object.
+# Live EE RAM and initialized USA ELF data agree on the complete bounded table:
+# two null prefix words47a7e8..47a7ec,61 unique executable methods47a7f0..47a8e0,
+# then a null boundary at47a8e4. Methods3a1b60,177cc0 and39d2e0 are already
+# reachable; root only the58 missing independently verified methods together.
+[[functions]]
+name = "post_opening_scene_subobject_slot0c_003a1b60"
+address = 0x003a1b60
+
+[[functions]]
+name = "object_47a7e8_method_003a1b70"
+address = 0x003a1b70
+[[functions]]
+name = "object_47a7e8_method_003a1b50"
+address = 0x003a1b50
+[[functions]]
+name = "object_47a7e8_method_003a1b30"
+address = 0x003a1b30
+[[functions]]
+name = "object_47a7e8_method_003a1b40"
+address = 0x003a1b40
+[[functions]]
+name = "object_47a7e8_method_003a1b20"
+address = 0x003a1b20
+[[functions]]
+name = "object_47a7e8_method_003a1b10"
+address = 0x003a1b10
+[[functions]]
+name = "object_47a7e8_method_003a1b00"
+address = 0x003a1b00
+[[functions]]
+name = "object_47a7e8_method_003a1af0"
+address = 0x003a1af0
+[[functions]]
+name = "object_47a7e8_method_00177f00"
+address = 0x00177f00
+[[functions]]
+name = "object_47a7e8_method_00177db0"
+address = 0x00177db0
+[[functions]]
+name = "object_47a7e8_method_003a1ae0"
+address = 0x003a1ae0
+[[functions]]
+name = "object_47a7e8_method_003a1ad0"
+address = 0x003a1ad0
+[[functions]]
+name = "object_47a7e8_method_003a1ac0"
+address = 0x003a1ac0
+[[functions]]
+name = "object_47a7e8_method_003a1ab0"
+address = 0x003a1ab0
+[[functions]]
+name = "object_47a7e8_method_003a1aa0"
+address = 0x003a1aa0
+[[functions]]
+name = "object_47a7e8_method_003a1a90"
+address = 0x003a1a90
+[[functions]]
+name = "object_47a7e8_method_003a1a80"
+address = 0x003a1a80
+[[functions]]
+name = "object_47a7e8_method_003a1a70"
+address = 0x003a1a70
+[[functions]]
+name = "object_47a7e8_method_003a1a60"
+address = 0x003a1a60
+[[functions]]
+name = "object_47a7e8_method_003a1a50"
+address = 0x003a1a50
+[[functions]]
+name = "object_47a7e8_method_003a1a40"
+address = 0x003a1a40
+[[functions]]
+name = "object_47a7e8_method_001770a0"
+address = 0x001770a0
+[[functions]]
+name = "object_47a7e8_method_003a1a30"
+address = 0x003a1a30
+[[functions]]
+name = "object_47a7e8_method_003a1a20"
+address = 0x003a1a20
+[[functions]]
+name = "object_47a7e8_method_003a1a10"
+address = 0x003a1a10
+[[functions]]
+name = "object_47a7e8_method_003a1a00"
+address = 0x003a1a00
+[[functions]]
+name = "object_47a7e8_method_003a19f0"
+address = 0x003a19f0
+[[functions]]
+name = "object_47a7e8_method_003a19e0"
+address = 0x003a19e0
+[[functions]]
+name = "object_47a7e8_method_003a19d0"
+address = 0x003a19d0
+[[functions]]
+name = "object_47a7e8_method_003a19c0"
+address = 0x003a19c0
+[[functions]]
+name = "object_47a7e8_method_003a19b0"
+address = 0x003a19b0
+[[functions]]
+name = "object_47a7e8_method_0039d120"
+address = 0x0039d120
+[[functions]]
+name = "object_47a7e8_method_0039d070"
+address = 0x0039d070
+[[functions]]
+name = "object_47a7e8_method_0039d000"
+address = 0x0039d000
+[[functions]]
+name = "object_47a7e8_method_0039bae0"
+address = 0x0039bae0
+[[functions]]
+name = "object_47a7e8_method_0039bac0"
+address = 0x0039bac0
+[[functions]]
+name = "object_47a7e8_method_0039b800"
+address = 0x0039b800
+[[functions]]
+name = "object_47a7e8_method_00399c80"
+address = 0x00399c80
+[[functions]]
+name = "object_47a7e8_method_00399c50"
+address = 0x00399c50
+[[functions]]
+name = "object_47a7e8_method_0039aea0"
+address = 0x0039aea0
+[[functions]]
+name = "object_47a7e8_method_00399c30"
+address = 0x00399c30
+[[functions]]
+name = "object_47a7e8_method_00399bf0"
+address = 0x00399bf0
+[[functions]]
+name = "object_47a7e8_method_0039a830"
+address = 0x0039a830
+[[functions]]
+name = "object_47a7e8_method_0039a7c0"
+address = 0x0039a7c0
+[[functions]]
+name = "object_47a7e8_method_0039cdc0"
+address = 0x0039cdc0
+[[functions]]
+name = "object_47a7e8_method_0039c7a0"
+address = 0x0039c7a0
+[[functions]]
+name = "object_47a7e8_method_0039c6c0"
+address = 0x0039c6c0
+[[functions]]
+name = "object_47a7e8_method_0039c5c0"
+address = 0x0039c5c0
+[[functions]]
+name = "object_47a7e8_method_0039c4c0"
+address = 0x0039c4c0
+[[functions]]
+name = "object_47a7e8_method_0039c380"
+address = 0x0039c380
+[[functions]]
+name = "object_47a7e8_method_0039c040"
+address = 0x0039c040
+[[functions]]
+name = "object_47a7e8_method_0039a8e0"
+address = 0x0039a8e0
+[[functions]]
+name = "object_47a7e8_method_0039a860"
+address = 0x0039a860
+[[functions]]
+name = "object_47a7e8_method_0039a690"
+address = 0x0039a690
+[[functions]]
+name = "object_47a7e8_method_0039a620"
+address = 0x0039a620
+[[functions]]
+name = "object_47a7e8_method_0039a5e0"
+address = 0x0039a5e0
+[[functions]]
+name = "object_47a7e8_method_0039a5b0"
+address = 0x0039a5b0
+[[functions]]
+name = "object_47a7e8_method_0039a510"
+address = 0x0039a510
+
+# Original3a0c48 checks the zero-extended selector below9 before3a0c68.
+# All nine original/live words at464420..464440 agree in63skip.
+[[indirect_targets]]
+site = 0x003a0c68
+table_start = 0x00464420
+table_end = 0x00464444
+
+# Original176650 walks six startup objects at44f800.64skip has1510c80 and
+# 16be3c0, whose original/live tables46aab0 and46a120 agree. Original2d078c
+# and2d07ec install them. Add the used initializers and their proven chain,
+# not every method in these larger tables. Evidence: post-opening-startup-object-64skip.json.
+[[functions]]
+name = "post_opening_object_initializer_001a4340"
+address = 0x001a4340
+[[functions]]
+name = "post_opening_object_initializer_00168a10"
+address = 0x00168a10
+# Original1a43b8 dispatches46aab0+5c;125d30 tails through its+60 slot.
+[[functions]]
+name = "post_opening_object_reset_0019ac70"
+address = 0x0019ac70
+[[functions]]
+name = "post_opening_object_reset_0019ab40"
+address = 0x0019ab40
+# Original19ae44/19aea0 use global44e550's live object887a00, table46ab50
+# slot+1c. That original1a44d0 calls slot+10; both original/live words agree.
+[[functions]]
+name = "post_opening_random_value_001a44c0"
+address = 0x001a44c0
+[[functions]]
+name = "post_opening_random_word_001a45a0"
+address = 0x001a45a0
+
+# Original125c0c selects46abb0+28 from global44e588;65skip reaches1aab80.
+# Original125c68 selects46aab0+98, whose body returns1. That selects125c98,
+# global44e4d8's table47a7e8+34. Original and65skip live slots agree.
+[[functions]]
+name = "post_opening_reset_clear_bit_001aab80"
+address = 0x001aab80
+[[functions]]
+name = "post_opening_reset_kind_0017fd40"
+address = 0x0017fd40
+[[functions]]
+name = "post_opening_reset_related_records_00177cc0"
+address = 0x00177cc0
+
+# Original176594 uses startup-list object slot+14 after initialization.
+# 66skip reaches1a4110; original/live46aab0+14 and46a120+14 agree.
+[[functions]]
+name = "post_opening_asset_requests_001a4110"
+address = 0x001a4110
+[[functions]]
+name = "post_opening_asset_requests_00168830"
+address = 0x00168830
+# The original request bodies use object+f0 table slots+a0/+a4/+a8.
+# Live first/second resource tables470620/46b240 match original image words.
+[[functions]]
+name = "post_opening_asset_name_002f7b80"
+address = 0x002f7b80
+[[functions]]
+name = "post_opening_asset_name_002f7b70"
+address = 0x002f7b70
+[[functions]]
+name = "post_opening_asset_name_002f7b30"
+address = 0x002f7b30
+[[functions]]
+name = "post_opening_asset_name_001f8090"
+address = 0x001f8090
+[[functions]]
+name = "post_opening_asset_name_001f8010"
+address = 0x001f8010
+[[functions]]
+name = "post_opening_asset_name_001f7f00"
+address = 0x001f7f00
+# Original1a4294 selects global44e558's table46c540+48, original/live221e70.
+# Its original four instructions return object+10c0+selector*2000.
+[[functions]]
+name = "post_opening_asset_buffer_00221e70"
+address = 0x00221e70
+
+# 67skip executes original1f9cf4 through object slot+20 and stops at1fa5e0.
+# Original table46b300+20, installed at2d0900, agrees with the observed target.
+# The original caller bounds the loop to16; the original body copies12 words
+# to object+20+selector*30. Keep all original instructions and explicit faults.
+[[functions]]
+name = "post_opening_record_init_001fa5e0"
+address = 0x001fa5e0
+
+# 68skip reaches1b8ce0 through original1b8e5c/100b40. Original1f9d90 supplies
+# selectors0 and1 to1b8d30. Constructor464920 copies the original descriptors
+# at3b2f68/3b2f78 into runtime47e300/47e30c; captured words agree.
+# Independent original executable/capture only; no shared rendering material.
+[[functions]]
+name = "post_opening_graphics_callback_001b8ce0"
+address = 0x001b8ce0
+[[functions]]
+name = "post_opening_graphics_callback_001b8c90"
+address = 0x001b8c90
+[[functions]]
+name = "post_opening_graphics_callback_001b8910"
+address = 0x001b8910
+[[functions]]
+name = "post_opening_graphics_callback_001b88c0"
+address = 0x001b88c0
+[[functions]]
+name = "post_opening_graphics_callback_001b8890"
+address = 0x001b8890
+[[functions]]
+name = "post_opening_graphics_callback_001b8860"
+address = 0x001b8860
+[[functions]]
+name = "post_opening_graphics_callback_001b87f0"
+address = 0x001b87f0
+
+# 69full reaches original3a0b04 -> table469a60+0c=122a30 after full OPENING.
+# Constructor20e260 installs the global44e4b8 object and this exact table;
+# captured1961500 agrees. Original122ac0 tails through+78=121fd0.
+# Original executable/native capture only; no shared rendering material.
+[[functions]]
+name = "post_opening_view_init_00122a30"
+address = 0x00122a30
+[[functions]]
+name = "post_opening_view_record_reset_00121fd0"
+address = 0x00121fd0
+
+# Original state descriptors44c7b0/44c7a0 match70skip's888444/18db890.
+# Original3a0644/4c/54 installs44c7c0's next callback3a0390.
+# Non-rendering shared lists provided extent leads only; original returns verified.
+[[functions]]
+name = "post_opening_state_dispatch_003a06e0"
+address = 0x003a06e0
+[[functions]]
+name = "post_opening_state_initialize_003a04a0"
+address = 0x003a04a0
+[[functions]]
+name = "post_opening_state_wait_003a0390"
+address = 0x003a0390
+
+# Original108970..108c00 explicitly registers the direct member descriptors
+# 44c7a0..44c870 through109390. Each16-byte record is {0,-1,target,0};
+# 44c880 begins string/RTTI data and independently bounds the14-record family.
+# The first three unique callbacks3a04a0/3a06e0/3a0390 are already rooted above.
+# Fresh connected execution installs44c7d0 at object888444 and selects3a0060.
+# Root the six remaining unique original callbacks from this proven family.
+[[functions]]
+name = "post_opening_state_member_003a0060"
+address = 0x003a0060
+[[functions]]
+name = "post_opening_state_member_0039eab0"
+address = 0x0039eab0
+[[functions]]
+name = "post_opening_state_member_0039df10"
+address = 0x0039df10
+[[functions]]
+name = "post_opening_state_member_0039e380"
+address = 0x0039e380
+[[functions]]
+name = "post_opening_state_member_0039d990"
+address = 0x0039d990
+[[functions]]
+name = "post_opening_state_member_0039e7d0"
+address = 0x0039e7d0
+
+# Original3a052c/3a0698 calls44e568's46c3e0+0c=21c760;
+# 21c798 selects+90=21b2b0, whose21b324 selects+60=21b160.
+# All slots agree with70skip's original installed table at objectfc77b0.
+# Original3a0558 calls44fe08/objectfd0640's46c320+0c=21af90.
+# Original executable/native capture only; no shared rendering material.
+[[functions]]
+name = "post_opening_flags_initialize_0021c760"
+address = 0x0021c760
+[[functions]]
+name = "post_opening_flag_index_rebuild_0021b2b0"
+address = 0x0021b2b0
+[[functions]]
+name = "post_opening_flag_query_0021b160"
+address = 0x0021b160
+
+# Fresh connected gameplay continuation calls global44e568/objectfc77b0 through
+# primary vptr46c3e0 slot+0x3c and reaches21bef0. Live EE RAM and initialized
+# USA ELF data agree on the full primary table46c3e0..46c474: two null prefix
+# words followed by35 executable methods, then a null word at46c474. Original
+# 21b108..124 installs46c3e0 at object+0 before transitioning the same object to
+# distinct adjacent state table46c480. Methods21b0f0,21c760,21b160 and21b2b0
+# are already reachable elsewhere; root only the31 missing independently bounded
+# methods so subsequent virtual slots do not require one rebuild apiece.
+[[functions]]
+name = "object_46c3e0_method_0021c740"
+address = 0x0021c740
+[[functions]]
+name = "object_46c3e0_method_0021c6a0"
+address = 0x0021c6a0
+[[functions]]
+name = "object_46c3e0_method_0021c610"
+address = 0x0021c610
+[[functions]]
+name = "object_46c3e0_method_0021c550"
+address = 0x0021c550
+[[functions]]
+name = "object_46c3e0_method_0021c490"
+address = 0x0021c490
+[[functions]]
+name = "object_46c3e0_method_0021c3d0"
+address = 0x0021c3d0
+[[functions]]
+name = "object_46c3e0_method_0021c310"
+address = 0x0021c310
+[[functions]]
+name = "object_46c3e0_method_0021c230"
+address = 0x0021c230
+[[functions]]
+name = "object_46c3e0_method_0021c150"
+address = 0x0021c150
+[[functions]]
+name = "object_46c3e0_method_0021c070"
+address = 0x0021c070
+[[functions]]
+name = "object_46c3e0_method_0021bfb0"
+address = 0x0021bfb0
+[[functions]]
+name = "object_46c3e0_method_0021bef0"
+address = 0x0021bef0
+[[functions]]
+name = "object_46c3e0_method_0021beb0"
+address = 0x0021beb0
+[[functions]]
+name = "object_46c3e0_method_0021be40"
+address = 0x0021be40
+[[functions]]
+name = "object_46c3e0_method_0021be00"
+address = 0x0021be00
+[[functions]]
+name = "object_46c3e0_method_0021bd50"
+address = 0x0021bd50
+[[functions]]
+name = "object_46c3e0_method_0021bc60"
+address = 0x0021bc60
+[[functions]]
+name = "object_46c3e0_method_0021bb20"
+address = 0x0021bb20
+[[functions]]
+name = "object_46c3e0_method_0021ba30"
+address = 0x0021ba30
+[[functions]]
+name = "object_46c3e0_method_0021b8f0"
+address = 0x0021b8f0
+[[functions]]
+name = "object_46c3e0_method_0021b1c0"
+address = 0x0021b1c0
+[[functions]]
+name = "object_46c3e0_method_0021b210"
+address = 0x0021b210
+[[functions]]
+name = "object_46c3e0_method_0021b270"
+address = 0x0021b270
+[[functions]]
+name = "object_46c3e0_method_0021b8b0"
+address = 0x0021b8b0
+[[functions]]
+name = "object_46c3e0_method_0021b820"
+address = 0x0021b820
+[[functions]]
+name = "object_46c3e0_method_0021b7e0"
+address = 0x0021b7e0
+[[functions]]
+name = "object_46c3e0_method_0021b2a0"
+address = 0x0021b2a0
+[[functions]]
+name = "object_46c3e0_method_0021b750"
+address = 0x0021b750
+[[functions]]
+name = "object_46c3e0_method_0021b6a0"
+address = 0x0021b6a0
+[[functions]]
+name = "object_46c3e0_method_0021b540"
+address = 0x0021b540
+[[functions]]
+name = "object_46c3e0_method_0021b3e0"
+address = 0x0021b3e0
+[[functions]]
+name = "post_opening_asset_request_0021af90"
+address = 0x0021af90
+
+# Original33e2a0 dispatches global44e4b8/object1961500 through469a60.
+# Its+1c/+5c/+28/+14 slots select the four original view setup callbacks.
+# Original122810 uses+18/+bc/+44 for its immediate view dependencies.
+# All seven original slot words agree with72skip RAM. Complete original
+# bodies/returns verified; no shared rendering material or runtime substitute.
+[[functions]]
+name = "post_opening_view_position_001225e0"
+address = 0x001225e0
+[[functions]]
+name = "post_opening_view_scalar_00122030"
+address = 0x00122030
+[[functions]]
+name = "post_opening_view_target_001225b0"
+address = 0x001225b0
+[[functions]]
+name = "post_opening_view_update_00122810"
+address = 0x00122810
+[[functions]]
+name = "post_opening_view_basis_001225f0"
+address = 0x001225f0
+[[functions]]
+name = "post_opening_view_range_00121b40"
+address = 0x00121b40
+[[functions]]
+name = "post_opening_view_copy_00122080"
+address = 0x00122080
+[[functions]]
+name = "post_opening_view_copy_00122090"
+address = 0x00122090
+
+# Original3a071c/24 constructs table476f40, stores it in the stack descriptor
+# at3a072c, then passes that descriptor to original33e2a0 at3a073c/40.
+# Candidate75 live RAM preserved descriptor word476f40 and table+0c=33d9f0,
+# matching the original executable. Root only the proven callback body.
+[[functions]]
+name = "post_opening_view_packet_0033d9f0"
+address = 0x0033d9f0
+
+# Candidate78 original caller1bbed0 dispatches object1ffebf0 through table46d7a0.
+# Live78 RAM and the original executable both contain table+0c=2699d0.
+# Root only that independently verified callback; rendering behavior remains
+# derived from original inputs/specifications rather than shared HG material.
+[[functions]]
+name = "post_opening_stream_packet_002699d0"
+address = 0x002699d0
+
+# Connected replay reaches1faf70 from1201e4 through global44e4c8's object vptr
+# slot+0x0c. The original ELF contains1faf70 exactly once at46b30c, fixing the
+# live table base at46b300. Original1f9658..64 and2d08ec..2d0900 independently
+# construct/install46b300. The original bounded table ends before the separately
+# installed46b350 table; it contains18 non-null methods at+08..+4c.1fa5e0 is
+# already compiled from the earlier record-init path, so root only the17 missing
+# original methods. Shared non-rendering lists were checked afterward only for
+# function-boundary leads; all targets and table provenance come from the ELF.
+[[functions]]
+name = "object_46b300_method_001f9640"
+address = 0x001f9640
+[[functions]]
+name = "object_46b300_method_001faf70"
+address = 0x001faf70
+[[functions]]
+name = "object_46b300_method_001faa00"
+address = 0x001faa00
+[[functions]]
+name = "object_46b300_method_001fa6c0"
+address = 0x001fa6c0
+[[functions]]
+name = "object_46b300_method_001fa6b0"
+address = 0x001fa6b0
+[[functions]]
+name = "object_46b300_method_001fa680"
+address = 0x001fa680
+[[functions]]
+name = "object_46b300_method_001fa530"
+address = 0x001fa530
+[[functions]]
+name = "object_46b300_method_001fa520"
+address = 0x001fa520
+[[functions]]
+name = "object_46b300_method_001fa430"
+address = 0x001fa430
+[[functions]]
+name = "object_46b300_method_001fa0e0"
+address = 0x001fa0e0
+[[functions]]
+name = "object_46b300_method_001fa0d0"
+address = 0x001fa0d0
+[[functions]]
+name = "object_46b300_method_001f9fc0"
+address = 0x001f9fc0
+[[functions]]
+name = "object_46b300_method_001f9fb0"
+address = 0x001f9fb0
+[[functions]]
+name = "object_46b300_method_001f9f80"
+address = 0x001f9f80
+[[functions]]
+name = "object_46b300_method_001f9f70"
+address = 0x001f9f70
+[[functions]]
+name = "object_46b300_method_001f96b0"
+address = 0x001f96b0
+[[functions]]
+name = "object_46b300_method_001f9710"
+address = 0x001f9710
+
+# Connected replay clears the46b300 family and next stops at2674f0 from the
+# original266d4c..5c virtual call through slot+0x0c. The original ELF contains
+# 2674f0 exactly once as initialized word46d75c, fixing this table at46d750.
+# Original267328..34 installs46d750 on the object and267338..40 later restores
+# the distinct46d730 base table. The bounded46d750 table has five non-null
+# executable entries at+08..+18; all were uncompiled in independent triage.
+# Shared non-rendering lists were checked only after this derivation for function
+# boundary leads; these targets and installation provenance come from the ELF.
+[[functions]]
+name = "object_46d750_method_00267310"
+address = 0x00267310
+[[functions]]
+name = "object_46d750_method_002674f0"
+address = 0x002674f0
+[[functions]]
+name = "object_46d750_method_002674e0"
+address = 0x002674e0
+[[functions]]
+name = "object_46d750_method_002673e0"
+address = 0x002673e0
+[[functions]]
+name = "object_46d750_method_00267370"
+address = 0x00267370
+
+# The same original dispatcher next reaches266e04/08 and calls26b480 through
+# object vptr slot+0x0c. Original267020..2c installs46d7b0 on that allocation;
+# independent triage also finds the earlier original installer2083b0..bc.
+# File-backed46d7b0 has exactly five non-null executable entries at+08..+18,
+# all uncompiled before this root batch. Shared non-rendering config was checked
+# afterward only as corroboration of boundaries, not for behavior or rendering.
+[[functions]]
+name = "object_46d7b0_method_0026b1e0"
+address = 0x0026b1e0
+[[functions]]
+name = "object_46d7b0_method_0026b480"
+address = 0x0026b480
+[[functions]]
+name = "object_46d7b0_method_0026b350"
+address = 0x0026b350
+[[functions]]
+name = "object_46d7b0_method_0026b2c0"
+address = 0x0026b2c0
+[[functions]]
+name = "object_46d7b0_method_0026b240"
+address = 0x0026b240
+
+# The next original dispatcher branch at267038..44 installs46eb40, and
+# independent triage also finds the earlier original installer at208348.
+# File-backed46eb40 is bounded by a zero at+0x1c and has exactly five non-null
+# executable entries at+08..+18. Connected replay after rooting46d7b0 now reaches
+# 2bb390 through this family. Shared non-rendering config was checked only after
+# the original-code/table derivation to corroborate function-boundary leads.
+[[functions]]
+name = "object_46eb40_method_002bafd0"
+address = 0x002bafd0
+[[functions]]
+name = "object_46eb40_method_002bb390"
+address = 0x002bb390
+[[functions]]
+name = "object_46eb40_method_002bb280"
+address = 0x002bb280
+[[functions]]
+name = "object_46eb40_method_002bb1a0"
+address = 0x002bb1a0
+[[functions]]
+name = "object_46eb40_method_002bb030"
+address = 0x002bb030
+
+# The following original dispatcher branch at267050..5c installs46ec60;
+# independent triage also finds original installers at208f18 and2242e0.
+# File-backed46ec60 is likewise bounded by zero at+0x1c and has exactly five
+# non-null executable entries at+08..+18. These roots are batched from the
+# independently verified original table to avoid another rebuild on this same
+# dispatcher path; shared non-rendering data only corroborated boundaries later.
+[[functions]]
+name = "object_46ec60_method_002c64e0"
+address = 0x002c64e0
+[[functions]]
+name = "object_46ec60_method_002c6630"
+address = 0x002c6630
+[[functions]]
+name = "object_46ec60_method_002c6620"
+address = 0x002c6620
+[[functions]]
+name = "object_46ec60_method_002c6570"
+address = 0x002c6570
+[[functions]]
+name = "object_46ec60_method_002c6540"
+address = 0x002c6540
+
+# Connected replay clears the46eb40/46ec60 dispatcher and next reaches2d69e0
+# from original39d3e4..f8 through global44f260's object vptr slot+0x20.
+# Original2d1510..30 stores that object globally and installs46f5c0 at object+0;
+# independent triage also finds the same original table installed at2d0f0c.
+# File-backed46f5c0 is bounded by zero at+0x2c and contains exactly nine
+# non-null executable entries at+08..+28. All nine were uncompiled before this
+# batch, so root the independently verified family together before replaying.
+[[functions]]
+name = "object_46f5c0_method_002d6b00"
+address = 0x002d6b00
+[[functions]]
+name = "object_46f5c0_method_002d73d0"
+address = 0x002d73d0
+[[functions]]
+name = "object_46f5c0_method_002d7320"
+address = 0x002d7320
+[[functions]]
+name = "object_46f5c0_method_002d6fd0"
+address = 0x002d6fd0
+[[functions]]
+name = "object_46f5c0_method_002d71f0"
+address = 0x002d71f0
+[[functions]]
+name = "object_46f5c0_method_002d7120"
+address = 0x002d7120
+[[functions]]
+name = "object_46f5c0_method_002d69e0"
+address = 0x002d69e0
+[[functions]]
+name = "object_46f5c0_method_002d7450"
+address = 0x002d7450
+[[functions]]
+name = "object_46f5c0_method_002d7430"
+address = 0x002d7430
+
+# Fresh continue-2d3e80 RAM: object18eca40 holds46f480; slot+0c selects2d3e80.
+# Original installers2d3aac..b8 and39aa38..48 publish46f480. Initialized
+# ELF/live RAM agree; 24 executable entries+08..+64 end before null46f4e8/ec.
+[[indirect_targets]]
+site = 0x001ffd34
+table_start = 0x0046f488
+table_end = 0x0046f4e8
+
+# Original1fbf70 masks selector, bounds f0..fa, subtracts f0, and1fbf90
+# bounds index below11.1fbf9c..b0 dispatches through456420; live f1 selects
+# 1fbfc0. All11 original executable labels agree with fresh46f480 RAM.
+[[indirect_targets]]
+site = 0x001fbfb0
+table_start = 0x00456420
+table_end = 0x0045644c
+
+# Original2cf3bc bounds byte selector below8;2cf3c8..dc dispatches via45d7a0.
+# Fresh continue-switch1fbfb0 selects index1 ->2cf4e4. The same routine's
+# second dispatch2cf5e8..608 independently bounds selector below8 at45d780.
+# Both eight-word tables agree with fresh RAM; root the complete same-body pair.
+[[indirect_targets]]
+site = 0x002cf3dc
+table_start = 0x0045d7a0
+table_end = 0x0045d7c0
+[[indirect_targets]]
+site = 0x002cf608
+table_start = 0x0045d780
+table_end = 0x0045d7a0
+
+# Fresh paired2cf3a0 replay: objectfc72c0 vptr46c770, slot+0c ->25e2b0.
+# Original25c868..70 and2d1370..7c install46c770. Null-bounded two-method
+# original table46c778..780 agrees with current RAM.
+[[indirect_targets]]
+# Next live objectfcda60 uses46d770 ->268090 at the same caller. Original
+# 267518..24 and2d11d4..dc install this table (latter at enclosing object+40).
+# Its two entries[46d778,46d780) match fresh RAM and have null prefix/trailer.
+# Third live objecta84f50 uses46ada0 ->1bdf80; original16f6f8..704 and
+# 16f78c..794 install it. Pair[46ada8,46adb0) matches fresh RAM and null bounds.
+# Fourth live objecta85110 uses46b1c0 ->1f2b80; original16f754..75c installs
+# it. Pair[46b1c8,46b1d0) matches fresh RAM and is bounded by null prefix
+# 46b1c0/c4 and the next null-prefixed table46b1d0/d4.
+# Fifth live object1ffeaf0 uses46eb60 ->2bb3e0. Original2bb238..244 installs
+# 46eb60 back into object+0. Original/live pair[46eb68,46eb70)=2bb220/2bb3e0
+# agrees exactly, with null prefix46eb60/64 and null trailer46eb70/74.
+# Sixth live object1ffeaf0 uses46d790 ->2685f0. Original267498..4a4 installs
+# 46d790; original/live pair[46d798,46d7a0)=267480/2685f0 agrees with null
+# prefix46d790/94 and the next table at46d7a0.
+# Adjacent proven46d7a0 family has269970/2699d0 at+08/+0c. Original269988..994
+# installs it and26b2d0..d8 also materializes it. Earlier live evidence already
+# proved1bbed0 slot+0c ->2699d0; root the missing sibling269970 in the same batch.
+# Seventh live object17f6c50 uses46fc30 ->2e5660. Original126188..194 installs
+# 46fc30 on the object. Original/live pair[46fc38,46fc40)=126170/2e5660 agrees
+# exactly, bounded by null prefix46fc30/34 and nulls46fc40/44 before the next table.
+# Eighth live object1ffeaa0 uses478b70 ->34e9e0. Original347658..664 installs
+# 478b70. Original/live pair[478b78,478b80)=347640/34e9e0 agrees exactly, with
+# null prefix478b70/74 and null trailer478b80/84 before the following table.
+# Ninth live staircase objectfc8990 uses46c780 ->25f0a0 at slot+0c. Original
+# 25e968..970 installs46c780. Original/live pair[46c788,46c790)=25e950/25f0a0
+# agrees exactly, bounded by null prefix46c780/84 and null trailer46c790/94.
+# Original/live code also agrees byte-for-byte through each independently decoded
+# return:25e950..25e9b4 and25f0a0..25f57c. No shared renderer configuration is used.
+# Explicit union retains exactly these independently bounded two-method families.
+site = 0x001bbed0
+targets = [0x0025c850, 0x0025e2b0, 0x00267500, 0x00268090, 0x0016f6e0, 0x001bdf80, 0x0016f680, 0x001f2b80, 0x002bb220, 0x002bb3e0, 0x00267480, 0x002685f0, 0x00269970, 0x002699d0, 0x00126170, 0x002e5660, 0x00347640, 0x0034e9e0, 0x0025e950, 0x0025f0a0]
+
+
+# Live paced gameplay stopped at202d3c via JR202d34. Original ELF202d14
+# checks index<8;202d20/28 constructs456a40 and202d24 scales by4.
+# These eight file-backed targets are the bounded secondary command switch.
+[[indirect_targets]]
+site = 0x00202d34
+table_start = 0x00456a40
+table_end = 0x00456a60
+
+# Recorded live path:172894..9c installs46c220 on objectcb8b40;
+# 1728a0/a4 reads slot+10 and JALR1728a8 selects124da0. Original ELF
+# and captured RAM agree at46c230. Target124da0/a4 is original JRra/NOP;
+# translate those instructions with their normal delay/budget behavior.
+[[indirect_targets]]
+site = 0x001728a8
+targets = [0x00124da0]
+
+# Manual visible fault20260922: a0=17f355c holds vptr46dfc0; original/live
+# slot+0c at46dfcc selects2ac530. Original20956c/70 loads that slot and
+# JALR209574 sets RA20957c, with a0 setup in delay slot209578.
+# Original2ac530/34/38 is LUI v0,0x40; JRra; ADDIU v0,v0,-28256 in delay.
+# Translate only this observed target with unchanged budget/delay semantics.
+[[indirect_targets]]
+site = 0x00209574
+targets = [0x002ac530]
+
+# New staircase stop20260922: original2032b4/b8 reads vptr and slot+28;
+# JALR2032bc returns2032c4 and delay2032c0 sets a0=17f355c in saved run.
+# Captured object vptr46dfc0, original/live slot46dfe8 ->2ac5d0 agree.
+# Preserve the earlier slot+0c/2ac530 root; this is a different call.
+[[indirect_targets]]
+site = 0x002032bc
+targets = [0x002ac5d0]
+
+# Manual staircase stop20260922: original209190/94 reads receiver vptr+30;
+# JALR209198 and delay20919c select captured a0=17f355c, returning2091a0.
+# Original/live vptr46dfc0 slot46dff0 is2ac540. Three original instructions
+# LUIv0,40; JRra; ADDIUv0,v0,-27936 (delay) return3f92e0, not a host stub.
+[[indirect_targets]]
+site = 0x00209198
+targets = [0x002ac540]
+
+# Paired original2091b0..c8 reads the same selected receiver and slot+30,
+# then stores that original returned pointer. Statically proved potential use.
+[[indirect_targets]]
+site = 0x002091c4
+targets = [0x002ac540]
+
+# Manual staircase20260922: selected receiver17f355c holds46dfc0;
+# original20961c/20, JALR209624, delay209628 select slot+18 ->2ac570.
+# Same original selector<6 routine209390 also consumes +10 and +14.
+# All three original/live getters agree; preserve LUI/JR/delay ADDIU.
+[[indirect_targets]]
+site = 0x002095dc
+targets = [0x002ac550]
+
+[[indirect_targets]]
+site = 0x00209600
+targets = [0x002ac560]
+
+[[indirect_targets]]
+site = 0x00209624
+targets = [0x002ac570]
+
+# Bounded original object family46dfc0..46e000: installer20a6f8..704
+# publishes46dfc0; next installer20a708..714 publishes distinct46e000.
+# Saved selected receiver and the complete64-byte file-backed table agree.
+# Root only remaining initialized methods of THIS independently bounded
+# family, following the existing46e4c0 workflow. These are potential calls,
+# not claimed dynamic hits. All original bodies independently inspected.
+# Existing2ac530/540/5d0,2a8940,2097f0,128080 and all prior roots remain.
+[[functions]]
+name = "object_table_46dfc0_slot08"
+address = 0x002ac4d0
+
+[[functions]]
+name = "object_table_46dfc0_slot20"
+address = 0x002097e0
+
+[[functions]]
+name = "object_table_46dfc0_slot24"
+address = 0x002ac580
+
+[[functions]]
+name = "object_table_46dfc0_slot34"
+address = 0x002ac5b0
+
+[[functions]]
+name = "object_table_46dfc0_slot38"
+address = 0x002ac5a0

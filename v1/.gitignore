@@ -1,0 +1,8 @@
+/emu/
+/Haunting Ground (USA)/
+/UNEEDED images/
+/build/
+/out/
+__pycache__/
+*.pyc
+.venv/

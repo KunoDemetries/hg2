@@ -1,4 +1,939 @@
+## Original bounded staircase object46dfc0: complete remaining static method coverage - 2026-09-22
+
+Latest manual c277ea1723404267b5f23dd71725f966, evidence project-link-visible/20260922T071804Z-4497884a223e48d5bd53d7c9ce48f0ca/native.log:1204, stops at2ac570/a017f355c/RA20962c. Saved receiver holds46dfc0. Original inspector5f0db0dfd3b2484aa0ed1231130a6745 decodes209390's selector<6 and same-receiver calls2095dc(+10),209600(+14),209624(+18), selecting2ac550/560/570. The live hit is only2ac570. These getters return3f93a0,3f9530,3f95f0 using original LUI/JR/delay ADDIU, not host replacements.
+
+Original installer701fc4e52f004d65bf7fef58ebbb79d8 independently locates20a6f8..20a704 publishing46dfc0, then20a708..20a714 publishing distinct46e000, followed by46e040/46b7f0. Saved receiver words match that sequence. The64-byte table46dfc0..46dfff matches original file3596352 and saved RAM4644800: SHAd7ebd6d8de5a91273c9de390de9d3c4d63cd04d88661e0704a08e610cfd53b99. This provides original installer/boundary and live-use evidence for this specific family, reusing the independently documented46e4c0 workflow in config. It does not justify scanning other tables or treating every nearby pointer as callable.
+
+Eight absent methods identified within that bounded table: slot08=2ac4d0,10=2ac550,14=2ac560,18=2ac570,20=2097e0,24=2ac580,34=2ac5b0,38=2ac5a0. Six other initialized entries2ac530/540/5d0,2a8940,2097f0,128080 were already compiled. Inspectors5c3c99d85fc6499fab98e33716f269dc anddd83e4f51a34410c88b9be3609e222fc independently decode all newly rooted bodies. Original/live256-byte2ac4d0..5cf match231848725dcb6c005199ab6d86866df1613cdcfe3cc77fa95876beaed57b1e57 (file1754448/RAM2802896); original/live16-byte2097e0 match1baba6d44296e1c7ecb565588d009ec11e0bf75c4f0b3f3baf2167c6a859d96a (file1087584/RAM2136032). The default returns zero via actual JR/DADDU instructions; the conditional delete and indexed loads retain their original operations and checked paths. No runtime decoding, forced calls, guessed return values, external implementation or BSS-table extent assumption.
+
+Configd2c998fa19148db9acc27a023ab7b027f86bf701b97885e86879aee8636aa989 adds three precise getter callsite entries and five explicit bounded-table roots, retaining every earlier repair. Exact pre-edit81772f41... is preserved by backup6da48db24c154d3fb49ad985d27b3b1f; plan/hash manifest stairs-object-46dfc0-preedit-20260922-g1.txt. Emitter8594a73e76fa46389c10b2363db10e31 adds exactly50 original words in shards0010/0015 only; generated preimages are in project-link-emit/20260922T073009Z-82326dd30ebd4020b5009323b0e16117. Body inspection confirms normal budgets, delay slots, returns and checked loads. Build0c9fb87d155648cfb1cfd66294056f79 produces game07a17eabed38b187659677758cf5b45da34a4280fd28b110593ba2ca60cebcaa; fixed verifier5d147ab1ec2147d79fd21e9d1a87d69f matches149-input provenance and expected original33M state. Potential family coverage is not a claim that all methods ran or that the complete staircase route passed; see PROGRESS for the manual retest requirement. Audio and throughput remain unresolved.
+
+## Original staircase slot+30 getter2ac540 - 2026-09-22
+
+Manual444f97023d454284a6eb624b8a9da788/native.log646, evidence project-link-visible/20260922T065755Z-2697cdfbcf484f14a093708fffe18461, stops at2ac540 with a017f355c/ra2091a0/sp1ffea20. Saved object17f355c holds vptr46dfc0; original/live64-byte table agrees SHAd7ebd6d8de5a91273c9de390de9d3c4d63cd04d88661e0704a08e610cfd53b99, slot+30=46dff0 contains2ac540. This is distinct from previously compiled+0c/2ac530 and+28/2ac5d0.
+
+Original inspector2421f0d1bdcc4d7a9b43bef6287c361b decodes209184..2091cc. The first call selects receiver base+4*selector+120, loads its vptr then+30 at209190/94, JALR209198 sets RA2091a0, and delay20919c supplies a0. Paired2091b0..2091c8 independently selects the same object/slot and stores the returned pointer in original state at2091d0. Its potential use is supported by original code, not a claimed dynamic hit. Inspector ee86c73dcf1d41d2af8a3c91418953c5 decodes2ac540/44/48: LUIv0,0x40; JRra; ADDIUv0,v0,-27936 in delay, returning3f92e0. There is no further call within this getter. Full16-byte original file1754560/saved EE2803008 match SHA c76d2d8a815bb74bad3e84685dd7fd0483065489aab0d1ac8dca9987ee1738ec, including padding. Pinned original ELF remains3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8.
+
+Config81772f417dea1d0eccb17d9dae7d49a6c012738fe51fddf2f3219b803c6d9efa appends exactly209198->2ac540 and2091c4->2ac540, retaining all earlier work. Dirty original2a50b98b... exact backup37ee07c5b4f14526a4f2bd2e2bb3a9d0; external plan stairs-2ac540-preedit-20260922-f1.txt. Configured emitter57806f8b46a24eb19e4b8a09b1cf7d0c saves prior bytes at project-link-emit/20260922T070559Z-2b210ef2cfea412eb3647ce25e74fa5f, changing only shard0015 as C++ and adding exactly3 original words. Shard05bdfcbb... lines49603..49621 retains ordinary budgets, trace selection, JR target snapshot, delay arithmetic, last-transfer and return handling. No host pointer-return stub, instruction patch, runtime decoder, emulator dependency or guest timing change. Python e29add19... passes130 tests. Build/replay/freshness and live stairs results are separate evidence in PROGRESS; this static proof does not certify the entire script or stair route.
+
+## Original second staircase dispatch2ac5d0 and callback2ac600 - 2026-09-22
+
+Manual3005b1c29cff45ad99918cf7832882db/native.log1106 (project-link-visible/20260922T064324Z-c54b636f936049019d5e5f53fc6c5fe4) stops at2ac5d0,a017f355c,a1=0,ra2032c4. Saved framebuffer67dbf852... shows the stair landing. Original caller inspector98329158f3a34d5abda3bdb19a72edc0 verifies2032b4/b8 vptr/slot+28 loads,JALR2032bc,delay2032c0. Saved object17f355c holds46dfc0. Original/live64-byte vtable identityd7ebd6d8de5a91273c9de390de9d3c4d63cd04d88661e0704a08e610cfd53b99 proves slot46dfe8->2ac5d0; earlier slot+0c/2ac530 is distinct and preserved.
+
+Inspector63108a06b6484d63b6b9d225a238133f decodes original dispatcher: mask initial a1 to8bits, multiply by12, move old a2/a3 to a1/a2, tail-jump100b40 with t9=01990900+12*index. Captured selector0 chooses saved BSS01990900={0,-1,2ac600}; existing independently decoded helper100b6c handles that negative-descriptor path. This BSS record is captured guest state, not claimed file-backed data, dynamic execution of the next function, or proof of a256-entry table. Only its selected callback is rooted. The callback's next virtual call2ac624 resolves in saved state via456df8->fcda00->46ecf0,+18->2c91d0, already compiled in shard0016; no additional root added.
+
+Original ELF SHA3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8. Full original/live152-byte region at file1754704/RAM2803152 matches08e46fa5a3c78004034f5006d162fe7348436d49abbe2f56241b69943e6990d3:40-byte dispatcher,8 padding,104-byte2ac600..664 callback. Keep actual saves, virtual call, conditional stores, JRra2ac660/stack-restore delay2ac664. No emulator or shared implementation used.
+
+Only config2032bc->2ac5d0 and existing100b6c->2ac600 added; new config2a50b98bfb1af41d99f897d1abbcfb941b0324a4f008291ca502dff7a394b26e. Exact dirty predecessorb8d3101f... preserved in backup33be0e762ffe44ccb0c19f9895f484ff. External stairs-2ac5d0-preedit-20260922-e1.txt records proof/plan/hashes. Emitterbd0cd304d15f487ebe70c9c0341187b2 archives generated originals at project-link-emit/20260922T065246Z-a4d75a31edd2445a9fe6857343e95172; exactly36 added words, only shard0015 C++ changed (e6b836246e65dcb14e295c315e67102f1392e06148ff43f99a0cc3b977434a17). Cases49603/49657 preserve normal checked static execution. Game1fe0fcdb73b9c78ff081941fdb6663e08826e1d7129e28d241c02e427e50957d built4a077e31... with149-input manifest67a1a896.... Protected host9704ed0b..., prior roots and pending VU mechanism remain unchanged. Standard33M qualification and actual100M staircase retest are separate; see PROGRESS. An initial documentation write during the verifier was rejected without changes; this write occurs after terminal tests.
+
+## Original menu-close callbacks3977d0 and3974a0 - 2026-09-22
+
+User's saved sessionb26be6103c9c4acf961ad659cf0fabf9/native.log820 stops at3977d0 with a0180f680/ra3999d8. Original caller3999d0 calls100b40 and delay3999d4 selects object+16fc; saved01810d7c contains {0,-1,3977d0}, while adjacent+1708 still contains396900. Caller inspector46bffe01... and the already independently decoded negative-descriptor JR100b6c establish this dispatch. The identical previously blocked target inspection succeeded on user-requested retry as1ec288e8f1a044019044cd67c9b6ec72, through the same configured task, not a fallback. Complete724-byte original/live body3977d0..397aa0 matches SHAa9602af38a50208d0e10645641ab3dad43a0ad52b3a38eb5c12b090bb7258d1b (ELFfile2717776; RAM3766224); JRra397a9c restores352 stack bytes in delay397aa0.
+
+Original3978f8/397904 loads descriptor44b1d0,397908 calls existing nonzero-descriptor helper100bd0,397924/28/2c copies its three words into object+16fc/+1700/+1704. Descriptor is {0,-1,3974a0}, proving a potential successor of the same observed dispatch without guessing adjacent functions. Inspector7ca164d5089842f7b00064c5f0d46666 decodes this successor; full812-byte original/live body3974a0..3977c8 matches SHA83ee781cbb23de6fb7e846c71e5bb8aca1993cb11bb269f57f6219a5542d5d38 (ELFfile2716960; RAM3765408). It loads44b1e0 at3976c0/cc and installs {0,-1,398850} at397714/18/20. That final callback is already compiled, so no third new root is needed. The32-byte descriptor pair at original44b1d0..1ef and saved RAM agrees SHA069f91053eeb1b7756b0eaaa1e4eff39515c500b2162c3072f57b30b42117888. Original ELF pinned3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8. These observations prove static coverage requirements, not all downstream behavior or successful live menu close.
+
+Only config site100b6c gains3977d0/3974a0; currentb8d3101f33e40b67bbcfa5cc0f7acafe3a9899a8cf418ee6bec4d2eb004d6711,161602bytes. Exact dirty original12393103... preserved in automatic backupd7fece70d66844c4969b7a08fb63c6ae; external planclose-menu-3977d0-family-preedit-20260922.txt. Configured hg_emit35b8201409954c61917c784460e57772 archives original generated bytes at project-link-emit/20260922T063803Z-efe99298d87a4a6d907e82b8e197d853 and changes only translated-shard-001c.cpp as C++ (384 additional words, exactly the two verified bodies), plus analysis/listing. New shardSHA3e38cfc44724deeda08f92b83b8257a9f4c19744a639d2b7d2e55f47ce27c88d contains both entry cases and ordinary checked budget/delay/return paths. Python c8ef3d914ca94f3bbe9a76475b14b62f passes130 tests; build58e9b25b02d144d2aecebc14173ff143 succeeds, executable2094e2cd8e2bdd4f0bcef49b3d14ca90ba6db939c166b30ffe25d61e8571d3d9,149-input manifest95c9f948ed016e89d1184e414a43ab7dc88f2a8ef70cba63325f29031ea607a3. F1/Tab/redraw host9704ed0b... and all previous coverage retained. No original instruction replacement, runtime decoding, audio/clock/rendering changes or emulator dependency. Live open/close test remains separate from fixed33M regression; see PROGRESS.
+
+## Original Select-menu member396900 and three installed successors - 2026-09-22
+
+Manual session93c3705fa75c447b93bde4547d095d73 (project-link-visible/20260922T060315Z-2b6cfc946afd44cfb159f18fef315246) delivered Select buttons65534 at native.log748, then stopped at396900/a0180f680/ra397f64 at line762. Original397f58 sets a0=s2;397f5c JAL100b40 and delay397f60 set t9=s2+1708. Saved EE RAM01810d88 contains {0,-1,396900}; the independently decoded member helper uses its negative-offset JR100b6c path. Own inspectorad68cf0740374d149a61feb1c2c86ad5 records this caller. Target inspectorsa8dff78c18f74af396ae6948013dfb00/59aca2fca079460cab3133ac917f9e16 identify normal prologue396900 and JRra3970c4/stack-restore delay3970c8. Complete1996-byte original ELF body at file2713984 and saved RAM at3762432 agree SHAfb5d15b9b0a62785886f2fb7f976191d6f8d092ec569650a386ccd5db6257aac. Original ELF identity remains3b374d53a499d2c17b205274ee9eb34280768f294f970ebf6ae6731f6a2dacb8.
+
+To avoid single-callback discovery for this same menu family, inspected ORIGINAL396900 descriptor installers, not adjacent functions by proximity. Sources44b200/44b210/44b220 are12-byte {0,-1,target} descriptors for394e40/395630/394670. Original/live96-byte44b200..44b25f region matches SHA8d77461e73dece559d617e7f2e3000df48a6a4a7954b157b220f738bef33cf07. Exact primary stores:396e3c/40/48,396ed0/d4/d8,396fdc/e0/e8 ->object+1708/170c/1710, the known caller's field. Helper100bd0 ORs the three words and returns nonzero for every descriptor. These are statically proven potential successor calls; not claimed to have occurred in the captured run. Secondary1714 copies share existing targets and add no roots. Already compiled393bd0 remains. Inspectors9321d6303ff34ae286d6c4f0040fb928,ac16345aa9334ef7a1cfed6b03d3cf18,ac7fd36f9e99496887f0ebe26e4317fd record installers/guard. Original prologue inspectors07c8c86a...,04ec9ee1...,201bb9cd... independently decode all three target entries.
+
+Config12393103... adds exactly these four roots to existing indirect_targets site100b6c, preserving staircase2ac530/unpause2f55c0 and all prior work. Original configd90c7919... exact backup4ababbf5ff094fdab9deb00af72c1d07; intermediate396900-only config3a4a79a5... backupc90e46405ea54ee58f53484b1fa00bef. External planselect-396900-preedit.txt plus pre-code PROGRESS amendment record scope. Configured emit011587b0980c42a4bf1e9a8db52c9f48 saves exact previous generated bytes under project-link-emit/20260922T061352Z-5a43a2db1eb64e34af2af7a7d9572822; newly discovered direct callees follow normal AOT CFG rules. No original call/renderer/fault/arithmetic/clock bypass or emulator dependency. Current F1/Tab host9704ed0b... stays unchanged. Synthetic and standard33M regression are not a live Select-menu success claim; see PROGRESS for build and runtime evidence.
+
+## Original unpause direct-member target2f55c0 - 2026-09-22
+
+User's manual unpause sessionecd7f4c9b0754e2b9d2110c0ef697e21 stops explicitly at2f55c0 with a0fc6fe0/ra2f609c (saved native.log1094). Original2f6090 sets a0=s0,2f6094 calls100b40, and delay2f6098 sets t9=s0+110. Saved EE RAMfc70f0 begins {0,-1,2f55c0}; the original helper100b40/44/48 loads the three words,100b4c takes the negative-offset branch, and100b6c JRt9 enters the direct callback. Inspectorscf9a925db267417582bc0cd0ef5e3e63 and3d3f3fbc6237472d8b068ed6d3cdfc73 establish caller/helper independently.
+
+Inspector5558618e1da444259886b357655f7146 decodes the original body2f55c0..2f599c. It has normal stack/register/FPU saves, original branches and calls, JRra at2f5998, and stack restore in delay2f599c before the already-known2f59a0 routine. Full992-byte original ELF slice(file2053696) and saved live EE code(VA3102144) agree SHAd15a1113d610faed2e3f6662a697a96198f77ac6eb322a9721e2a9e558f60b58. Original ELF remains3b374d53...; no external implementation, guessed adjacent callback or rendering reference is used.
+
+Config change appends only2f55c0 to existing indirect_targets site100b6c, retaining previously verified2f5c80/2f59a0 and the separate staircase2ac530 root. Old config77332e15... saved automatically in backup5eeb0dc61e2243c08abb457eaee98dd6; newd90c7919.... Pre-edit provenance and exact hashes in external unpause-2f55c0-preedit.txt. Build/regression and actual live unpause verification are separately recorded in PROGRESS; compiling the missing callback alone does not prove its downstream calls or full unpause now succeed.
+
+## Original live virtual target2ac530 - 2026-09-22
+
+Manual visible jobc1fa9cfc84bc40bfaad9712c131e0ffc stopped at EE2ac530, ra20957c, a017f355c. Saved EE RAM at17f355c contains vptr46dfc0; slot46dfcc contains2ac530. Original caller20956c loads the vptr,209570 reads+0c,209574 JALR t9 preserves the return20957c, and209578 sets a0 in the delay slot. Own hg_inspect jobs5e1deef013e04e1badb6278240006d6f andf7977dab48d348ecb396afb32cc0e830 establish original target/caller instructions, not an external implementation.
+
+Pinned original ELF3b374d53... PT_LOAD maps file0x80 to VA0x100000. Its64-byte table at file3596352 matches saved RAM at46dfc0 exactly (original slice SHA d7ebd6d8de5a91273c9de390de9d3c4d63cd04d88661e0704a08e610cfd53b99). Target2ac530/34/38 is LUI v0,0x40; JRra; ADDIU v0,v0,-28256 in delay slot, returning3f91a0. Config adds only indirect_targets site209574 ->2ac530. No neighboring method is assumed reachable, no original call is bypassed and no renderer/clock/arithmetic/fault behavior is changed.
+
+Configured hg_emitb0129f4346b0439282aee2efe6468458 backs up all prior generated bytes under project-link-emit/20260922T053246Z-dbc5de424d2a4c44bf8db98e75cf151d. Only translated.cpp and translated-shard-0015.cpp change as C++ (plus analysis/listing). The new page_2ac body at shard0015 lines49581..49604 preserves the normal budget/trace prologues, static target selection, delay-slot arithmetic, return and unsupported-address fault.130Python tests3a2d0275f45f4a819e990bcf4f82b8c9 pass; build/replay/live re-cross results belong in PROGRESS, not inferred from emission. Config backupf5bc653dd3ce41e1a0e5031270be7035 restores exact e6a72c5f... if needed; current77332e15....
+
+Evidence project-link-visible/20260922T052458Z-71c5108ac15b4b9a80b5a56e4112e3fc retains the later staircase-landing framebuffer640x448, EE/IOP/GS/VU states and fault log. PrintWindow returned white despite that saved image, so it is not a faithful capture here. Missing audio is separately explained by the launch command having no speaker option; the next manual launch must use audio=speakers. This does not certify complete SPU2 mixing or synchronization. No manual input recording was produced, so the later route requires a new live test.
+
+## Build freshness and rejected GL error-notification trial - 2026-09-21
+
+Primary documentation consulted: CMake add_custom_command POST_BUILD (https://cmake.org/cmake/help/latest/command/add_custom_command.html), GLFW context sharing (https://www.glfw.org/docs/latest/context_guide.html#context_sharing), and Khronos KHR_debug specification (https://registry.khronos.org/OpenGL/extensions/KHR/KHR_debug.txt). The retained post-link/preflight hash code is independently written project infrastructure, outside native execution timing. The rejected GL trial derived its callback guarantee from KHR_debug sections2.5,5.5 and5.5.7: an ordinary context may emit no messages, whereas the selected debug-context synchronous mode supplies API-error notifications before the offending call returns. The trial preserved polling fallback and original fault points and passed an actual-driver expected INVALID_ENUM startup test, but regressed qualified throughput and was removed. No emulator/shared-renderer code, algorithms or comments were used. See HG-DIAG-028/030, HG-FAIL-028 and PERFORMANCE for the measured scope; documentation alone is not proof of physical-console fidelity or improved performance.
+
+## Original Start direct-member callback2f5c80 - 2026-09-20
+
+Saved live fault reports EE PC2f5c80, a0=fc6fe0, ra2f609c. Independently decoded
+original2f6094 calls member helper100b40 and sets t9=s0+0x110 in its delay slot.
+Helper100b40 reads three descriptor words; negative word1 reaches direct JR t9 at
+100b6c. Saved live EE RAM atfc70f0 is 00000000 ffffffff 002f5c80, proving this
+specific direct target at that observed call. Original2f5c80 has a normal prologue,
+body and JR ra at2f603c with stack restore delay slot2f6040;2f6050 starts the next
+routine. No neighboring address or external implementation was used as the proof.
+
+Config therefore adds only2f5c80 to site100b6c. Project Link hg_emit regenerated
+the normal independent emitter output: prior backup contains no page_2f5/case2f5c80;
+new translated-shard-0017.cpp contains `case 0x002f5c80u: step_2f5c80`, and
+translated.cpp dispatches page_2f5. analysis.json marks target3103872 compiled=true.
+Emitter backup/manifest: TEMP/haunting-toc-probe/project-link-emit/
+20260920T204149Z-312ef9d99f9542d88c5fef2ef9b3fb81. Built hg_game SHA256
+806b231e7fbc6e50b915e02659e9ab1b2e7a9a6ca103601a27b1a6722e2e903a.
+Tests/build pass as recorded in PROGRESS. Runtime crossing of the former Start fault
+remains unverified because no replay/launch task is exposed; this is static-coverage
+and build evidence only, with no gameplay-FPS or audio claim.
+
+## CURRENT - previous execution path restored and replay verified, 2026-09-20
+
+Rejected matrix183227 implementation after9.377% slower mean scene, both pairs;
+all four candidate/control state comparisons passed. Archived source/tests/exe/map
+in matrix183227-rejected. Restored emitter/CMake/generated main match exact
+matrix-postcompat-baseline bytes. The two new matrix test files were archived
+outside active tests; inherited unused helper sources remain as in that baseline.
+Restored hg_game build exit0; full105 Python tests pass. Fresh restored33M replay
+ends native-iop-budget and matches original image/EE RAM+registers/devices/GS/VU,
+with only verified RTC IOP differences. Current exe SHA256
+1a89f68ad5db75e80d7ef66adc9689f4c08600c34fb37ebbe1ed95e6ff2783ea.
+Proof matrix183227-restored-validation.json. Compatibility fixes remain intact.
+No matrix speed gain or verified30 gameplayFPS. No new visible game was launched.
+
+## REJECTED - prepared matrix arithmetic slowed both pairs; restoring, 2026-09-20
+
+Original matrix build and all four33M captures pass: image, EE RAM/registers/devices,
+GS and VU exact; IOP differs only verified RTC bfcd1/2/3. Two warmups excluded.
+Control scenes7.6884/7.9125s, candidates8.8191/8.2447s. Mean7.80045 ->8.53190s,
+9.377% slower, both pairs. Reject this implementation despite synthetic correctness.
+Archive matrix183227-rejected preserves candidate sources/tests/exe/map and hashes.
+Evidence matrix183227-summary.json and all four captures; no performance gain.
+
+## VERIFIED - live compatibility fixes and saved regressions, 2026-09-20
+
+VU0 normal-ACC product-underflow and original callback124da0 are built. The exact
+42-event replay reaches45M native-iop-budget, passing both former faults. Both
+warmups and four33M regressions ended native-iop-budget; all recorded image/EE/GS/
+VU comparisons pass, IOP differs only RTC bfcd1/2/3. Saved livecompat results reused.
+Mean matched scene 8.46275 -> 8.52585s (+0.746%); pairs disagree,
+so no repeatable speed effect is established. Retain required compatibility fixes.
+Current executable SHA256 2608296bcff3c2a47887f67b2cf233fd41a30eaf9792f50df85f21c1ac3d5eae.
+30 gameplayFPS remains unverified/unmet. No new tests/build/replay needed for launch.
+
+## Original virtual callback124da0 - 2026-09-20
+
+After the bounded VU0 underflow correction, the exact42-event recording advances
+from36.445516M to39.245766M and stops at missing124da0. Captured a0=cb8b40,
+[a0]=46c220, t9=124da0 and ra=1728b0 agree with independently decoded original
+172894..9c installing that table and1728a0/a4 selecting slot+10 before JALR1728a8.
+Original ELF and live RAM46c230 both contain124da0. Original124da0/a4 is JRra/NOP
+03e00008/00000000. A narrow authorized shared manual-config address lookup had
+no match; the original instructions and observed path establish this target.
+Only that indirect-site target is added. Normal old/new emission matches all26
+current generated files and adds exactly2 original words in shard0009; no words
+removed, main/other shards unchanged. Proofs callback124da0-regeneration-proof.json
+and callback124da0-applied-proof.json. The large-file patch reader failed before
+mutation; a verified580-byte insertion exactly equals normal emitter output and
+preserves all outside bytes.105 Python tests pass; callback build/replay pending.
+No host success stub, skipped instruction, external implementation or guessed
+neighbor callback. Current baseline live-callback-124da0-baseline preserves files
+and pre-callback corrected executable4488fc9d... with manifests.
+
+## Bounded VU0 accumulated product-underflow - 2026-09-20
+
+Sony VU User's Manual v6.0, April2002, p42 MADD exception table, macroVMADDbc
+p273 referring to microMADDbc p88. User-local original PDF SHA256
+ a858ef55cd2638accdfca612d5359eb6e48a48c7fd6792b18080d866e610fde5.
+Transcript: https://studylib.net/doc/25815876/vuusersmanual.158394566
+Coordinate-based extraction in TEMP/haunting-toc-probe/sony-vu-page42-tables.json
+separates ACC normal/productUDF row: current U/O0, final-result Z/S, stickyUS1.
+For nonzero normal ACC (encoded exponent1..254), adding the flushed signed-zero
+product leaves that ACC exactly unchanged. Separate accumulated stickyU from
+current flags; retain atomic original snapshots/commits. Unsupported zero/denormal
+ACC underflow, product overflow, exceptional ACC and exceptional sums still fault.
+No EE COP1 or external renderer policy borrowed; VU1 helpers are not a flag oracle.
+49152 synthetic runtime cases, 12 atomic rejection cases and translated delay-slot
+checks pass. External actual-operand fixture produces expected vector/ACC/flags.
+Original-game continuation validation pending. Existing bounded24-bit profile
+and physical-console least-bit uncertainty remain. No timing changes.
+
+## Compile-time VF readiness proof retained - 2026-09-20
+
+Proof uses existing native model only: successful VF check establishes selected
+lanes ready; produced_vf writes issue_cycle+4; each pair advances one cycle.
+Conservative ages ignore additional stalls. Reset proof at entries/targets/control
+boundaries. Unit advance and WAITQ detect unsigned wrap and restore original
+masks for the remaining invocation. Require-target advances cannot wrap. Zero
+advance cannot additionally complete Q/P after the pair's initial positive advance.
+No new hardware-timing assumption or interpreter.49152 compiled synthetic states,
+105 Python tests and four original captures pass; scene2.631% lower. This validates
+preservation of existing behavior, not complete physical-console timing fidelity.
+
+## Combined exact product/add host call retained - 2026-09-20
+
+Existing independently implemented integer product and exact add bodies are
+inlined only inside the AVX2-specific source; one guarded dispatch combines calls.
+Product rounding/saturation happens before addition, and exception masks are ORed
+as before. No host FMA or guest timing change.4M chained scalar comparisons/four
+MXCSR modes, existing32M arithmetic comparisons and four original captures pass.
+Scene0.702% lower, both pairs faster. This removes host overhead, not guest work.
+
+## VU SQ snapshot elision candidate - 2026-09-20
+
+Own original microprogram bytes and existing decoded dependency metadata identify
+131 reachable SQ sites,20 overlapping same-pair upper VF writes. SQ consumes VF
+lanes/definedness and VI address only; upper operations change no VI. If store
+lanes and upper VF writes are disjoint, the post-upper operands equal the saved
+pre-upper operands. Overlapping sites retain the original entire-state snapshot,
+including fault ordering. Existing dual-issue behavior remains unchanged; no new
+console assumption. Original proof vu-sq-snapshot-static-proof.json. Incremental
+regeneration matches old emitter block exactly before inserting normal new output.
+Build/104 Python tests and four original captures pass (RTC only).
+Matched scene1.410% lower; retained.
+
+## Resident masked-transfer proof - 2026-09-20
+
+Derived from own PSMT8 byte mapping and existing CPU expression. The same eight
+word indices/byte masks carry the16 host input bytes. GPU updates use uint32
+(old & ~mask) | (value & mask); merging duplicate words combines masks and retains
+last writer for each bit. One shader invocation per unique word prevents RMW races.
+Queued draws precede updates; later draws and overlapping CPU access flush them.
+Unmodified bits stay on GPU until ordinary coherence materialization. No external
+rendering reference or guest timing change.1042 differential cases per GPU mode
+and four original captures validate existing modeled behavior, not total console
+fidelity. HG-DIAG-017 and masked-transfer-summary.json record scope/evidence.
+
+## External native stack diagnostic - 2026-09-20
+
+Independent external sampler follows Microsoft DbgHelp StackWalk64 contract:
+https://learn.microsoft.com/en-us/windows/win32/api/dbghelp/nf-dbghelp-stackwalk
+Installed SDK Windows/DbgHelp headers supply structs. No external implementation
+copied. CONTEXT_FULL with RIP/RSP/RBP initializes the walk; remote reads and PE
+unwind tables use SymFunctionTableAccess64/SymGetModuleBase64. Per-sample suspension
+uses scoped resume and no allocation while suspended. Five-second run is excluded
+from benchmarks; observed call chains support the GS download/flush lead only.
+
+## Four64-bit-lane integer product candidate - 2026-09-20
+
+Derived solely from existing independently implemented Fpu::product and SSE2
+broadcast_products. Four unsigned24x24 products fit48 bits; bit47 selects exact
+right shift23/24 and exponent carry. Signed exponent range remains -126..384;
+64-bit compare masks select underflow zero or overflow Fmax. Exponent-zero input
+retains signed zero with no underflow flag; exponent255 remains finite per existing
+model. AVX2 lane packing selects the low32 bits of each64-bit lane; masks retain
+X/Y/Z/W order. No host FP arithmetic, clock changes or emulator implementation.
+Existing CPU/OS AVX2 guard and scalar/SSE2 fallback remain.16M scalar product
+comparisons across full exponent pairs, edge mantissas/signs and random inputs
+passed in fourMXCSR modes without exception flags. All four original timing/state trials pass (verified RTC-only IOP differences).
+Scene mean2.476% lower; retained. This establishes implementation equivalence,
+not new console fidelity.
+
+## Options connected state group - 2026-09-20
+
+Own original393c5c/393ca0/393ce4/393d28/393d6c/3940c4 load complete direct-member
+records44b408/418/428/438/448/458, test them with100bd0, and store all three words
+atobject+1708/170c/1710. Their targets are393880,393480,3930c0,392b50,392670,392360;
+original397f5c and397ea0 dispatch that same field through100b40. Original3998c4..
+3998fc loads44b170 ->398100 and storesobject+16fc. Captured397d60 stop likewise
+uses the live object+16fc descriptor; original44b1a0 retains its template. Scoped
+original-byte proof: options-state-group-proof.json. No unrelated descriptor list
+was rooted automatically; own decoder evidence was checked against load/store code.
+
+## Options body descriptor - 2026-09-20
+
+Original397f5c calls100b40 with object+1708 inr25. Hidden replay captures this
+at8fe5c8 as {0,-1,393bd0}; original44b060 contains the same descriptor. Add393bd0
+to100b6c static targets. Shared non-rendering functions.manual.toml393bd0 extent
+and narrow Options lead consulted; all target facts independently read from own
+ELF and options-transition-replay EE RAM. No copied implementation.
+
+## 2026-09-20 Options transition continuation
+
+Captured replay and fresh live session both reach3984d0 through100b6c; object
+8fe5bc now contains {0,-1,3984d0}, matching original44b160. Original398724..39875c
+loads {0,-1,397f00} at44b180, checks it via100bd0, then stores its three words at
+object+16fc/1700/1704 for the same helper. Original398878 checks state<16 before
+398898 loads table4643a0..4643e0 and jumps. All16 words independently read from ELF.
+The narrow shared non-rendering functions.manual.toml3984d0 extent was consulted
+as a lead; target/table/store proof is from original ELF and live snapshots.
+
+## 2026-09-20 live direct-member callbacks
+
+Own digest-verified original SLUS_210.75 descriptors44af30 and44b050 contain
+{0,0xffffffff,0x3838f0} and {0,0xffffffff,0x399920}. Captured live EE objects
+17f3afc and8fe5bc respectively contain identical descriptors. Original helpers
+384ba0/3999c0 route these through100b40, whose direct transfer is100b6c.
+Independently inspected target bodies; add only these live-proven static targets.
+Narrow shared HG non-rendering functions.manual.toml extent leads corroborated the
+addresses; no implementation or rendering material was copied. Artifacts:
+live-member-3838f0-proof.json, live-paced-audio-check.*, manual-intro-recording.*.
+
+User video reference: https://www.youtube.com/watch?v=JvdAHmVA-vI&t=28s,
+SHN Survival Horror Network longplay. Visual landmark comparison only, not a
+physical-console timing oracle or proof of internal gameplay FPS.
+
+GPU triangle host-interface reference: Khronos ARB_gpu_shader_int64, inspected
+2026-09-19: https://registry.khronos.org/OpenGL/extensions/ARB/ARB_gpu_shader_int64.txt
+64-bit GLSL arithmetic and packing interfaces only. Triangle coverage/interpolation,
+texture/depth/color stages derive from our existing independently implemented CPU
+renderer and recorded GS manuals, not an external rendering implementation.
+
+Independent manual check after rendering-reference request: original GS User's
+Manual v6 printedpp15/17/35/51/95/162 inspected from existing local PDF. Page35
+specifies parallel pixel processing and setup gradients; page162 describes8KiB
+pages and column access; page51 requires TEXFLUSH invalidation when newly written
+image/CLUT data is used for textures. Physical cache behavior and alias pixel order
+remain separate verification questions; host GPU coherence is not a substitute
+for those guest semantics. Extract outside repo: gs-pipeline-reference.txt.
+Wide host integer division interface verified against Microsoft documentation:
+https://learn.microsoft.com/en-us/cpp/intrinsics/udiv128?view=msvc-170
+The new helper checks divisor/quotient width and preserves portable checked fallback.
+
+## Rendering reference comparison requested by user - 2026-09-19
+
+User explicitly asked to learn from PCSX2 rendering and original PS2 behavior.
+The initial independent GPU sprite implementation and measured batching result
+precede this inspection. Inspected official PCSX2 GS documentation:
+https://github.com/PCSX2/pcsx2/discussions/4311
+https://github.com/PCSX2/pcsx2/blob/master/pcsx2/Docs/GameIndex.md
+Search results also exposed excerpts of GS.cpp, GSRendererHW.cpp and
+Renderers/OpenGL/GSTextureOGL.cpp in that same official repository. These were
+used only as architecture leads: texture/target caching, readback and synchronization
+costs, and why games submit narrow clearing strips. No source, comments, algorithms,
+game fixes or mappings copied into our renderer. Original GS User Manual remains
+the authority for independently derived behavior; PCSX2 is not a runtime dependency.
+
+Open leads, not established console facts: verify page-cache/drawing-group effects
+and alias ordering against original manuals/probes. Our CPU row-major feedback
+order is not automatically physical-console proof. GPU per-draw alias remains
+rejected. Resident VRAM and synchronization only at true consumers are candidates;
+do not copy PCSX2 cache/invalidation heuristics or game-specific substitutions.
+
+## OpenGL sprite acceleration provenance - 2026-09-19
+
+runtime/gl_gs.cpp is an independent port of our existing CPU CT32 sprite pixel
+math, with host-prepared addresses/fractions and integer filtering/TFX/ALPHA.
+No external emulator or shared project rendering implementation was consulted.
+OpenGL interface/ordering reference: Khronos ARB_shader_storage_buffer_object,
+https://registry.khronos.org/OpenGL/extensions/ARB/ARB_shader_storage_buffer_object.txt
+(accessed2026-09-19): std430 SSBO layout and barrier-controlled buffer visibility.
+GL_BUFFER_UPDATE_BARRIER_BIT precedes synchronous buffer readback. Separate
+invocations write distinct destination words; texture/frame page overlap is rejected.
+OpenGL4.3 context verified on RTX5070 driver616.92. No shader int64 needed for
+this first path: interpolation stays in checked CPU setup, channel math is32-bit.
+
+## Original scene display-wait counter (2026-09-19)
+
+Read-only own-decoder inspection of the original USA ELF (configured digest).
+1bf190..1bf1b0 registers1beda0 for INTC cause2 through26be80 (syscall16),
+and1bf1c0..1bf1d4 registers1bed80 for cause3. Handler1beda0 sets GP-30444
+and increments the word at GP-30436;1bed80 sets GP-30440. The1beef0 wait
+routine clears/polls these flags and compares that counter with object+0x1c,
+waiting when the difference is below2 (1bef40..1befd4). This corroborates
+original display synchronization; it is not a free-running frame counter or
+proof of measured game FPS. Do not relabel callback counts as completed frames.
+External inspect artifacts: frame-boundary-inspect, frame-counter-writer,
+frame-counter-registration and frame-counter-syscall under TEMP/haunting-toc-probe.
+No game data or generated code added to version control; no runtime behavior changed.
+
+## VU character projection and data hazards - 2026-09-19
+
+External character-vu-0 before/after captures select scene4 entry58. Independent
+weighted-bone/matrix projection predicts x1969.9667,y2109.4265,z87909.20.
+Using captured previous Q=.01104458142 instead produces1956.3359,2094.8307,
+87300.93, matching native output1956.3125,2094.8125,87300 after quantization.
+Original DIV198 to MULq1c8 has six pair intervals; dependency stalls were absent.
+Sony VU User's Manual v6 pp44-48,365-366 (VU_Users_Manual.pdf from
+https://github.com/ninjadynamics/PS2Docs) independently specifies per-field VF
+hazards, simultaneous-pipeline stalls, four-cycle FMAC/load latency, and seven-cycle
+DIV latency. Q itself does not interlock. AOT emission now supplies explicit
+register dependencies to bounded runtime readiness tracking, advancing Q/P on
+stalls without instruction decoding. Integer loads use4, integer arithmetic1.
+Actual game replay validation pending. Existing flag/XGKICK/EFU timing limitations
+are not closed by this change. No external renderer implementation consulted.
+The separate vu-instruction-manual.pdf is a BigBoss/Jules reference, not the Sony
+manual; it was not used as authority for this timing correction.
+
+## PACKED XYZF2 bit fields - 2026-09-19
+
+Independent visual inspection of Sony EE User's Manual v6.0 p154, section7.3.2
+(local hg-ee-users-manual.pdf), proves PACKED Z occupies bits68..91 and F
+bits100..107; ADC is111. Corrected parser shifts of high64 by4/36 before
+packing the GS register. Synthetic nonzero reserved-nibble test checks depth,
+fog and ADC. This is a verified parser defect; its contribution to Fiona's
+observed geometry/color corruption remains unproven. No external rendering
+implementation consulted.
+
+## Post-opening VU1 program identity - 2026-09-18
+
+Fresh continue-vu1-micro capture retains exact VU1 MicroMem under HG-DIAG-006.
+MicroMem[0,0x298) matches original ELF3a7558 byte-for-byte:83 instruction pairs.
+The immediately preceding original VIF code at3a7554 is4a530000, independently
+decoding as MPG NUM=0x53,destination0. MicroMem[0x298,0x2f0) still matches the
+tail of the prior95-pair opening program at3ac6b0; it is a stale partial-overwrite
+tail. A fault-message-only diagnostic records the actual activation entry as0.
+Structural vu-inspect of the83-pair payload reports5 direct control pairs, both
+END pairs and every branch/delay slot inside the payload, with no unsupported
+decoded pairs. Build-time emit_vu1 succeeds from entry0 without adding operations.
+Therefore the second AOT identity is source3a7558,micro0,count83,entry0. No shared
+rendering configuration, mapping, algorithm or implementation was consulted.
+
+## Eighth 1bbed0 object family 478b70 - 2026-09-18
+
+Fresh continue-sharded-fc30 replay clears2e5660 and reaches original34e9e0,
+RA1bbed8, object1ffeaa0 vptr478b70. Original ELF and fresh EE RAM agree exactly
+on478b70=0,478b74=0,478b78=347640,478b7c=34e9e0,478b80=0,478b84=0, bounding
+the family to[478b78,478b80). Original347658..664 materializes478b70 and stores
+it to object+0. Both methods were missing before this batch. The following478b80
+family is left unrooted until live evidence reaches it. Shared non-rendering data
+only corroborated the34e9e0 boundary after independent original/live proof.
+
+## Seventh 1bbed0 object family 46fc30 - 2026-09-18
+
+Fresh continue-sharded-d790 replay clears2685f0 and reaches original2e5660,
+RA1bbed8, object17f6c50 vptr46fc30. The common caller1bbebc..d0 loads slot+0c.
+Original ELF and fresh EE RAM agree exactly on46fc30=0,46fc34=0,46fc38=126170,
+46fc3c=2e5660,46fc40=0,46fc44=0, bounding this family to[46fc38,46fc40).
+Original126188..194 materializes46fc30 and stores it to object+0. Both methods
+were missing before this batch. The adjacent46fc40 family is not rooted here
+because it is not yet the live blocker. Shared non-rendering data only corroborated
+function extents after the original/live proof; no rendering material was used.
+
+## Remaining post-opening graphics callback descriptors - 2026-09-18
+
+Fresh continue-object46eb60 replay clears2bb3e0 and reaches1b8910 through
+member helper100b40, RA1b8e64. The live descriptor block47e300 contains seven
+direct triples:1b8ce0,1b8c90,1b8910,1b88c0,1b8890,1b8860,1b87f0. The first
+two were already rooted. Original constants3b2f68..3b2fd0 contain the same seven
+targets in order, and original constructor464920..464a60 copies the corresponding
+three-word descriptors into47e300..47e350. Fresh EE RAM matches every copied word.
+Root the remaining five callbacks together. Own decoding shows the small neighboring
+bodies directly;1b88c0's only virtual dependency resolves through live global44e550
+to an already-compiled target. The supplied non-rendering shared list corroborates
+function extents only; no rendering mapping, algorithm or implementation is used.
+
+## Fifth 1bbed0 object family 46eb60 - 2026-09-18
+
+Fresh continue-object46b1c0 replay clears1f2b80 and reaches original2bb3e0,
+RA1bbed8, with live object1ffeaf0 holding vptr46eb60. The common caller1bbebc..d0
+loads object slot+0c. Original ELF and the fresh EE RAM capture agree exactly on
+46eb60=0,46eb64=0,46eb68=2bb220,46eb6c=2bb3e0,46eb70=0,46eb74=0, bounding the
+two-method family to[46eb68,46eb70). Original2bb238..244 materializes46eb60 and
+stores it to object+0. The three immediate virtual calls inside2bb3e0 resolve in
+the same capture to already-compiled1bb980,1c0f10 and1bbbb0, so no speculative
+dependency roots are added. The supplied non-rendering shared function list only
+corroborates the2bb3e0 extent; all table, installer and live-use evidence is ours.
+
+## Fourth 1bbed0 object family 46b1c0 - 2026-09-17
+
+Fresh continue-vuconvert replay clears the VFTOI0 stop and reaches1f2b80, RA1bbed8.
+Live objecta85110 holds46b1c0; original ELF and fresh EE RAM agree on16f680/1f2b80
+at46b1c8/cc. Null words46b1c0/c4 prefix the pair and the next table begins with
+nulls at46b1d0/d4, independently bounding this family to[46b1c8,46b1d0).
+Original16f754..75c materializes and stores46b1c0 into object+0. The caller1bbed0
+loads slot+0c and therefore selects1f2b80 for this live object. Added only this
+proven two-method family to the existing explicit target union. No rendering
+reference material or implementation was used.
+
+## VU0 macro fixed-point conversions - 2026-09-17
+
+Fresh continue-object46ada0 replay clears1bdf80 and reaches original10dda4,
+word4be5217c (VFTOI0.xyzw VF5,VF4), RA1b6d54. Sony VU User's Manual v6.0
+pp253-256/264-267 defines macro encodings13c..13f/17c..17f; pp77-84
+and26-28 define lane masking, toward-zero conversion, signed saturation and
+unchanged flags. Source: https://studylib.net/doc/25815876/vuusersmanual.158394566
+The macro emitter now calls vu_convert with constant operands/scale/direction.
+It reuses the independently derived integer-bit conversion primitives already
+in Vu1State; no runtime decoder or reference implementation is introduced.
+All four fractional widths0/4/12/15 in both directions are covered together.
+Inputs are snapshotted, VF0 remains architectural, masked lanes/ACC/Q/flags
+are preserved. Tests cover all masks, aliases, poisoned VF0, integer limits,
+exponent-zero/255 inputs, rounding and a translated branch delay slot.
+43 Python tests and3 targeted native CTests pass; game emit344672 words /
+4525 boundaries. Connected build/replay pending. No new diagnostic introduced.
+
+## Third1bbed0 object family46ada0 - 2026-09-17
+
+Fresh continue-object46d770 replay clears268090 and reaches1bdf80, RA1bbed8.
+Objecta84f50 holds46ada0. Original ELF and RAM agree on16f6e0/1bdf80 at
+46ada8/ac, bounded by null prefix46ada0/a4 and following46adb0/b4.
+Original16f6f8..704 and16f78c..794 install46ada0. Added this exact pair to
+1bbed0's verified target union. Permitted exact CSV lookup gave an abbreviated
+1bdf80 boundary only; all table/call/installer evidence is original and live.
+
+## Second1bbed0 object family46d770 - 2026-09-17
+
+Fresh continue-object46c770 replay clears25e2b0 and reaches268090, RA1bbed8.
+Objectfcda60 holds46d770; original ELF/live RAM agree on267500/268090 at
+46d778/77c, bounded by null prefix46d770/774 and trailing46d780/784.
+Original267518..24 installs at object+0;2d11d4..dc installs at enclosing
+object+40. The caller1bbed0 target set is now the explicit union of these
+and the prior independently bounded46c770 pair. Exact permitted non-rendering
+CSV lookup only corroborated268090 extent; no implementation copied.
+
+## Object family46c770 - 2026-09-17
+
+Fresh paired2cf3a0 replay clears both switches and reaches25e2b0 from1bbed0,
+RA1bbed8. Original caller loads object's slot+0c. Live objectfc72c0 holds
+46c770; initialized ELF and RAM contain25c850/25e2b0 at46c778/77c, bounded
+by null prefix46c770/774 and following null46c780/784. Original25c868..70
+and2d1370..7c publish46c770. Rooted only this proven two-method family.
+Exact permitted non-rendering shared function-list lookup was a boundary lead
+only (its reported25e2b0 extent is short); original control flow is authoritative.
+
+## Paired selector switches in2cf3a0 - 2026-09-17
+
+After the1fbfb0 root, connected replay clears1fbfc0 and stops at2cf4e4,
+RA207854, selector1. Original caller20784c invokes2cf3a0. Its byte-masked
+selector is bounded below8 at2cf3bc before dispatch2cf3dc through45d7a0.
+The same routine bounds the selector below8 at2cf5e8 and dispatches at2cf608
+through45d780. Both complete eight-word tables match fresh
+continue-switch1fbfb0.ram.ee-ram.bin and contain executable internal labels.
+The permitted non-rendering shared lookup supplied a same-routine table lead;
+all addresses, bounds and targets were independently checked in original ELF
+and current RAM. No reference implementation or rendering material used.
+
+## Selector switch 1fbfb0 - 2026-09-17
+
+Post46f480 replay clears2d3e80 and reaches1fbfc0 with a1=f1, RA202bf4.
+Original1fbf70 masks the selector to a byte, bounds f0..fa, subtracts f0,
+and1fbf90 explicitly bounds the resulting index below11.1fbf9c..b0 loads
+and jumps through table[456420,45644c). Its11 executable case labels agree
+with fresh continue-46f480 RAM and end at null45644c. Exact permitted shared
+non-rendering lookup only corroborates enclosing routine1fbf70..1fc028.
+Original bounds and data independently authorize this AOT root family.
+
+## Object family 46f480 � 2026-09-17
+
+Fresh connected capture `%TEMP%/haunting-toc-probe/continue-2d3e80.ram`
+confirms object18eca40 vptr46f480 and virtual slot+0c target2d3e80 at caller
+1ffd34. Original ELF installers2d3aac..2d3ab8 and39aa38..39aa48 publish
+that vptr. The 24 initialized executable words in [46f488,46f4e8) agree
+with live RAM, with null prefix46f480/484 and trailing null46f4e8/ec.
+The bounded family is rooted for AOT translation. Exact permitted non-rendering
+shared function-list lookup corroborated only the2d3e80 function extent;
+no implementation or rendering material was consulted.
+
 # Sources and provenance
+
+## Connected object-dispatch table 46e4c0, 2026-09-15
+
+Original USA ELF code and initialized data independently establish this root
+batch.  Connected execution reaches the original virtual call at
+`0x0020956c..0x00209578`; it loads slot `+0x0c`, whose live target is
+`0x002b1100`.  That pointer occurs exactly once in initialized data at
+`0x0046e4cc`, fixing table base `0x0046e4c0`.  Original
+`0x0020a868..0x0020a874` installs the base, while `0x0020a878` begins the next
+table at `0x0046e500`, bounding this family to `[0x0046e4c0,0x0046e500)`.
+
+The non-null file-backed executable entries are `2b10a0`, `2b1100`, `2b1120`,
+`2b1130`, `209800`, `2097f0`, `2b1140`, `2b1150`, `2b11a0`, `2a8940`,
+`2b1110`, `2b1180`, `2b1170`, and `128080`.  They are rooted as one bounded
+family to avoid redundant rebuild/replay cycles.  Generation after the batch is
+254865 reachable EE words / 2463 unresolved items.  The Release rebuild completed
+successfully; post-build connected replay is pending.
+
+Only after the original table address, installer, bounds, live slot, and executable
+entries were established was the supplied non-rendering shared HG configuration
+searched for function-boundary corroboration.  No shared rendering material,
+rendering mapping, algorithm, or implementation was inspected or copied.
+
+## Connected object-dispatch tables 46d750/46d7b0/46eb40/46ec60, 2026-09-15
+
+Original ELF code and initialized data are the authority for this root batch.
+At original `0x266d4c..0x266d5c`, the live object call loads vptr slot `+0x0c`;
+the fault target `0x2674f0` occurs exactly once in initialized data at
+`0x46d75c`, fixing table base `0x46d750`. Original `0x267328..0x267334` installs
+that table, while `0x267338..0x267340` installs distinct base `0x46d730`. The
+bounded executable entries at `+08..+18` are `267310`, `2674f0`, `2674e0`,
+`2673e0`, and `267370`.
+
+The same original dispatcher later calls `0x26b480` through slot `+0x0c`.
+Original `0x267020..0x26702c` and independent triage at `0x2083b0..0x2083bc`
+install `0x46d7b0`; its five file-backed executable entries are `26b1e0`,
+`26b480`, `26b350`, `26b2c0`, and `26b240`. After these roots, the identical
+connected replay clears `0x26b480` and stops at original `0x2bb390`, RA
+`0x266eb8`, after 29,068,787 slices. This is direct runtime evidence that the
+earlier virtual target no longer blocks the path.
+
+Original `0x267038..0x267044` installs `0x46eb40`; independent triage also finds
+the earlier installer at `0x208348`. File-backed words at `+08..+18` are
+`2bafd0`, `2bb390`, `2bb280`, `2bb1a0`, and `2bb030`, followed by zero at
+`+0x1c`. The immediately following original branch `0x267050..0x26705c`
+installs `0x46ec60`; triage also finds installers `0x208f18` and `0x2242e0`.
+That table contains `2c64e0`, `2c6630`, `2c6620`, `2c6570`, and `2c6540`, again
+followed by zero at `+0x1c`.
+
+Only after each table, installer, and bounded executable entry was independently
+derived from the original inputs were exact non-rendering shared-configuration
+searches used to corroborate function-boundary leads. No shared rendering data,
+rendering mappings, algorithms, or implementation were inspected or copied.
+The roots preserve the original bodies and remain ordinary AOT discovery inputs;
+no runtime decoding/interpreter/JIT fallback is introduced.
+
+## Packed matrix word interleave75,2026-09-15
+
+Sony EE Core Instruction Set Manual v6.0 (April2002),pp205/208,
+independently establishes PEXTLW/PEXTUW:opcode28,subcode18,functions8/40.
+The selected low/high64-bit source halves are interleaved by32-bit words,
+with rt supplying each low word and rs each high word. Both128-bit source
+registers are snapshotted before a destination write;architectural zero
+reads and discarded writes are preserved. No arithmetic flags change.
+Primary manual archive (HTML):
+https://www.scribd.com/document/784545190/EE-Core-Instruction-Set-Manual
+
+Original10dc10..1c contains71286488,71286ca8,716a7488,716a7ca8;
+our original-only decoder inspection through10dc58 verifies the immediate
+matrix rearrangement and subsequent previously implemented VU chain.
+No shared rendering material or emulator implementation was consulted.
+Native helper selection is fixed at generation;no runtime decoding added.
+Synthetic tests cover all source/destination registers,both aliases,poisoned
+zero storage,every input bit,unchanged unrelated registers and a JR delay
+slot that overwrites the jump-source register. Candidate75 validation and
+post-opening replay are pending. This is instruction coverage,not timing
+or physical-console parity. No diagnostic family added.
+
+## Bounded VU broadcast products74,2026-09-15
+
+Sony VU User's Manual v6.0 (April2002), macro VMADDbc p273,
+VMADDAbc p277 and VMULAbc p303 independently establish the new static
+instruction encodings. ACC forms match low11 bits with bc masked:
+VMULA 0x1bc, VMADDA 0x0bc; VF-destination VMADD has function8..11.
+The original matrix-vector words at10dabc..10dac8 select these forms.
+Primary manual archive: https://studylib.net/doc/25815876/vuusersmanual.158394566
+No shared rendering material or emulator implementation was consulted.
+
+decode.py and emit.py select native vu_broadcast_product calls at build time.
+VMULA writes selected ACC lanes, VMADDA adds into selected ACC lanes, and
+VMADD writes selected VF lanes while preserving ACC. Inputs are snapshotted
+before output changes, including broadcast-source/destination aliasing and
+architectural VF0. The manual's numeric rules pp26-29 and flags pp39-42,
+together with micro MADDbc pp88-89, define the bounded arithmetic profile.
+Normal accumulated-result Z/S and sticky Z/S describe the final sum; a
+negative or zero intermediate product alone does not set them. Inactive
+MAC lanes clear; unrelated I/D and accumulated status bits remain.
+
+The existing independently written integer24-bit product/add primitives
+provide truncation and signed-zero handling. Physical-hardware least-bit
+agreement remains unmeasured. VMULA retains documented product saturation
+and underflow flags. Accumulating forms explicitly fault on product overflow,
+product underflow, ACC exponent255 or final addition overflow/underflow:
+these combinations are not inferred from COP1's different MADD policy or
+from ambiguously flattened exception-table rows. Results and flags commit
+only after all selected lanes succeed. These correctness faults are not
+diagnostic overrides; no new diagnostic family is introduced.
+
+Tests cover all16 masks/four broadcasts/three forms, aliases, VF0, signed
+zero, final-result flags and atomic exceptional rejection. An independent
+synthetic program checks ACC chains, a VF result in a JR delay slot, budget
+boundaries and the exact delay-slot fault PC.40 Python tool tests pass.
+Generation yields203680 reachable words/1801 issues with no budget
+exhaustion. ALL_BUILD passes and all25 CTests pass13.08s.74skip advances
+past the broadcast matrix transform to original10dc10 unsupported71286488,
+RA10e170,modeled28234190us.359 sampled images retain the known final hash.
+No new scene or speed measurement is established.
+
+### EE COP1 MSUBA.S gameplay path (2026-09-17)
+
+Fresh connected gameplay execution reaches original EE 0x1f11b0, word
+0x4616b01f, after the independently rooted 0x46b0d0 resource interface.
+The EE COP1 single-precision arithmetic encoding uses function 0x1f with
+the destination field zero for MSUBA.S, the accumulator-only subtract form
+paired with the already modeled MSUB.S/MADDA.S operations. The independent
+decoder now recognizes that exact encoding, the emitter calls a dedicated
+runtime helper, and the helper updates ACC through the existing verified COP1
+msub arithmetic while preserving the ordinary destination registers.
+Focused decode/emission tests reject nonzero destination-field encodings, and
+the FPU test covers an ACC chain 6 -> 12 -> 6 through MULA/MADDA/MSUBA.
+
+## Original post-movie view setup73,2026-09-15
+
+Original33e2a0 selects global44e4b8/object1961500/table469a60. Its virtual
+slots+1c/+5c/+28/+14 select1225e0/122030/1225b0/122810 in order;72skip faults
+at the first call,RA33e318. Original122810 selects+18=1225f0,+bc=121b40 and
++44=122090. All seven original/live72 slots agree and lacked compiled labels.
+All seven are added as bounded AOT roots, preserving original bodies and direct
+discovery.1225f0 is inspected through return/delay122804/08;121b40 through
+121c48/4c;122090 tails to original10dd68 at122098/9c.122810's complete original
+body ends122a14/18. Original1225f0's alternate branch uses global44e550,
+object887a00,table46ab50+18=1a4510; original/live agree and it is already compiled.
+Evidence external post-opening-view-dependencies-72skip.json records input hashes,
+slot checks and the alternate dependency. Earlier view-and-load72 proof records
+use sites and following asset-finalization candidates. Only original executable
+and native captures used; no shared rendering material or emulator implementation.
+Candidate73 generates203665 words/1803 issues without cap exhaustion; both
+diagnostics build and six startup regressions pass4.84s.73skip passes position,
+scalar and target writes and enters122810/1225f0. It faults at original10dabc
+unsupported4be821bc,RA12272c,modeled28234190us.359 sampled images,last hash
+aa51ff064036e5a49ef1278494344a67796499ebfb13b0985ebcca7e16b4ad88.
+No completion of all seven callbacks,asset loading or newly rendered scene is
+claimed. Captured view scalar,position,target and normalized direction fields
+are retained in73skip RAM. Original10daa8 uses broadcast multiply/accumulate
+words4be821bc,4be828bd,4be830be,4be83a4b before writing its transformed vector.
+
+## Original post-movie state batch71,2026-09-15
+
+Original44c7b0/44c7a0 triples equal70skip's888444/18db890 descriptors,
+selecting3a06e0/3a04a0. Original3a0628/38/40 reads44c7c0=(0,ffffffff,3a0390),
+then3a0644/4c/54 installs it at object+1053450. Original3a0390 is verified
+through return/delay3a0498/49c. Shared non-rendering lists supplied only an
+extent lead; original instructions established the actual boundary.
+
+Original3a052c/3a0698 selects44e568/objectfc77b0/table46c3e0+0c=21c760.
+Both copy/reset branches retain the13-word loop and dispatch21c798 through
++90=21b2b0; its21b324 dispatches+60=21b160. These three slots agree in the
+original executable and70skip capture. Complete original bodies were inspected,
+including returns21c7d4/d8,21b3cc/d0 and21b1ac/b0. Original3a0558 selects
+44fe08/objectfd0640/table46c320+0c=21af90,which tails through global44e4e0's
+46a1e0+0c=16bbd0. Original/live slots agree. Original3a03dc uses that same
+object80adc0's+24=16b510. Both16bbd0/16b510 were already statically translated.
+Seven missing roots only are added; all original branches and direct discovery
+remain. No shared rendering material or emulator implementation was consulted.
+
+Evidence external post-opening-state-batch-70skip.json retains original/capture
+hashes,three state descriptors and initial virtual-slot/installation evidence.
+The following+90/+60 and44e4e0 slots were verified by bounded read-only checks.
+Two optional combined inspection commands were tool-blocked; narrower checks
+succeeded. No blocked command's proposed output is claimed.
+Generation71 reaches the configured200000-word discovery cap with1779 boundaries;
+all seven root labels are present. Both diagnostics built and six startup checks
+passed4.86s,but71skip failed early at EE16af48,RA16af40,3309039us,zero images.
+That PC is explicitly listed among the ten instruction-budget frontier entries;
+analysis-71-capped.json preserves the exact report. Candidate72 raises only the
+bounded discovery work limit to400000. Fresh generation finishes at202888 words,
+1795 boundaries and zero instruction-budget exhaustion. Both diagnostics build;
+all25 CTests pass8.22s.72skip reaches EE1225e0/RA33e318 at28234189us,
+with358 sampled images. This passes3a06e0 into original33e2a0 view setup.
+
+
+
+## Original view-initialization callbacks70,2026-09-15
+
+69full's original3a0b04 dispatches global44e4b8/object1961500 through
+469a60+0c=122a30. Original20e260 stores the global and installs469a60 at
+20e270. All original/live slot words agree. Complete original122a30..122ac4
+initializes scalar/vector fields and tails through table+78=121fd0; original
+121fd0..121fe0 stores0,-1,-1 to object+290/+294/+298. These two missing
+entries alone are added as AOT roots. Following3a0b20/3a0b34 callbacks through
+global44e560/object887204/table46bf2c select2106b0/210640; both match original
+words and were already compiled. No copied or guessed rendering behavior.
+Evidence: external post-opening-view-init-69full.json includes ELF/capture
+hashes, live/original words and installation provenance. Generation70 yields
+171110 reachable EE words/1190 boundaries. Both diagnostic targets build;
+all25 CTest checks pass14.02s.70skip passes both view callbacks and stops at
+missing EE3a06e0,modeled28234187us. Eleven selected view fields agree with the
+original writes;359 sampled images retained. No new scene is established.
+
+
+## Full OPENING and later view-initialization boundary69,2026-09-15
+
+The unskipped69full replay completes6300 OPENING CSC starts/54366 sectors.
+All6518 startup guest conversion timestamps equal61full. First-to-last
+OPENING takes210.7389host seconds for210.241230 modeled seconds. Console
+identifies missing EE122a30,RA3a0b0c,a01961500,a14f1838,234941153us.
+Generic native-iop-fault metadata is not the processor classification.
+Refreshed hg_diagnostic builds; all six original startup regressions pass4.17s.
+This confirms the extended original path after the full movie, not a new scene
+or asynchronous asset-load completion. See PERFORMANCE.md for timing limits.
+
+
+## Post-OPENING graphics callback descriptors,2026-09-15
+
+Candidate68 built with171027 reachable EE words/1189 boundaries; all six
+refreshed startup checks pass (4.16s).68skip passes the original16-record
+initialization and reaches1b8ce0,RA1b8e64,a04f1920,a1=0,modeled28201035us.
+359 sampled images and complete sidecars retained. New scene pixels and
+asynchronous asset-load completion are not established.
+
+Original1f9d90 selects1b8d30 twice with a2=0 and a2=1 (1f9e68/1f9f04).
+That body computes47e300+selector*12 and calls original100b40, which tails
+through the descriptor's target when its middle word is negative.68skip's
+first descriptor is(0,ffffffff,1b8ce0); the second is(0,ffffffff,1b8c90).
+These runtime addresses are BSS, not file-backed original words. Original
+constructor464920 copies the corresponding original constants at3b2f68 and
+3b2f78 into those descriptors, including stores464940/464960 and
+464970/464984/4649ac. Those independently inspected source triples agree.
+Both complete original bodies clamp/adjust the input and replicate its byte;
+candidate69 adds only1b8ce0 and1b8c90, retaining original instruction behavior.
+No shared rendering reference was used. A combined optional capture-comparison
+command was tool-blocked and did not create post-opening-palette-68skip.json;
+do not claim its proposed16-record byte comparison was performed.
+
+## Post-OPENING indexed record initialization,2026-09-15
+
+Candidate67 built with170990 reachable EE words/1189 boundaries. All six
+refreshed startup regressions pass (4.14s).67skip passes the prior1a4110
+boundary and stops at original EE1fa5e0,RA1f9cfc,a017f4600,a11ffebe0,
+modeled28201030us;359 sampled images and complete sidecars are retained.
+This is further original execution, not completed asset loading or a new scene.
+
+Original1f9c80 clears object fields, prepares12 words on its stack and calls
+object table+20 at1f9cf4 for indices0..15. Our original-image analysis records
+table46b300+20=1fa5e0, with its table installation at2d0900. The observed EE
+fault selects that exact target. Original1fa5e0..1fa670 copies those12 words
+to object+20+index*30 (hex offsets), retaining the original loads/stores.
+Candidate68 adds this one observed root. Record semantics beyond the field
+copy remain unproven; no shared reference was consulted for this potentially
+rendering-adjacent initialization. No guessed implementation or hardware change.
+
+External post-opening-asset-requests-66skip.json now records all ten original/
+live table comparisons for candidate67, original filenames and both input hashes.
+Fresh bounded67skip field reads agree with original46b300+20=1fa5e0.
+Saved original returns1f9da8 and3a0a4c establish the later call chain after
+3a0a34 returned from176550. The six-slot startup list still holds1510c80,
+16be3c0 and four nulls, with the expected request-method slots. Thus both
+original request callbacks returned before this reset; asynchronous asset-load
+completion remains unproven. External post-opening-records-67skip.json records
+the original/live words, saved returns and input hashes. Its three following
+reset dependencies1c2930,1c0f10,1b8d30 are already statically translated.
+
+## Post-OPENING asset requests,2026-09-15
+
+Candidate66 built with170654 reachable EE words/1175 boundaries; all six
+refreshed game startup tests pass (4.19s).66skip passes both startup initializers
+and reaches the following list traversal176550, stopping at EE1a4110,
+RA17659c,a01510c80,modeled28200869us. The second initializer's original
+object+f3668 store is now2.355 sampled images and complete sidecars retained.
+This verifies further original execution; no new scene pixels are claimed.
+
+Original176594 uses slot+14 of the same six-entry list. Original/live tables
+46aab0 and46a120 select1a4110 and168830. These bodies select filenames through
+object+f0's table slots+a0/+a4/+a8, then call already-translated16bbd0 through
+global44e4e0,live table46a1e0+0c. First resource objecta84f40/table470620
+selects2f7b80/2f7b70/2f7b30; original bodies return O_FIS/FIS_000.PCK,
+O_FIN/FIN_000.MRK and O_FIS/FIS_000.TEX strings (original separator backslash).
+Second objecta84380/table46b240 selects1f8090/1f8010/1f7f00. The first two
+use original bounded selector branches; the third returns a fixed string.
+Original1a4294 also selects global44e558's objectfc8900/table46c540+48,
+target221e70, whose original body computes object+10c0+selector*2000.
+All relevant original/live slots agree. Candidate67 adds only these nine missing
+roots;16bbd0 is already compiled. The exact non-rendering shared-config lookup
+only confirmed1a4110's original extent. No renderer material was consulted.
+
+## Post-OPENING startup initializers,2026-09-15
+
+Candidate64 builds successfully and all25 refreshed CTests pass (13.29s).
+Exploratory64skip passes3a1990 and stops at original1a4340,RA17669c,
+a01510c80. Original176650 bounds the list44f800 to six entries; the live
+list contains1510c80 and16be3c0 followed by four nulls. Their tables46aab0
+and46a120 are installed by original2d078c and2d07ec. Original176694 calls
+slot+0c, selecting1a4340 and168a10. The original/live words agree.
+Original1a43b8 uses the first table's+5c slot19ac70; its direct125cc0 call
+tails through+60 to19ab40. Original19ae44/19aea0 additionally uses global
+44e550's live object887a00, table46ab50+1c=1a44c0. Original1a44d0 then
+calls that table's+10=1a45a0. Both original/live entries agree. These six
+specific roots are added together; no other methods are inferred as needed.
+The original1a45a0 body reads and tempers a random word; no substitute is used.
+Exact non-rendering shared-config lookup for1a4340 only confirmed the bounds
+already established by the original return at1a43c8. No implementation or
+rendering reference material was used. External post-opening-startup-object-64skip.json
+records the original-image and live-table evidence. Candidate65 built and all
+six refreshed game startup regressions passed (4.12s). Its65skip replay reaches
+the first initializer/reset chain, then stops at missing EE target1aab80,
+RA125c14,a017b1b80,a1=-1.358 sampled images were retained. The generic
+native-iop-fault metadata does not override the explicit EE console fault.
+
+Original125c0c selects global44e588's object17b1b80, table46abb0+28=1aab80.
+Original2d07e8/2d07f4 installs that table;2d07cc stores the global object.
+The complete original1aab80..1aabb4 either returns for selector-1 or clears
+the selected object+4 bit. Original125c68 then selects46aab0+98=17fd40,
+whose original two instructions return1. This selects125c98's call through
+global44e4d8's object888480, table47a7e8+34=177cc0. That original body
+ends at177dac and resets bounded related records through2a84c0/2a8500.
+All three original/live slots agree. These three precise roots form candidate66;
+their original bodies are translated without substitutes. Narrow non-rendering
+shared-config address lookups only confirm original function extents.
+
+## Post-OPENING scene dispatch,2026-09-15
+
+Exploratory63skip advances past2c9480 and stops at3a1990 through2d1bc0,
+live object888440 slot+0c. All four original/live methods in47a7d0 agree;
+2d06bc/2d06d0 forms that pointer and2d06e0 installs it.2d06e8 independently
+installs47a7e8 at object+40, proving the next subobject table boundary.
+3a1990 increments object+73ee40 then tails into the original11f9c0 state
+routine. Exact shared non-rendering lookup confirms this sequence and leads
+to3a07d0's switch, which was independently decoded:3a0c44 zero-extends the
+selector,3a0c48 checks unsigned<9,3a0c64 reads464420+index*4,and3a0c68
+jumps to it. All nine original/live table words match. Four method roots and
+that bounded indirect table are added; no substituted implementation used.
+Evidence: external post-opening-scene-63skip.json. Candidate63's25 refreshed
+CTest checks pass; candidate64 runtime verification is pending.
+
+
+## Post-OPENING object table,2026-09-15
+
+61full completes6300 original OPENING conversions, then the original EE call
+at120ca0 selects slot+8 of live objectfcda00's table46ecf0: target2c9480.
+Original2d1174/2d1184 materializes and installs46ecf0;2d0d84/2d0d8c also
+installs it. All16 words at46ecf0..46ed2c agree between the verified ELF and
+61 EE RAM: two leading nulls,eleven methods at+8..+30,then null46ed24 and
+alignment before the next table46ed30. Original2c9480 clears four fields
+and initializes64 entries at stride b0 using25fc50 and1f40f0. This is
+independently decoded object initialization, with no substituted rendering.
+The eleven bounded method roots were added together; no runtime discovery
+or instruction fallback was introduced. External post-opening-table-61full.json
+records exact slots, image hash, live address and constructor/caller evidence.
+
+Only after this original-input derivation, an exact non-rendering initializer
+lookup of2c9480 in the authorized shared HG configuration confirmed its bounds
+and described the independently verified2c9470 slot+0c tail thunk to slot+8.
+No shared rendering material, implementation, or algorithm was used. Candidate63
+generation reaches163566 words with1081 recorded boundaries; runtime validation
+is pending. Static coverage counts do not establish later game execution.
+
+### Per-frame metadata qualification
+
+External original-frame-timestamps.json records independent ffprobe frame reads.
+CAPCOM has181 available monotonic timestamps,0..6.0s, plus0.033333s last dwell.
+LOOP_DEMO's last frame lacks a best-effort timestamp; its available timestamps
+are not all strictly increasing. OPENING has6300 timestamps,0..209.966667s at
+the endpoints, but these also are not all strictly increasing. All three have
+repeat_pict=0 and no interlaced frames in this analyzer. Do not silently fill
+missing timestamps or equate nominal30fps intervals with every source PTS.
+The frame-count/duration analysis and native CSC timing remain distinct.
+
+
+## Original full movie extents and pacing comparison (2026-09-15)
+
+Read-only original ISO extents come from our existing CVM index at origin
+2991302656bytes. LOOP_DEMO: ISO offset4138942464,size63602688,SHA256
+e4ee4587bcc36cd71c2a618cda4e19976006724584bc2ee45f7234c1da939ba4.
+OPENING: ISO offset4328001536,size111341568,SHA256
+b5679f5137f44e77fa3de969fbff5b852b266dda9bbff1bc12d011322bb77d55.
+External copies and original-movie-timing.json are in haunting-movie-reference60.
+Installed ffprobe independently decoded/counts2968 and6300 video frames,
+respectively, each512x448 MPEG2 at30/1fps. LOOP reports98.9s video and99.008667s
+container duration; OPENING reports210s for both. Last-frame dwell and CSC
+first-to-last spans must be distinguished. No analyzer is a runtime dependency.
+
+Original fixed-input native58/59 execute identical1066 OPENING timestamps and
+end with identical EE/GS/machine state.59 paced host span35.5496s versus58's
+34.9217s,for35.611639s modeled time. This is a partial original movie measurement,
+not its full210s and not an inspected longplay/physical-console comparison.
+
+
+## Host playback pacing and movie-rate validation (2026-09-14)
+
+Native53 CAPCOM:181 CSC starts span6.090484 modeled seconds in4.7007 host
+seconds; OPENING1066 starts span35.611639 modeled seconds in36.1589 host seconds.
+These independent native observations identify stage-specific overspeed that the
+opening average alone hid. Original CAPCOM bytes were copied read-only to an
+external temporary file and inspected using the installed ffprobe analyzer:
+512x448 MPEG2,181 decoded frames,30/1fps,6.033333s stream duration. ffprobe is
+not a runtime or build dependency. Artifact: haunting-movie-reference54/capcom-timing.json.
+WorldofLongplays US reference: https://www.youtube.com/watch?v=eY1SSSzx9DA .
+The page title, creator and4:44:38 duration were read; transported screenshots
+omitted images, so visual landmarks and capture provenance remain unverified.
+
+HostDeadlineWaiter is independently written against Microsoft's API contracts:
+https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createwaitabletimerexw
+https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-setwaitabletimer
+https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject
+The timer is unnamed, non-inheritable, high-resolution, one-shot and relative in
+100ns units, with no APC or resume request. Handle lifetime is scoped to the
+runner; system-wide timer settings are not changed. Host deadline policy consumes
+elapsed modeled time only and changes no guest state, time allocation or inputs.
+Windows requires high-resolution timer support; creation/wait failures are explicit.
+
 
 ## OPENING audio buffer overlap (2026-09-13)
 
@@ -609,6 +1544,28 @@ used; search results containing emulator sources were not used as evidence.
   this is not mixed audio output. Underrun, unsupported control values, malformed
   descriptors, and active-register edits fault. Sony pp13-14 establish short-word
   addressing; pp10/28 establish the clock and buffer shape.
+- Streamed-audio synchronization verification (2026-09-15): original USA EE code
+  independently identifies the two queue terms used by the movie clock. Object
+  table `0x003cff70` slot 8 enters `0x1e34a0 -> 0x1e34f0`; the helper copies the
+  submitted descriptor bytes into its ring and `0x1e35f4` adds the descriptor
+  length to `0x003d0128+0x0c`. `0x1e3464` subtracts consumed bytes, while the
+  selector-1 getter `0x1e3268` returns this byte count and `0x1d3c58` divides it
+  by two. Callback A reaches `0x1e3f20/0x1e3f68` and sums `+0x0c` byte lengths
+  over the list rooted at `0x003d4040+0x18`; live queue methods `0x1e4318` and
+  `0x1e41b0` update the node descriptor containing that length. The corrected
+  live node in the focused capture is `0x003ccc60`, contribution word
+  `0x003ccc6c`.
+  HG-DIAG-013 external capture `spu2-sync-dma-19p4m.csv.events.csv` correlates
+  those original writes with the native SPU2 endpoint: each freed 256-frame half
+  accepts 1024 bytes and each observed 2048-byte descriptor completes after two
+  halves/512 frames. The longer original-movie sync capture measures native core-0
+  consumption at 47,999.59 and 47,999.89 frames/s in two sustained segments,
+  without growing guest-clock drift. First nonzero raw frame 924676 maps to
+  ~19.355198s guest time; the next original movie-sync sample reports position
+  1024 at 19.358531s. No runtime clock or queue value was substituted. This
+  validates the implemented streaming timing for the observed game path, while
+  synthetic TOC/issue-slot diagnostics and lack of physical-console timing
+  measurement remain explicit limitations.
 - Sony **EE Core User's Manual, version 6.0**, archived at
   <https://github.com/ninjadynamics/PS2Docs/blob/main/EE_Core_Users_Manual.pdf>,
   pp156,158–159,162–165: floating-point formats, FCR31 masks, signed zero,
@@ -2080,3 +3037,404 @@ The next EE stop383550 is an object+4 member callback dispatched by
 383550 at+8;3842e0/3842e4 loads it and38430c..384318 installs the member.
 Added the verified230-word state callback. Derived only from original
 ELF; no shared rendering-related configuration or implementation read.
+
+### Independent native rendering and static-register optimization (2026-09-14)
+
+Our replay42 GS capture independently records the movie sprite PRIM0x116,
+TEX0=0x664022200, CLAMP=0x6fc007fc00a, FRAME=0x10a0000 and TEST=0x30000.
+Candidate43 reduces redundant texture address/shading work only for the checked
+neutral PSMCT32, TCC1/TFX0, REGION_CLAMP, RGB24 path. It composes the X and Y
+contributions of our existing CT32 address function and retains live VRAM reads,
+original destination addressing, masks and pixel order. No shared rendering
+material or emulator implementation was used. Full-VRAM differential cases
+include feedback overlap and address wrap; invalid states retain explicit faults.
+
+Candidate44 changes only how our EE emitter expresses already decoded scalar
+register operands: constant storage locations, architectural zero reads, and
+evaluated discarded results. Runtime helper semantics and dynamic index checks
+are retained. Fixed-input replays43fixed/44fixed have identical full EE/GS/machine
+state, all1066 guest CSC timestamps and the order of1315 shared sampled images.
+Synthetic original-independent programs cover every destination, aliases, upper
+halves, zero storage, loads that fault, branch annulment and discarded JALR links.
+The diagnostic input-at facility replays observed button transitions at exact
+slices and is accounted for as HG-DIAG-006; it changes no execution clock rules.
+
+### Checked scratchpad and CSC arithmetic optimization (2026-09-14)
+
+Candidate46 extends our existing fixed-width byte-lane RAM operations to the
+already implemented16KiB scratchpad range. Alignment and complete spans remain
+checked, with the unchanged general memory methods as the differential reference.
+Candidate47 tabulates only the existing CSC integer coefficients for byte inputs
+and uses equivalent clipping before a final shift. No external rendering material
+was consulted. Exhaustive16,777,216 RAW8 colors match a separately expressed
+rational formula; threshold/fallback and stream-pressure regressions also pass.
+The arithmetic profile's physical-console limitations remain in ORACLE.md.
+Replays46fixed/47fixed preserve all1066 timestamps and full EE/GS/machine state.
+
+### IOP history and host presentation optimization (2026-09-14)
+
+Candidate49 separates our diagnostic IOP instruction ring from existing SIFMAN
+event snapshots. Static hooks preserve those events without instruction history;
+committed register reads preserve original delayed-load behavior. No new guest
+code roots, adapters, clock rules or service substitutions were introduced.
+All23 CTest entries pass and connected49fixed preserves47fixed guest timestamps,
+EE/GS/machine state,1316 images and retained SIF/SNDDRV diagnostic reports.
+Candidate50 changes only the independent OpenGL preview consumer: file polling,
+handle lifetime, texture reuse and optional host presentation measurements.
+No shared rendering material or emulator implementation was consulted.
+### Texture product saturation (2026-09-19)
+
+Sony GS User's Manual6.0 p59, section3.4.9, defines the texture product as
+(A*B)>>7 with the result clamped to0..255. Our MODULATE path previously packed
+the wider product directly, allowing RGB carry into adjacent channels and alpha
+wrap. The shared product helper now saturates before packing; HIGHLIGHT's
+subsequent nonnegative alpha addition and saturation remain equivalent.
+Synthetic tests isolate bright red, green, blue and alpha overflow. Derived
+from the local hardware manual, with no external rendering implementation.
+
+### Scene texture filtering gap (2026-09-19)
+
+Original captured scene draw environments (stq-after2.ram.gs.json) include
+18132 textured draws with TEX1=0x60 and1488 with TEX1=0. Character texture
+groups also use0x60. GS manual6.0 p127 defines MMAG bit5=LINEAR and MMIN
+bits8:6=1=LINEAR; p62 specifies level-zero bilinear for that MMIN mode.
+At audit time the native shade_point_tex0 path ignored those filtering fields
+and sampled nearest texels. Texture-product saturation corrected the color tint.
+Manual pp28/50/58 specifies fractional texel coordinates, half-texel centers,
+the four-neighbor interpolation and independent wrapping of each neighbor.
+The new bounded path retains fractional UV/STQ through rasterization.56 synthetic
+UV samples across four wrap modes match external completed memory-oracle
+readbacks and native packet replay (ORACLE.md). Mixed min/mag selection and
+mipmapping remain explicit gaps; physical-console/STQ precision parity is unproven.
+No external renderer code or algorithm was consulted.
+# Optimization architecture reference review (2026-09-19)
+
+Follow-up opposite-lane sprite candidate derives solely from captured original
+draws and our GS-manual-derived swizzles. Retained33M draw history includes narrow
+PSMCT16S strips whose source/destination share a32-bit word but occupy different
+16-bit lanes. A host proof checks every row/column component, rejects filtering
+fractions and repeated destination words, and retains depth/frame isolation.
+Since no texture-source bit is modified, no new feedback-cache assumption is needed
+for this bounded case. Existing wider GS-cache/precision limits remain. Tests cover
+both lane directions, VRAM wrap, masks, DATE/blending and broken-proof fallback.
+
+The bounded VU optimization changes host inlining and an algebraically equivalent
+MAC bit packing expression only; arithmetic, register checks and readiness remain
+the existing independently derived definitions. Six original state/image comparisons
+and focused arithmetic/hazard tests pass (RTC excepted). This does not establish
+previously unverified EFU/FPU last-bit precision or physical-console timing.
+
+Sprite-format expansion implements this project's existing CPU address/TEXA,
+TFX, blend, DATE/Z, dither and FRAME-mask formulas. Original GS-manual-derived
+definitions remain in gs.hpp/gs.cpp; no external implementation was used. The
+host descriptor/address decomposition and paired16-bit word ownership were
+derived from our existing swizzles and independently compared against CPU writes.
+853 differential cases include accepted GPU paths, alias fallback and CLUT faults;
+original replay preserves images/EE/GS/VU (RTC excepted). This establishes bounded
+equivalence, not full physical-console precision/cache/timing parity.
+
+User explicitly requested comparison with PCSX2 and other PS2 recompilation
+projects. Read primary documentation only for architectural leads:
+- https://pcsx2.net/docs/troubleshooting/performance/ distinguishes internal FPS,
+  video output and speed; its counters prioritize readbacks/uploads/copies.
+- https://pcsx2.net/blog/2026/pcsx2-2.8/ reports gains from avoiding transfers and
+  excessive render passes, and notes ordered blending has backend-specific costs.
+  These are optimization leads, not independent proof of PS2 behavior. Adjacent
+  sections describing game fixes/cache behavior were exposed; none adopted.
+- https://github.com/ran-j/PS2Recomp/blob/main/README.md documents literal ELF-to-C++
+  translation, runtime services and optional stubs/overrides. This is an experimental
+  framework, not evidence that equivalent faithful HG work runs at console speed.
+  No implementation or shared HG rendering configuration was inspected/copied.
+- https://opengoal.dev/docs/porting-info/porting_to_x86/ documents a game-specific
+  native port with separate game/system services. Its historical status details
+  are not treated as current feature coverage.
+- https://opengoal.dev/docs/porting-info/drawable_and_tfrag/porting_tfrag/ describes
+  first understanding a faithful slow renderer, then offline preparation and a
+  specialized PC renderer with fewer draws. We reviewed architectural prose,
+  including Jak-specific pipeline descriptions; no code/algorithm was imported.
+  OpenGOAL is a GOAL decompilation/native port, not a drop-in generic PS2 AOT runtime.
+
+Search also exposed PCSX2 GS.cpp snippets about renderer lifecycle/cache readback
+and timing counters; no implementation copied. Our resident triangle implementation
+predates this review and derives arithmetic from our own checked CPU path/manuals.
+Applicable next steps are workload measurements, fewer ownership transitions and
+batched host work. Game-specific high-level replacements would require independently
+proving HG inputs, outputs, memory effects and ordering before adoption. No external
+reference authorizes skipping guest work, changing clocks or weakening faults.
+
+## Broader completed-project survey (2026-09-19, user requested)
+
+Searched completed/playable PS2 static recompilations and decompilation native
+ports, plus named Sly/Ratchet/Colossus leads and project catalogs. Catalogs were
+only discovery aids; checked primary project statements. This is a bounded search,
+not proof of an exhaustive worldwide inventory. No external code was imported.
+
+- OpenGOAL Jak and Daxter,Jak II,Jak3: official FAQ says feature complete and
+  completable; II/3 remain beta with audio/graphics caveats. Three games sharing
+  one project, not three unrelated rendering systems. https://opengoal.dev/docs/faq/
+- OpenGOAL graphics prose documents bucket-specific renderers,shared textures,
+  ordered frame synchronization and batching of consecutive compatible primitives.
+  https://opengoal.dev/docs/porting-info/graphics/ is historical architecture,not
+  a current feature-coverage list. Its embedded illustrative code was exposed but
+  not adopted. Prior tfrag review already describes offline geometry preparation
+  and fewer host draws; no need to copy/re-review its detailed algorithms.
+- Q2 report: remaining fidelity issues include inherited blend state and ocean
+  environment mapping. Completion does not establish bit-exact console behavior.
+  https://opengoal.dev/blog/progress-report-q2-2026/
+- 3rd Strike: game code fully decompiled,CRI middleware partially so:
+  https://github.com/crowded-street/3s-decomp/blob/main/README.md . Native successor
+  https://github.com/crowded-street/3sx uses SDL3 rendering and supports desktop
+  platforms, but its 1.0 roadmap remains open and releases are labelled prerelease:
+  https://github.com/crowded-street/3sx/releases . Reviewed README/docs inventory
+  and releases; no rendering implementation inspected. Count as additional released
+  native-port reference, not verified finished/static-binary recompilation.
+- BT3-Recomp README claims near30fps fights but notes graphical defects and skipped
+  FMVs. Not counted finished. Read status prose only; no runtime source/configuration
+  or mappings inspected. Adjacent README exposed its experimental external GS
+  backend and benchmark claims; neither adopted nor independently verified.
+  https://github.com/z3xox/BT3-Recomp/blob/main/README.md
+- Sly1 primary README is WIP matching PS2 code run via PCSX2,not native desktop
+  rendering: https://github.com/TheOnlyZac/sly1 . Silent Hill Origins/GTA VCS
+  PS2Recomp fork search status remained experimental/incomplete VU1:
+  https://github.com/BlackLineInteractive/SHO-GTA-VCS-PS2Recomp . No implementation
+  inspected. Other discoveries (.hack announcement,Fate PSP/PS2 hybrid) lacked
+  verified completion and were not treated as finished reference systems.
+
+Inference for HG: large gains may require independently proved game-specific
+native batches/assets rather than only scalar helper tuning. Verify all observable
+RAM/VRAM/state/order effects before such optimization; retain faithful reference
+and explicit faults. Immediate PSMT8 span candidate predates this survey and uses
+only our existing original-spec-derived addressing. No architecture reference
+changes the project's AOT-only,OpenGL,independent-runtime constraints.
+
+
+## 2026-09-20 — per-batch GL command storage API provenance
+
+Khronos glBufferData reference confirms a new store is created and supplied data
+copied for initialization; STREAM is a usage hint, not a performance guarantee.
+Read official source XML because registry XHTML could not be fetched by browser:
+https://raw.githubusercontent.com/KhronosGroup/OpenGL-Refpages/main/gl4/glBufferData.xml
+Canonical: https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml
+Independent host change replaces scratch command/tile storage only. No external
+rendering implementation/algorithm copied. Existing ordered GL behavior must remain
+and GPU/original-state comparisons verify our usage; speed remains experimental.
+
+
+### Selective MSVC whole-program compilation experiment (2026-09-20)
+
+Microsoft /GL and /LTCG documentation supplies compiler option semantics only:
+https://learn.microsoft.com/en-us/cpp/build/reference/gl-whole-program-optimization?view=msvc-170
+https://learn.microsoft.com/en-us/cpp/build/reference/ltcg-link-time-code-generation?view=msvc-170
+Local same-toolset IR allows cross-unit optimization during linking; explicit
+/LTCG avoids linker restart. Restrict trial to generated VU main and own helpers;
+no external rendering/runtime implementation used. Performance must be measured.
+
+### MSVC profile-guided optimization experiment (2026-09-27, rejected)
+
+Microsoft PGO documentation supplied build-tool semantics only:
+https://learn.microsoft.com/en-us/cpp/build/profile-guided-optimizations?view=msvc-170
+https://learn.microsoft.com/en-us/cpp/build/reference/genprofile-fastgenprofile-generate-profiling-instrumented-build?view=msvc-170
+https://learn.microsoft.com/en-us/cpp/build/reference/useprofile?view=msvc-170
+The local14.51 toolchain independently supplied `/FASTGENPROFILE`, `/LTCG`,
+`/USEPROFILE` and `pgomgr`. Runtime instrumentation writes scenario PGC data; the
+valid helper-only trial explicitly merged the one fresh exact-link PGC into its PGD
+before USE. Training used only our existing native build and fixed original33M
+recording; no external code, algorithm or runtime backend was introduced. The USE
+candidate preserved exact state but was slower than adjacent OFF, so all PGO build/
+provenance/test plumbing was removed. PGD/PGC/training-wrapper files remain ignored
+external evidence only and are not production inputs. See HG-DIAG-085/HG-FAIL-045.
+
+### Packed integer add host-ISA references (2026-09-20)
+
+Own scalar Fpu::add (EE Core manual already cited) remains arithmetic reference.
+Microsoft intrinsic lists and CPUID documentation supply host primitive/feature
+semantics only, not a copied arithmetic algorithm:
+https://learn.microsoft.com/en-us/cpp/intrinsics/x86-intrinsics-list?view=msvc-170
+https://learn.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=msvc-170
+Intel SDM supplies AVX OSXSAVE/XGETBV and AVX2 feature requirements:
+https://cdrdv2-public.intel.com/868137/325462-089-sdm-vol-1-2abcd-3abcd-4.pdf
+No host floating-point rounding is used. AVX2 is isolated from generic dispatch.
+
+
+Packed-add refinement: exact integer-to-binary32 conversion is used only for bit
+length of m<=2^24-1, where all inputs are exactly representable. Guest arithmetic
+and chopping remain integers.16M tests in4rounding modes verify scalar equality and
+unchanged host FP exception flags. This independently derived bound revises the
+initial all-integer-normalization experiment; no external arithmetic code copied.
+
+
+## Live gameplay secondary command switch - 2026-09-20
+
+Paced live capture live-paced-input-check stopped at EE202d3c after32805801
+slices. Own decoder on configured USA ELF SHA2563b374d53a499d2c17b205274ee9eb342
+80768f294f970ebf6ae6731f6a2dacb8 verifies SLTIU202d14 bound8 and BEQ202d18 rejecting indexes>=8, index shift202d24, base456a40 built202d20/28, load202d30
+and JR202d34. Eight original pointers through exclusive456a60 target202d3c,
+202d64,202d6c,202d7c,202de0,202df0,202e00,202e10. External proof artifact
+live-secondary-dispatch-table.json retains exact addresses/hash. Narrow lookup
+of ../HG/config/functions.manual.toml for these non-rendering addresses supplied
+corroborating bounds only; no implementation, patches or rendering material used.
+Register exactly that range for offline translation; no runtime decoder/fallback.
+## Staircase object family 46c780 - 2026-09-27
+
+User live capture `%TEMP%/hg-stairs-live-20260927-145012` stopped explicitly at
+original EE `0x0025f0a0`, RA `0x001bbed8`, object `0x00fc8990`. The common
+original caller `0x001bbebc..0x001bbed4` loads object slot `+0x0c`; captured RAM
+holds vptr `0x0046c780` and target `0x0025f0a0` at that slot. Original ELF and
+captured RAM agree exactly on the null-bounded pair
+`[0x0046c788,0x0046c790) = {0x0025e950,0x0025f0a0}`, with null words at
+`0x0046c780/84` and `0x0046c790/94`. Original `0x0025e968..70` materializes and
+installs `0x0046c780`. Independently decoded return/delay boundaries are
+`0x0025e9ac/b0` and `0x0025f574/78`; the next body starts at `0x0025f580`.
+Original/live code hashes match byte-for-byte:
+`25e950..25e9b4 = 884404a0...` and `25f0a0..25f57c = d83d380f...`.
+
+The user-shared configuration had an exact-address function-list entry, but this
+body constructs graphics work, so that reference result was discarded and did
+not supply the boundary, target set, implementation, mapping or algorithm. The
+bounded AOT change is independently derived solely from the original ELF and
+captured live state: append both proved family methods to the existing
+`0x001bbed0` target union. Generation added740 original instruction cases in one
+EE shard and removed none. Candidate executable `8d01457f...` matched151-input
+post-link provenance; fixed evidence `%TEMP%/hg-stairs-25f0a0-fixed-20260927`
+qualified all864 original writers and every retained state digest with zero
+validation failures. Only a live replay can prove traversal beyond this later
+manual stop.
+
+## Door member callback 197640 - 2026-09-27
+
+After the independently verified `25f0a0` coverage repair, the user traversed the
+stairs and reached a new explicit stop while opening a door. External capture
+`%TEMP%/hg-stairs-25f0a0-live-20260927-150328` reports EE `0x00197640`, RA
+`0x001a367c`, object `0x01510c80`. Original caller `0x001a3674` invokes the
+existing generic member helper `0x00100b40` with object descriptor at `+0xa0`;
+captured RAM contains `{0,-1,0x00197640}` there. Four initialized original ELF
+records contain that exact descriptor (`0x003b2608`, `0x003b26c8`, `0x003b26d8`,
+`0x003b2e98`). Original and live body `0x00197640..0x00197fe8` are byte-identical,
+SHA256 `93aa6e2f...`; own decoding proves return/delay at `0x00197fe0/1fe4` and
+the next prologue at `0x00197ff0`.
+
+The shared analysis list contained only a truncated start entry and the shared
+manual list omitted this body, so neither supplied a usable function boundary,
+mapping or implementation. The AOT change roots only the observed callback.
+Generation adds exactly618 original instruction cases from entry through return
+delay, loses none, and leaves twelve dynamic virtual calls as explicit checked
+transfers. Candidate executable `9750e473...` matches151-input provenance;
+fixed evidence `%TEMP%/hg-door-197640-fixed-20260927` qualifies all864 writers
+and every retained state digest with zero validation failures. Live door replay
+is still required; no audio, renderer, clock or runtime fallback changed.
+
+## Sequential door member callback 196fc0 - 2026-09-27
+
+The qualified `197640` build executed that callback and advanced to a second
+explicit door-state callback. External capture
+`%TEMP%/hg-door-197640-live-20260927-151207` reports EE `0x00196fc0`, RA
+`0x001a367c`, object `0x01510c80`. The same live descriptor at object `+0xa0`
+now contains `{0,-1,0x00196fc0}`, exactly matching the unique initialized
+original descriptor at `0x003b28e8`. Original/live body
+`0x00196fc0..0x00197640` is byte-identical, SHA256 `80d017c5...`; own decoding
+proves return/delay `0x00197638/3c` and the already verified next prologue at
+`0x00197640`. The authorized shared manual function list corroborates only that
+independently established extent; no implementation or mapping is imported.
+
+Rooting only `0x00196fc0` adds416 body instructions plus independently reached
+direct callees,1,761 cases total in one shard, with no existing cases lost; two
+dynamic transfers remain explicit checked operations. Candidate executable
+`db4e2b27...` matches151-input provenance. Fixed evidence
+`%TEMP%/hg-door-196fc0-fixed-20260927` qualifies864 original writers, zero
+validation failures and every retained state digest. The actual door route still
+requires live continuation. Earlier `25f0a0` and `197640` coverage is retained.
+
+## Door-transition virtual callback 1aa040 - 2026-09-27
+
+The qualified `196fc0` build advanced through the door sequence and stopped at
+the next explicit missing AOT target. External capture
+`%TEMP%/hg-door-196fc0-live-20260927-152451` reports EE `0x001aa040`, RA
+`0x001271bc`, object `0x017b1b80`, and argument `0x01511fb0`. Original caller
+`0x001271ac..0x001271b8` loads the object's vptr and slot `+0x0c`, performs the
+virtual call at `0x001271b4`, and preserves the observed return address. Captured
+RAM holds vptr `0x0046abb0` and target `0x001aa040` in that exact slot. The table
+contains additional non-null sibling methods, so they were deliberately not
+rooted without observed or independently bounded reachability evidence.
+
+Original ELF and captured RAM body `0x001aa040..0x001aa718` are byte-identical,
+SHA256 `1e5210bf850b6de9be9baf77bb543e39e1f8480e6be48360e1957acbebf6ae31`.
+Own decoding proves return/delay at `0x001aa710/14` and the next body begins at
+`0x001aa720`. The authorized shared manual function list corroborates only this
+independently established non-rendering extent; its truncated analysis output
+was not used for a mapping or implementation. Rooting only `0x001aa040` adds596
+generated instruction cases, including all438 instructions in the bounded body
+and independently reached direct callees, with no previous case lost. Four
+dynamic calls remain explicit checked transfers.
+
+Release executable `d1c17b67...` matches its151-input post-link provenance.
+Fixed evidence `%TEMP%/hg-door-1aa040-fixed-20260927/evidence` qualifies all864
+original writer events with zero caller, trace, stack, writer or state failures;
+frame, EE, GS VRAM/state, VU and RTC-normalized IOP digests remain exact. The
+measured10.6981 FPS is ordinary host variance for this coverage-only change and
+is not an optimization result. Live continuation is required to prove progress
+beyond this callback. No renderer, audio, clock, input or runtime fallback changed.
+
+## Door-transition virtual callback 1a9f90 - 2026-09-27
+
+The qualified `1aa040` build advanced to a distinct virtual call in the same
+door-transition object. External capture
+`%TEMP%/hg-door-1aa040-live-20260927-154203` reports EE `0x001a9f90`, RA
+`0x001271e8`, object `0x017b1b80`. Original caller `0x001271d8..e4` loads the
+object vptr then slot `+0x14`, calls it at `0x001271e0`, and supplies the object
+in the delay slot. Captured RAM contains vptr `0x0046abb0` and target
+`0x001a9f90` at that exact slot. The surrounding live/original table has many
+other initialized entries and is therefore not evidence to root its siblings.
+
+Original ELF and captured RAM body `[0x001a9f90,0x001a9fe4)` are byte-identical:
+84 bytes, SHA256 `0cadda6beff13f1c5168256f053b11c7301474ea4759d3c7ac79f7e408115cb9`.
+Own decoding proves return/delay at `0x001a9fdc/0x001a9fe0`, padding follows,
+and the next prologue begins at `0x001a9ff0`. The authorized shared non-rendering
+manual list corroborates only this independently established extent; no code,
+mapping or implementation was imported. The AOT change roots only the observed
+entry and adds exactly21 original instruction cases, with no old cases lost and
+no unresolved instruction inside the body.
+
+Release executable `bbaea93f...` matches its151-input post-link provenance.
+Fixed evidence `%TEMP%/hg-door-1a9f90-fixed-20260927/evidence` qualifies all864
+original writer events, zero validation failures, and exact retained frame, EE,
+GS VRAM/state, VU and RTC-normalized IOP digests. The measured11.2036 FPS is
+ordinary host variance for a coverage-only change, not an optimization claim.
+Live continuation is required to establish the next route state. No renderer,
+audio, clock, input or runtime fallback changed.
+
+## Door-transition direct-member callback 1a4c60 - 2026-09-27
+
+The game-scoped HG-DIAG-006 recording run progressed through the newly compiled
+`1a9f90` entry and stopped at its first internal member dispatch. External
+capture `%TEMP%/hg-door-route-recording-20260927-160542` reports EE
+`0x001a4c60`, RA `0x001a9fc0`, object `0x017b1b80`, member `0x017b1b90`.
+The original `0x001a9fb8` call invokes the existing `0x00100b40` helper with
+descriptor address `member+0x1004c = 0x017c1bdc`; captured RAM contains
+`{0,-1,0x001a4c60}` there. The identical initialized original descriptor occurs
+at VA `0x003b2f28`, independently confirming this specific dynamic target.
+
+Original ELF and captured RAM body `[0x001a4c60,0x001a4cbc)` are byte-identical:
+92 bytes, SHA256 `d78f4286c5f80366bed3f33db4c54065206a1ff5dafe6fc6194344e11bcf1ac9`.
+Own decoding proves return/delay at `0x001a4cb4/0x001a4cb8` and the next prologue
+at `0x001a4cc0`. The authorized shared non-rendering manual list corroborates
+only that independently established extent. Rooting only `0x001a4c60` adds
+exactly23 original instruction cases with no old cases lost and no unresolved
+operation inside the body.
+
+Release executable `3882ee01...` matches its151-input post-link provenance.
+Fixed evidence `%TEMP%/hg-door-1a4c60-fixed-20260927/evidence` qualifies all864
+original writer events, zero validation failures, and exact frame, EE, GS
+VRAM/state, VU and RTC-normalized IOP digests. The measured11.1543 FPS is host
+variance for a coverage-only change. The user's107 observed controller-state
+transitions are retained only in external evidence; the derived108-event replay
+adds one disclosed neutral release after the stopped guest boundary. No global
+keyboard input, renderer, audio, clock or runtime fallback changed.
+
+Unattended evidence `%TEMP%/hg-door-route-replay-20260927-161726` delivered all
+108 scheduled states at their recorded slices with live host input disabled.
+The repaired build passed the former `0x001a4c60` boundary and completed the
+350,000,000-slice budget without another EE fault, retaining external final
+IOP/EE/GS/VU/display state. This proves the recorded prefix can reproduce and
+clear the door route through that boundary; it does not claim correctness for
+unrecorded movement after the final neutral state or complete-game playability.
+

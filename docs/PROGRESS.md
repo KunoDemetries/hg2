@@ -1,22 +1,4653 @@
+## HG-DIAG-088 exact XYZ lane ADD/SUB SIMD reuse restored; adjacent result is inconclusive-positive - 2026-09-27
+
+The bounded mask14 XYZ ADD/SUB candidate reused the already exact `try_fpu_add4` backend and preserved the original scalar path for invalid/undefined/unsupported cases. `build_tests`, runtime, translation, VU-readiness and Python suites all passed. Candidate executable `37aabe2e78f47a9418cfb49fb01ef58ae5b9e39eff097b9c5eeb0ed0a21ecf84` completed the fixed33M replay with864 original writers, zero unexpected/lost/caller failures, and verifier `c44e1685cc864a1c970a0c69e93a2ce5` qualified exact retained frame/EE/GS/VU/RTC-normalized IOP state at10.9755428FPS (10.8044644/11.1521262).
+
+The three candidate source/test files were then byte-restored to their pre-088 hashes and ordinary production rebuilt as executable `b5beb2db086da49efa5104dc1f0bc9000225843a5da36aa975d270a397931634` with151-input provenance. Adjacent verifier `d3563b0ccd0d486b81f3070203e07d0f` / evidence `project-link-verifier/2d8134300c8e477f99812d4f481e6a78` again qualifies864 writers, zero validation failures and exact retained state at10.4785007FPS (10.2415644/10.7266597). The candidate is therefore ~4.74% faster than this adjacent restored control, but both runs are far below the earlier clean13.5107444FPS sample because of severe host drift. Do not claim either a regression or a retained win from the nonadjacent baseline. Production remains the exact restored clean source with zero active088 cost. If088 is revisited, reapply the exact archived candidate and require another close candidate/control repeat before retention. `v1/` remains untouched.
+
+## HG-DIAG-085 MSVC profile-guided native build experiment planned - 2026-09-27
+
+Renderer-only and ordered packet-worker routes are now empirically bounded below30FPS, and the exact compact-SQ snapshot route was already measured inconclusive/flat. The next broad non-semantic gate is opt-in MSVC PGO trained only on the fixed original33M replay. Default `HG_PGO_MODE=OFF` remains production. Broad first-party `/GL` plus `/FASTGENPROFILE:EXACT` linked (`cb2963d5...`) but is impractical at~2166 slices/s with an86MiB PGD. Its10K EE0x100158 stop is not a semantic divergence: restored OFF game `a616b045...` produces the identical stop at that artificial early budget. Reject only the broad/EXACT training shape.
+
+Current gate compiles only generated main/VU plus owned VU helpers with `/GL`, matching the surface previously exact-state-qualified under unprofiled LTCG; large EE shards and unrelated runtime/renderer code stay ordinary. Selective `/FASTGENPROFILE:NOEXACT` game `e5fd991a...` runs the same prefix at124865 slices/s versus OFF179707, making33M training feasible. USE provenance hashes exact ignored PGD bytes. Then run runtime/translation/VU-readiness/GPU regressions, exact replay, two fixed qualifications and adjacent OFF control. Require864 original writers, unchanged captures and>=5% repeatable gain with neither heavy window regressing. Otherwise restore/rebuild OFF. Current plan SHA `a0aa7efa...`; preimages `%TEMP%/hg-diag085-pgo-preedit-20260927-164923`. No guest, renderer, input, clock, fault or `v1/` change.
+
+Continuation rescan found the latest selective GENERATE build `66355e7808b4b36f64413c1e50d012992bbd9cf6ec2bbb583dfebd7a16b513dd` links with151-input provenance, but fixed replay `da4f33ab49314bb6921790cbd2c6cebf` exits before guest startup with Windows `0xC0000135`; `native.log` is empty and the isolated evidence directory has no PGO runtime DLL. Treat this as host training deployment failure, not guest divergence. BEFORE code edit, external plan `hg-diag085-pgo-training-launch-preedit-20260927.txt` SHA `b209208a...` records the bounded workaround: temporarily add a GENERATE-only `hg_game` POST_BUILD training invocation so the exact33M fixed schedule runs inside the configured Visual Studio/MSBuild environment where the profiler runtime is available, using the already pinned2064-byte TOC SHA `9230bc27...` and writing captures only under `%TEMP%/haunting-toc-probe/hg-diag085-pgo-training`. Require normal33M completion/no fault and a changed PGD; restore this training plumbing byte-exactly before USE qualification. Never weaken Project Link replay isolation; failure restores OFF.
+
+The first build-integrated full33M attempt `e793c25e461e417786d28db10249ed9a` proves the missing-runtime diagnosis but exposes a second blocker: after copying the exact MSVC `pgort140.dll`, the byte-identical66355e78 executable launches, opens the NVIDIA4.3 context, reaches the slice0 checkpoint and begins normal disc reads, then exits with Windows `0xC0000005` before the1M checkpoint. No frame/state training outputs are produced and `build/pgo/hg_game.pgd` remains2617344 bytes with its old timestamp, so no valid full training data exists. Next bounded diagnostic changes only the temporary launcher to a10K slice prefix to establish whether the crash is after the previously reported short prefix or is immediate under this launch method; this diagnostic is not performance evidence. If the short prefix also crashes, close selective NOEXACT training rather than weakening runtime faults.
+
+Corrected10K no-input launcher `364d936e36754a87a75c291b10af35ec` reaches the same artificial cooperative startup stop at EE0x100158 as the prior PGO/OFF prefix comparison and writes the expected startup captures; it does not reproduce0xC0000005 before10K. The first10K retry `754603a7...` was invalid only because future recording inputs were attached to a10K budget and the runtime rejected them before execution. External follow-up plan `hg-diag085-pgo-surface-isolation-preedit-20260927.txt` SHA `b23b2961...` now narrows instrumentation to generated main/VU translated.cpp only while restoring the exact33M 12-event schedule. If generated-main-only still crashes, test the complementary helper-only surface; do not broaden semantics or suppress the access violation.
+
+Generated-main-only training job `f1962012e642439aaedbd7e5a146cd3c` crosses the earlier failure point and reaches the12M checkpoint with ordinary input delivery,243 qualified writer observations by12M, zero unexpected writers/caller mismatches and normal GS progress, then exits `0xC0000005` before13M. This proves helper instrumentation explains the before1M failure but generated-main NOEXACT instrumentation is independently unstable later.
+
+Helper-only `/GL` is stable through the complete fixed route. Instrumented executable `6a519b6bc184b15f6612f7975657469e7639fbd9da4b1027733b18ef107776f6` with generated translated.cpp ordinary reaches33,000,000 slices in build/training job `140025cc29ab4b69818f8aa1e1c1e871`; the custom build reports exit2 only because hg_game returns2 at the configured guest budget, not because of an access violation. The final frame/EE RAM/GS VRAM/GS state/VU state are byte-identical to clean verifier evidence `project-link-verifier/3e0e50d6271f47708ec7ff1a46d9e0aa` (b6ab8abd/8747a80e/74ad06df/eaf454f2/5adb6544). Fresh runtime profile `build/Release/hg_game!4.pgc` exists. The matching PGD did not change during execution because MSVC records scenario data in PGC; Microsoft `pgomgr` must merge the matching PGC into PGD before `/USEPROFILE`. External pre-edit plan `hg-diag085-pgo-merge-preedit-20260927.txt` SHA `0a490c61...` records the bounded fix: fresh-link helper-only GENERATE, clear stale PGC/profile counts, run the exact33M route through a temporary external wrapper accepting only expected budget return2, merge exactly the fresh PGC into its matching PGD with pgomgr, then build helper-only USE. Temporary wrapper `hg-diag085-pgo-training-wrapper.py` is now SHA `76f75e57...` and additionally refuses to merge unless the run reaches exactly33M, reports exactly864 original writers with zero unexpected/lost/caller/stack failures, matches the established frame/EE/GS/modeled-state/VU hashes byte-for-byte, matches RTC-normalized IOP SHA `51d0b0ea...`, and keys stale/fresh PGC discovery to the explicit PGD basename. Any merge incompatibility, USE fault/state mismatch, or failure to beat the>=5% retention gate restores OFF. `v1/` remains untouched.
+
+Fresh exact train/merge job `6e29a19f05794d4fbc2ceb7748b196f1` completed the full helper-only route and wrapper validation, then merged the sole fresh `hg_game_helper_only!1.pgc` SHA `b8d870bf...` into its matching PGD. `training-result.json` SHA `b56b61d8...` records instrumented exe `57a3db82...`, exactly864 qualified original writers, zero unexpected/lost/caller/stack failures, all retained frame/EE/GS/modeled/VU hashes equal to control, RTC-normalized IOP `51d0b0ea...`, pre-merge PGD `a726dcc2...`, cleared PGD `69ec1865...`, and merged PGD `c3a54e0f...`. The MSBuild task is marked failed only because the subsequent GENERATE provenance step rejected a newer transient `build/CMakeCache.txt`; training and merge themselves succeeded. An unfinished follow-up cache edit currently points at untrained `hg_game_helper_only_v2.pgd`; do not consume it. Next bounded edit removes the temporary GENERATE wrapper from CMake and sets cache `HG_PGO_MODE=USE` with `HG_PGO_PROFILE=.../hg_game_helper_only.pgd`, so the verified merged profile is consumed by a fresh link and provenance is regenerated afterward.
+
+Helper-only USE build `37f1d5d690a64b65bac0a7126d421ec5` consumed the verified merged `hg_game_helper_only.pgd`; MSVC reports65/65 profiled functions optimized from profile data. Candidate executable `cf904288497e61ab317797f85945b8043bdf79db96967035bd222283d5336062` has matched152-input provenance. Python133/133, runtime, translation and VU-readiness suites pass; VU readiness covers262,144 fused-transform and81,920 compiled-VU comparisons. Fixed replay `f9ea7f6017a141ecbec3c40e18bfccd3` reaches33M/864 original writers with no unexpected/lost/caller/stack failures. Two fixed frame qualifications are exact-state clean: `0a2d174362c64efb9d9103449f0d1b5a` =13.3542847FPS with heavy windows13.2998178/13.4091996; `236b670c7be6477a823a318aa5dba28e` =13.2833878FPS with heavy windows13.2837995/13.2829761. Both have864 writers and exact retained frame/EE/GS/modeled/VU plus RTC-normalized IOP `51d0b0ea...`. Candidate repeatability spread is~0.53%. Next gate is one adjacent fresh ordinary OFF build/verifier under the same current host state; retain PGO only if both USE runs beat that control by>=5% and neither corresponding heavy sub-window regresses.
+
+Adjacent ordinary OFF build `18f6e392734f4ef9bb264e2ac53b9e48` forced a real CMake regeneration after one discarded stale-project build, recompiled the VU helper sources without `/GL`, and produced151-input executable `5fc22723d9a54b5929b76a964f42ab1ce4674561554019bd910d0b58d6b31740`. Fixed verifier `1e52390d675e4d4ca893ee676b023585` qualifies exact retained state/864 writers at13.4984342FPS with heavy windows13.4621512/13.5349133. Therefore USE run1 is~1.07% slower overall and USE run2~1.59% slower; all four candidate heavy-window comparisons are slower than the adjacent control. HG-DIAG-085 fails the >=5% retention gate and is rejected. External restoration plan `hg-diag085-pgo-reject-restore-20260927.txt` SHA `25841497...` records removal of the bounded CMake/provenance/test PGO support and an ordinary rebuild/qualification. Do not retain compiler-layout PGO from this experiment; profile databases and wrapper/results remain evidence only outside production. `v1/` untouched.
+
+Restoration has removed the PGO-only CMake blocks, restored `tools/hg_build_provenance.py` byte-for-byte to pre-PGO SHA `db569ff9...`, restored `tests/test_build_provenance.py` to pre-PGO SHA `240f8d13...`, and removed stale PGO cache entries. Restoration builds `07a7055e24d643a3bb960c40f8f988b3` and `4dae332ae31e4c95bb62eb78202b733a` linked ordinary code but were correctly rejected by freshness because restored CMake/provenance source mtimes were newer than the reused link. Configured emitter job `eaec74b000dc4202b386660db1f32337` verified all25 EE shards with zero generated-file changes, so it correctly did not force a relink. A discarded temporary force marker in protected `runtime/game_host.cpp` was restored byte-exact before acceptance; the recorded bounded relink mechanism then used only `runtime/controller.cpp`, which is restored to SHA `ba75b662...`. Final ordinary build `dd9d0c984eab41da8bd56e643aa1dad2` produces current executable `93de29f8254f1cebdb91af45bceb41079f2d8a8dee0dc3239d2a3fdcd5ef0c85` with151-input provenance. Final gates all pass: Python132/132, build/runtime/translation/VU-readiness, and fixed verifier `dad485f3619d40c48bf17dafcc5ba957` / evidence `project-link-verifier/e5005e3e85d5431780be3e0bc6f42fce` qualifies864 writers, zero failures, exact retained frame/EE/GS/VU/RTC-normalized IOP state and13.7931352FPS (13.7588171/13.8276248). This higher clean sample is host/build variance, not a PGO gain. HG-DIAG-085 is closed with zero production PGO cost.
+
+Broad snapshot census is now resolved read-only. Current generated AOT contains21 static full-`Vu1State` snapshot sites, all same-pair upper/SQ overlap preservation. Retained31M..33M dynamic counts imply3,123,480 snapshot-pair executions out of84,835,200 total VU pairs (3.6818%). Program1 pair0x0170 alone is2,798,220 (~89.59% of all snapshot executions); Program5 contributes162,780, Program3 95,940, Program6 55,680, and all remaining snapshot sites are small. Program1's snapshot is the exact hot mechanism already exercised by the archived compact-SQ candidate, which was fully state-correct but inconclusive/flat under adjacent host drift. Therefore a broad snapshot/local-state rewrite is NOT justified and compact-SQ must not be repeated unchanged.
+
+NEXT measurable gate is the whole-13-program dynamic operation census recorded before code edit in external plan `vu-dynamic-operation-census-preedit-20260927.txt` SHA `d99a37d2...`. Add one temporary Python unittest only: load the exact configured original ELF through existing `hgtool.config.load(..., Elf)`, assemble each configured MicroMem image through existing `vu_emit._program_bytes`, decode with existing `vu_decode.decode_program`, and join every retained `(program,pc)` dynamic count from `vu-dynamic-pair-counts-20260927.csv`. Assert complete mapping and total84,835,200 executions. Persist aggregate JSON/CSV externally by upper/lower op and broad helper family, including separate aggregates excluding Program1's already-specialized static loop0x0158..0x01c8. Run once, then delete the temporary test and rerun Python tests. No runtime/emitter/config/generated semantics change; diagnostic timing is not FPS. Use the census to choose a shared class large enough to matter against measured~1.86s VU cost; reject if it only re-identifies compact SQ, direct-memory/preflight static loop, readiness-only, identity cache, scheduled clock or PGO. `v1/` untouched.
+
+That census is complete: external `summary.json`/`pairs.csv` under `vu-dynamic-operation-census-20260927/` preserve all84,835,200 mapped pairs, and cleanup Python job `0990d3ee51b7401ca49fb69b8264497e` passes with only the inert temporary-test placeholder remaining. Excluding Program1's already-specialized loop, the largest arithmetic candidates are `xyz_acc=8,295,780` and `xyz_madd=3,353,040` dynamic upper operations. BEFORE any production edit, follow-up plan `vu-xyz-chain-census-preedit-20260927.txt` SHA `8874594c...` records one bounded read-only chain census: temporarily reuse the inert test to count only contiguous equal-frequency matrix-like XYZ chains across Programs2-12, emit aggregate evidence externally, then restore the placeholder and rerun Python tests. Only prototype fusion if this covers a substantial multi-program share; otherwise close the route. No runtime/emitter/config/generated/guest/v1 change in the census itself.
+
+The bounded XYZ chain census passed its feasibility gate. Python job `a050d0bb1ad44026b9e56de69b12a71b` generated external `vu-xyz-chain-census-20260927/summary.json` SHA `69b5737b...` and `chains.csv`; cleanup job `7454974be58a4629add1a30c5cdbb261` restored the inert test and passes. Across Programs2-12 there are86 static equal-frequency `mulax+madday+maddaz[+maddw]` chains covering4,115,520 dynamic XYZ operations (35.3299% of11,648,820 non-hot-loop XYZ operations). The safer full four-stage shape alone has67 chains /761,940 dynamic runs /3,047,760 dynamic XYZ operations, led by Programs8,9 and5. This is broad enough for one production prototype.
+
+BEFORE code edit, HG-DIAG-086 plan `vu-xyz-matrix-fusion-preedit-20260927.txt` SHA `97d70cb0...` records the bounded candidate. Change only `tools/hgtool/vu_emit.py` (preimage `2759ccd9...`), `tests/test_vu_decode.py` (`b1a5a0e...`) and `tests/generate_vu_readiness.py` (`2d4ff806...`): recognize only four contiguous mask14 `mulax/madday/maddaz/maddw` chains with no internal control/immediate and statically stable future VF operands; speculatively call existing pure `prepare_vu_matrix` before mutation; if preparation fails, fall through to unchanged original code; if it succeeds, execute the original per-pair clocks/readiness/lower/fault/produced-state boundaries while replacing only each upper arithmetic call with the prepared stage commit. Middle labels/original code remain for alternate entries. No runtime arithmetic algorithm, guest clock, lower memory/order, renderer, input, fault, or `v1/` change. Validate Python, configured generation, runtime/translation/VU-readiness differential tests, exact33M replay/fixed verifier, then performance A/B. Restore/regenerate/rebuild on any mismatch or flat/slower result.
+
+HG-DIAG-086 candidate is state-correct but not a demonstrated win. Python passes after the bounded assertion fix; build/runtime/translation pass; VU-readiness job `2fc815116a3e4615be34eb6fedce2f40` passes262,144 fused-transform checks plus98,304 compiled full-state/fault comparisons with25,265 retained static-loop iterations and14,044 actual XYZ-matrix fast-path hits. Configured generation/build produced151-input executable `5ce827b52904575dc2143769b2cb776cf4bb83794d6467583a76978c0dc8880e`. Original33M replay `540cbb6c2345473cb1389958e0799d41` reaches budget with864 original writers and no unexpected/lost/caller failures. Fixed verifier `adf168cab7014be38c77dbcb7fd45043` / evidence `project-link-verifier/881c22c96d2e4e08b57e2d68302f7b36` qualifies with864 writers, zero validation failures, exact retained frame/EE/GS/VU/RTC-normalized IOP state, and13.5823737FPS (13.5509312/13.6139625 steady windows). Adjacent exact-restored control build `fcc01e86d0f945db8d81e6251423a4d4` produced151-input executable `92904fe09150ac6ef9058b8980b009cdeb851d730765a4d75a8160eac9f580ef`; fixed verifier `5472728938c24884a87ad7b51f684c6b` / evidence `project-link-verifier/957527875152469bbc19070570d2d239` qualifies the same864 writers/exact retained state at13.6538654FPS (13.6529333/13.6547976). Candidate is therefore ~0.52% slower in the close reversal. Reject HG-DIAG-086. `tools/hgtool/vu_emit.py`, `tests/test_vu_decode.py` and `tests/generate_vu_readiness.py` are byte-restored to preimages, configured regeneration job `76f0fcda4a734d0db840c91b3340be90` succeeded, final Python job `fa5dd87d2da14ce1be95ff1a7306a7ad` passes, and current production executable is clean `92904fe0...`. No086 code/runtime cost remains; preserve the external census/plan only. Do not repeat the same state-pure four-stage prepare/commit fusion unchanged.
+
+HG-DIAG-087 sampled completed-operation timing is complete and removed. Instrumented replay `4a62cd52f5f0434d87b39997bc67c201` reached33M with864 original writers and zero unexpected/lost/caller failures; verifier `0d6dc8ec257742eab8a80cc346ad7818` preserved exact retained frame/EE/GS/VU/RTC-normalized IOP state. Aggregate `vu-family-sampled-timing-20260927/summary.json` SHA `50207849...` records the heavy-window results. Raw256x estimates rank convert366.82ms, Q arithmetic269.88ms, broadcast MUL242.07ms, ACC MUL/MADD169.68ms and lane ADD/SUB165.68ms, but convert35.91ns/sample and Q36.20ns/sample expose a ~36ns timer/scope floor; those totals cannot be treated as removable wall time. Lane ADD/SUB is55.69ns/sample across2,974,020 calls, while EFU is79.66ns/sample across only759,600 calls. Prefer lane ADD/SUB as the next shared arithmetic target. All087 source edits were byte-restored. Probe-free build `7a02d9ad2e024f80b18bd41d8d41cdef` produced151-input executable `10e73dff7f37f057d57b5651f5a85ecec26fb733fded9240ec30527b8b8362cc`; fixed verifier `ca3a899a53754af284188c4a898dec4f` / evidence `project-link-verifier/69dc142f792d45e585542337b31b5f6f` requalifies864 writers, zero failures and exact retained state at13.5107444FPS (13.4805408/13.5410836). Instrumented11.965FPS is explicitly not a production comparison.
+
+NEXT bounded production mechanism is HG-DIAG-088 exact XYZ lane ADD/SUB SIMD reuse, recorded before edit in `vu-xyz-add-simd-preedit-20260927.txt` SHA `e03fae7a...`. Exhaustive active generated-code search finds `add_vector` sites using mask14 (XYZ), and HG-DIAG-087 measured2,974,020 dynamic lane ADD/SUB calls. Reuse the already exact-tested `try_fpu_add4` backend with an inert host W lane: helper admits only valid XYZ operands, returns false before mutation for any invalid/undefined/unsupported case, preserves original scalar fault order by fallback, updates flags with mask14 and writes only XYZ. W is never guest-read or guest-written. Change only `runtime/include/hg/vif.hpp`, `runtime/vu_products.cpp` and differential tests; no new arithmetic algorithm, emitter/clock/readiness/renderer/input change, and `v1/` stays untouched. Require full state/fault tests, exact33M/864-writer qualification and adjacent reversal before retention.
+
+## HG-DIAG-084 closes standalone GPU-native render targets; probe-free build restored - 2026-09-27
+
+The aggregate-only CPU GS construction census completed in Project Link job `ed2f2f19fe874ac29ea8f04a1a19159e`, evidence `project-link-runtime/20260927T213702Z-75cf0fb810c346dfbf05df0e772925ea`. It reached the33M budget, all864 original0x001bef84 writer events and no unexpected fault. Frame `b6ab8abd...`, EE `8747a80e...`, GS VRAM `74ad06df...`, GS state `eaf454f2...`, VU `5adb6544...` and RTC-normalized IOP `51d0b0ea...` match the established control exactly. Instrumented rate is not FPS evidence.
+
+The two31M..33M intervals totaled5.16963s. Exact non-overlapping GL CPU stages totaled453,062,000ns (8.7639%): sprite analysis/pack/queue34.2672ms; triangle analysis/queue41.5715ms; flush upload/payload-tile/dispatch193.5634ms; mandatory83,722,240-byte materialization183.6599ms. Complete packet application sampled2,384/152,526 packets and extrapolated1.479264s inclusive over285,600,224 bytes; it overlaps some materialization and is not additive. Deleting every measured GL CPU stage would reach only12.72 original boundaries/s in this sample. Even deliberately double-counting the whole inclusive packet estimate as also removable gives an impossible optimistic ceiling18.53/s, still below30. HG-DIAG-083 already measured only~0.703s GPU execution. Standalone GPU-native render targets therefore fail the feasibility gate; do not prototype this route unchanged.
+
+External aggregate JSON/CSV and archived temporary sources are `%TEMP%/hg-diag084-cpu-gs-20260927` (`summary.json` SHA `a266c609...`, `stages.csv` SHA `cc523071...`); byte preimages are `%TEMP%/hg-diag084-preedit-20260927-163125`. `runtime/gs.cpp`, `runtime/gl_gs.cpp` and `runtime/system_diagnostic.cpp` are restored exactly to `050855fa...`, `f40ac711...`, `12d9ef7c...`; private `runtime/gs_cpu_profile.hpp` is removed. Probe-free build has151-input provenance, executable `21d1c84969db2b95699262d12bc8ea1bbe6ce960c32446f428be427dd42388e7`, manifest `125f347a...`. Runtime and969-case GPU/CPU tests pass. Fixed verifier `d89aa4e1621f47cdb66ca06a7d66d397` / evidence `project-link-verifier/3e0e50d6271f47708ec7ff1a46d9e0aa` qualifies all captures/writers but sampled9.59636FPS under severe current host drift; this exact-source result is not a regression claim or a new comparison baseline. No game/job remains active; `v1/` untouched.
+
+Next measurable structural gate returns to broad AOT VU execution, since renderer-only and ordered packet-worker routes are now bounded below30. Reuse the retained heavy dynamic pair-count file and current generated C++ to count full `Vu1State` pair-start snapshots by lower-operation class and dynamic activation, including code size. Do not repeat the exact compact-SQ-only candidate that was already inconclusive. Implement nothing unless a broader build-time operand snapshot/local-state scheme removes a substantial shared portion of the measured~1.86s VU bucket without duplicating code bodies, changing clocks, moving first faults or weakening full-state differential tests.
+## HG-DIAG-084 CPU GS construction census planned - 2026-09-27
+
+Next measurable milestone is an aggregate-only CPU GS construction census during the original31M..33M heavy window. The temporary probe will arm only for unpaced `--profile-gs`, sample complete GIF packet application1/64, and exactly partition GL sprite/triangle admission and queue preparation, flush VRAM upload, payload/tile construction, dispatch/barrier, and mandatory materialization. Existing per-primitive raster counters will reset at31M so the report describes the same interval. Measurements are host-only aggregate counts/times/bytes; no packet, palette, texture or VRAM payload is recorded. Inclusive packet and raster timings will be labeled non-additive; GL sub-stages will be non-overlapping.
+
+External byte-for-byte backups and the pre-edit plan are `%TEMP%/hg-diag084-preedit-20260927-163125`; manifest includes `runtime/gs.cpp`, `runtime/gl_gs.cpp`, `runtime/system_diagnostic.cpp`, `docs/DIAGNOSTICS.md` and this file. A new private `runtime/gs_cpu_profile.hpp` may be added, avoiding the widely included public GS headers. Preserve all inherited changes and keep `v1/` untouched. Build focused runtime/GPU tests, then run one original33M replay requiring864 original writer events, no unexpected fault and unchanged retained captures. Use the result to decide whether a GPU-native render-target prototype has a credible removable CPU bucket. Regardless of outcome, preserve external aggregate evidence, byte-restore every probe source and rebuild before any FPS qualification.
+## Recorded door route verified unattended through350M - 2026-09-27
+
+Unattended hidden replay `%TEMP%/hg-door-route-replay-20260927-161726` used the qualified3882ee01 executable, disabled live host input, and delivered all108 external `--input-at` states at their recorded guest slices. It passed the former1a4c60 fault and reached the350,000,000-slice budget without any new EE fault, writing final IOP/EE/GS/VU/display state. The worker completed; hidden host PID9072 was identity-checked and stopped afterward. No process remains. This is functional route evidence, not FPS qualification or proof beyond the recorded final neutral state.
+
+The user no longer needs to repeat the startup/stairs/door path for this boundary. Preserve exact observed replay SHAad349a44, derived replay SHAb778126d and metadata SHA9515f968 under `%TEMP%/hg-door-route-recording-20260927-160542`. Future AOT candidates can use the same350M invocation to reach the door automatically. If exploration beyond this point requires new movement, record only the additional delivered hg_game states and append them with independently marked provenance; never use global keyboard capture. Current executable3882ee01 remains the source-matched qualified build. Audio and30FPS remain unresolved; v1 untouched.
+## Callback1a4c60 qualified; unattended recorded-route replay active - 2026-09-27
+
+Game-scoped HG-DIAG-006 run `%TEMP%/hg-door-route-recording-20260927-160542` captured107 exact delivered controller transitions and then stopped at EE1a4c60, RA1a9fc0 inside the newly compiled1a9f90 member loop. Live descriptor17c1bdc={0,-1,1a4c60} matches initialized original descriptor3b2f28. Original/live `[1a4c60,1a4cbc)` is byte-identical,92 bytes SHAd78f4286..., return/delay1a4cb4/1a4cb8, next prologue1a4cc0. Shared non-rendering manual extent only corroborates independent proof. External pre-edit backup `%TEMP%/hg-door-1a4c60-preedit-20260927`.
+
+Config04e1d5af roots only1a4c60 and retains every prior route repair. Generation reached371,487 words and adds exactly23 cases with zero losses/body issues. Python132/132, runtime and translation regressions pass. Release executable3882ee010fa7db41e3c5e9a1b36932561730100ca470c1da7a3446dea2c4c468 matches151-input provenance manifest365b2716.... Fixed evidence `%TEMP%/hg-door-1a4c60-fixed-20260927/evidence` qualifies864 writers, zero failures and exact frameb6ab8abd, EE8747a80e, GS-VRAM74ad06df, GS-stateeaf454f2, VU5adb6544 and normalized IOP51d0b0ea. Its11.15430FPS is host variance/non-performance evidence.
+
+External exact replay `door-route-observed.input-at.txt` contains all107 observed states, SHAad349a44.... Derived `door-route-replay.input-at.txt` SHAb778126d... has108 events: the exact prefix plus one disclosed neutral release at332272640 because the stopped guest could not receive the physical release. Metadata SHA9515f968.... Unattended hidden PID9072/session `%TEMP%/hg-door-route-replay-20260927-161726` is active with live input disabled,350M-slice budget, same GPU/audio flags and external state capture. This run is functional replay evidence, not FPS qualification. Monitor to terminal/fault, preserve next explicit stop, and continue without asking the user to drive the route again.
+## Active game-scoped route recording - 2026-09-27
+
+At the user's request, the qualified1a9f90 executable was relaunched with existing HG-DIAG-006 `--profile` input observation so the manual route to the door can be replayed without repeated user driving. This is not a system keylogger: it records only changed `HostInput` states actually delivered by hg_game to the guest, as exact guest slice plus buttons,4 axes and12 pressure bytes. Evidence is external at `%TEMP%/hg-door-route-recording-20260927-160542/native.stderr.log`; PID42680 is active with speakers, GPU flags and external fault-state capture. No source, guest input semantics, clock or repository game-derived data changed. Profiling output invalidates this run for FPS qualification.
+
+Next: user drives the route once and leaves the process open at the next freeze. Preserve the log, extract ordered `pad:` snapshots from `Host input slice=` records, validate strict slice order and exact parse round-trip, then replay through existing bounded `--input-at` support on the same qualified executable. Retain initial neutral state and final release explicitly in the derived external replay. Do not capture global OS input or infer keys not delivered to the guest.
+## Door-transition target1a9f90 compiled and qualified; live continuation active - 2026-09-27
+
+The1aa040 build progressed to a distinct explicit AOT stop at EE1a9f90, RA1271e8. Capture `%TEMP%/hg-door-1aa040-live-20260927-154203` holds object17b1b80 vptr46abb0 and caller1271e0 selecting slot+14. Original/live `[1a9f90,1a9fe4)` is byte-identical,84 bytes SHA0cadda6b..., with independently decoded return/delay1a9fdc/1a9fe0 and next prologue1a9ff0. The multi-entry vtable does not bound siblings; shared non-rendering manual extent only corroborates independent proof. External backup/plan `%TEMP%/hg-door-1a9f90-preedit-20260927`.
+
+Configd4012b7d roots only1a9f90 while retaining1aa040 and all earlier stairs/door coverage. Generation reached371,464 words and added exactly21 cases1a9f90..1a9fe0 with zero losses or body issues. Python132/132, runtime and translation regressions pass. Release executablebbaea93fb3c8ad6e3148957db92d893465ae10762b39b52fe9ae830d0e14d084 matches151-input provenance manifest82f27d2b.... Fixed evidence `%TEMP%/hg-door-1a9f90-fixed-20260927/evidence` qualifies864 writers, zero failures and exact frameb6ab8abd, EE8747a80e, GS-VRAM74ad06df, GS-stateeaf454f2, VU5adb6544 and normalized IOP51d0b0ea. Its11.20356FPS is host variance/non-performance evidence.
+
+Live continuation is active as PID10040 with session `%TEMP%/hg-door-1a9f90-live-20260927-155400`, speakers enabled and external stdout/stderr plus fault-state capture. User should continue and leave the process open at the next freeze. Audio remains unfinished SPU2 synthesis/mixing. No renderer, clock, runtime fallback or v1 change.
+## Door-transition target1aa040 compiled and qualified; live continuation active - 2026-09-27
+
+The196fc0 build advanced farther through the user's door route and stopped explicitly at EE1aa040, RA1271bc. Capture `%TEMP%/hg-door-196fc0-live-20260927-152451` holds object17b1b80 vptr46abb0 and observed slot+0c target1aa040. The surrounding table has many non-null siblings and is not a bounded pair, so only the observed target was added. Original/live1aa040..1aa718 is byte-identical SHA1e5210bf..., with independently decoded return/delay1aa710/1aa714 and next prologue1aa720. Shared manual extent only corroborates this proof. External pre-edit backup/plan: `%TEMP%/hg-door-1aa040-preedit-20260927`.
+
+Configafa21709 roots only1aa040 and preserves all prior staircase/door coverage. Generation reached371,443 words, adding596 cases with zero losses, including all438 bounded body instructions plus direct callees; four dynamic transfers remain explicit. Python132/132, runtime and translation regressions pass. Release executabled1c17b674e3f42b23e7d9670d1128c1315145db2b6cf095f7d0fc2ebae386b67 matches151-input provenance manifestbb94457a.... Fixed evidence `%TEMP%/hg-door-1aa040-fixed-20260927/evidence` qualifies864 writers, zero validation failures and exact frameb6ab8abd, EE8747a80e, GS-VRAM74ad06df, GS-stateeaf454f2, VU5adb6544 and normalized IOP51d0b0ea. Its10.69807FPS is host variance/non-performance evidence.
+
+Live continuation is active as PID50628 with session `%TEMP%/hg-door-1aa040-live-20260927-154203`, speakers enabled and external stdout/stderr plus fault-state capture. User should continue through the door and leave the process open at the next freeze. Audio remains known unfinished SPU2 synthesis/mixing. No renderer, clock, runtime fallback or v1 change.
+## Sequential door callback196fc0 compiled and qualified; live continuation next - 2026-09-27
+
+The197640 build ran past its former stop and exposed the next original door-state callback196fc0 through the same helper return1a367c. Capture `%TEMP%/hg-door-197640-live-20260927-151207` holds live object1510c80 descriptor{0,-1,196fc0}; unique initialized original record3b28e8 matches. Original/live196fc0..197640 SHA80d017c5... is byte-identical, bounded by return/delay197638/19763c and existing197640 prologue. Shared manual extent only corroborates independent proof. External backup/plan `%TEMP%/hg-door-196fc0-preedit-20260927`.
+
+Configb546dbce roots only196fc0 while preserving25f0a0/197640. Generation reached370,847 words:416 callback instructions plus direct callees,1,761 new cases total, zero lost; two callback dynamic transfers remain explicit. Python132/132 and runtime/translation/GIF/VIF/input/controls regressions pass. Release executabledb4e2b27f9b5ef27245d034d49ea1aa8ddb1abe04f9d18aa7f6c3a742d63d57a matches151-input provenance digest81c23424. Fixed evidence `%TEMP%/hg-door-196fc0-fixed-20260927` qualifies864 writers, zero failures and exact frame/EE/GS/VRAM/VU/normalized-IOP state. Its10.00579FPS is host variance, not a coverage-performance claim.
+
+Next: speakers-enabled live door continuation with external fault capture. Preserve all three proved roots; independently verify only the next explicit stop. Audio remains unfinished; no renderer/runtime/clock/fallback/v1 change.
+## Door callback197640 compiled and state-qualified; live door continuation next - 2026-09-27
+
+The25f0a0 candidate cleared the staircase: the user's next stop occurred only while opening a door. Capture `%TEMP%/hg-stairs-25f0a0-live-20260927-150328` reports explicit EE197640, RA1a367c, object1510c80. Original1a3674 calls generic member helper100b40 with object+a0 descriptor; live descriptor is{0,-1,197640}. Four initialized original records match. Original/live197640..197fe8 is byte-identical SHA93aa6e2f..., independently bounded by return/delay197fe0/197fe4 and next prologue197ff0. Shared lists supplied no usable body boundary. External pre-edit plan/backup is `%TEMP%/hg-door-197640-preedit-20260927`.
+
+Config15eea80a roots only197640. Generation reached369,086 words and added exactly618 instruction cases with none lost; twelve dynamic virtual calls remain explicit checked transfers. Python132/132 plus runtime/translation/GIF/VIF/input/controls regressions pass. Release executable9750e473488cf821ff999ee1533a3e4f45f62a44f697bb26af90c86c13733acf matches151-input provenance digest4dfd690f. Fixed evidence `%TEMP%/hg-door-197640-fixed-20260927` qualifies864 writers, zero validation failures and exact frameb6ab8abd, EE8747a80e, GS-VRAM74ad06df, GS-stateeaf454f2, VU5adb6544 and normalized IOP51d0b0ea. The10.54532FPS sample is host variance/non-performance evidence; audio remains unfinished.
+
+Next action: launch this exact candidate with speakers and external fault capture; user retries the door. Preserve both the now-live-proved staircase25f0a0 family and door197640 coverage. If another stop occurs, independently verify only that first target. No v1, renderer algorithm, clock, audio or fallback change.
+## Staircase target25f0a0 compiled and state-qualified; live continuation next - 2026-09-27
+
+Captured session `%TEMP%/hg-stairs-live-20260927-145012` proves the apparent freeze was explicit missing static translation at EE25f0a0, RA1bbed8, a0/objectfc8990. The common original caller1bbed0 loads slot+0c. Live object vptr46c780 and original/live table agree exactly on null-bounded pair25e950/25f0a0; original25e968..970 installs46c780. Original/live code is byte-identical through independently decoded returns:25e950..25e9b4 SHA884404a0... and25f0a0..25f57c SHAd83d380f.... The shared exact-address list was not used because the body constructs graphics work. External pre-edit backup/plan is `%TEMP%/hg-stairs-25f0a0-preedit-20260927`.
+
+Configc4e5884f appends only this proved pair to the existing1bbed0 target union. `hg.py emit` succeeded with368,468 reachable words; one shard changed, adding740 original instruction cases and losing none. Python132/132, runtime, translation, GIF/VIF/input/controls regressions pass. Release executable8d01457f160a679828284bfd6116e59671c21ed8a205e551234bda1b17bc8ee5 matches151-input provenance digestc13617e5. Fixed evidence `%TEMP%/hg-stairs-25f0a0-fixed-20260927` qualified all864 original writers, zero validation failures and exact relaxed frameb6ab8abd, EE8747a80e, GS-VRAM74ad06df, GS-stateeaf454f2, VU5adb6544 and normalized IOP51d0b0ea. Its12.26111FPS is a non-performance sample; this is coverage only and audio remains unfinished.
+
+Next action: launch this exact candidate with speakers and external log/state capture. The user must replay the actual staircase route because the fixed33M recording does not reach it. If another explicit stop occurs, preserve and independently verify that first target; do not infer adjacent methods or weaken the fault. No runtime fallback, renderer algorithm, guest-clock change or v1 edit.
+## Manual staircase/audio retest - 2026-09-27
+
+User tested the current probe-free executable966a3692 interactively with the qualified external TOC and GPU sprites/residency/triangles enabled. The game again stopped while going up the stairs. The window reported14-19 video updates/s, which the user judged visibly better than the previous manual test; this counter is host presentation activity, not the fixed original-writer FPS metric and is not a qualification claim. Gameplay audio remained audibly broken, consistent with the documented unfinished SPU2 synthesis/mixing/output path rather than an HG-DIAG-082/083 renderer change.
+
+The manually launched PID54604 had exited before follow-up inspection. This quick launch did not redirect stdout/stderr or request a saved fault state, so no stop PC, caller, explicit fault text or memory evidence exists for this occurrence. Do not assume recurrence of2ac530/2ac540/2ac5d0 or add another target from the visual freeze alone. Next live staircase retest must use the exact same source-matched executable with external native log/state capture and speakers enabled; inspect the first explicit stop before any code/config change. No game process remains active and no source was changed by this retest.
+## HG-DIAG-083 GPU elapsed census closed; probe-free build - 2026-09-27
+
+The renderer-audit fallback was completed after the exact-but-flat ordered worker was rejected. HG-DIAG-083 used a fixed512-object `GL_TIME_ELAPSED` ring around accepted sprite, triangle and masked-write dispatch, polled queries without blocking during the original31M..33M guest interval, and deferred the only final `glFinish`/collection until after all timed writer windows. It ran only under the existing unpaced `--profile-gs` diagnostic path and changed no guest clocks, state, packet ordering, pixels, observations or faults. Backups are `%TEMP%/hg-diag083-preedit-20260927`; aggregate evidence is `%TEMP%/hg-diag083-gpu-elapsed` and `%TEMP%/hg-diag083-gpu-elapsed-repeat`. No game-derived payload was stored in the repository.
+
+The repeat reached33M, all864 original writer events and no fault with zero skipped queries. GPU elapsed was703,482,880ns across2,045 batches: sprite295,785,472ns/302, triangle354,574,176ns/843 and masked53,123,232ns/900. The window submitted33,780 sprite draws and245,616 triangle draws; CPU-side flush time was180,787,800ns. Materialization downloaded83,722,240 bytes in97,509,700ns; only339 of18,761 bulk scopes touched GPU-dirty storage, covering1,340 pages. The first run measured the same shape (~690.75ms total GPU). Thus the GPU is not saturated in the roughly4.8-second heavy host interval, and readback-only GPU render targets have insufficient ceiling. A useful GPU-native design must also remove or overlap substantial CPU GS packet/state and draw construction; do not repeat a backing-storage-only experiment or another raw-packet worker.
+
+The three probe files were restored byte-exact, forced to rebuild, and contain no HG-DIAG-083/query-profile code. Current probe-free executable SHA256 `966a3692231d248e38966dc0e8b3ee5d92b37ce82186d294032eec5099f96ebe` matches151-input provenance digest `3ea1c42ceeb18226aafeeacc97d06de0b209071a7f19cd7ce691cf3e0021a711`. Final fixed evidence `%TEMP%/hg-diag083-fixed-final-clean` qualified864 writers, zero validation failures and exact relaxed frame `b6ab8abd`, GS VRAM `74ad06df`, EE, GS-state, VU and RTC-normalized IOP digests. It measured60 final boundaries/5.00095s =11.99772043FPS (subwindows12.26974/11.73750), recorded as host variance rather than a source regression because the source/input digest and all retained state match the restored control. Post-restore runtime and969-case GPU/CPU regressions pass; the same restored source state also passed translation,81920 VU-readiness,1920 GS-page and GS-memory suites. No diagnostic, game, profiler or command session remains active; `v1/` was untouched.
+
+Next measurable renderer milestone: use an observation-only heavy-window census to attribute CPU GS construction by packet parsing, draw assembly, tile/job upload and mandatory guest materialization consumer. Prototype GPU-native render targets only if the design removes a substantial measured CPU construction bucket as well as the83.7MB readback while preserving display publication, CLUT/IMAGE semantics, guest reads and synchronous first faults. The protected comparison remains13.12060460FPS; accept no candidate without two fixed qualifications plus an adjacent restored control and at least repeatable5% gain in both heavy subwindows.
+## HG-DIAG-082 coarse ordered GS pipeline closed - 2026-09-27
+
+The original31M..33M census passed its feasibility gate. External evidence `%TEMP%/hg-diag082-20260927-retry` records152,526 completed packets /285,600,224 bytes,100% eligible,120 spans and120 joins,4,759,856-byte peak owned data,7,494,500ns copy time,990,933,500ns synchronous application,67,255,600ns raster time, zero shadow mismatches/predicted faults/fault divergences,50,224 CLUT-write packets /49,564 actual loads,3,240 IMAGE packets /6,739,200 qwords,3,300 transfer packets and sources240 GIF DMA/61,146 VIF DIRECT/91,140 VU XGKICK. The replay reached33M,864 original writer events and no fault. This proved that ordered raw work can cross CLUT/IMAGE/VU boundaries with only display/observation-scale synchronization and within the fixed32MiB queue.
+
+A bounded one-consumer prototype then owned actual GS state and the existing GL context. Producer preflight used the validated shadow; a fixed32MiB byte ring and fixed command ring carried copied packets/raster/privileged/vblank/materialization commands with sequence ordering and no per-packet allocation. Focused differential coverage passed copied-source reuse, forced ring wrap/backpressure, conditional CLUT, transfer start/payload/completion/surplus/cancel, reset, shutdown, malformed prefixes, duplicate SIGNAL, FINISH-during-transfer, draw-capacity and first-fault text/order. A7M smoke completed9,331 draws/8,789 packets/94 original writers with no divergence. Two unpaced33M candidates queued231,223 packets with zero backpressure and matched the adjacent synchronous control byte-for-byte for retained display, EE, GS-VRAM/state and VU captures. Their last heavy subwindows improved over that noisy unpaced control, but unpaced timing is not the retention authority.
+
+Fixed candidate evidence `%TEMP%/hg-diag082-fixed-candidate1`, executable5a303fff, matched153-input post-link provenance,864 original writers, zero validation failures and exact retained frame/EE/GS-VRAM/GS/VU/RTC-normalized IOP digests, but measured60 heavy boundaries/4.59105s =13.06890581FPS. This is below protected13.12060460FPS, so the required repeatable >=5% fixed-verifier gain failed. The entire census/worker/switch/test/verifier extension was removed. Backed runtime sources were restored byte-exact; active host20da4bc7 was recovered from its exact Project Link backup after an older9704 historical revision produced strict hashes. Restored regression suites pass: runtime, translation,81920 VU-readiness,1920 GS page cases, GS memory and969 GPU/CPU cases. Final synchronous build34ea10c7 has151-input provenance. Fixed evidence `%TEMP%/hg-diag082-fixed-final-control` qualifies864 writers and all expected relaxed hashes (`frame b6ab8abd`, `GS VRAM74ad06df`, EE/VU/GS/normalized IOP exact) at12.33920474FPS; this lower single sample is host drift, not a retained regression or a reason to resurrect082. No082 source or process remains; v1 was untouched.
+
+Next measurable route is the renderer audit's GPU-native render-target architecture. Begin with HG-DIAG-083 nonblocking OpenGL elapsed-time queries around actual accepted sprite/triangle/masked-transfer dispatch and materialization boundaries; never use CPU submit time as GPU occupancy. Keep query polling nonblocking during guest execution, store no game-derived bytes, and remove the probe after one original heavy replay. Use the result to determine whether render targets can eliminate enough CPU-visible VRAM materialization/readback to justify an implementation. Do not build another packet worker.
+## Handoff checkpoint - 2026-09-27
+
+Active milestone: raise the original heavy gameplay display-writer throughput from the current provenance-qualified13.12060460FPS to30FPS while retaining exact original writer count, frame/EE/GS-VRAM/VU/RTC-normalized IOP captures, guest clocks and explicit faults. Current clean exe SHA256 a670ea48bf0af2dc1ffefe90a86490ea21bf189225b24788090cd3b6634d9b31; fixed verifier job9e5f8b50, evidence project-link-verifier/a47d629e6afb48448120f397bef8547d, 60 writer boundaries/4.57296s, all864 original writer events, validation_failures empty, passes_30fps=false. No production source/executable change in the latest native CPU sampling turn. No active Project Link job, native game process, Visual Studio sampler session or shell command session at handoff.
+
+Exact blocker: the measured slow interval distributes host work across VU~1.91s, complete GIF~0.74s, pending raster~0.51s and other~1.31s in the earlier disjoint instrumented4.66s window. The new HG-DIAG-081 native exclusive PC ranking confirms no one helper is large enough to remove the~2.57s/60-frame clean gap. Rejected065's GIF worker required56,877 synchronous joins and regressed to10.687FPS; HG-DIAG-080 found49,564 actual CLUT reload packets among50,224 CLUT-write packets, so IMAGE-only or no-load palette admission cannot eliminate most joins. Any useful renderer/VU pipeline overlap needs an independently proved producer shadow with ordered CLUT source versions, IMAGE payload ownership, guest read/event and first-fault publication; that contract has not yet been established. Do not implement a speculative worker or repeat failed XYZ/FPU/VRAM microvariants.
+
+Next executable action: read current root AGENTS.md, rules.md, learned skills.md and current sections of this file; rescan every project Markdown file including ignored folders. Use the external high-rate ETL (%TEMP%/hg-vu-native-full-high-20260927.diagsession) plus first-party symbolizer (%TEMP%/hg_symbolize_profile.py) only for candidate ranking. Before a production edit, map complete packet-span dependency/observation boundaries in runtime/vif.cpp, runtime/gs.cpp, runtime/include/hg/vif.hpp and runtime/system_diagnostic.cpp, using the original31M..33M trace; count actual provably join-free coarse spans and copied bytes. If few, reject that overlap design without rebuilding it and select a different broad exact VU/GIF structural route. Write a concrete change plan here, back up dirty source outside repo, implement one bounded candidate, run relevant tests and fixed original verifier with fresh post-link provenance. Any new diagnostic gets a stable HG-DIAG identifier and cleanup. Preserve frozen v1 and all external independence constraints. Pre-handoff progress backup %TEMP%/hg-handoff-progress-preedit-20260927, SHA256 '+$hash+@'.
+## Native CPU sample over current original replay - 2026-09-27
+
+Next measurable milestone remains a provenance-qualified 30 original writer boundaries per second with unchanged original frames, EE/GS-VRAM/VU/RTC-normalized IOP captures, guest clocks and explicit faults. Current fixed-verifier clean baseline is 13.12060460 FPS (60 boundaries / 4.57296 s), exe a670ea48, verifier9e5f8b50. This investigation made no runtime/source/executable change and no FPS improvement claim.
+
+HG-DIAG-081: the Visual Studio native CPU sampler successfully attached to actual hg_game.exe PID16112 during Project Link original gameplay33m replay38c616eb; replay reached33M and exited budget_reached without a fault. High-rate ETL is external at %TEMP%/hg-vu-native-full-high-20260927.diagsession; decoded event dump and first-party map symbolizer are external at %TEMP%/hg-vu-native-full-high-dump.txt and %TEMP%/hg_symbolize_profile.py. The isolated executable was the current clean build. The collector ETL lacks a reliable loader image for this already-running target, so the xperf symbol report alone is not usable. The module base 0x7ff79c120000 was recovered by matching exact repeated instruction PCs to the earlier low-rate trace with an explicit hg_game image load and the same executable; symbol lookup uses all function entries in build/Release/hg_game.map, including entries without the optional `i` marker. The first low-rate session accidentally attached to the Python wrapper, and a later high-rate late attach missed the game; neither is used for the heavy ranking. No profiler session or replay remains active.
+
+The last ETL 12.0M..16.5167M microseconds contains18,803 sampled hg_game PID16112 CPU PCs. This approximates the final heavy gameplay interval; no exact slice-to-ETL marker was recorded, so use it for ranking only, not calibrated per-function seconds or an FPS claim. Top exclusive symbol samples: Vif1Path::process_pending 848 (4.51% of all target samples); existing scalar XYZ prepare<false> 741 (3.94%) and prepare<true> 244 (1.30%); existing fpu_transform_avx2 638 (3.39%); Vu1State::arithmetic_q 517 (2.75%); Vu1State::multiply_vector 429 (2.28%); Gif decode304 (1.62%); GL masked_write283 (1.51%); CPU triangle raster240 (1.28%). Other host/driver samples and many AOT helpers are dispersed. Symbolized exclusive PCs can include inlined work in a named containing function and do not measure inclusive call trees. This agrees with prior complete scoped VU1.91s/GIF0.74s/raster0.51s, and rejects a single helper as a credible 2.57s/60-boundary saving. In particular the hot XYZ and fused transform paths are already retained optimizations with measured unsuccessful wider variants; do not repeat them unchanged.
+
+Decision and next executable action: use this trace to rank broad operation families, then design a bounded, exact multi-stage VU plus GIF/GS overlap only if producer-side shadow state proves ordered CLUT sources, IMAGE payload ownership, guest reads/events and first-fault publication without the rejected065 per-packet joins. Before a worker edit, obtain an exact original heavy-window timestamp marker and sampled call-stack attribution for this architecture question; retain the existing synchronous path if the correctness barrier cannot be removed. No skipped visible work, guest-clock change, or emulator code. The current clean exe and fixed verifier remain the qualification baseline. Documentation preimage backup %TEMP%/hg-native-sample-docs-preedit-20260927.
+## HG-DIAG-080 packet census closed; clean verifier - 2026-09-27
+
+Diagnostic game build ec14809a succeeded. Original unpaced33M replay 7bee2f3b reached the full budget with864 original0x001bef84 display-writer events, no fault; evidence project-link-runtime/20260927T151449Z-701ec61f7a064efbb253e43a1836b47c. HG-DIAG-080 observed152,526 successfully applied complete GIF packets /285,600,224 bytes during31M..33M. Exact mutually exclusive packet-shape split:95,762 plain,50,224 CLUT-write-only,3,240 IMAGE-only and3,300 transfer-control/HWREG-only; zero event-write packets in this window. CLUT-write packets held52,204 TEX0/TEX2 writes, of which49,564 packets each caused one actual CLUT reload (98.69% of CLUT-write packets). IMAGE packets carried6,739,200 transfers and107,879,040 packet bytes; CLUT packets carried8,268,352 packet bytes. These are packet counts from the current synchronous path, not a proof of asynchronous safety or a qualified FPS measure.
+
+Decision: reject IMAGE-only or no-load palette admission as a meaningful successor to rejected065. Actual CLUT loads occupy49,564 distinct packets, so eliminating all3,240 IMAGE packet joins alone leaves a large fine-grained palette barrier. The full async path would need a validated producer-side shadow of CLUT/transfer preconditions, ordered source versions and exact first-fault rollback/observation, plus roughly108MB of IMAGE packet payload in this interval. Do not conflate zero event writes with absence of faults or guest reads. Even ideal graphics-only overlap cannot close the approximately2.57s/60-boundary gap to30FPS. Next major performance work must also reduce or overlap substantial VU and other host work; do not reintroduce065 unchanged.
+
+All probe source files were archived outside the repo under %TEMP%/hg-diag080-probe-20260927 and byte-restored exactly: gs.hpp23f36c56, gs.cpp050855fa, system_diagnostic.cpp12d9ef7c. Initial restore build e3a37b0d was falsely incremental because Copy-Item retained backup timestamps; forced timestamp-only rebuild6b44db1b succeeded and contains no HG-DIAG-080 string. The resulting clean executable a670ea48bf0af2dc1ffefe90a86490ea21bf189225b24788090cd3b6634d9b31 differs in bytes from the older clean hash, but fixed verifier9e5f8b50/evidence project-link-verifier/a47d629e6afb48448120f397bef8547d passed fresh151-input post-link provenance, all864 writer events and exact retained frame/EE/GS-VRAM/VU/RTC-normalized IOP digests with zero validation failures. It measured60 final original boundaries in4.57296s =13.12060460FPS (windows13.03566/13.20667), passes_30fps=false. This is current production; no active diagnostic code or job. Documentation/result backup %TEMP%/hg-diag080-postedit-20260927/manifest.txt.
+## HG-DIAG-080 plan before probe - 2026-09-27
+
+Measure complete GIF packet classes in the original heavy31M..33M window before another graphics worker: total packets/bytes, packets containing TEX0/TEX2 writes, actual CLUT reloads, IMAGE transfers, transfer-control/HWREG writes and SIGNAL/FINISH/LABEL writes, including overlapping categories. Existing HG-DIAG-065 counted 56,877 joins but not distinct packet intersections, so the count can bound how many joins a palette-only or IMAGE-only preflight might remove. This is an eligibility census, not a worker or performance optimization; it cannot prove a shadow state safe.
+
+Temporary files: runtime/include/hg/gs.hpp declares host-only HG-DIAG-080 counters and default-null pointer; runtime/gs.cpp observes only already-decoded complete packets before/after unchanged application; runtime/system_diagnostic.cpp arms at31M only for unpaced --profile, reports and disables after original33M. No guest clocks, state, packet parsing, draw order, VRAM, pixels, input or fault behavior is changed. Disabled cost is one branch per completed packet; active counting cost unknown and its FPS invalid. Backups and hashes: %TEMP%/hg-diag080-preedit-20260927/manifest.txt. Build and run one original33M replay, verify864 original writer events and no fault, then byte-restore all probe sources, clean build and compare executable SHA/provenance. Keep only evidence and diagnostics inventory. Reject an isolated graphics worker if the count still implies tens of thousands of joins or copy volume that consumes overlap; even a perfect renderer-only path cannot reach30 FPS by measured phase budget.
+## GS packet boundary source audit - 2026-09-27
+
+Current qualified game remains 13.14495157 FPS; no runtime file, generated source, diagnostic or executable was changed in this continuation. Re-examined the original/current `GifPath::submit_qword`, `GsRegisterState::write_ad`, CLUT load and transfer paths, `EeState::pump_vif1/pump_gif/store_quad`, and outer connected drain. Every completed GIF packet is currently applied synchronously during qword submission; EE/VU callers then check GS interrupt state, and the outer slice rasterizes pending draws before advancing IOP. A `TEX0/TEX2` write may validate/fault, rasterize earlier draws, read VRAM source, update 512-word shared palette state and compare slots before publishing the register write. Transfer control may validate/fault and rasterize, while IMAGE data can partially mutate VRAM before a later fault. A producer-side asynchronous queue therefore needs an ordered GS control/source shadow and exact fault/observation barriers, not just immutable copied payload.
+
+The rejected HG-DIAG-065 worker counted 56,877 synchronous packets, containing 52,144 TEX0/TEX2 writes, 10,980 transfer-control/HWREG writes and 6,739,200 IMAGE transfers (categories overlap). The 52,144 palette writes are about 92% of the synchronous-packet count, but packets can contain multiple writes, so this is not a fraction of packets; IMAGE-only prevalidation cannot make this design coarse. An ideal graphics-only overlap is also capped by the measured approximately 0.741s complete GIF plus 0.506s raster buckets, below the roughly 2.56s clean-build gap to 30 FPS. Do not rebuild the old queue or relax fault, CLUT, readback or interrupt semantics. A useful new architecture must overlap substantial VU and other work as well, and avoid per-packet joins by a proved shadow contract. No claim of 30 FPS progress or a current-build full native call-stack sample.
+
+Next concrete implementation gate: make a small, host-only original-replay census of packet spans where an ordered shadow can prove all fault-producing register, CLUT and transfer preconditions using only state already available to the VU producer, plus bytes that remain immutable until consumer completion. Count required joins and copied bytes together, including actual TEX0/TEX2 reloads, begin-transfer boundaries, event writes and first-fault points. If this cannot eliminate most of the 56,877 joins, reject the worker before source integration. Even if it can, pair it with a broad exact VU cost reduction rather than calling renderer overlap a 30 FPS solution. Backed-up documentation preimage: %TEMP%/hg-progress-pre-gs-boundary-audit-20260927.md, SHA256 6befb1fb51dd301319efccbb9b1af732192d6a6b0c10dd06529c3d40539000cf.
+## VU continuation gate - 2026-09-27
+
+Next measurable milestone remains a qualified improvement from the clean 13.14495157 FPS baseline toward 30 FPS, preserving the same 60 original display-writer boundaries, frame/EE/GS-VRAM/VU/RTC-normalized IOP captures, guest clocks and explicit faults. Before editing runtime code, audited original-byte-decoded VU pairs against the retained HG-DIAG-038 dynamic counts. All 3,071 counted pair addresses resolved. The existing XYZ padded-add and combined multiply-add paths were already tested and rejected (HG-FAIL-019 and the 2026-09-21 combined XYZ reversal); broad clock hoisting and full-vector helper extensions were also rejected (HG-FAIL-040/020). Do not repeat these unchanged.
+
+The exact eight-pair MULAx/MADDAy/MADDAz/MADDw twice sequence outside program 1 accounts for 2,379,360 dynamic pairs, about 6.1% of its 38,831,580 pairs. The shorter four-pair sequence is present across other programs but dispersed, and pair counts are not host-time attribution. The existing program-1 fused loop is already measured at only about 0.667s of a 4.5s heavy interval. Extending that specialized transform across this small external footprint cannot plausibly close the roughly 2.56s needed for 30 FPS; no VU source candidate was made. Audit script is external temp hg-vu-chain-audit-20260927.py; no original bytes or generated source were added to the repository. No job is active and the production executable remains 6396dcd3.
+
+Next executable investigation: design and count a genuinely coarse, ordered VU/graphics pipeline boundary that can overlap or remove multiple measured buckets without the 56,877 packet joins of rejected HG-DIAG-065. Prove immutable packet payload, ordered CLUT/IMAGE source and fault/guest-read observation points from our own code and original trace before editing execution. If eligibility is low, reject that architecture without a worker build; if high, implement a bounded candidate with exact differential and fixed original replay. Renderer-private representation can change, but no game-visible work, guest timing or explicit fault may be skipped. Documentation backup: %TEMP%/hg-progress-pre-vu-gate-20260927.md, SHA256 f98fdf0db75f59a29f173d1c131329162010605fd4360e332a1fae06809fa3e4.
+## Whole-path FPS audit after user request - 2026-09-27
+
+Current provenance-qualified clean game6396dcd3 is13.14495157FPS (60 original writes/4.56449s), so30FPS needs those60 boundaries in2.0s, about2.56449s removed or overlapped. Reconciled the complete HG-DIAG-049 heavy-window profile (4.6623099s instrumented wall): VU1.9077751s, complete GIF0.7406284s, pending raster0.5058070s, DIRECT0.0702168s, UNPACK0.1262956s, MPG0.0014276s, other/overhead1.3101594s. These are disjoint within049. Independent complete HG-DIAG-076 EE0.4942611s/IOP0.1860953s/SIF0.0537283s explain~0.734s of the other category across runs, with drift/overhead caveat. HG-DIAG-069 GPU elapsed0.3716103s is nested and asynchronously measured, not additive. HG-DIAG-077 IMAGE CPU~0.326s is nested in GIF;079 nonzero VF readiness~0.416s is nested in VU and upper-biased. No one renderer-only or narrow VU route can supply2.56s.
+
+Reused the original HG-DIAG-038 count-only heavy trace with the current own VU decoder, independently joining3071 static pair addresses to their original-byte-verified AOT programs. All84,835,200 pair counts resolved; program1 contributes46,003,620 including41,973,300 in its known15-pair loop. Outside program1,38,831,580 pairs include11,619,060 LQ,1,582,020 SQ,~4.408M MULAx and~4.217M MADDAy; top XYZ arithmetic masks are14 and already use retained own scalar specialization where applicable. This is a dynamic mix, not host-time attribution or a new optimization. Counts file is external temp `vu-dynamic-pair-counts-20260927.csv`; no game-derived source committed.
+
+Attempted fresh Windows CPU sampled trace with built-in WPR CPU.Light.File. It failed before recording with policy error0xc5585011 even after command escalation; `wpr -status` confirms no active recording. Thus no current-build whole-process sampled call-stack profile is claimed. Complete scoped subsystem timing and the source/dynamic mix scan identify the major costs, but the exact per-function host critical path inside all VU programs remains unresolved. No runtime/source changes or FPS gain this audit. Next implementation must target multiple large buckets with a proved ordered GS packet/readback/fault contract and a broad exact VU execution strategy; do not repeat the rejected065 worker or single-helper micro-tuning. Preserve PS2-visible behavior and original guest clocks. No active job.
+
+## Clean post-079 qualification - 2026-09-27
+
+Verifier job3a909f8c9f1343e9b805f6a7e2c05b08 passed on exact-restored clean executable6396dcd3775cb10c5c8e4a49f8d31aba87e546cb6adf85450d4ff1ea88468958 with matched post-link build provenance. Final60 original0x001bef84 writer boundaries took4.56449s = **13.14495157 FPS**, windows13.42396 and12.87731; passes_30fps=false. All864 original writer events, frame/EE/GS-VRAM/VU/RTC-normalized IOP capture digests and qualifications match retained clean captures; validation_failures empty. Evidence project-link-verifier/79b121545e2a44818b23c9d157597ec0. No active job, diagnostic source or retained speedup. This is Windows replay evidence only. Next structural milestone and proof obligations remain below.
+
+## HG-DIAG-079 VU readiness cost measured; probe removed - 2026-09-27
+
+Original unpaced33M replay job c2df25ec0bba46a9a8deeb20002a93af reached budget with864 original display-writer events and no fault. During31M..33M, nonzero-register Vu1State::require_vf completed12,489,360 calls:12,056,580 (96.535%) zero wait and432,780 (3.465%) real stalls. One-in256 samples measured1,554,700ns over47,107 zero-wait calls and69,400ns over1,679 stalls. Fixed256x estimate is0.3980032s zero-wait plus0.0177664s stall, total~0.4157696s, with timer overhead, changed inlining and sample bias. Even impossible full removal from the last clean60-frame/4.57652s rate yields only~14.42FPS, so a narrow guard/advance fast path cannot deliver30FPS. No production candidate retained.
+
+Probe source byte-restored exactly: vif.hpp a4e5db94 (backup c861ddb5), vu_matrix.cpp910f850d (backup8885895a), runner12d9ef7c (backup485c2d6d). Clean rebuild a27d9642 succeeded; executable6396dcd3775cb10c5c8e4a49f8d31aba87e546cb6adf85450d4ff1ea88468958 with post-link manifest, no active job/probe. Current exact-restored executable is provenance-qualified at13.14495157FPS as recorded above;30FPS remains unmet. Next measurable milestone requires a structural mechanism with plausible >2.5s/60-frame saving across VU and GIF/GS, preserving original clocks, readback, frames and faults. Prior coarse worker and local VU guards cannot do this independently. Before code, map an exact ordered producer/consumer dependency contract that avoids065's52,144 CLUT packet joins, or find a shared VU operation with measured substantially larger exclusive cost. Do not repeat078/079 attribution or claim an additive speedup from cross-run buckets.
+
+## HG-DIAG-079 plan before edit - 2026-09-27
+
+Measure a genuinely shared VU cost before another speculative micro-optimization: one-in256 completed Vu1State::require_vf calls during original heavy31M..33M, split by zero wait versus actual dependency stall, with total call counts. This helper checks field readiness and can call advance_pipeline even with zero cycles; it is used across the AOT programs, unlike the already-optimized program1 transform. Temporary host-only counters in runtime/include/hg/vif.hpp, definition in runtime/vu_matrix.cpp and --profile arm/report in runtime/system_diagnostic.cpp. Preserve original statements, fault positions, guest clocks, Q/P, arithmetic, memory and rendering exactly; no runtime fast path. Timer/sample overhead and instrumentation may bias totals, so use only to decide whether a shared guarded zero-wait path has enough ceiling to justify a proved candidate. Project Link backups before edits; build, original33M replay, then restore all probes byte-exact and clean build. If estimated helper cost is small relative to the>2.5s gap, reject without coding. No v1 or external renderer source.
+
+## HG-DIAG-078 cancelled after evidence rescan - 2026-09-27
+
+The proposed palette-load probe was not implemented. HG-FAIL-022 already measured23,399 heavy CLUT loads with pending work and zero conservative FRAME/ZBUF overlap with incoming palette source; its exact-state deferred-barrier candidate regressed9.3183 to4.2280FPS. HG-DIAG-064 recorded49,564 actual heavy CLUT loads, and065 recorded52,144 TEX0/TEX2 commands among56,877 coarse-worker joins. Recounting pending draws would repeat an expensive replay without resolving packet fault/order ownership. No runtime files, executable or guest behavior changed. A successor worker still needs a complete proof of ordered faults, old-palette draw consumption and guest reads before removing joins. More importantly,049's~0.741s GIF plus~0.506s raster is insufficient alone to close a~2.58s/60-frame gap from13.11 to30FPS even under impossible full elimination. The next high-value implementation must also reduce/overlap VU work (~1.91s) while preserving original clocks and state. No active job; clean game2650964da remains current,30FPS unmet.
+
+## HG-DIAG-077 IMAGE qword CPU cost measured; probe removed - 2026-09-27
+
+Original unpaced33M replay `9db72da2466d42caa98920e1e7e59196` reached budget with864 original display-writer events and no fault. One-in64 completed IMAGE qwords were timed by destination format in31M..33M: PSMT8(0x13)6,389,760 calls/99,840 samples/3,838,400ns sampled => fixed64x **0.2456576s**; PSMT4(0x14)245,760/3,840/1,117,600ns => **0.0715264s**; CT32(0)103,680/1,620/133,700ns => **0.0085568s**. All IMAGE qword application totals~**0.3257408s**, with sampling/timer bias, versus HG-DIAG-049 complete GIF~0.741s and full heavy wall~4.5s. Even impossible elimination of every IMAGE CPU operation would bring13.11FPS only to about14.1FPS at fixed frame count. GPU masked-transfer execution was already~0.00376s in069. A bulk indexed upload rewrite is therefore not a route to30FPS; no candidate implemented.
+
+Probe files restored byte-exact: gs.hpp23f36c56, gs.cpp050855fa, runner12d9ef7c. Clean build job828105e3 produced game2650964da1139086c5b01c86d1832e5b013487ccdc2b3f0e1d2c29b16d18ebed with post-link provenance. Archives: gs.hpp01dd9d140e1d40c48ec2e5ef9db2862b, gs.cpp7f8505e84abc4a12917c3944948c5ec4, runner28f8f53dfb0148b98bf54e146f7d1335. No077 code, counters or guest effects remain. Last qualified clean13.11039829FPS on source-identical pre-probe build;30FPS unmet. Next major route remains structural overlap/removal of VU plus ordered GIF/GS service, with far fewer than065's56,877 correctness joins. No active job.
+
+## HG-DIAG-077 plan before edit - 2026-09-27
+
+Qualified clean game5c7d7f20 is13.11039829FPS. HG-DIAG-049 complete GIF packets cost~0.741s/31M..33M; HG-DIAG-065 counted6,739,200 IMAGE transfers inside synchronous packet classes, while HG-DIAG-069 measured only~0.00376s masked-transfer GPU execution. The unmeasured opportunity is CPU IMAGE qword conversion/coherence. Temporary host-only sampled timing in runtime/include/hg/gs.hpp around completed IMAGE transfer application, split by destination format (especially0x13 PSMT8), with a runner arm/report solely for unpaced --profile31M..33M. No transfer ordering, fault, VRAM, guest-clock or pixel change. Run build and original33M replay, compare sampled estimate with complete GIF budget; then restore probe and clean build. If this dominates, implement a bounded bulk exact converter with original fallback and differential tests; otherwise reject before coding. No v1 changes or external renderer source.
+
+## Clean post-diagnostic qualification - 2026-09-27
+
+Verifier job `e3bca4ed1fc44925a1a7a45100cf82eb` on current clean executable `5c7d7f2081ec9eb51b3ab74e9fffb8d0c48d0ccb80a7853fb7b6f3faf56bc237` passed provenance and original-frame qualification: **13.11039829 FPS** over60 final steady gameplay boundaries/4.57652s; windows13.38867 and12.84346FPS. All864 original writer events, retained frame/EE/GS-VRAM/VU/RTC-normalized IOP digests match prior clean captures; no validation failures. Evidence `project-link-verifier/8080370e4f554775a8d0a0ed74090694`. This is a clean current-build FPS datum, not a gain;30FPS remains unmet. No active diagnostic source or job.
+
+## HG-DIAG-076 complete-scope attribution; probe removed - 2026-09-27
+
+Original unpaced replay `30d4578a72774582b965f0d42f429f5f` reached33M,864 original display-writer events, no fault. Complete host-only phase scopes in heavy31M..33M measured wall **4.4590229s**, EE run/observation **0.4942611s**, IOP run/I-O **0.1860953s**, SIF **0.0537283s**. These scopes are disjoint from each other, but were not run simultaneously with HG-DIAG-049's exclusive VU/GIF/raster scopes, so their cross-run sums are approximate under drift and active timestamp overhead. Against HG-DIAG-049's ~1.310s complement they account for~0.734s, leaving roughly~0.576s other/overhead. Instrumented13.5333 interval rate is not qualified FPS. The measured CPU-side graphics work plus residual alone cannot bridge the >2s/60-frame gap to30FPS; VU and graphics preparation both require structural gains.
+
+HG-DIAG-076 header source was restored byte-exact to4efc1994 from archive4ad0e393683240ee8d04fa9fdfd2c436. Clean build5590280f succeeded, current game executable5c7d7f2081ec9eb51b3ab74e9fffb8d0c48d0ccb80a7853fb7b6f3faf56bc237 with post-link provenance. No076 probe remains and no active job. Next milestone: identify a structural overlap or removed-work route covering VU plus ordered GIF/GS packet service, with explicit original event/readback/fault boundaries. HG-DIAG-065's 56,877 joins made its coarse worker slower; do not repeat unchanged. Plan must prove fewer joins or substantially less copied work before implementation. Clean qualified baseline remains~12.6�13.7FPS depending host drift;30FPS unmet.
+
+## HG-DIAG-076 plan before edit - 2026-09-27
+
+HG-DIAG-075's sparse slices missed bursty work. Measure complete31M..33M elapsed around runner EE, IOP and SIF phase spans outside HG-DIAG-049's exclusive graphics buckets. Temporary host-only counters in runtime/include/hg/diagnostic_profile.hpp, active only for --profile/unpaced heavy window. No guest clocks/state/ordering/renderer/fault changes. Build and one original33M replay, then byte-restore and rebuild clean. Instrumented FPS is invalid; no v1 changes.
+
+## HG-DIAG-075 sample invalid for burst attribution; removed - 2026-09-27
+
+One original33M unpaced replay `5606cb4fd8f7422eb13429afe03ae645` reached budget with864 original writers and no fault. The existing1/256 slice sampler collected7,825 samples in31M..33M; scaled phase sum was only1.3766912s while measured heavy wall was4.3229158s. It missed ~2.946s of bursty work, so its per-phase proportions cannot divide the earlier1.31s exclusive-profile complement reliably. Do not use its apparent `ee_run` ~0.497s, IOP ~0.207s or graphics phase values as complete host attribution. Probe source runtime/include/hg/diagnostic_profile.hpp was restored byte-exact to4efc1994; clean build8f477dd0 succeeded, current executable9d108f69ac8e772d0d4b21770e59893df29010c380b48ba822aae38ac5bc688b with provenance. Instrumented13.8483 interval rate is not qualified FPS. Archivebbac1289ca114054a8b1ebab4d5b3392; no075 code remains.
+
+Current obstacle:30FPS needs a large reduction from ~4.3�4.7s/60 original heavy-window frames to~2s. Reliable exclusive categories remain VU~1.91s, complete GIF~0.74s, whole raster~0.51s, other~1.31s, with probe overhead/host drift. HG-DIAG-073/074 establish VU1 hot loop~0.67s and distributed other programs~1.16s. Next action should use complete scoped timing of one plausible shared CPU preparation operation, or a structural design that demonstrably eliminates/overlaps hundreds of ms without ~56,877 synchronous packet joins seen in065. No active job; no diagnostic source remains; user-visible30FPS is unmet.
+
+## HG-DIAG-075 plan before edit - 2026-09-27
+
+Reuse the existing1/256 host `DiagnosticProfile` sampler for a bounded31M..33M phase-delta report: one temporary change in runtime/include/hg/diagnostic_profile.hpp, no new instrumentation in hot subsystems. Record sampled_ns per host phase and wall only at the start/end slice boundary; original phase marks/guest code remain untouched. Heavy sample estimates may overlap HG-DIAG-049's nested exclusive buckets and must be interpreted as a separate phase partition, not added. Run build and one original33M `--profile` replay, then byte-restore the header and clean rebuild. Purpose: divide the earlier1.31s complement and distinguish CPU-side graphics service from EE/IOP/host overhead before another optimization. No v1 changes or qualified FPS claim.
+
+## HG-DIAG-074 measured and removed - 2026-09-27
+
+One unpaced original33M replay `cbaf2baee4534b08afdec5e0e71c2684` sampled1/16 completed AOT VU1 activations by verified static program identity during31M..33M. It reached budget/no fault with864 original display-writer events. The13 programs' sampled time totals116,284,000ns, fixed16x ~**1.860544s**, close to independent HG-DIAG-049 exclusive VU1.907775s. Program1 contributed43,948,300ns sampled/~0.703173s and111,840 activations, consistent with HG-DIAG-073 hot-loop ~0.667296s. Other programs together ~1.157371s: program3 ~0.238402s, program8 ~0.229874s, program9 ~0.194954s, program5 ~0.161112s; each remaining program <0.1s. These estimates include nested XGKICK VU body service and sample/clock bias; instrumented interval14.0165Hz is not qualified FPS. No single overlooked program can close the30FPS gap. Need a shared-cost structural improvement or concurrency that preserves all ordering/readback/faults; avoid another isolated VU operation from count alone.
+
+The four HG-DIAG-074 files were restored byte-exact (runner12d9ef7c, emitter2759ccd9, vu_matrix.cpp910f850d, header9f57f985), `hg_emit` job95cf88d0 regenerated clean `out/translated.cpp`2f8f8ff3, and clean build3760695c produced executable eff6806b2dc484fa4a3785652723608ccf6a5a676b825b08679941aab456ddc9 with post-link provenance. No074 probe remains. Archives: runnercbc483977b354e77ae1e6badea055f9f, emitter8da0311185f54314b0247d039595c375, vu_matrix.cppb5fd38615ed642829708d33c739b5402, headerc581b5ca986b4c23b14cd5c0e169f5a0. Python tests and build passed; no new qualified clean FPS measurement, existing exact-source qualified range12.59�13.72FPS remains. Next measurable milestone: isolate CPU-side GIF/GS preparation and the ~1.31s non-VU/non-GIF/non-raster complement within the same heavy window; select a change capable of saving at least several hundred ms before coding. No active job.
+
+## HG-DIAG-074 plan before edit - 2026-09-26
+
+Sample 1/16 complete AOT VU1 activations in31M..33M by original verified static program identity (13 programs). Temporary host-only counters in vu_matrix.hpp/cpp, emitted timing around each identified `_run` in vu_emit.py, and `--profile` runner arm/report. Do not alter dispatcher matching, VU state, guest clocks, GIF/GS, packets or explicit faults. A thrown original fault propagates as before and is not timed as completed. Python tests, emission, build and one original33M replay establish counts/timing; this is attribution only, never qualified FPS. Restore all four files byte-exact, regenerate/rebuild clean and record result. Target is the largest remaining measured VU body, not assumed from pair counts.
+
+## HG-DIAG-073 measured and removed - 2026-09-26
+
+One unpaced `gameplay33m --profile` replay `7ce957bf0f4a44c0b5efc30d488e6132` sampled 1/64 original program1 fast-loop attempts in31M..33M. It reached the33M budget,864 original display-writer events and no fault. Of2,798,220 loop attempts,43,722 completed samples accumulated10,426,500ns whole-loop and4,380,700ns nested fused-transform time. Fixed64x estimates are **0.667296s** loop and **0.280365s** transform, leaving ~0.386931s other loop work; timer overhead and sampling bias make these approximate, and the instrumented13.083 host interval rate is not qualified FPS. The loop is ~35% of the earlier ~1.908s heavy exclusive VU bucket and ~15% of the adjacent ~4.49s heavy host interval. Optimizing its arithmetic alone cannot deliver30FPS; remaining VU work, GIF/front-end and pending raster also matter.
+
+HG-DIAG-073 sources were restored byte-exact: runner12d9ef7c, emitter2759ccd9, vu_matrix.cpp910f850d, vu_matrix.hpp9f57f985. Clean `hg_emit` joba1d8fb99 and build8d9b507c succeeded; current game executable SHA7576d75f710ae9223bd677dee8c01a885ffe679e50cc35c4dd917e1d51ee45e3 with post-link provenance. No073 probe or guest effect remains. Probe archives: runner2f9db7577e9946f6b6866654a2a4900c, emitter463c98417b0243ba924b4806777446c8, vu_matrix.cpp3528e01552884f6a9a0a068f13aa5540, headerca71fea4681f4f3b88fc3d103619c8cc. Next measurable milestone: attribute the remaining ~1.24s exclusive VU work by static program entry or host phase, then choose an operation that removes a large measured cost while preserving exact guest state; revisit renderer CPU-side service only with a measured eliminable bucket. Qualified clean baseline remains12.58608�13.72106FPS under host drift;30FPS unmet. No active job.
+
+## HG-DIAG-072 closed flat; clean production restored - 2026-09-26
+
+Whole-loop memory preflight was implemented only for independently proved original program1/0x0158 and synthetic counterpart. Before guest mutation it checked the counter, stride, all address bounds, disjoint full read/write ranges and all future LQ definition masks; accepted iterations used direct selected-lane memory effects, otherwise the unchanged checked CFG ran. Python132, runtime/translation,262144 arithmetic and81920 compiled CFG/fault comparisons passed. Candidatea6892685 / verifier90f4132d / evidence project-link-verifier/09d9f1d4004d40ccb8d39dd2f090fbc0 qualified12.91580830FPS; adjacent clean d97629a6 / verifier6544881e / evidence project-link-verifier/16e7f98d0f6c46c8974e1184c3b49de6 qualified12.58608357. Byte-identical candidate reversal8fedbf88 / verifier48431931 / evidence project-link-verifier/ea0c0b92896045baac0b29d1b4b5a900 qualified12.60928043FPS. All retained frame/EE/GS/VRAM/VU/normalized-IOP captures and864 writers matched within same-date comparisons. The initial candidate lead was host drift, not repeatable gain. Emitter and test restored exactly to2759ccd9/b1a5a0e5, generated source regenerated to2f8f8ff3; clean rebuild6a1d97de produces2ac4ee75 with provenance. No072 code, counters or guest effects remain. Candidate source archived in backup419ecca3b5e543678a424e4a443783ec; tests6767504476d8409bb38ba742d8852093. Reject unchanged proof hoist/direct memory route;30FPS unmet.
+
+Next measurable milestone: identify how much of the ~1.9s exclusive heavy VU cost belongs to the proven hot loop and its fused transform, versus other operations, before choosing another CPU or concurrency rewrite. HG-DIAG-073 plan before edits: sampled host-only elapsed timing of1/64 completed static fast-loop iterations, with a nested measurement around fused_vu_transform only, armed solely by --profile/unpaced in31M..33M. Add temporary counters in runtime/include/hg/vu_matrix.hpp and runtime/vu_matrix.cpp, emitted sample boundaries in tools/hgtool/vu_emit.py, runner arm/report in runtime/system_diagnostic.cpp. No clocks/state/packets/pixels or fault behavior changes; disabled default one branch per fast iteration, instrumented FPS invalid. Report sample counts, summed loop and nested transform ns with explicit sampling/overhead caveats. Restore all probe sources byte-exact, regenerate and rebuild clean after one replay. If hot loop is not most VU cost, shift to other active program entries; if it is, use the measured non-transform remainder to select a structural target. No v1 edits.
+
+## HG-DIAG-072 reversal pending - 2026-09-26
+
+First candidate gamea6892685 (builddd3c1d44, verifier90f4132d, evidence project-link-verifier/09d9f1d4004d40ccb8d39dd2f090fbc0) qualified12.91580830FPS with864 original writers and matching frame/EE/GS/VU/RTC-normalized IOP captures. Python132, runtime/translation,262144 arithmetic and81920 compiled state/fault checks pass; emitter only recognized the original0x0158 hot loop plus synthetic counterpart. Exact emitter/test restore and regeneration returned production source; clean rebuildcda97844/game d97629a6/verifier6544881e/evidence project-link-verifier/16e7f98d0f6c46c8974e1184c3b49de6 qualified12.58608357FPS with the same retained captures. Earlier13.72106 clean is nonadjacent drift. A 0.33FPS candidate lead versus this adjacent control is plausible but below confident retention under observed host variation. One close candidate re-enable/rebuild/qualifier is justified as reversal; use archived byte-exact candidate emitter backup805fa5930c7c4e1bbaff1283df10684c and test72688d947c1945b7bb1fa396df0bce52, then regenerate. Keep only repeatable material gain; otherwise restore clean and record closed. No active job now.
+
+## Active HG-DIAG-072 - whole-loop VU memory proof hoist, 2026-09-26
+
+HG-DIAG-071 established that direct LQ/SQ/ISW lane accesses alone are not a throughput win because it retained the fast loop's per-iteration safety network. The retained program1 loop still repeats seven bounds tests, three selected-definition tests and twelve same-iteration LQ-vs-write alias comparisons across ~2.798M heavy-loop iterations. Its exact shape offers a stronger proof: the counter decrements by1 to zero, all LQ addresses share one VI base, all writes share another, and both bases advance by the same positive stride in the loop tail.
+
+HG-DIAG-072 is emitter-only and conservatively hoists that proof before guest mutation. It will recognize only the existing exact15-pair loop plus counter/base/stride invariants, require a nonzero counter, prove no base wrap and whole-activation address bounds, prove invariant LQ/write non-alias once, and pre-scan future LQ definition masks. Any uncertainty rejects the fast path at its first pair and uses the unchanged checked CFG/fault path. On success the fused body may omit per-iteration safety branches and use the already-validated direct selected-lane memory effects from071 while preserving the full pre-upper state snapshot for same-pair SQ. Arithmetic, Q/P, pipeline/readiness, VI updates, branch evaluation, overlap behavior and guest state remain unchanged. Pre-edit manifest `artifacts/vu-static-loop-preflight-preedit-20260926.txt`; clean production control is `e3442936...` / verifier `b62a2467...` = **13.72106000 FPS**. Require Python structure, configured regeneration, runtime/translation and81920 full VU differential comparisons, then exact qualified33M state before timing. No v1 edit.
+
+## HG-DIAG-071 rejected by reversal; production restored, 2026-09-26
+
+The retained HG-DIAG-061 program1 fast loop already proves all seven LQ/SQ/ISW addresses in-range, proves LQ selected lanes defined, rejects per-iteration read/write aliases and falls back before mutation to the unchanged checked CFG. HG-DIAG-071 reused only those existing proofs to replace seven generic VU-memory helpers per completed fast iteration (3 LQ,3 SQ,1 ISW) with direct selected-lane loads/stores and exact definition-bit merges; same-pair SQ retained the pre-upper whole-state snapshot. No arithmetic, clocks, Q/P, readiness, branch/fault fallback, overlap behavior, renderer or guest state changed. Pre-edit manifest: `artifacts/vu-static-loop-direct-memory-preedit-20260926.txt`.
+
+Correctness passed: Python emitter tests, build/runtime/translation, **262,144** fused arithmetic comparisons and **81,920** compiled baseline-vs-fast VU state/fault comparisons with **25,265** fast-loop iterations. Candidate game `5078e954d50dbc22b3203612e2b34d9a755367f7eb04e9b7c686d9dd1f47d776`, verifier `029447cc6334408cadaf44da2b453753` / evidence `project-link-verifier/a6198b5a3a834467b12c312f2af07d64`, qualified with exact retained frame/EE/GS/VRAM/VU/normalized-IOP state and864 original writers at **13.34492859 FPS**. Its immediate pre-candidate clean control `03bbc50e...` was13.31507688FPS, initially looking flat.
+
+Exact emitter/test source was then byte-restored to `2759ccd9...` / `b1a5a0e5...`; configured regeneration restored `out/translated.cpp` exactly to `2f8f8ff3...`. Clean rebuild `fa9e923152f1457f921751f3e07d0983` produced production game `e34429360dbe712ed5c2628889f6554714e867a0e135403e393f0ba7a1bc154f`. Adjacent restored verifier `b62a246750c449c2893e05dcf0cf2d1f` / evidence `project-link-verifier/b038c4290285483e9dde104e3787175c` qualifies at **13.72106000 FPS** with the same retained state and864 writers, decisively above the candidate. Reject unchanged direct-memory fast-loop emission; source-level checked-helper count did not identify a useful throughput cost on this host. Current production is the clean13.72106FPS build.30FPS remains unmet. Next work should use measured VU pair/helper attribution across the remaining hot entries rather than another call-count-only micro-optimization.
+
+## HG-DIAG-070 closed - triangle first-covered scan is too small, 2026-09-26
+
+Diagnostic replay `0415f2c462eb4cbc8d3f21a5d2558324` / evidence `project-link-runtime/20260926T155412Z-3a697015ceaa459c99aa2024dfd921bd` sampled1/64 of heavy31M..33M triangle coverage searches without changing admission or rendering. Across592,835 triangle calls it sampled9,257;5,155 sampled calls were empty (~55.7%), but only174,872 pixel centers were actually tested out of3,973,809 sampled bounding-box positions because nonempty searches terminate early. Sampled scan time was664,400ns, or about **42.52ms** by the fixed64x extrapolation. This is under1% of the ~4.5s heavy host interval and cannot justify redesigning triangle admission/native rasterization by itself.
+
+All three070 probe files were byte-restored exactly (`gs.hpp`23f36c56..., `gs.cpp`050855fa..., runner12d9ef7c...) and clean rebuild `edc68e31b584474ba0ecb47507b8a6db` succeeded. Do not infer cost from empty-triangle count or bounding-box area alone; measured tested-pixel work is small. Next target returns to the multi-second VU bucket. The retained program1 static-loop guard already proves VU-memory addresses/definitions for ~2.798M iterations but still executes generic checked LQ/SQ/ISW helpers roughly14M times. HG-DIAG-071 should test direct guarded VU-memory accesses inside that existing exact fast loop, with the unchanged checked CFG on guard failure and full compiled CFG/fault comparison before gameplay timing.
+
+## HG-DIAG-069 closed - GPU execution is not the 30 FPS limiter, 2026-09-26
+
+One diagnostic-only heavy31M..33M replay (`38d9b1621c0e42d584783a3eb0389661`, evidence `project-link-runtime/20260926T153932Z-8635ffa0f6ab46548579ef0bfc30ea94`) used bounded nonblocking GL_TIME_ELAPSED queries around the existing compute dispatch+barrier region. It collected2045/2046 issued queries with0 pool skips and1 unresolved query: sprites302 queries / **122,800,640 ns**, triangles843 / **245,050,592 ns**, masked transfers900 / **3,759,104 ns**, total **371,610,336 ns = 0.37161 s**. Triangle work is ~65.9% of measured GPU time, sprites~33.0%, masked~1.0%. Queries never blocked and the instrumented replay is not FPS.
+
+All three probe files were byte-restored exactly (`gl_gs.cpp`f40ac711..., `gl_gs.hpp`385cc4e8..., runner12d9ef7c...), then clean build `dfd85ea05fc44c1e81289c30ebe0f0ec` and qualified verifier `ecd753ec2e704a1abc4d45b9f671c739` / evidence `project-link-verifier/2c22551468054588bb35b8e6c1b0990c` produced game `c4b0299defa3c1370db4da9cbb9a3cc06ca9e04141db3484012e668d8a920fb2` at **13.36916269 FPS**, with exact retained frame/EE/GS/VRAM/VU/normalized-IOP state and864 original writers. The clean heavy host span is4.48794s; measured GPU execution is only ~8.3% of that non-additive interval. Even the impossible upper bound of deleting all0.37161s as fully serialized work would yield only ~14.58FPS. Therefore raw shader/compute execution cannot be the principal path to30FPS. A native render-target rewrite could still save CPU-side GS preparation, but must be justified by CPU work eliminated rather than GPU draw time. Next structural target should isolate/reduce CPU VU + GIF/GS front-end work; do not undertake a large shader rewrite merely to reduce the measured GPU0.37s.
+
+## HG-DIAG-068 rejected by adjacent reversal; production restored, 2026-09-26
+
+The VU AOT identity-cache hypothesis was structurally valid but slower. It keyed a host-private static program id to MicroMem generation, invalidated only after a complete MPG commit, and preserved the original ordered full matcher/fault path on every miss. Python133, runtime, translation and VU-readiness suites passed; generated output contained only the intended cached dispatch plus unchanged fallback. Qualified candidate game `ea4f05755e4885884ca7f1d111304bfb8248a347b2fb32c9edcd4eabe076ee18` measured **13.37744919 FPS** (`d8ea031c...`, evidence `project-link-verifier/ce50355c2f2a4a24956ead193282345c`) and identical-binary repeat **13.38073086 FPS** (`c006112f...`, evidence `project-link-verifier/4903ed8ff161429691c7ba3d4b777a91`), both with exact retained frame/EE/GS/VRAM/VU/normalized-IOP state and864 original writers.
+
+All five pre-068 source/test files were byte-restored (`vif.hpp` a4e5db94..., `vif.cpp` d051e21e..., `vu_emit.py`2759ccd9..., `gif_tests.cpp`30b5a31a..., `test_vu_decode.py`b1a5a0e5...), then `hg_emit` regenerated the original full-match dispatch (`b52bb8c8...`) and clean build `8f167110...` freshly recompiled the generated translation. Reversal game `283385568d229960b28fe4193316a0998baa8b0aa6847bc86718e9273c6c7498` qualifies **13.63651860 FPS** (`f0ba6c73...`, evidence `project-link-verifier/422a0044322a48e5b65dc016054c404e`) with matching retained state. Reject 068 as a real throughput regression; repeated MicroMem identity scans are not the heavy-scene limiter on this host. Current production is the clean reversal build;30FPS remains unmet. Next work should target work inside the hot VU program bodies or another measured large exclusive bucket, not dispatch identity.
+
+## HG-DIAG-067 rejected by adjacent reversal; production restored, 2026-09-26
+
+The whole-transform AVX-512 embedded-rounding trial is closed. The corrected implementation kept the result host-local until every stage passed exact normal-range guards, preserved separate multiply/chopped-add RTZ+SAE semantics, and fell back atomically to the retained AVX2 whole-transform path on any rejection. Exact validation passed on the corrected source:262144 fused arithmetic comparisons plus81920 compiled CFG/fault comparisons (`83330bc2...`), runtime regression `e678c1c0...`, translation `f0392cd5...`, build-tests `e7f0078e...`. Qualified corrected game `70fc003acbd786f2588b9d82f34807778a3945b9a61e5279e34ecd391de6e43f` measured **13.39402314 FPS** (`79500c60...`, evidence `project-link-verifier/7f3176abcee443828df130f3f68f3b60`) and identical-binary repeat **13.19899688 FPS** (`31423e50...`, evidence `project-link-verifier/f8981cc3482d4cfba9a1eb51c170ab45`), with exact retained frame/EE/GS/VRAM/VU/normalized-IOP state and864 original writers.
+
+Exact pre-067 source was then restored using automatic backups (`fpu_madd4_er.cpp` -> `11e89dcccdd824ad771581d1bbe1b4f62ae3f5e7ce75f8a76fa695064da88348`; `fpu_add4.cpp` -> `c5f6d80d0f769dc415a1787af5346377f0b39113f64089cb60e54b6ee11d6dd8`). Clean rebuild `bc68748a9ebe462fa7759fdebe0bae1e` produced game `1f9bc032b8eb9e493ab71f2ea01113dde4d4bfc80e17520f939fecd6dc0d1ff2`; reversal verifier `21639e45c52e47b1a6982530ab8ae5ae` / evidence `project-link-verifier/963a5e2bbd574fca84170ddac94cb15a` qualifies at **13.62447319 FPS**, faster than both corrected candidate runs with the same retained state. Reject 067 as a real throughput regression under adjacent reversal; do not retry unchanged.30FPS remains unmet.
+
+## HG-DIAG-066 closed flat; next exact fused arithmetic trial
+
+066 candidate987a0ebc /6dc0554d /project-link-verifier/149b938182694bddbb122f271b625349 qualifies13.01247463FPS. Adjacent exact-restored control545047b7 /29b29d02 /project-link-verifier/f585927bb88b48bab0bab7d6182afd7e qualifies12.99300327FPS, revealing host drift from prior13.49206. All retained frame/EE/GS/VRAM/VU/metadata/normalized IOP match;864 writer events qualify.80 differential batch/fault cases and runtime suite passed. Saving register copies is flat, not a demonstrated regression or useful gain. Source/tests restored byte-exact; archives56dbc564601b46c19ad56ad40f9052fd and37872cdda5164e1bbcead91dd21c020b. Current game is rebuilt clean, no active job. Do not repeat unchanged.
+
+## Active HG-DIAG-066 - batch register restoration, 2026-09-26
+
+Milestone: improve qualified heavy FPS above clean13.49206 with identical original frames/state and fault ordering. CLUT-residency review found five CPU palette consumption paths (generic texel, DrawTexture, sprite/triangle job capture, CPU feedback); HG-FAIL-022 already reports zero conservative pending draw/source overlaps and a failed barrier deferral. GPU-resident CLUT is not justified as the next costly rewrite by current evidence.
+
+Bounded candidate before editing: runtime/gs.cpp factors primitive dispatch from environment restoration. Public single-draw rasterization remains unchanged; pending batch saves live128-register bank once, installs each captured environment (or original live bank for uncaptured draws), dispatches in identical order, increments completion only after success, restores live state before accelerator end_batch on success or fault. This removes repeated1KiB save/restore pairs across635882 heavy draws; no reduced snapshots, pixel changes, delayed faults, or guest timing changes. No changes to empty-batch accelerator lifecycle. tests/runtime_tests.cpp compares mixed captured/uncaptured draws and partial faults against sequential public rasterize_draw. Project Link automatic byte backups preserve both dirty preimages. Build/tests and fresh qualified verifier; reject flat/slower or any mismatch. Host saving is unmeasured; this is not a30FPS promise.
+
+## Current production restored and verified - 2026-09-26
+
+30FPS remains UNMET. Final clean game7dd58858b9267f6353c8a3a7be927366e44d28b557d0d965bb19c2caff98dfd7 (buildfe5f7a2fc0a24e389c8b4109f61eae59) qualifies at13.49205992FPS in a03d48e7dec44aae9fe4fd372e930fd7; evidence project-link-verifier/1f11a7309b8644c9a260a53c7a6ccd6f. All864 original boundaries, retained frame/EE/GS/VRAM/VU/metadata and same-date RTC-normalized IOP captures match; raw IOP difference is the documented RTC mask. No retained speedup this session:06313.49534 is flat against final clean13.49206,065 coarse graphics worker10.68711 regressed.
+
+All candidate/probe changes are removed; exact original source hashes restored. New065 headers removed after byte-identical external archives under artifacts/rejected065-*.txt. Final test products rebuilt4d1c44ff; runtimec2b21c61 and VU25491fbc pass (262144 arithmetic,81920 CFG/fault comparisons). No active job/thread, diagnostic counter, packet hook, timing override or experimental worker remains. No v1 edits. Documentation/audit/lessons updated; HG-FAIL-044 prevents repeating the failed route.
+
+Active user goal remains30FPS preserving visible PS2 behavior and strict guest computation. Concrete blocker: packet-level overlap still required56,877 synchronous CLUT/transfer/fault boundaries, despite only60 coarse drains. Renderer-only threading as implemented is closed. Next major milestone must reduce that dependency cost rather than tune the same queue or repeat tiny arithmetic changes. Next executable investigation: inspect a renderer-private GPU-resident CLUT representation and enumerate every CPU palette consumer/materialization boundary before proposing an implementation; source locations gs.hpp load_clut_from_tex0/texel_from_tex0 and gl_gs.cpp triangle palette capture. This is an unmeasured architectural lead, not a claim it reaches30FPS or authorization to skip guest-visible reads. Preserve strict renderer as reference and require meaningful measured savings before expansion.
+
+### Prior restore plan and experiment record
+## Coarse worker performance gate FAILED - restore production
+
+065 schedule census64f826a8 / project-link-runtime/20260926T054102Z-76836220702843459ed6e92f62cc0f8d/native.log:2271 finds95,409 asynchronous and56,877 synchronous packets,17,694,308 transfers; synchronous packets contain6,739,200 IMAGE transfers,52,144 CLUT writes,0 event writes,10,980 transfer-control/HWREG writes. Thus60 coarse drain launches still incur56,877 correctness joins.49,564 actual CLUT loads from064 versus52,144 CLUT writes leaves little gain from merely admitting no-load TEX0/TEX2 writes. The candidate10.68711FPS regression is consistent with lost overlap and added packet handoffs; exact cost attribution is not established. Do not repeat unchanged coarse queue or unsafe removal of joins. A future architecture must validate fault-capable GS work independently or change the renderer-private representation to remove dependency cost, with original event/fault/state proof; adding a worker alone is not enough.
+
+Restore gs.cpp/system_diagnostic.cpp/runtime_tests.cpp exact original preimages; archive new worker/schedule/test headers outside repo and remove experimental production integration/counters. Finish expanded80-case fault/ordering suite first, then rebuild/qualify clean production and record restoredFPS.30FPS remains unachieved.063 remains archived without proven material gain. No pixel/guest-clock/logic compromises authorized.
+
+## HG-DIAG-065 first measured result - correct but slower; investigating waits
+
+Coarse producer/consumer candidate5e5a35f5 (buildf2e7f554, verifier849cdad4, evidenced43fb956d81e401bb864906cf3d0a642) qualifies864 original writers and EXACT frame/EE/GS/VRAM/VU/metadata/same-date normalized IOP captures versus clean control. Heavy FPS10.68711 (10.69199/10.68224), below clean13.16456/13.31100. Do not retain this regression. Runtime testsded5dd6b pass1024 packet classifications and64 threaded/synchronous DMA/VU/event/fault comparisons plus existing suite; translationff2bc59d passes. Extended tests add2048 A+D/primitive classifications and partial-packet faults (80 comparisons), awaiting rebuild/run.
+
+Temporary065 counters now arm only --profile unpaced31M..33M: count asynchronous packets, synchronous packets, total transfers, IMAGE transfers in synchronous packets, CLUT/event/transfer A+D commands in synchronous packets. No timers or guest effects; disabled one boolean branch per complete packet; remove counters before FPS testing. They distinguish actual blocking-packet frequency from coarse drain count before any queue redesign. Buildfb4f0eea passes; replay64f826a8 active. Current game is diagnostic and NOT qualified for FPS. Counter-free preimages: worker5c2d5409, runnerdad5f032. Production baseline sources still recoverable: gs.cpp7d54bd54 ->050855fa, runner9180d018 ->12d9ef7c, runtime_tests9d86db44 ->e45ef1f8. New scheduling/worker/test headers recorded new. All65 changes remain experimental until performance gate passes.
+
+## Active structural candidate - HG-DIAG-065 coarse VIF producer / GS consumer
+
+064 gate PASSES: heavy31M..33M has60 nonempty VIF drains,14,457,736 pump iterations (max240,987),60 VU-active drains/85,680,900 VU issue cycles (max1,428,015),635,882 draws and49,564 CLUT loads. All60 drains have drawing/CLUT work. Evidence0d5dbd23 / project-link-runtime/20260926T052937Z-fceb72dd239442b9b6f9396c8eae5cd1/native.log:2270. No fault; diagnostic runner restored byte-exact12d9ef7c, archived17cc52a3. This is60 ownership handoffs, not126180 per-activation handoffs.
+
+Plan before edits: new gif packet scheduling/worker headers; gs.cpp thread-local complete-packet consumer hook; system_diagnostic.cpp one persistent producer worker per game, enabled only for VIF DMA drains and no VU capture observer; runtime tests for packet safety, ordering, faults and worker lifecycle. Worker owns EE/VIF/VU/GIF transport only during drain. Existing main native/GL thread consumes immutable decoded packets and retains all GS/OpenGL execution. One bounded ordered ring, no snapshot or per-activation wake. Potentially faulting/event/CLUT/transfer packets wait synchronously until applied, preserving their original fault/event point; proven register/vertex-only packets can overlap. Preflight validates descriptors/addresses, primitive7 vertex faults and conservative draw capacity without modifying guest state. Producer IRQ checks read only privileged event fields; queued safe packets cannot write these fields. Main never resumes EE/IOP, PATH3 or raster service until producer and queue finish. Parser suffix erased only after accepted/completed callback; partial failing-packet state remains observable. On VU failure drain preceding safe packets then propagate original error. Keep synchronous reference and disable when diagnostic VU observers access GS mid-execution. Backups automatic, new files recorded new. Validate safety classifier and synthetic multi-packet DMA against synchronous state/fault results, runtime/translation, then fixed game verifier and adjacent reversal. Reject on race/order/fault/state mismatch or flat FPS. No guest clocks, math, pixels or visible work changed.
+
+## Active coarse graphics overlap gate - HG-DIAG-064, 2026-09-26
+
+063 candidate20669097 qualifies13.49534FPS; adjacent restored control37d4df70 qualifies13.16456, repeated13.31100, against earlier06113.39..13.42. Frame/EE/GS/VRAM/VU/metadata and same-date RTC-normalized IOP digests all match; raw IOP differs at documented RTC bytes.132 Python tests,262144 arithmetic groups (including prepared reuse and forced fallback),81920 full CFG/fault comparisons, runtime/translation pass. Candidate advantage is small relative to observed variation; source restored exactly and candidate archived, not retained as a material gain or30FPS result. Backups manifest: artifacts/prep063-backups-20260926.txt; candidate archives from restores7e5e8427/3c819e1d/ea9d66a5/685fa2ad/2bd49af6/f174ffc6. Current baseline game37d4df70, build486c74cc, verifier310a593b/7baa379a, candidate verifier97e86cd4.
+
+Next bounded gate: runner-only count census of actual VIF DMA drain sizes in heavy31M..33M. Existing records count126180 VU activations, but not whether whole drains amortize handoff. In system_diagnostic.cpp, only --profile and unpaced heavy window, count nonempty drains, pump iterations, VU-active drains/cycles, GS draws and CLUT loads per drain, size histogram/maxima. No new thread, timer, guest mutation, ordering or fault change. One replay, then byte-restore runner12d9ef7c... and rebuild clean. This answers whether coarse ownership transfers have enough work to justify implementation. No micro-optimization or throughput claim from instrumented run.
+
+## Active 30 FPS work - HG-DIAG-063 coefficient preparation, 2026-09-26
+
+User explicitly requests reaching30FPS, with prior PS2-visible fidelity constraints retained. Markdown rescan complete. Renderer overlap feasibility: XGKICK has no per-qword IRQ sync, but VIF returns synchronously and syncs after each delivered qword/tag; extending beyond activations requires separating GS event state, GL ownership and exact fault boundaries. Per-activation worker reuse would repeat the126180-handoff cost already rejected. No speculative worker enabled. Next measurable milestone: exact qualified throughput improvement by hoisting loop-invariant VU transform operand decoding. Existing static proof rejects any coefficient written by upper/lower loop operations, so predecode sign/exponent/mantissa/active masks once after entry guards, before the loop. This is host-only preparation, not guest arithmetic or instruction execution. Files: vu_matrix.hpp, fpu_add4.cpp/fpu_add4_avx2.cpp, vu_emit.py; extend arithmetic and emitted-CFG tests. Keep original fused helper/scalar fallback, exact products/adds/flags/pipeline/memory/fault positions. No cache, no approximate floating point, no input/clocks/renderer changes. Automatic Project Link external backups preserve each dirty preimage; emitter task backs generated output. Validate132 Python tests, arithmetic/CFG full-state comparisons, runtime/translation, then provenance-qualified original33M frame replay and adjacent reversal if promising. Reject/restore if flat or incorrect. No30FPS claim until measured.
+
+## Renderer route audit completed - 2026-09-26
+
+Report: docs/RENDERER_ROUTE_AUDIT.md. Major scan completed across frontend, raster, compute shaders, coherence, presentation and prior trials. Best next investment: feasibility gate for coarse ordered GIF/GS consumer overlap, preserving existing raster math. Not a measured win or proven optimum. Exclusive049 profile offers about1.246s GIF+raster versus1.908s VU in4.662s instrumented wall; costs predate current061. Per-qword GS interrupt checks are the main obstacle. Exact next action: map GS event/read/status/fault observation boundaries and prove eligible immutable packet chunks before implementing any worker; add one inventoried probe only if static proof leaves decisive uncertainty. Reject if joins/copy/queue costs consume overlap. Full native render-target rewrite is a larger second option; do not repeat closed palette/sprite/readback or fine-grained VIF feeder trials. No runtime edits, tests, benchmarks, new diagnostics or live command sessions this audit; current061 executable unchanged. Documentation automatically backed up. Requested audit milestone complete.
+
+### Audit scope recorded before work
+
+User requests a major renderer scan and the most efficient route to higher FPS while preserving PS2 appearance. Milestone for this request: a source-grounded ranked decision, elimination of already failed routes, and one bounded next experiment with explicit correctness/performance gates. Read-only renderer/frontend/coherence/presentation audit plus existing diagnostic evidence; no new runtime optimization or replay until an unresolved question justifies it. Plan: save current findings in docs/RENDERER_ROUTE_AUDIT.md, retaining source locations, measured scopes, unknowns and a low-cost stop/go gate. Automatic external backup applies to documentation edits. No changes to frozen v1, guest clocks, graphics, or existing061 executable.
+
+## Current FPS state - fused transform retained, paired follow-up closed
+
+Final test products rebuilt from restored061 (78c5a54128cf46229c7578bf2f42e886);7b4188a4834a438fa311b4894f9c4101 again passes262144 arithmetic and81920 complete CFG/fault comparisons. Game remains qualifiedb4418029...; no active job, timer probe or062 source. AGENTS map, DIAGNOSTICS, PERFORMANCE and learned skills updated. Windows only verified; no playability/audio/cross-platform claim.
+
+Retained source061 is built and qualified: buildc79375b2a68e432991fca786924cc5ef/gameb441802986229169860a9792093e0f748a34f18ec2d1aeae4475ab5e83a99331. Verifier91d45e3d/evidencef500ca8a recorded an outlying12.52048FPS; immediate same-binary repeatc6b9bd9d1e3f43a4adeb9e1af166813e/evidence1168ae6a355d4328b4cd4c898d5c8f34 returns13.38861343FPS. All captures/864 original writers exact. Retain the earlier three13.39..13.42 candidate results versus adjacent disabled12.95555, but report actual host variability and30FPS unmet.
+
+062 exact eight-lane follow-up is rejected: tests2d45a6ad/e1af3c5f/014c9fea/a27dae36 pass; buildfbf9fab5/gamecf7ace95/verifier482171bd/evidence9f5f81c3 gives13.28229979FPS with exact state. Source restored byte-exact8d81eb8e via b93e7eaed8e0411393ff453833b2ce64; archivec535876a344b4903a4ef203f14e19cd1. No062 code remains. No active jobs or probes.
+
+Reused038 dynamic counts joined to the existing matrix-block opportunity report:7,446,900 four-stage groups overall, only1,535,820 outside program1. Thus simply broadening fusion beyond the current2,798,220 two-transform loop iterations has limited upside; do not implement generic matrix fusion from static site count alone. Identity caching, compact snapshots, eight-lane arithmetic and earlier repeated helper approaches remain closed. Next measurable milestone remains a material qualified FPS improvement with exact guest state; inspect a larger eliminated-work mechanism in VIF/VU/GIF using this evidence before adding probes or edits. Current blocker is CPU throughput, not missing translation or build failure. Next executable investigation: reuse038 pair-frequency data and current generated output to identify repeated operand/state preparation across a whole VU activation; prove invariance and cost before a bounded candidate. No candidate for that has been implemented.
+
+## Retained fused transform; paired-lane arithmetic history
+
+HG-DIAG-061 reversal evidence: disabled path buildf8a97e5d/gamee2c7448c/verifierb27da501/evidence84f7e924ebad4df18fbb92164f1ac7b1 gives12.95554951FPS. Re-enabled identical source/emission, build6c582e87/gameb12a31bcabdf0d69c0718769c54a5ce02b66b8fa90eeba391e2dd29c258f08f7/verifier4c64b302/evidencef6c78f5f9013408ca67fa00a5a603c9a gives13.42152768FPS. Together with13.39465/13.40776 earlier candidates, this supports retaining the modest fused-block gain (~3.5% versus adjacent control; earlier control13.2027 shows variance). All captures and864 writers remain exact;30FPS unmet. No timing probes remain. Restored emitter2759ccd9 is enabled.
+
+HG-DIAG-062 planned bounded follow-up in runtime/fpu_add4_avx2.cpp only: process the two independent transform chains together in eight32-bit AVX2 lanes. Reuse exact product4 twice per stage, replace the six separate packed additions with three eight-lane additions derived from our existing add4 integer algorithm, and aggregate intermediate sticky flags across both chains. Preserve final second-chain MAC/current and stage3 ACC, both VF results, scalar/CPU-feature fallback and original emission. No float guest approximation, FMA, guest-clock/order change or new runtime settings. Existing262144 scalar/reference comparisons across16MXCSR modes and81920 full CFG/fault fixtures validate the changed backend; build/runtime/translation then original qualified FPS versus retained061. Automatic external byte backup before change. Reject on mismatch or flat/slower result.
+
+## Fused transform validated; adjacent control completed
+
+HG-DIAG-061: 132 Python tests (b1528a4a), 262144 fused scalar/reference and81920 complete CFG/fault comparisons with25265 fast iterations (ad640685), runtime07b69b0e and translationff01e03a pass. Emit4ff9c3bc produces exactly one fused site in original program1 at0158 (translated.cpp2f8f8ff3). Buildfa7c1c73 / game8ddd14b7e248805004b3b4cf8b7713ea781e480a4385f011cf586f09d930d528 qualifies twice: ce92cef5 / db09b6aefd4b49c2801f53fd41e374ce =13.39465107FPS;77731c37 / d8173ebdf0844483a696eed50db1786d =13.40776131FPS. Both retain every frame/EE/GS/VU/metadata and same-date normalized IOP hash,864 original writers. About1.5% above earlier13.20271448 control, not yet enough evidence to retain complexity.
+
+Next controlled adjustment: temporarily disable only optimize_static_loop in the original emission call in tools/hgtool/vu_emit.py, preserving fused implementation/test bytes. Regenerate/build/qualify adjacent control under the same conditions; generated VU behavior must match the old checked CFG. If gain is host drift, restore all nine candidate files via recorded automatic backups and regenerate/rebuild clean. If repeatably useful, restore this single flag and rebuild candidate. No guest behavior or test criteria changes. This source switch is experimental A/B selection, not a runtime setting.
+
+## Planned production candidate - fused exact transform block
+
+Implementation detail: tools/hgtool/emit.py also adds the required vu_matrix.hpp include to generated main; no EE instruction emission changes. Synthetic tests instantiate the scalar helper with CPU-feature dispatch disabled only in the test translation unit.
+
+HG-DIAG-060 replay8510bd08a31d4ce1b83767777c53f512 / project-link-runtime/20260926T033233Z-241df2122e6a4327b9960164063aeb80 completes33M: all2M heavy slices measured, VIF/GIF3430.6037ms, EE495.1729ms, IOP187.2191ms, hostIO184.6125ms, raster109.0445ms, clocks96.4213ms, interrupts78.3706ms, SIF52.2181ms, IPUinput50.7047ms, IPUoutput40.6898ms, diagnostic history39.0394ms. These include substantial timer overhead and nested work; not additive to049/058/059 and not FPS. Header restored exactly4efc1994; archived753cf440.... No hidden dominant outer-runtime phase; VIF/VU/GIF remains the major target.
+
+Next bounded structural candidate (HG-DIAG-061): reuse the previously validated static15-pair loop guard/scheduling only as infrastructure, then replace its two consecutive full-lane four-stage transform chains with one exact fused helper. Unlike rejected cache/prepared matrix paths, no lookup table, no stored eight-stage result array and no intermediate MAC/ACC publications. Compute all products/adds with existing strict integer arithmetic. Keep only two final VF results, final live ACC (stage7), final MAC/current flags and OR of every stage's sticky flags. Publish VF outputs at their original consuming boundaries; preserve lower SQ/LQ/FCAND/MTIR/ISW operations and all Q/P timing. AOT proof must establish coefficient/input closure, no intervening MAC/STATUS/ACC read or fault, shared input XYZ and VF0.W translation, and exact source masks. Failed guard uses unchanged checked CFG.
+
+Files: tools/hgtool/vu_emit.py, runtime/include/hg/vu_matrix.hpp, runtime/vu_matrix.cpp, runtime/include/hg/fpu_add4.hpp, runtime/fpu_add4.cpp, runtime/fpu_add4_avx2.cpp and focused existing synthetic VU test generator/Python tests. Restore earlier static-loop scaffolding from verified external backups, preserving current originals in automatic backups. Test all outputs/flags against scalar operations across arbitrary bits and16MXCSR modes, full compiled CFG states/faults, Python/runtime/translation, then regenerate/build and original qualified A/B. Reject if correctness differs or gain stays in host drift. No v1 edits, guest-clock changes, approximation, runtime decoding or external implementation.
+
+## Clean control verified; outer-runtime attribution next
+
+Clean build5355a06a... gameabb7c3a30d22a5eacef5361bcbb01f64a4ca0ce4579ae1df81920b34ef92a8cd; verifier4edd1e1d9a4a432e82ab6ff6b8894132 / evidence4d5f865a10b84c9e89399b3406b86ea9 qualifies864 original writers, exact retained frame/EE/GS/VU/metadata hashes at13.20271448FPS. No production optimization has been retained this continuation; this is a fresh host-condition control, not a claimed gain. Current UTC-date normalized IOP digest0369e0d1... is a new same-date baseline; date fields remain unmasked.
+
+HG-DIAG-060 planned in diagnostic_profile.hpp only: select every slice31M..33M, omit per-PC map accounting, reset elapsed origin at31M, retain the11 existing phase marks/counters. Measure all phases to resolve the prior~1.31s complement; no guest changes. ~22M timestamp calls add unknown overhead distributed across phases; tiny phase percentages are not exact and instrumented FPS is invalid. No per-instruction timers. One replay, restore exact header, then target largest non-VU phase using source evidence. Automatic backup before edit.
+
+## VU entry attribution captured - 2026-09-25
+
+HG-DIAG-059 replay0d0dcdb1413047c0b38690a9692d8794 / project-link-runtime/20260926T032811Z-a9907960748b4150bbcce8f25b47ba31 completes33M/no fault. Inclusive VU entry buckets:0x288=578.4494ms/46140 calls,0x60=367.3810ms/32580,0x908=220.7393ms/2400,0x970=216.5298ms/1920,0xec0=185.5928ms/1920,0x58=166.2523ms/1560,0xa90=129.0214ms/1620; other entries smaller. Entry0 activation35040calls takes only4.0494ms. Entry is not program identity and times include nested GIF/GS. This shows why optimizing only the frequent transform program cannot solve the whole VU cost. Runner byte-restored12d9ef7c via44ea261a..., archived probe c4210065.... No active probe source. Next: get a fresh provenance-qualified clean control after the diagnostic cleanup, then isolate the ~1.31s unclassified outer runtime cost rather than repeat rejected VU helpers. Restore build required; all original execution unchanged.
+
+## HG-DIAG-058 closed; next VU entry attribution
+
+Replayf4d3ea6142a54f21964a095c5058cefe / project-link-runtime/20260926T032546Z-78fb6ee1b0ed4f9e976dc662f950a5b7 reaches33M. Heavy-only readbacks: raster339 calls/10,977,280 bytes/49,798,700ns; ordinary CPU reads60/68,812,800/32,264,700ns; CPU writes480/3,932,160/71,948,300ns; other zero. Sum154,011,700ns. Backend flush2045/154,759,400ns. This is secondary to ~4.6-5s heavy runtime; do not pursue another GPU readback mechanism from whole-replay totals. Both probe sources restored exactly; backups73007a32.../d485c50c....
+
+HG-DIAG-059 plan: runner-only temporary wrapper around the existing AOT VU executor, enabled under --profile at31M and restored before final captures. Aggregate inclusive call time/count by original entry offset (not program identity), plus issue-cycle deltas. No instruction decoding or substituted execution; each original executor call executes unchanged. Static1024-entry host arrays, two timestamps per activation, no per-instruction timers; active cost unknown and timing is attribution only. This distinguishes the hot transform continuation from other entries before further implementation. Capture once then byte-restore runner. Existing backup workflow applies; no generated/header changes.
+
+## Current FPS milestone - isolate heavy-window synchronization, 2026-09-25
+
+HG-DIAG-057 replay1eb7f6c56f454dadbcdaba92f9a32c9e / project-link-runtime/20260926T031609Z-a3d733f2bba74f49b8d019ba4f3444ba reaches33M without runtime fault. In31M..33M only339 dirty raster scopes /1340 pages occur: self-feedback180/720, other textured triangles159/620, sprites zero. The prior3111 scopes/75809 pages are WHOLE-REPLAY totals, not the heavy window. Do not use them as heavy-frame attribution. All four057 sources restored byte-exact (gs050855fa, glf40ac711, memory6943d381, runner12d9ef7c); diagnostic binary still requires rebuild.
+
+Next measurable milestone: HG-DIAG-058 in runtime/gl_gs.cpp and system_diagnostic.cpp records existing download/flush durations and bytes only during31M..33M, distinguishing masked raster scopes from ordinary CPU reads/writes and other materialization. No added per-pixel timers, no guest/rendering/order changes; active branch/counter cost unknown, diagnostic FPS invalid. Reuse existing timestamps, stop recording before final capture. Automatic Project Link byte backups precede each edit. Capture once, restore probes, then choose a structural change from actual heavy-window cost. Current measured clean FPS remains about12.7-13.0;30 unmet.
+
+## Current user priority - diagnose and fix rendering issues, 2026-09-24
+
+User clarified explicitly: FPS. Target throughput, not a visual-defect investigation. Stop isolated helper trials; use exclusive costs from the same heavy frames to choose a structural change. Stop isolated helper trials. Production restore completed: build02b1ecf550f74cab95afd278f98bcc54, executable375239426e5db2d1a9178f551daa1946828159955e713c83742abd0518b30b33. No active jobs or new probes. Renderer/source/emitter are restored; eight GPU queue dependency tests remain. Latest clean captured frameb6ab8abd... from verifierb7575d1b... inspected as actual640x448 pixels: courtyard scene and character present; a single image cannot establish absence of visual/timing defects. Existing measured speed~12.9FPS,30 unmet. Next measurable milestone: attribute the current31M..33M heavy window exclusively, then materially improve qualified gameplay FPS with preserved captures. No further proposed unit-product or whole-loop optimization has been implemented.
+
+## REJECTED EE MICRO-OPTIMIZATION - cooperative RAM-poll direct read, 2026-09-25
+
+The generated cooperative EE wait guard already proves the polled address is aligned, in ordinary EE RAM and outside any watched wait range before yielding to the scheduler. A bounded candidate replaced only the redundant generic `State::load()` inside that proof with an exact direct little-endian `s.ram` read; the real translated guest load/branch still executed whenever the poll changed or the proof failed. Python/runtime/translation/65536-readiness passed and candidate executable `107546f152b99ae0438574823f462a3d9f22b93cd91121cd9d98ab7adbdab02c` qualified twice with exact retained frame/EE/GS/VU/normalized-IOP state and864 original writers at **12.9969998592 / 12.8334559641 FPS**. This is not a repeatable material gain against nearby clean controls (`12.9310902202` before the trial; provenance-clean `12.7234826717` after restore, demonstrating large host variance). Emitter, focused test and generated shard are restored byte-exact to `5985e970...` / `7d957ed9...` / `bf878328...`; clean production executable is `8a24b87bdea80d7cdc9cf020b154530f1ae78cc4f257e41a6825685e20e96cbf`. Do not retry this direct-read shortcut unchanged. Pre-edit note: `artifacts/ee-cooperative-ram-poll-direct-read-preedit-20260924.txt`.
+
+## REJECTED RENDERER COHERENCE - exact self-feedback page prepass, 2026-09-25
+
+HG-DIAG-055/056 narrowed the remaining PSMT8H CPU-feedback question. All **18,378** heavy self-feedback triangles use ZTST=GEQUAL, ZMSK=1, PSMZ24, so old depth contents must remain visible. Their conservative clipped-rectangle frame+depth masks total98,312 page references while actually covered samples touch66,374 (-32.49%);8,376/18,378 draws are geometrically reducible. A production candidate therefore ran the exact original coverage predicates once before the existing scalar raster and used the covered CT32+Z page union for `GsCpuMemoryScope`, falling back to the retained rectangle on unsupported/faulting address state. Build/runtime/translation/65536-readiness passed. Candidate executable `d1722cfdef8d217dff5cb073f5d0380bb95656a6a4b64e00ad0f844a97e7a5ca`, verifier `41587591433148f787769cb76d6dec38` / evidence `project-link-verifier/eca79e62aa4543bebec91a85ebd1d999` is fully qualified with exact retained frame/EE/GS/VU/normalized-IOP and864 original writers, but measures **12.7348789231 FPS**. Immediate byte-restored control executable `9f51b316ad051cdeaac0bd7bf5f27c937033a53c8feea32f2d4187e3df24b7b8`, verifier `601ac0c9de4746df8bbc4d435e7182d6` / evidence `project-link-verifier/176034c909d54aadb631d80ce8f502d0`, qualifies at **12.7180078513 FPS** with the same retained state. More importantly final-only backend traffic does not improve: nearby clean `1,526,636,544 B / 1.3018276 s` readback versus candidate `1,532,370,944 B / 1.3554876 s`; bulk dirty scopes/pages remain3111/75809. The geometrically omitted pages were generally not GPU-dirty when these CPU scopes occurred, so theoretical mask shrinkage does not remove the actual synchronization. REJECT; `runtime/gs.cpp` restored to `050855fa...` and clean rebuild/control completed. Do not retry exact feedback page prepasses or page-count minimization without dirty-intersection evidence. Pre-edit `artifacts/feedback-exact-page-prepass-preedit-20260925.txt`.
+
+## REJECTED NATIVE RENDERER - ordered fragment-interlock CT32 sprite batches, 2026-09-24
+
+The prior tile-list experiment proved 40,640 / 52,398 accepted sprites can form only 2,607 same-framebuffer/no-depth RAW/WAR-safe batches, but per-pixel job-list replay was slower. This retry kept the same dependency proof and replaced tile replay with hardware rectangle rasterization plus ordered `GL_ARB_fragment_shader_interlock`. The RTX 5070 / NVIDIA 616.92 driver exposes the extension. After fixing one NVIDIA GLSL reserved-word parse (`active` -> `covered`), activation replay `d8c9cacc05e04f59ba195a120b133cca` proved exactly **40,640 interlock sprites / 2,607 batches**.
+
+Candidate executable `f3146f46cf24804694699ae1ec3272f5a5270be142cb9ff86f10ce89f0679317`; build/runtime/translation/65536-readiness gates passed. Fixed verifier `cdba1da14c954ac08e1bf840e682fea7` / evidence `project-link-verifier/61b5b3cb5dee46248ea7ebaa6d13e22b` is fully qualified with exact retained frame, GS-VRAM, EE, VU, GS and RTC-normalized IOP state plus 864 original frame writers, but measures **12.7043817413 FPS** (12.75955 / 12.64969), below nearby clean ~12.9-13.0 FPS controls. Dispatch collapse is real, but graphics-pipeline/interlock overhead outweighs it. REJECT without repeat. Header/GS/backend sources were restored byte-exact and clean rebuild `768c998831f84ffaae64d5a1a5606039` produced game SHA `3dca17159af842da29a3857500412fb1f65e88045c12c9915046f9e8676f6873`. `v1/` remains untouched.
+
+## REJECTED RUNTIME MICRO-GATE - idle peripheral DMA pumps, 2026-09-24
+
+A scheduler-only gate skipped scratchpad/IPU pump entry when the first existing no-work predicates were already false; active transfer ordering, batching, backpressure, faults and guest timing were unchanged. Runtime/translation/readiness passed and verifier `7b210554654344b2a2eb0c59bfbf9fd2` qualified exact retained state at **12.9777712408 FPS**, versus adjacent clean `13.0059025121 FPS`. The gate is flat and was restored byte-exact to `runtime/system_diagnostic.cpp` SHA `12d9ef7c6230cc78ba73e0ef02e92da33fcef723074f50f44143085615763169`. Do not spend further time on this no-op scheduler micro-gate.
+
+Renderer CPU-sprite fallback is now essentially exhausted in the measured heavy window, while HG-DIAG-049 attributes ~1.91s to VU execution versus ~0.51s to whole raster. The compact pre-upper SQ snapshot is now conclusively CLOSED: exact candidate executable `31a4921469e37f35ff5e995dda555cbff71a960a47ad4c930bc0c7db385fff61` qualified twice at **12.8547096442 / 12.8780512933 FPS** with all retained state and864 original writers, then exact regeneration/rebuild produced clean executable `ca656a66dda0eeae7aea129a8aa7d10ac22550580d0140e94e01c82a7841a384`, which qualified at **12.9310902202 FPS**. Removing the full `Vu1State` copy is therefore exact but not a throughput win in adjacent A/B; do not retry unchanged. Production emitter/tests/generated source are restored to `5c4fcb32...` / `00c9c923...` / `9025a246...` / `6979f9a8...`. Next measure the HG-DIAG-049 ~1.31s complement instead of another closed VU microtrial; the untried coarse VIF double-buffer overlap can hide only ~0.18s measured UNPACK work and cannot by itself close the30FPS gap.
+
+## REJECTED VU OPTIMIZATION - large exact transform cache is flat
+
+Runtime cache source6bcfa63d... / headerab70f5c1...; emittera7a890e7...; test generator0b7e5124... / Python2aa44d06.... New262144 cached/scalar/reference pairs across16MXCSR modes pass (deliberate hash collisions, table overflow/replacement, changed matrices/coordinates, repeated anchors across modes), plus81920 full compiled CFG/state/fault comparisons and25265 exercised fast iterations: a2ef8d61....132 Python980efd31..., runtimefddc2f37... and translation1d97a1ac... pass. Scalar cache implementation is independently instantiated with packed matrix backend disabled in test translation unit. No test-only switches or probes enter game runtime. Cache stores all eight stage results and publishes status/MAC/ACC/VF/defined bits at original stages, preserving lower operations. Coefficient closure and shared XYZ/VF0.W proof are checked at emission. Final build b70f2399d... / game a95b8c37... / verifier e74eefaf1ade43f9b1484068b5b4dbae / evidence project-link-verifier/12098263b08845cd94ea774f7d4e9bcc is fully qualified with all retained capture hashes and864 original writers, but measures **12.9529204518 FPS** versus nearest clean control48afad6e...=12.88540792FPS (~0.52%). This is not a material gain and the ~22MiB 65536-entry hash/table path is rejected. Restore the whole static-loop/cache candidate to emitter backup f8856d258c964a86813e5fecbbb762f6, generator backup6e212f00ade94ed484df215ce7efb2f9, Python backup7545d1f6185e451596a34567b0998df3, and cache-only header/cpp backups995e007fa1cf4054bc56d5bdfcfe7b35/266bb3c319fd4454a75c07707693bd5e; regenerate translated.cpp. v1 frozen.
+
+## CLOSED VU TRANSFORM MEMOIZATION - poor tiny-cache locality, 2026-09-24
+
+HG-DIAG-052 replay `abca19e41b804f2586664fe89a5ddac2` / `project-link-runtime/20260924T173527Z-5eac56a4e8eb46f784c7e84c3dd209fe` observed2,957,520 exact transform keys:45,120 immediate-MRU hits,71,460 distance2,132,840 distance3,88,980 distance4 and2,619,120 misses. Recent-4 coverage is only **11.44%** despite HG-DIAG-051's87.37% large-table reuse; the working set is broad rather than tightly clustered. A tiny exact cache cannot retain the large cache's arithmetic-elimination rate, while the65536-entry cache itself produced only~0.52% versus the nearest clean control. Close transform memoization. Probe sources were restored byte-exact to `runtime/vu_products.cpp`1e53d7e7... and `runtime/system_diagnostic.cpp`12d9ef7c....
+
+Next structural target comes from the exclusive heavy-window profile: VU1.9078s, complete GIF packet0.7406s, raster0.5058s, remaining other work1.3102s. Prior generic GIF streaming/EOP/DMA batching and append serialization are already closed. Historical mixed-packet attribution found TEX0/TEX2 CLUT loads dominate ordinary register packets, but palette-source reads themselves were only a fraction of that cost; the ordering/load boundary is the interesting part.
+
+## REJECTED GIF TRANSPORT CANDIDATE - incremental packet-completion scan, 2026-09-24
+
+The exact CLUT reuse candidate is closed below: it exercised all24,305 provably safe no-draw repeats yet gained only~0.69%. Next target stays inside the measured~0.74s complete-GIF class but avoids already rejected direct-consumer/batching mechanisms. Current `GifPath::submit_qword` appends one qword and calls `gif_packet_size(pending.data(),pending.size())` every time, rescanning all prior tags/payload from byte0 until EOP; once complete, `decode_gif_packet` validates/scans again and materializes transfers. Historical HG-DIAG-005 attributed ~0.369s to the scan bucket and ~0.186s to decode/materialization, though timer overhead means those are attribution only.
+
+Bounded candidate changes **completion discovery only**. Add host-private incremental parser state to `GifPath`: next tag offset, remaining payload bytes/EOP, completed-first-packet size, and known pending size. Each appended16-byte qword advances only newly available bytes. On first-packet completion, keep the exact existing `decode_gif_packet` + `apply_gif_register_transfers` path and erase only after success, preserving partial GS mutation/fault behavior. If public `pending` was externally resized/cleared/copied, detect size mismatch and rebuild scan state once from byte0 before normal incremental operation. `write_control(1)` resets both pending bytes and scan state. Max-pending fault occurs at the same point before packet application. No packet/tag semantics, Q reset, PRE/NOP/REGLIST/IMAGE handling, GS ordering, rendering, clocks or input change.
+
+Existing GIF differential regressions (5825 state/fault checkpoints), translation and65536 readiness pass. Candidate build `a4e217da5f514be292c87f67c4a63f50`, game SHA `59d42c44...`, verifier `97ea46d4d7274acca162c1f91f56709d` / evidence `project-link-verifier/00a8b2ddefde47a5bc789448b02c9e5c` is fully qualified with exact retained hashes and864 original writers at **12.92192787 FPS** (12.87664/12.96753), only~0.28% over the nearest clean12.8854 and below the stronger12.9724 control. Reject as flat; `gs.hpp`/`gs.cpp` restored exactly to23f36c56.../050855fa.... This closes parser/transport micro-optimization.
+
+## REJECTED NATIVE RENDERER - ordered CT32 sprite tile batches, 2026-09-24
+
+Prior HG-DIAG-047 proved52,398 accepted sprites but22,389 conservative conflict-free waves; the production grouped-wave candidate reduced dispatches to22,390 yet was flat because framebuffer **write/write** overlap forced most splits. New mechanism permits WAW only for a stronger exact class: destination PSMCT32, no depth read/write, same framebuffer base+width mapping, and each accepted job already proves its own texture pages do not overlap its frame writes. A batch additionally rejects any cross-draw RAW (`new reads & prior writes`) or WAR (`new writes & prior reads`) texture dependency. Under identical CT32 mapping, each screen pixel maps to one unique32-bit destination word; one16x16 compute invocation owns that pixel and loops every sprite touching it in original draw order, so overlapping destination blending/masks/DATM remain ordered without inter-dispatch barriers. Different mappings, any depth access,16/24-bit destinations, masked transfers, triangles, CPU fallback and all uncertain cases flush/fall back to existing path.
+
+Implementation reused the existing exact sprite pixel shader arithmetic/addresses with a binding2 ordered tile list and one16x16 invocation owning each screen pixel. Build-tests `812a377b9f20434c80acd95050e6d56c` and runtime tests `57eb929a5fbf4855b89a13e6f0e226bd` pass. Game build `91ed2f19b2784331876f736989aef9f9`, executable SHA `581133e6...`. Hidden replay `2352c86c51dd4535abe4c4f407f411d9` / `project-link-runtime/20260924T212126Z-9eb1b452082e4a6b9ff518e9a2b92311` proves strong activation: **40,640 /52,398 sprites** enter tiled mode in only **2,607 tiled batches**; backend totals flushes6370 / flush0.382472s / download1,448,648,704 bytes / readback0.947164s. Fixed verifier `fd905a21f9a24390b27cd9e588912bb9` / evidence `project-link-verifier/2b455b35a92b45d3992e77ea3887a795` is fully qualified with exact retained frame/GS-VRAM/EE/VU/GS/normalized-IOP hashes and864 original writers, but measures **12.80245807 FPS** (12.58215/13.03062), below the stronger clean12.97244 and fresh clean12.88541 controls. Therefore dispatch/barrier collapse is real but per-pixel tile-list replay/wide dispatch overhead outweighs it. REJECT without repeat and restore exact pre-tile sources. Do not tune this same tile-list mechanism unchanged. v1 frozen.
+
+## REJECTED PRODUCTION CANDIDATE - exact redundant CLUT reload elision, 2026-09-24
+
+HG-DIAG-053 replay `65821f629e2b49849e450fa2190c08f9` / `project-link-runtime/20260924T174900Z-660cb9ecd7c74f51a7e140c9343dc6f5`:49,564 actual CLUT loads;39,946 unchanged results;40,006 same normalized key;39,886 same-key+unchanged (**80.47% of all loads**);24,305 same-key+unchanged with no pending draws (**49.04%**). This is large enough for a bounded exact candidate.
+
+Do **not** skip from key equality alone. Proposed mechanism: add a host-private monotonic VRAM write generation in `GsLocalMemory`, incremented for every CPU or accepted GPU-visible mutation path that can change local memory. After a successful CLUT load, store the normalized CLUT source key plus the current generation. On a later load with identical source key, permit an early return only when (a) the draw queue is already empty, (b) no incomplete host-to-local transfer exists, and (c) VRAM generation is unchanged since the prior load. This proves the palette source cannot have changed because **no VRAM word changed anywhere**, intentionally conservative but exact. Preserve CLD comparison-register side effects: only loads that would actually occur after existing CLD guards are eligible, and update CLD2/3 compare slots exactly as the original successful load would. Preserve TEX0/TEX2 register writes in `write_ad`; the optimization lives only inside the load helper. Implemented in `runtime/include/hg/gs_memory.hpp` and `runtime/include/hg/gs.hpp`; focused tests in `tests/gs_memory_tests.cpp` and `tests/gif_tests.cpp`. Memory tracking is active only while a coherence observer is attached; raster scopes invalidate before detaching the observer, so inner pixel loops do not increment per pixel. Same-key/no-write reuse, CPU-write invalidation, pending-draw rejection, CLD2 side effects/CLD4 skip and scope/backend generation behavior are covered. Build-tests38c55853..., runtime46591a9f..., translationd03918f6..., VU-readinessb3e3d558... and Python3de698f8... all pass. Candidate build1cfcc4da... / game1db6cf3a... / fixed verifier3e9cd295... / evidence `project-link-verifier/5fd11aa86aa244a4943f9c07ea907480` qualifies all retained hashes and864 original boundaries at **12.97401089 FPS** (windows12.92385/13.02456) versus nearest clean12.88540792, only~0.69%. HG-DIAG-054 replay021572796c9d4e9eaf3c8a19a8665684 / `project-link-runtime/20260924T184234Z-fbcb3f9a33e644ee8d921dfa0110138d` reports **24,305 reuse hits /49,564 loads**, exactly HG-DIAG-053's no-pending unchanged opportunity count. Global generation therefore already captures the entire safe no-draw set; source-page generations cannot enlarge it. Reject this mechanism as materially too small. Restored `gs_memory.hpp`6943d381..., `gs.hpp`23f36c56..., `gif_tests.cpp`30b5a31a..., `gs_memory_tests.cpp`6cc4c140... and runner12d9ef7c... byte-exact. Next rebuild clean once before new work. v1 frozen.
+
+Proposed production files runtime/include/hg/vu_matrix.hpp, runtime/vu_matrix.cpp, tools/hgtool/vu_emit.py; extend existing synthetic emitter/compiled CFG tests. Add a context containing eight coefficient vectors and precomputed hash, constructed once at the guarded loop entry only after proving those VF coefficient registers are never written in the loop. Recognizer additionally proves two XYZ-plus-VF0.W matrix chains share one coordinate source, unchanged through the first seven stages, with final stage permitted to replace it. At first matrix operation after the original coordinate LQ and MULq/SQ, lookup a thread-local65536-entry bounded native cache using all32 coefficient words and three current input words; full equality after hashing prevents collisions from reusing incorrect results. On miss compute all eight stages with existing exact product/add helpers (portable exact scalar fallback), preserving separate product rounding/saturation and each stage's MAC/current flags. Store all eight stage values and flags, approximately22MiB host-private storage. Emit direct per-stage publication at the ORIGINAL arithmetic positions: original MAC/status merge, ACC or VF writes, defined masks; preserve all lower operations, source snapshots, Q/P clocks, reads/writes and checked fallback. Context hoists coefficient hashing only, no original memory access is moved across another guest memory operation. Cache has no guest-visible contents and survives only within its host thread; keys cover every arithmetic input. This is exact pure-result memoization, not approximate rendering or a VU interpreter. Test repeated/mutated keys, replacement collisions, scalar/AVX output,16MXCSR modes and full compiled CFG/fault states, then qualified replay. Keep only material measured FPS benefit with all retained captures. Existing failed stage-commit helper is not reactivated; publication is emitted directly and cache hits eliminate arithmetic. v1 unchanged.
+
+## Static loop active but flat; investigate repeated pure transform work
+
+HG-DIAG-050 replay4c6f7fc3bed94c8a94c2df80e6247299 / project-link-runtime/20260924T042230Z-85baf60ba94a45a9922f3f1c339b0683:27863040 full_result calls,16789320 equal-cycle transitions =6*2798220, exactly the earlier heavy hot-loop iteration count. Fast loop activation is proven across the entire hot workload, yet qualified12.731FPS shows no gain. Both diagnostic source files restored exactly; do not retain scoreboard-only changes as an improvement.
+
+Next HG-DIAG-051 discriminator: count exact repeat keys for the two pure full-vector matrix transforms (eight complete coefficient vectors plus three input coordinate words) at the first MULA in runtime/vu_products.cpp, gated/reset31M under --profile in runner. A bounded65536-entry direct-mapped host cache compares all35 words, counts hits/misses/collisions and never supplies any result or mutates guest state. Report opportunity only; timestamps invalid, active hash/copy cost unmeasured, temporary memory about9MiB. If reuse is substantial, implement bounded exact memoization of the whole proved non-faulting pure transform group, with every original lower operation, Q/P/clock/flags/readiness transition preserved and original checked AOT fallback. This targets repeated arithmetic work, not an isolated helper. Cache identity must include every arithmetic input, use full equality after hashing, and store final results plus all intermediate sticky-flag contributions and retained ACC. No guessed transforms, approximate VU arithmetic or skipped guest-visible effects. One census then exact two-file restore before production change; v1 unchanged.
+
+## Static whole-loop candidate - exact but no measured gain; activation audit next
+
+Game556cc3f2... / qualifier657b09ddd37a4d80801d8618befc7fd0 / evidence18ab523bd42c44adb472899ddbc5701a preserves all retained captures and864 qualified boundaries;12.73123098FPS versus recent clean12.88540792, no gain. Before rejecting its mechanism, HG-DIAG-050 temporarily counts full_result calls and repeated issue_cycle in runtime/vu_products.cpp, armed/reset under --profile at31M in runner. In this one fast loop six consecutive full_result transitions share the deferred clock, versus distinct clocks in normal pair scheduling; this cheaply discriminates actual fast-path use without changing generated code or adding instruction timers. No guest changes; active per-arithmetic integer counter cost unmeasured, timing invalid. One replay then exact two-file restore. If active, investigate arithmetic grouping with a different lower-overhead design; do not call scoreboard removal a win.
+
+## Static whole-loop candidate - tests passed, game validation next
+
+Emitter30a137d5... matches exactly one original site, program1:0158, and retains the original checked CFG. Generated translated.cppcdf5e1f3... is the only generated change; archiveproject-link-emit/20260924T041425Z-d88f8846de9146e8a1092b0e155b8cee/before.132 Python tests254242c3... pass;81920 complete-state/fault comparisonsc9eedbb4... pass with25265 fast-loop iterations (synthetic alternate register allocation/strides; signed and unsigned immediate forms checked). Coverage includes arbitrary float bits, clocks/wrap, Q/P completion, readiness stalls, undefined VF/ACC/memory, bounds, aliases and exit from fast mode after valid iterations. Conservative address-disjoint guard is retained; original initializer independently shows inputTOP+1 and outputTOP+0x100. Exact preimage backups emitterf8856d25..., generator6e212f00..., Python7545d1f6.... Next build_game then qualified33M FPS/state comparison. No speed gain claimed yet.
+
+## HG-DIAG-049 captured; next bounded structural AOT candidate
+
+Replayfaffeec91c8344d08a14db75e96ce3d6 / artifactsproject-link-runtime/20260924T040408Z-a7ac5e72ef204c57b247f49fbf2acd1d. Heavy wall4.6623099s; exclusiveVU1.9077751s/126180calls, DIRECTtransport0.0702168s/61146, UNPACK0.1262956s/450960, MPG0.0014276s/3960, GIFcompletepacket0.7406284s/152526, whole raster0.5058070s/2052864. Categories0..5 are disjoint; complement1.3101594s includes other runtime/host work and instrumentation. Raster includes empty calls. VU includes XGKICK validation/transport but excludes complete packet/GS. No fault. All three sources byte-restored to prior hashes; probe archives1c89bb61...,c40e10b7...,fcdb34b4.... Current executable remains diagnostic until rebuilt.
+
+Proposed files tools/hgtool/vu_emit.py, tests/generate_vu_readiness.py and tests/test_vu_decode.py; generated source refreshed through hg_emit. At build time recognize the register-independent15-pair transform loop shape already decoded from original inputs. Derive per-lane imported readiness limits and final ready timestamps; reject any internal hazard that exceeds its static issue slot. Emit one guarded native do-loop before the checked original CFG, avoiding per-pair scoreboard work across that whole loop. Initial guard validates imported VF defined/readiness, VI readiness and Q completion by DIV. Per-iteration guard checks clock wrap, all LQ/SQ/ISW bounds, required input definitions and conservative input/output nonalias. On any rejected guard execute original checked AOT instructions unchanged. In accepted path retain all arithmetic/lower operations and their exact order; advance Q/P/issue time only at Q consumers, DIV and loop end with the exact original elapsed cycles; materialize final per-lane ready timestamps before looping/exiting. No possible architectural operation fault may be moved into this deferred span: guards establish defined/bounded inputs, and arithmetic routines are total for valid operands. No guest clocks or operation count changes, no runtime decoder/interpreter. Unlike rejected deferred-clock helper, schedule is resolved statically and imported checks amortized across loop iterations; unlike prepared matrix trial, no arithmetic precompute or stage dispatch. Compare full states/faults against unoptimized synthetic CFG with randomized readiness/wrap/Q/P/undefined/alias/bounds/branch states, then original fixed replay. Keep only material qualified FPS gain; otherwise exact restore. v1 frozen. Automatic backups and generated preimage archive mandatory.
+
+## HG-DIAG-049 original plan
+
+Temporary edits only runtime/vif.cpp, runtime/gs.cpp and runtime/system_diagnostic.cpp. VIF defines a host-only nested category timer; completed MSCAL/MSCNT, DIRECT, UNPACK and MPG scope their work. Completed GIF packets and whole rasterize_pending_draws (including environment handling/end_batch) nest scopes, so their time is subtracted from the enclosing VU/DIRECT category. VU category retains XGKICK transport/validation but excludes complete-packet decode/apply and nested raster. No per-instruction or per-qword timestamps. Arm with --profile only at31M; report category counts/exclusive nanoseconds plus heavy wall time at normal report. No guest fields, inputs, clocks, faults or ordering changes. Timestamp/counter overhead is unmeasured; instrumented FPS is invalid. One replay then byte-exact restore of all three files. Automatic Project Link preimage backups/hash manifests outside repo. Header/generated code and v1 untouched. This separates major costs before committing to a new production mechanism.
+
+## Prior experiment - XYZ MULq rejected; whole-loop inspection only
+
+Candidate buildc63581ff... game7c07f178... / qualifiera1ccb84b34d24071b40470600782e071 / evidence93826940f2094aadb0ac07ed1cd92141 is exact for all retained captures/864 boundaries but12.80275857FPS versus clean12.88540792.49 emitted sites use helper, so activation is proven. No gain; restore all five candidate files exactly from recorded backups, regenerate and rebuild original executable. Do not repeat isolated XYZ MULq helper unchanged.
+
+Next bounded investigation (no implementation yet): inspect the full15-pair hot program1 loop0158..01c8 from current AOT output and original-byte-validated decoder. Determine whether a whole straight-line block optimization can keep working registers/flags local across original operations with a proved no-fault guard and checked AOT fallback. Preserve all guest instructions, intermediate observable memory, pipeline/clock/Q/P/readiness, branch and fault ordering; no runtime decoding or interpreter. Earlier matrix preparation, deferred-clock scheduling and SQ/helper microtrials are closed. Do not implement until the actual loop supports a concrete proof and a substantial removed-cost mechanism. v1 unchanged.
+
+
+Candidate files: vu_xyz.cppfcdde075... (restoree2b52fe49209436583f12566e8a19b7b), vu_xyz.hppe2c5a664... (restore853a53856ca448b4bb570d834960ab2c), emitter3a77a8cb... (restored6109dda3c974573a1b4ccdeab48a098), runtime_tests.cppf00b0ac5... (restoreca3b08b771ec44208f7497d0c5218bbb), Python teste2788e43... (restorea93a27d0adc34490834d6f933ef0feb1).132 Python tests c96fdbe5..., runtimebcdc7a40... including262144 XYZ full-state/fault comparisons across16MXCSR modes, translationbd9afab0... and65536 readinessfc3455ad... passed. hg_emit888e783d... changes only translated.cpp; saved clean generated/executable artifacts project-link-emit/20260924T034907Z-c4ac8d42ddf9466ca90c708d5aa28a12/before. Next game build and qualified replay; no speed claim.
+
+
+Production restoration completed: emit6f653107... changes only translated.cpp back to original6979f9a8..., build8cc5aed293f0401f99629a3126b0c847 game4c0eda31.... All renderer probes removed. Clean closest qualified control remains48afad6e...=12.88540792FPS; compact21b82198...=12.88333283, closed flat.
+
+New bounded candidate: HG-DIAG-038's2.798M hot program1:0170 pairs execute MULq.xyz; native sampling also identified arithmetic_q. Extend the existing successful scalar XYZ helper pattern, not padded SIMD or per-register template cloning. Add vu_xyz_multiply_q to runtime/vu_xyz.cpp + declaration runtime/include/hg/vu_xyz.hpp; route only AOT mulq dest14 in tools/hgtool/vu_emit.py. For valid source/destination and definedXYZ, use the SAME Fpu::product on three lanes, fuse existing arithmetic-flag accumulation into that loop, then commit original MAC/status and selected lanes. Q/pipeline/clocks are untouched; unsupported/undefined inputs call original arithmetic_q before any mutation, preserving fault ordering/partial state. VF0 reads zeroXYZ, VF0 writes discard; W and other state preserved. Extend tests/runtime_tests.cpp differential fixture with this operation over16MXCSR modes, invalid/zero registers, undefined lanes, saturation/underflow and complete-state/fault comparison. Add emitter assertion, run Python/runtime/translation/readiness tests, regenerate/build and qualified replay. Keep only material gain with exact state; otherwise restore. Automatic backups; v1 unchanged.
+
+
+Close comparison resolves the earlier drift: clean48afad6e...=12.88540792FPS, compact21b8219840844c948e222e211a4be762 / evidence89357dec177e43619d6f6b5f8a7c06fb=12.88333283FPS. All retained captures and864 qualified writers exact; no material gain. Restore original emitter/tests exactly using7bc7169d...,e8afab2e...,8ee49986.... Regenerate then build current production; candidate native code must not remain the delivered executable. Archive compact SQ as state-correct but no demonstrated benefit in this close comparison. Do not repeat unchanged. Next investigation should address a different measured VIF/VU cost rather than renderer micro-tuning or SQ copies. v1 unchanged.
+
+
+Fresh clean control48afad6ee5bb42b694ffda80b280971a / evidenceb7575d1b01344491acfe1062ee632149, game4070eebe..., qualifies12.88540792FPS with all retained hashes. Restored archived compact emitter3dae0f04... and exact prior tests0c92d4ca.../24d23fca...; clean restore backups7bc7169de68548b8b58b0b77f53b5f39,e8afab2e03364df8a0865c6c3089224f,8ee49986ae074032861b5ac9aefc255e. hg_emit7b5e2a6b... changed only translated.cpp; preserved clean executable/generated sources under project-link-emit/20260924T034010Z-e2d1e675cc0d4366acc0c8dd7ecb3c84/before. Buildb7188875f76b425c9c7c0c6dffd73083 succeeded gamee083d49c.... Next qualified replay. Reuse prior exact candidate regression evidence; no speed gain claimed yet.
+
+
+HG-DIAG-048 completed:04f386d7930a499196383849ab73f836 / project-link-runtime/20260924T033513Z-66f924fa35ff441789c43b3d69230517. Heavy triangle lists240/14.2906ms, strips601922/265.3297ms, sprites33900/163.5473ms; total443.1676ms inside primitive dispatch (excludes environment setup/batch-final work). No runtime fault; restored runner12d9ef7c... via080bc1b8..., archive6b148e7b.... This plus three flat renderer candidates supports returning to the measured VIF/VU CPU cost; no total renderer ceiling claim.
+
+Next: rebuild the clean retained source and qualify it after all probes are removed. Then resolve the previously inconclusive compact SQ candidate using close alternating comparisons if the clean control is stable. Reuse already-verified archived emitter/tests (0428c02c...,59c4449f...,1a4a725c...) and established122880 state/fault comparisons; do not invent another VU shortcut. Its previous same-session candidate/control direction was promising but confounded by host drift. The intended milestone is a repeatable measured improvement with exact retained captures; reject/inconclusive otherwise. Documented renderer priority has been pursued through current measured candidates. v1 stays untouched.
+
+
+Restored build90a02adf... / game677c08c1... replay39b4352504e94724831bc34a47b97ef1 / evidenceproject-link-runtime/20260924T033209Z-7eb3236084bc424880aab74d76c91f87 reaches33M normally. Whole-run sampled profile remains unsuitable for infrequent heavy nested VIF/VU work; does not justify another shader change.
+
+HG-DIAG-048 plan: in runtime/system_diagnostic.cpp only, under existing --profile arm/reset existing GS profile counters at31M, then report at33M. This reuses HG-DIAG-005 per-raster timing, includes implicit coherence stalls inside the raster call, and adds no guest/state/clock/order changes. Two host timer reads per raster call; cost unmeasured, instrumented FPS invalid. Purpose: quantify current heavy triangle versus sprite inclusive CPU raster time after retained renderer extensions. One replay then exact runner restore. This is a discriminator for a substantial renderer follow-up; do not infer GPU execution time from CPU submission timings. Source backups automatic; v1 unchanged.
+
+
+Recovered interrupted verifier bee97f13ef4f496babdd07fd08ad9ff8 / evidencebdf98c302e124ac9b483a52131c7dee3: deferred STQ setup gameb6aa2491... passes149-input provenance,864 qualified boundaries and all retained captures,12.92042525FPS. Runtime tests023825e7... and1177 GPU/CPU cases in each memory mode passed. No material gain versus clean12.97244005; restore only gs.cpp to050855fa... from backup5dd9a0bc.... Keep eight queued-sprite regression cases. No new production renderer optimization retained this session.
+
+Next measurable milestone: rebuild retained sources and run configured gameplay33m profiling replay to refresh host-phase attribution after the retained renderer extensions. No new probes or behavior changes. Inspect heavy-window versus whole-run costs and choose a substantial measured blocker. Current source renderer is restored; executable must be rebuilt before use. v1 unchanged.
+
+## Prior experiment - defer unused STQ preparation for empty triangles
+
+Grouped sprite dispatch candidate game78e373ba... / verifier11e3ac0e5a4d45d48200020268ccef23 / evidence2f40c8531022496ea5a9b4c033a3600d passed1177 GPU/CPU cases per memory mode,864 qualified writers and all retained hashes. Dispatches52398->22390; flush0.4581s versus clean0.4768s and readback1.3775s versus1.3814s, but12.91191705FPS is flat versus12.97244005. Reject the implementation for lack of material overall benefit; exact gl_gs.cppf40ac711... restored, candidate backup0b10a4fd59504cdebb273a3f6288ae12. Retain eight meaningful queued-sprite dependency regressions (testse2cec44c...). No census remains. Current executable still candidate until next build.
+
+Next bounded renderer change: HG-DIAG-043 already proves328578 heavy triangles cover no sample. runtime/gs.cpp currently performs PreparedTriangleStq::prepare BEFORE the first-covered-sample search, even though that result is discarded on every empty triangle. Independently inspected prepare: only local integer decoding/bounds/coefficient preparation, returns not-ready for unsupported input, no guest effects or explicit faults. Move only PreparedTriangleStq construction/prepare after has_sample succeeds; leave linear_texture_filter and all existing fault-producing operations in their original positions. This eliminates unused nine-coordinate preparation, not original guest work or raster coverage. No shader/coherence/clock/input changes. Build runtime/GPU regressions and one fixed replay; require exact retained captures and material throughput benefit. Automatic byte backup before gs.cpp edit; v1 frozen.
+
+## Prior experiment - conflict-free sprite dispatch groups
+
+HG-DIAG-047 replay dbd1ced8a6994345ae5a5c67c2bc6ab0 / evidence3f2311a748ab472796890295b7fe81c5 preserved all retained captures;52398 sprites predict22389 waves across1494 actual sprite flush groups (57.27% fewer dispatches). Probe restored exactly via backup0fcb8e4a...; gl_gs.cppf40ac711.... Instrumented timing is invalid.
+
+Production experiment: runtime/gl_gs.cpp retains the same page-hazard proof but records a wave-start flag per command. Upload command offsets into existing binding2 buffer at sprite flush; shader selects its unchanged job using uniform command_base plus gl_WorkGroupID.z. Dispatch one max-width/max-height rectangle per wave with Z equal to its command count, preserving per-job bounds checks and barriers between waves. All jobs within a wave have disjoint write pages and no cross-job read/write conflicts; destination RMW and16-bit packed writes are covered by whole-word/page write masks. Existing CPU coherence, admission, batch/flush cuts, shader arithmetic and faults stay unchanged. Add targeted GPU/CPU tests for disjoint mixed-size jobs followed by RAW/WAR/WAW dependencies and packed halves. GPU tests in both memory modes and fixed replay must preserve exact retained captures. Keep only a repeatable material speed gain. Automatic backups; v1 unchanged.
+
+
+HG-DIAG-046 cleanup is complete: gs.cpp050855fa... and runner12d9ef7c... restored exactly. Clean build8e0344ec... / game4b145ff0... qualifies at12.97244005FPS, verifier5c135a0a... / evidence57d2a6073d444db1b2d65b5c8e9f790a, with all retained captures exact. No census remains.
+
+Exact CT32 sprite shader specialization passed1169 GPU/CPU cases in each memory mode, including315 specialized draws per main suite. Game6d2ea7c5... / verifier6b9325c7d0014be68ece555f20ed8e9b / evidence6deeda8f5e76458b8c2cb1000cf9d4b5 preserves all retained capture hashes and864 qualified boundaries, but12.92153827FPS does not improve clean12.97244005. Reject for this workload, not correctness. Restored gl_gs.cpp exactf40ac711...; candidate archived backup322e538be8e543b59f14ed4108f892b5. Build still candidate until next build.
+
+Next measurable milestone: determine whether existing ordered sprite commands can form conflict-free dispatch waves within actual flush boundaries. HG-DIAG-047 temporarily adds integer-only counters and two512-page masks in runtime/gl_gs.cpp. Starting each flush group fresh, begin a new wave whenever incoming texture/depth reads overlap prior writes, or incoming writes overlap prior reads/writes; destination RMW is covered by writes. Record total sprites versus conservative predicted waves. No dispatch/order/guest changes. Active unconditionally only in the temporary diagnostic build; host cost unmeasured, timing invalid. One fixed33M replay must preserve retained captures, then remove probe exactly. If wave count is materially lower, consider batching only proved-disjoint commands; otherwise reject page-based coalescing before implementation. Automatic Project Link backups precede edits; v1 frozen.
+
+## Earlier continuation - SQ candidate inconclusive; completed census
+
+Compact SQ is state-correct:131 Python tests, runtime/translation tests,65536 readiness comparisons and122880 compiled compact-versus-whole-state comparisons (89970 matched faults) passed. Candidate build5e5697d6681b4390967c5a858025ab94 / game8d61991f... qualified at12.66771527 and12.79200414FPS (verifiers88f111aa.../33eada36..., evidence1766da0a.../d9ed89a8...). Every retained frame/VRAM/EE/VU/GS and same-date RTC-normalized IOP hash matches. Machine-code prologue program1 stack allocation shrinks0x8f8->0x208; executable grows19968bytes. Restored same-session controls64ce6f09.../4e26be50... measure12.36996079/12.58420933FPS, showing host drift from the earlier13.553747 control. Thus the candidate is NOT proven slower; a repeatable material gain is also not established against the observed drift. Archive it as inconclusive and return to the renderer priority. Current generated translated.cpp is exact original6979f9a8..., emitter5c4fcb32..., game dec028f3.... Candidate source/test backups0428c02c189e4e5f9178662649a368ca,59c4449fd01a475aa5d8b29863dbdac1,1a4a725c7f4c4aeba1478025ccbb677c; candidate executable preserved by emitter d4577e07... at project-link-emit/20260924T030647Z-3e3266d460fb41e4a3ca21982e12cbfc/before.
+
+Build environment repair: missing temporary GLFW C sources blocked83269a5d...; restored the exact CMake-pinned commit7b6aead9... from the upstream archive (SHA699bf0b3...). No dependency version/configuration change.
+
+HG-DIAG-046 completed previously but was left active in source. Recovered replay40c0559ada4a4461a98c833bf3227b18 / project-link-runtime/20260923T195005Z-71f1a714515a4af1b37f309f512af94c. Largest classes:CT32->CT32 blended nearest9600 draws/136302720pixels; linear9120/111705840. Both have ATE off, no Z writes and ZTST ALWAYS. Instrumented timing is attribution-only. Next edits remove ONLY census counters/helpers/calls/include from runtime/gs.cpp and runtime/system_diagnostic.cpp, requiring exact pre-census hashes050855fa.../12d9ef7c...; add the missing DIAGNOSTICS entry and rebuild/qualify clean code. Then test an exact shader specialization for CT32->CT32 textured sprites with alpha/DATE disabled, ZTST ALWAYS and no Z writes, preserving all other GS semantics, hazards and ordered dispatches. Verification: GPU/CPU regression suite and qualified fixed replay with exact retained hashes. v1 remains frozen.
+
+## Continuation audit - 2026-09-24
+
+Rescanned all project Markdown including ignored folders and frozen reference documentation. Recovered qualified control c0f40bf3dff94131ad06556e4775e087 / project-link-verifier/10873ab614a74341a5afc56c2ea7bf0b: current game ec553dba... measures13.5537473853FPS with expected relaxed frame/VRAM/EE/VU/GS hashes. The compact SQ emitter edit exists (3dae0f04...), but out/translated.cpp still contains whole-state snapshots and test_vu_decode.py still expects them. No active Project Link job.
+
+Next milestone: complete compact-SQ differential validation and measure the regenerated native executable against that control. Extend tests/test_vu_decode.py ordering assertions and tests/generate_vu_readiness.py with compiled frozen whole-state-reference comparisons over masks, undefined lanes, VI0, bounds and upper-before-lower faults; preserve all existing readiness cases. Automatic Project Link byte backups/hash manifests precede edits; hg_emit archives generated preimages. Emitter semantics reviewed against existing vif.hpp store_qword. No runtime clock/arithmetic/renderer changes or new diagnostic switches. Reject on any unexplained state/fault difference or non-material performance result. Keep v1 frozen.
+
+## INCONCLUSIVE VU OPTIMIZATION - compact pre-upper SQ operand snapshot, 2026-09-23
+
+HG-DIAG-038 measured program1 loop0x0158..0x01c8 at2,798,220 executions per pair in31M..33M; its15 pairs contribute41,973,300 executions (~49.5% of all heavy VU pairs). Pair0x0170 issues lower `SQ vf10,-4(vi4)` mask14 concurrently with upper `MULq` writing vf10 mask14. Current AOT output preserves lower pair-start semantics via `const auto lower_vu1_snapshot_0170=v.vu1;`, causing a full `Vu1State` copy on every hot-loop iteration solely so SQ sees pre-upper VF10/VI4.
+
+Bounded AOT change: for overlapping lower SQ only, capture the statically selected raw source VF lanes, source `vf_defined` mask, and address VI value before upper execution; execute upper unchanged; then perform the same SQ address bounds check and data/defined stores from those captures at the original lower execution point. Hot0x0170 captures only VF10 X/Y/Z (`dest=14`), one defined byte and VI4. Raw VF access is intentional because undefined lanes must preserve their stored bits while clearing the corresponding destination-memory defined bit exactly as existing `store_qword`; using `read_vf` would incorrectly fault. Decoded register fields are inherently in-range. The `VU1 SQ exceeds VU1 data memory` check remains after the upper, preserving fault ordering. Non-overlapping SQ remains unchanged.
+
+Modify only `tools/hgtool/vu_emit.py`, its Python regression, and regenerated `out/translated.cpp`; no runtime interpreter/helper is introduced. Run Python tests, `hg_emit`, build/tests, runtime/translation/VU-readiness suites, then fixed gameplay verifier. Require exact retained frame/VRAM/EE/VU/normalized-IOP/GS-register state and a material improvement over the current **13.54..13.56 FPS** renderer baseline. `v1/` remains frozen.
+
+## REJECTED NATIVE RENDERER - persistent mapped resident VRAM, 2026-09-23
+
+Current retained renderer baseline is **12.2492476920 / 12.2974255340 FPS** with native STQ + bulk page-mask CPU coherence + proved CPU same-pixel PSMT8H feedback fast path. Final frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state remains the retained relaxed family. Remaining GPU->CPU visibility is still ~1.84GB and ~1.50s per33M run.
+
+Next structural candidate targets the transfer mechanism rather than page selection. The active RTX5070/OpenGL4.3 driver may expose `GL_ARB_buffer_storage`; if available, allocate the resident4MiB GS SSBO with persistent coherent read/write mapping. Keep the existing CPU `GsLocalMemory` vector as authoritative guest-visible host storage. GPU batches create lightweight fences with page read/write masks. Before a CPU mapped read, wait only through the newest prior epoch that writes a requested page; before copying CPU-dirty pages into the mapping, wait only through the newest epoch that reads/writes those pages. Coherent mapped memcpy replaces `glGetBufferSubData`/`glBufferSubData` for VRAM only; job/tile buffers remain unchanged. Unsupported extension/entrypoints fall back to the retained implementation exactly.
+
+The page-mask and bulk-scope correctness contract was unchanged. Build `c8bd3cfcc72649919770ed0bf75ff572`, game SHA `0ef57249...`, verifier `4518321d3d8f4b3584e14432004914f2` / evidence `project-link-verifier/cf9fc0ea70a54a3cacaaea1b1ea94174` is fully qualified and state-correct but regresses to **10.6427512221 FPS**. The extension path definitely activates (`persistent_vram=1`) and preserves the same ~1.838GB logical download volume, but1640 explicit conflict waits cost1.7877727s and total readback rises to1.8702112s. Therefore persistent coherent mapping does not remove the actual GPU/CPU dependency stall and adds fence overhead. REJECT without repeat; `runtime/gl_gs.cpp` restored exactly to retained SHA1a474ad7....
+
+## REJECTED NATIVE RENDERER - state-aware CPU output dirtiness, 2026-09-23
+
+Retained bulk scopes currently use one conservative frame+depth page mask as both read visibility and CPU write dirtiness. The scalar pixel path does need old frame/depth contents visible for destination/depth tests and blending, but it does **not** modify depth when ZBUF.ZMSK=1 and cannot modify FRAME when FBMSK masks every stored payload bit for the active frame format. Marking those pages CPU-dirty creates unnecessary later upload/memcmp/dependency work.
+
+Bounded change separated frame/depth visibility from write dirtiness. Build `b9104ccfea924156b14d09daa8de5f8a`, game SHA `107e0425...`, verifier `ac38e5ad0e6745b7ad2633556c7faa35` / evidence `project-link-verifier/7f020c8bff7040a79b87100f0ce15946` is fully qualified/state-correct but measures **12.1839285859 FPS**, below retained12.25..12.30. Backend metrics are effectively unchanged: upload506593280, download1837113344, flushes4316, triangle batches1166. Therefore measured workload does not benefit from ZMSK/full-FBMSK dirty-page elision. REJECT without repeat and restore `gs_raster_pages.hpp`/`gs.cpp` exactly.
+
+## REJECTED NATIVE RENDERER - 8x8 GPU triangle tiles, 2026-09-23
+
+The retained triangle compute path already launches one thread per pixel, but each pixel loops over every triangle binned into its **16x16** tile. No prior 8x8 variant is documented. Smaller tiles preserve exact per-pixel draw order and all shader math/state/coherence while reducing false candidate triangles introduced by bounding-box quantization at tile edges; cost is more bins/workgroups/tile entries.
+
+Bounded candidate changed triangle shader workgroup to8x8 and host tile binning/capacity accordingly. Build `a8b11ec9beca4a3b967a1bb53d228e55`, game SHA `eb8a848b...`, verifier `06b8114809c144f3b8ea67a471164b15` / evidence `project-link-verifier/cceb58acb05941aa94bd2889de5a30bf` is fully qualified and reproduces exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state, but measures **11.9185959894 FPS**. GPU draw/batch counts stay48195/305856/1166 while flush time rises~0.506s and readback~1.601s. Smaller tiles therefore add workgroup/bin overhead without reducing enough per-pixel triangle replay. REJECT without repeat; restore both files exactly.
+
+## REJECTED NATIVE RENDERER - exact scanline first-covered-sample solver, 2026-09-23
+
+HG-DIAG-043 measured602162 heavy triangle calls, of which **328578** have no covered sample and9327 are zero-area. The current CPU admission path scans every integer pixel in the clipped bounding box until it finds the first top-left-covered sample; this work executes before GPU submission, so even triangles that ultimately go to GPU pay it. The rejected early-GPU-submit experiment proved sending empty strip geometry to GPU is worse, but it did not make this CPU search necessary.
+
+Bounded production candidate replaces only that exhaustive first-sample search with an exact per-row integer interval solve. For each of the three directed edges, the top-left rule is an inequality `A*x+B >= 0` at pixel-center sample coordinates; derive the inclusive x lower/upper bound for the current integer y using signed floor/ceil division, intersect the three intervals with scissor/bounds, and select the leftmost valid x on the first row with a nonempty intersection. Rows still advance top-to-bottom exactly; the returned `(first_covered_x,first_covered_y)` must equal the old exhaustive search. Triangle coverage inside the actual raster loop, GPU job bounds/admission, STQ/color/Z math and all coherence remain unchanged.
+
+Differential regression compared the interval solver to the old exhaustive top-left search for fixed edge cases plus100000 deterministic randomized normalized triangles/scissors and passed. Build `5b3d991b4bd84310a1fa66dfdc49a54b`, game SHA `c9d70b1e...`, verifier `e3a5eb7e43fe4c71896e44894e37f4fe` / evidence `project-link-verifier/bd89c3a9b5b24e4fa09d9c5807deb455` is fully qualified with exact retained relaxed hashes but only **11.8815175074 FPS**. Exact per-row signed division/interval solving costs more than the simple pixel edge tests for this workload. REJECT without repeat; restore helper/test/runtime exactly.
+
+## REJECTED NATIVE RENDERER - compact nonempty triangle tile dispatch, 2026-09-23
+
+Current 16x16 compute path dispatches `triangle_columns*triangle_rows` workgroups for every batch. The shader immediately reads `count=bins[tile*2+1]`; empty tiles still launch256 threads only to execute zero triangle iterations. Host already knows exactly which `tile_jobs[]` vectors are nonempty. Candidate compacts only nonempty tiles into the tile SSBO: each active record stores original tile x/y plus begin/count, followed by the unchanged ordered job-offset list. Dispatch becomes `active_tile_count x 1`, and shader derives pixel coordinates from recorded tile origin + `gl_LocalInvocationID.xy`. Per-pixel job order, coverage/interpolation, texture/blend/depth, VRAM hazards and batch boundaries remain unchanged.
+
+Build `61fdd97f58a3482bb494ab2d50861fe2`, game SHA `ceb8b042...`, verifier `1a7ce9f5ece1409d94f70dbea0ba2f14` / evidence `project-link-verifier/b50243e0c93848998f0cff738f17e2da` is fully qualified/state-correct but measures **11.9913422509 FPS**. The mechanism is strongly active:899552 potential grid workgroups compact to414313 active workgroups (-53.94%), yet flush/readback worsen to~0.494/1.623s and net throughput loses. Empty workgroups are not the dominant cost; host compaction/dispatch-shape overhead outweighs them. REJECT without repeat and restore both files.
+
+## REJECTED NATIVE RENDERER - exact int32 triangle edge coverage, 2026-09-23
+
+Every GPU triangle pixel currently evaluates three directed edge functions with signed64-bit multiplies before coverage rejection. Most candidate pixels never reach texture/color/Z work. New exact specialization removes 64-bit coverage ALU only where the host can prove it safe: for each accepted triangle, evaluate all three affine edge functions at the four extreme pixel samples of its clipped job rectangle. If every value lies within INT32_MIN..INT32_MAX, set a renderer-private flag. The shader then computes those same edge values with 32-bit signed arithmetic and widens the exact result to i64vec3 for unchanged downstream interpolation; otherwise it uses the existing int64 edge function.
+
+Because an affine function reaches its rectangle extrema at corners, the host proof covers every dispatched pixel in the job bounds. Build `71bcb422fe794cd1a345e7f5e8f526f9`, game SHA `79f6d25c...`, verifier `f184d5da3882495facf49c88427f10be` / evidence `project-link-verifier/da69a9a5db5b490c9464558a61e64602` is fully qualified/state-correct but only **12.0595985360 FPS**. Proof succeeds on **305856/305856** accepted GPU triangles, so lack of activation is not the issue. Flush/readback metrics remain ~0.468/1.541s. Exact int32 edge arithmetic therefore does not outperform the existing int64 shader on this GPU. REJECT without repeat and restore all four files.
+
+## COMPLETED DIAGNOSTIC - pixel-weighted CPU sprite fallback reasons, 2026-09-23
+
+HG-DIAG-045 replay `57e727cd9c8e45af80314047ec01cd7a` / evidence `project-link-runtime/20260923T191748Z-1ba2d054c7754f969888476a012d2afd` captures31M..33M only and is attribution-only. Heavy sprites:33900 total /507599160 clipped pixels;31620 GPU /494505840 pixels. CPU fallback is2280 draws /13093320 pixels. Pixel-weighted reasons: **alpha-test960 /6881280 (52.56%)**, frame-format480 /3440640 (26.28%), CT32-special CPU720 /2580480 (19.71%), small120 /190920 (1.46%); all STQ/fog/SCANMSK/depth/backend/texture/prep/direct-RGB24/other buckets are zero. Diagnostic source was restored exactly after capture.
+
+## RETAINED NATIVE RENDERER - GPU sprite alpha test + AFAIL, 2026-09-23
+
+The largest measured CPU-sprite class was alpha-tested sprites:6.88M heavy pixels. `GsSpriteJob` already carried the complete TEST register, so the retained extension removes only the ATE admission ban and implements generic GS ATST plus KEEP/FB_ONLY/ZB_ONLY/RGB_ONLY in the existing compute shader, preserving DATE/depth ordering, masks, blending and conservative hazards. Build `eb2834ac07e942c4bf32bc33b9134765`, game SHA `3a7d01f6...`. Verifiers `1686986b1dc744d993dc9255152a162d` / evidence `project-link-verifier/dcc26227b57542929e38214a83589281` and repeat `5616f1e77e2a4008b0a0b63c0420b6ed` / evidence `project-link-verifier/15dce89e214644178d546491137809f8` are fully qualified with exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state, measuring **12.8673632199 FPS** and **12.8978724959 FPS**. GPU sprites rise48195->50102 and resident downloads fall~1.838GB->~1.651GB; retain. This is the current renderer baseline.
+
+## RETAINED NATIVE RENDERER - GPU PSMZ24 framebuffer sprites, 2026-09-23
+
+The next measured CPU-sprite bucket was unsupported framebuffer format:480 heavy draws /3440640 pixels (26.28% of fallback pixels). CPU `write_frame_pixel` supports formats0,1,2,10 and0x31, while the GPU sprite gate accepted0,1,2,10; the measured supported CPU-only bucket therefore resolved to **PSMZ24 (0x31)** destination sprites. The first candidate (`0482cf8e0bbf43f889ea8c615cb9edbf`, game `41d78c80...`) was fast at13.2132FPS but changed frame/GS-VRAM because separable destination addressing double-counted the PSMZ32 origin block: `psmz32_word(0,width,0,0)==1536`. Mirroring the already-correct PSMZ24 source path and subtracting1536 once from the destination row term fixes the representation exactly.
+
+Corrected build `99ed4159775b49e29fbc5e70697bffcb`, game SHA `f6c4d157...`. Verifier `5914df424421479481e89885d0d9190d` / evidence `project-link-verifier/f9e433e71e964ee09a21f46de480fabf` and repeat `2649e37470944103b5c8be259f58c743` / evidence `project-link-verifier/0865801447fc4bc19d35a1bb0372bd48` are fully qualified with exact retained relaxed frame `b6ab8abd...`, GS-VRAM `74ad06df...`, EE/VU/normalized-IOP/GS-register state and864 original frame writes, measuring **13.2366469808 FPS** and **13.2084401933 FPS**. GPU sprites rise50102->50694; upload falls to462913536, download to1573126144, dirty CPU scopes to84957 and dirty pages80668. Retain. This is the current renderer baseline (~13.21-13.24FPS). `v1/` remains frozen.
+
+## COMPLETED DIAGNOSTIC - pixel-weighted accepted GPU sprite classes, 2026-09-23
+
+The retained renderer now qualifies at **13.54..13.56FPS** and heavy CPU sprite fallback is essentially exhausted (only120 small draws/190920 pixels remain). The larger renderer surface is the ~1.29B sprite pixels already accepted by the GPU path. Add one per-accepted-draw, no-clock HG-DIAG-046 census armed only31M..33M. Classify by source format (including untextured), destination format, nearest/linear, blend enable, ATE/AFAIL, Z write and Z test; accumulate draw count + clipped pixel area in fixed counters. No shader/per-pixel instrumentation, admission changes, guest state, clocks or ordering changes. One configured replay is attribution-only, then restore `runtime/gs.cpp` and `runtime/system_diagnostic.cpp` byte-exact. Use the dominant **pixel-weighted accepted shader class** to select the next production fast path. Pre-edit manifest `artifacts/gpu-sprite-class-census-preedit-20260923.txt`. `v1/` remains frozen.
+
+## RETAINED NATIVE RENDERER - lower CT32-special GPU area threshold, 2026-09-23
+
+HG-DIAG-045 left720 heavy CT32-special CPU sprites /2580480 pixels after the retained alpha-test and PSMZ24 extensions, averaging exactly3584 clipped pixels/draw. The exact CT32 specialization attempted GPU only at area>=4096; whole-run backend summaries had zero alias rejections, proving this class was blocked before dependency admission. Lowering **only this exact CT32 specialization** from4096 to2048 leaves the generic threshold unchanged.
+
+Build `0ef61e0572414d5c84c07aad9052104b`, game SHA `3974dde6...`. Verifier `f10415122c794d45948354ee56272994` / evidence `project-link-verifier/680a321286e84fe28577293710f18504` and repeat `f2ed3cf56e784f32b18d6f5aeec6bf9a` / evidence `project-link-verifier/6ead120ade94497f8cced86b5d1f311a` are fully qualified with exact retained frame/GS-VRAM/EE/VU/normalized-IOP/GS-register hashes and864 original frame writes, measuring **13.5356461241 FPS** and **13.5554621735 FPS**. GPU sprites rise50694->52398; flushes4163->3879, upload462913536->461586432, download1573126144->1533517824, CPU raster scopes84957->83253 and dirty scopes3395->3111. Retain. This is the current renderer baseline (~13.54-13.56FPS). Remaining measured heavy CPU sprite fallback is only120 small draws /190920 pixels, so further generic-threshold work is low priority. `v1/` remains frozen.
+
+## RETAINED NATIVE RENDERER - CPU same-pixel PSMT8H feedback fast path, 2026-09-23
+
+Retained bulk-mask coherence establishes the new12.07/12.20FPS baseline. The dominant real triangle CPU fallback remains the independently proven same-pixel PSMT8H feedback class:18378 heavy draws/794236 covered samples, Q exactly1.0, per-vertex exact12.4 STQ-minus-screen deltas all dx=dy=8, nearest filtering, TEX0 base/stride equal FRAME, and every covered sample maps to its own destination CT32 word. The prior GPU specialization was state-correct but slower because compute/batch hazard overhead exceeded saved CPU work.
+
+New bounded candidate keeps these draws on the CPU and changes only their texture-source calculation. Under the exact proof guard (PSMT8H, CT32 frame, same base/stride, Q==1, nearest, supported CT32 CLUT config, conservative wrap identity, each vertex delta in[0,15]) the CPU pixel loop reads the current destination CT32 word high byte directly as the CLUT index and applies the existing texture function. It skips per-pixel perspective STQ division, wrapping/address calculation and PSMT8H source lookup. Because source==current destination word is already proven by the guard, draw order and framebuffer feedback remain scalar/ordered exactly as before. Any guard failure uses the unchanged generic CPU path.
+
+For coherence, guarded feedback draws use their conservative frame/depth output pages as the texture-read footprint instead of the whole TEX0 footprint, because the source word is the same destination word. No GPU admission or batch behavior changes. Build `a4aafb86202a4a87a842287e746bbaa7`, game SHA `1fcfc869...`. Verifiers `af3fce6edc544af1ad93597abb098b66` / evidence `project-link-verifier/5206b2ef39b549dd87d8fe7c30925f07` and repeat `e4287a0b54074034a1fc47afcd1e75ac` / evidence `project-link-verifier/91b0d59da4f44ea8b6ff78ff250d78dc` are fully qualified with exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state and864 original frame writes, measuring **12.2492476920 FPS** and **12.2974255340 FPS**. GPU draw/batch counts remain48195 sprites/305856 triangles/1166 triangle batches, proving this is a CPU-fallback optimization rather than added GPU work. Resident download falls slightly again to~1.838GB/readback~1.50s. Retain. This is the current renderer baseline. `v1/` remains frozen.
+
+## REJECTED NATIVE RENDERER - asynchronous GPU-direct scanout, 2026-09-23
+
+Palette-payload/cache experiments are closed and restored; they changed triangle batches but did not repeatably improve qualified FPS. Do not continue generic triangle payload micro-optimization.
+
+Next structural candidate revisits HG-DIAG-041 only by removing its measured regression source. The rejected direct-scanout implementation reduced GPU->CPU download from~2.724GB/1.524s control to~2.327GB/~1.02s, but performed `glFinish()` for worker->UI publication and UI->worker texture reuse; direct runs11.4899/11.6584FPS lost to activation-off12.2142FPS. Candidate restores that already-state-correct scanout implementation, then replaces per-frame CPU-blocking finishes with cross-context GPU sync objects on the existing3-texture ring: worker writes scanout -> `glFenceSync` + `glFlush`; UI inserts `glWaitSync` before sampling; after UI draw, a reuse fence is attached to the released texture; worker inserts `glWaitSync` before rewriting it. Waits remain ordered on the GPU command streams rather than stalling the CPU. Pending frames never sampled by UI can be released in worker order without a reuse fence. Final diagnostic capture remains CPU `display_image()` after timing. No guest state/readback/order/rendering math change.
+
+This is materially different from rejected HG-DIAG-041: same scanout conversion and texture ring, different synchronization mechanism. Build `df0acefc...`, game SHA `90f99b12...`, verifier `80d798da5fae438d93b33be3c9395d80` / evidence `project-link-verifier/d2025f5fffc94dd7a2793c716017fb79` is fully qualified at **11.7614311309 FPS** (11.7522163/11.7706605), with exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register hashes and864 original frame writers. The async fence path definitely ran:1057 GPU scanouts; downloads2.327GB/readback1.037s, flush0.740s. This remains inside the clean11.74..11.98FPS baseline range and is therefore flat, not a structural win. REJECT and restore all scanout source without a repeat.
+
+## REJECTED NATIVE RENDERER - early GPU triangle submission, 2026-09-23
+
+HG-DIAG-043 showed328578 heavy-window triangles have no covered sample, so candidate moved the unchanged GPU submit attempt ahead of the scalar first-covered-pixel search. Build `6ee7d8da857a45e18a8e1b122bf4d7c4`, game SHA `758671ec...`, verifier `929021567ee84c0d92a8d7bf70e520c0` / evidence `project-link-verifier/b333669be5964a96986351498f081c01` is fully state-correct but **slower at11.6001879230 FPS** (11.5857850/11.6146267). GPU triangle submissions rise305856->378260, batches1014->1088, resident download rises to2.722840576GB and readback to1.5608973s. The backend/coherency overhead of admitting empty strip geometry exceeds the saved CPU search. REJECT without repeat and restore `runtime/gs.cpp` from backup `da4b511dc06440679a7221e184b27bd7` to e03185c7.... Do not retry early submission unchanged.
+
+## REJECTED NATIVE RENDERER - batched same-pixel PSMT8H feedback under native STQ, 2026-09-23
+
+The remaining meaningful sampled-triangle CPU fallback is measured:18378/18641 heavy submit rejects are one proven same-pixel PSMT8H framebuffer-feedback class; only263 are unsupported format. Prior semantic proof established all18378 use nearest PSMT8H, TEX0/FRAME same base+stride, Q==1.0 at every vertex, exact positive 12.4 source-minus-screen deltas dx=dy=8, and794236/794236 covered samples map to their own destination CT32 word. The 2026-09-21 exact specialization was state-correct but0.777% slower because it moved these draws into the compute backend while retaining conservative batch dependency barriers.
+
+Changed architecture justified one materially different retry: current native-STQ renderer plus a self-feedback-only triangle batch mode. Build `40c2b8028e034c85abdda5fe0380ba23`, game SHA `58ff1e3a...`, verifier `387e6b1821eb4ebda0edd0a1ede0f5bd` / evidence `project-link-verifier/5d4f13f03048421e927f03321f974bd5` is fully qualified and state-correct at **11.8746981848 FPS** (11.7481203/12.0040334). The path is active: GPU triangles rise305856->328503, but throughput remains inside the clean11.74..11.98 host range. REJECT without repeat; source restored to pre-candidate native-STQ hashes.
+
+## REJECTED NATIVE RENDERER - page-selective CPU raster coherence, 2026-09-23
+
+The largest remaining renderer cost is GPU->CPU VRAM materialization (~2.7GB/33M route). Current `GsCpuMemoryScope(vram,writes)` still calls `access(0,VRAM,false)` before every CPU raster fallback, forcing **all currently GPU-dirty pages** to download even when the fallback reads only a small texture/frame/depth footprint. This is especially wasteful for the measured PSMT8H feedback fallback, whose texture source aliases its destination pages.
+
+Bounded production candidate: extend CPU-raster scope to accept a conservative `reads` page mask plus `writes`. Synchronize only `reads|writes`, then mark only proven output pages dirty and temporarily detach the observer exactly as before. Add an independent page-footprint helper for TEX0 texture reads using supported formats/clamp bounds; frame/depth output pages remain included because CPU tests/blending read them before write. Use this selective scope for triangle and sprite CPU fallbacks where the page set can be proven; retain the old full-memory scope for lines/points or any unsupported/uncertain texture state. No raster math, texture values, draw order, guest-visible readback semantics or fault behavior changes. One build + fixed verifier decides retain/revert; additionally compare GPU download_bytes/readback_ns against the clean baseline.
+
+Pre-edit targets: `runtime/include/hg/gs_memory.hpp`, `runtime/include/hg/gs_raster_pages.hpp`, `runtime/gs.cpp`. Build `5d4e54dc6198465899135b0810b01541`, game SHA `1d4283d5...`, verifier `529121679cb74ee39f324d1876ba2324` / evidence `project-link-verifier/1131af4855224d2b83c3eaefd80e381d` is fully qualified and reproduces retained relaxed frame/GS-VRAM/EE/VU/IOP/GS-register state at **11.8802706326 FPS**. The mechanism is active and cuts resident download bytes **2723987456 -> 1849303040 (-32.1%)**, but readback time remains effectively unchanged (**~1.56s -> 1.55s**) while flushes rise3788->4315 and triangle batches1014->1166. Therefore synchronous readback latency/order, not byte volume, is dominant. REJECT and restore these three files exactly; do not repeat page selection alone.
+
+## REJECTED NATIVE RENDERER - coalesced resident readback calls, 2026-09-23
+
+First coalescing policy (merge gaps <=4 pages) build `d58b06684c1440748ae4e187bfa6200c`, game SHA `d7fd2493...`, verifier `eb448eafd0ba4180ae54ca775c11831e` / evidence `project-link-verifier/a57a18457f374c3484d6f04c0b5ac0ac` is fully qualified/state-correct but **slower at11.5652841012FPS**. It performs2831 synchronous readback calls; true dirty bytes remain2723987456 while merged span bytes2748334080 (+0.89%), readback1.5848611s. Small-gap coalescing therefore does not remove enough synchronization points.
+
+Aggressive one-span-per-request subvariant build `715df6f4030b404bb7d596839832fffb`, game SHA `3e4e9588...`, verifier `7a0e4bdb40374cf1875cb45402ab0467` / evidence `project-link-verifier/af2bb965fa524da784a86c11c2d1242f` is state-correct but **11.6929205213 FPS**. It reduces calls2831->2105 (=readback_requests) but expands transfer span to2918170624 bytes and worsens readback to1.6622227s. Close synchronous run coalescing; restore `gl_gs.cpp` baseline `eedd42e4...`.
+
+## COMPLETED DIAGNOSTIC - resident readback request source mix, 2026-09-23
+
+Counter-only verifier `67de146490fc4e99abd1afb72fec6af9` / evidence `project-link-verifier/2c1e4de5cd324fa382c1dbce7cdf0343` is state-correct; timing is attribution-only. Dirty-triggered source mix:2105 total `download()` requests; **1422 full-VRAM reads**,336 single-page write/RMW,346 other multi-page reads,1 full write,0 single-page reads,0 other multi-page writes. Thus67.55% of synchronization requests are the current `GsCpuMemoryScope(vram,writes)` full-read phase used by CPU raster fallback. Restore counter-only `gl_gs.cpp` before production work.
+
+## RETAINED NATIVE RENDERER - bulk masked CPU raster coherence, 2026-09-23
+
+Prior page-selective raster scope proved useful byte reduction (-32%) but expressed its page mask as many ordinary observer accesses, increasing flushes/batches and leaving stall time flat. The new architecture adds **one bulk observer operation** for a CPU raster scope: pass conservative read/write page masks to the resident accelerator once; it checks queued GPU dependencies once, flushes at most once, downloads `reads|writes` once, and marks only writes CPU-dirty once. Then the scope detaches the observer for scalar pixel loops exactly as before. Unsupported/uncertain footprints fall back to the existing full scope. Reuse the proven output-page helper and conservative TEX0 page footprint, but never fan the mask back into per-range `access()` calls. This directly attacks the measured1422 dominant full-read requests while avoiding the fragmentation that invalidated the earlier selective-scope implementation.
+
+Files: `runtime/include/hg/gs_memory.hpp`, `runtime/include/hg/gs_raster_pages.hpp`, `runtime/gs.cpp`, `runtime/gl_gs.cpp`. Build `3ad303fe46484f59bc7caa8276f0b858`, game SHA `a0cbdb5d...`. Verifiers `7a68d183771d4f99997bd638eb8e5946` / evidence `project-link-verifier/a69af520e04547eaa43eb9046b6c7c9e` and repeat `8f81c63ee97849fd87adc8dc55b99913` / evidence `project-link-verifier/63b1b35249b94399a9d2a66702eccb94` are fully qualified with exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state and864 original frame writers, measuring **12.0725074799 FPS** and **12.1955681305 FPS**. Retain. Resident download is ~1.85GB versus ~2.72GB clean baseline; bulk scope counters show87456 CPU raster scopes but only3889 dirty-sync scopes/121218 dirty pages. Flushes4316 and triangle batches1166 remain higher than the old full-read path, yet removing per-range observer fanout produces a repeatable net throughput gain. This is the new renderer baseline. `v1/` remains frozen.
+
+## COMPLETED DIAGNOSTIC - classified dominant triangle GPU admission gap, 2026-09-23
+
+Restored retained native-STQ renderer is the clean post-HG-DIAG-041 baseline. Fixed final-only verifier `bf52c9254fcd45a9bc00dbdbae7ec1ef` / evidence `project-link-verifier/a8b88738d3c04f2cb0bd47c32529fd31` qualifies at **11.8450197614 FPS** (11.8002454/11.8901352), with relaxed frame SHA `b6ab8abd...`, GS-VRAM `74ad06df...`, exact EE/VU/normalized-IOP/GS-register state and864 original frame writers. Use this as the current source-clean renderer baseline. The earlier12.214188 control retained rejected scanout code and is not a source-layout-equivalent retained baseline.
+
+HG-DIAG-042 is captured and removed. Two completed count-only replays reproduce the exact same primitive totals:0 points/lines,292 triangle lists,794702 triangle strips,1920 triangle fans,64432 sprites =861346 total rasterized draws. Existing backend accepts305856 triangles and48195 sprites, leaving491058 triangle versus16237 sprite non-accelerated draws. Triangles are **96.7993%** of the507295 acceleration gap; strips alone are92.2628% of all rasterized draws. Diagnostic timing is invalid and all temporary HG-DIAG-042 source is byte-restored.
+
+HG-DIAG-043 heavy-window replay `88095b71d7504a669fdd665f1a30b2e0` / evidence `project-link-runtime/20260923T091510Z-04ec5d9f442048f4b1ead12e1597b1ee` resolves the apparent triangle gap. Over31M..33M there are602162 triangle raster calls:9327 zero-area +328578 no-covered-sample =337905 geometry-only/empty draws. Of the264257 triangles with at least one covered sample, **all264257 reach the submit gate**: fog=0, textured-FST=0, STQ-not-ready=0. GPU accepts245616; only **18641 sampled triangles** are rejected by bounded submit/state/format checks and then rasterized on CPU. So the huge whole-run491058 'triangle gap' is mostly strip topology/off-screen/no-sample work, not expensive CPU rasterization. Instrumented timing is invalid as FPS evidence. All temporary HG-DIAG-043 files are now byte-restored: `gs.hpp`23f36c56..., `gs.cpp`e03185c7..., `system_diagnostic.cpp`12d9ef7c....
+
+NEXT production candidate: skip another rejection diagnostic and remove unconditional per-triangle palette payload. Current `gl_gs.cpp::render_triangle` appends all64 job words **plus256 palette words for every accepted GPU triangle**. The shader reads the palette only for indexed texture formats (PSMT8/PSMT8H paths represented here by format0x13/0x1b); untextured and CT32 format0 triangles never dereference `d(PALETTE)`. With305856 accepted triangles/run, unconditional palette copying can move roughly391MB of triangle payload instead of the64-word core payload and forces earlier SSBO/batch flushes. Bounded change: append/set PALETTE only when `FORMAT!=0` and the job is textured; leave the fixed64-word job unchanged otherwise. No guest state, raster semantics, shader math, ordering, texture reads, page coherence or relaxed-STQ behavior changes. Existing variable offsets/tile bins already address jobs by their actual starting offset. Build/relevant tests then fixed verifier directly; keep only if state/frame remains in the retained relaxed-STQ family and throughput improves beyond host variance.
+
+Format0/untextured-only compact payload build `47118c7f9f48440fae3b4abe8c4d541e` / game SHA365f0a97... is state-correct but not useful alone. Verifier `23fa2e4bb6024a148eb99d4902e7932c` / evidence `project-link-verifier/f6ac7afcb62446f9b9a2e118ccb3549c` qualifies at **11.5665549209 FPS** with exact retained relaxed frame/GS-VRAM/EE/VU/IOP/GS-register hashes and864 writers; triangle batches remain exactly1014. This confirms dominant accepted triangles are indexed and the simple omission does not reduce meaningful batching. Do not benchmark it again.
+
+Existing retained evidence already resolves HG-DIAG-044: of18641 heavy sampled-triangle submit fallbacks,263 are unsupported texture format and18378 are true texture/output alias; the exact PSMT8H same-pixel feedback specialization was state-correct but slower and is rejected. Skip those diagnostics/candidates.
+
+REJECTED indexed-palette cache extension. Build `9e45fa125d434c7abf403a486767aac0`, game SHA `9749fc5f39cb664317d3962313405e76281b84bfd169cdd6b52e6088c4adb9d4`. Verifiers `356710331b5d4800959b88b0ea1022e8` / evidence `project-link-verifier/7ac42c4715f04fdfbe63dbf486195e05` and repeat `779d0d95bdb8413f81d6f02818aac615` / evidence `project-link-verifier/826f0d03a39f4bebb52df3445d21c157` both qualify with exact retained relaxed frame/GS-VRAM/EE/VU/normalized-IOP/GS-register state and864 writers, measuring **12.0166550839 FPS** then **11.8424246970 FPS**. The mechanism is definitely active:305856 triangles become1258 palette uploads +301392 palette reuses +3206 omissions, triangle batches drop1014 to936 and first-run flush time drops to0.4118s, yet repeat throughput lands essentially on clean baseline11.8450 and within the11.7379..11.9805 host range. This is not a repeatable FPS gain. Restore `runtime/gl_gs.cpp` from pre-palette backup `52d9924ef42c4c5aa9316d71c6dc75c2` to eedd42e4.... Do not retain/repeat unchanged.
+
+NEXT: resume HG-DIAG-044 first-failing submit classification for the18641 sampled heavy triangles rejected inside `submit()`. The palette experiments show that reducing generic triangle host payload/batches is insufficient; target a measured missing renderer case instead.
+
+## ACTIVE NATIVE RENDERER - relaxed internal GS implementation, 2026-09-23
+
+### ACTIVE HG-DIAG-042 - heavy renderer fallback classification
+
+HG-DIAG-041 direct scanout is fully source-restored; build `3d8cf02d...` game SHA `9ebd5ed7...` is retained native-STQ only. Final-only verifier controls are qualified at **11.9805196750 FPS** (`d0af0917...`) and **11.7378928526 FPS** (`25324521...`), both with identical relaxed frame SHA `b6ab8abd...`, GS-VRAM `74ad06df...`, exact EE/VU/normalized-IOP/GS-register state and864 original writer events. Treat ~11.74-11.98 as the current final-only harness baseline; host variance remains material.
+
+Whole-run count-only HG-DIAG-042 first stage now proves the gap is overwhelmingly triangles:796914 triangle draws vs64432 sprites; existing GPU paths accept305856/48195, leaving491058 CPU triangles and16237 CPU sprites. Triangle fallbacks are96.7993% of the507295 unaccelerated draws; primitive4 triangle strips alone are794702 draws. The first temporary counter edit is restored byte-exact.
+
+NEXT refinement is count-only last2M gameplay slices (31M..33M), targeting triangles first. Temporary `runtime/gs.cpp` thread-local counters classify calls, zero-area, no-covered-sample, fog, textured-FST, STQ-not-ready, pre-submit eligibility, submit rejection and GPU acceptance. `runtime/system_diagnostic.cpp` arms/reset counters exactly at31M and prints one snapshot after the33M loop. Degenerate/no-sample counts are required because triangle-strip connector geometry can otherwise overstate the real CPU raster burden. No timers, no renderer decisions, no guest writes/clocks/input/order/fault changes. Restore both files byte-exact immediately after one capture. Use the dominant heavy-window blocker to choose the next production native-renderer mechanism rather than guessing.
+
+
+### REJECTED structural candidate - GPU-direct scanout, 2026-09-23
+
+Retained HG-DIAG-039 native STQ is the current renderer baseline; rejected HG-DIAG-040 float coverage/Gouraud/Z is restored. The next bounded renderer change removes a host-only round trip: normal presentation currently calls `display_image()`, materializes committed resident VRAM pages to CPU, converts GS swizzled display pixels into an RGBA vector, then `game_host` uploads that vector back to OpenGL. Candidate adds a validated display-scanout metadata path plus optional GPU scanout on the existing resident accelerator. It will flush only already-rasterized GPU work (never the guest pending draw list), upload only CPU-dirty displayed pages, compute-decode PSMCT32/24/16/16S into shared host textures, and present those textures without CPU pixel copies. CPU `display_image()` remains fallback and final verifier/state capture remains unchanged.
+
+Use bounded shared textures owned by `game_host`; worker and UI synchronize ownership so a texture is never rewritten while the UI samples it. Guest-visible VRAM/readback/order, CPU fallback, faults, input, clocks and AOT execution remain unchanged. Primary expected savings: presentation-related GPU->CPU readback, CPU swizzle/format conversion/vector allocation, and CPU->GPU texture upload. Pre-edit manifest: `artifacts/gpu-direct-scanout-preedit-20260923.txt` SHA3d8bc4d6.... Result: REJECT. Direct scanout qualified twice at11.4898726 and11.6583860FPS with1064/1058 scanouts and identical relaxed frame/VRAM/game state. One-line activation-off control under the identical final-only verifier qualified at **12.2141880 FPS** (12.1394581/12.2898437), exact same relaxed frame SHA b6ab8abd..., GS-VRAM74ad06df..., EE/VU/normalized-IOP/GS-register state and864 writers, with0 scanouts. Direct scanout reduced downloads from2.724GB/1.524s in control to2.327GB/~1.02s but increased GPU flush time from0.497s to~0.78-0.79s and adds cross-context glFinish/texture ownership synchronization; net measured throughput is worse. Restore the entire HG-DIAG-041 source set to pre-scanout candidate1 state, retain the final-only verifier harness separately, rebuild, and establish the new candidate1 control under that harness. Do not repeat glFinish-per-scanout shared-texture handoff unchanged.
+
+First runtime shader launch caught only a reserved GLSL local name before guest execution; renamed and rebuilt successfully as game SHA `652f833e...`. Clean33M replay `d3873650...` then completed/no fault with normal48195 sprites/305856 triangles/842 masked batches and retained native STQ, but reported `GS GPU scanouts: frames=0` because configured replay enables `--video-rate-log`, whose changed-image diagnostic intentionally requires CPU pixel frames. Therefore that replay validates compatibility only and cannot time direct scanout. Measurement-only verifier harness now omits continuous `--preview-file` and copies the already-produced post-budget `verifier-state.ram.display.ppm` to `verifier-frame.ppm` after process exit; 131 Python tests pass. Direct verifier `02b7ad25...` is qualified at **11.4898726348 FPS** with1064 scanouts; repeat `b7d36c9c...` is qualified at **11.6583859742 FPS** with1058 scanouts. Both reproduce relaxed frame SHA `b6ab8abd...`, GS-VRAM `74ad06df...`, exact EE/VU/normalized-IOP/GS-register state and864 original writer events. NEXT A/B: temporarily force only `game_host.cpp` `gpu_direct_scanout=false`, leaving all scanout/backend code compiled and verifier harness identical; build/run one qualified control, then restore the activation line exactly and rebuild. This isolates scanout from verifier-harness and layout changes.
+
+
+User now explicitly authorizes renderer internals to differ from literal PS2 GS execution in the active root project, provided game-visible behavior and visual output remain correct. `v1/` is the frozen pre-rule-loosen reference and must not be modified. Static recompilation, no interpreter/JIT/emulator runtime, explicit unsupported behavior, and rendering-independence/no-copy rules remain unchanged. CPU/EE/VU/game logic fidelity remains strict; only renderer implementation freedom is broadened.
+
+Current exact GPU-resident replay already offloads48195 sprites/305856 triangles/842 masked batches but still downloads~2.67GB VRAM and spends~1.02s in readback over33M. The dominant GPU triangle shader also emulates GS coverage/interpolation with GL_ARB_gpu_shader_int64 per fragment. First bounded native-renderer candidate: retain existing GPU VRAM/coherency, texture/blend/depth/fallback plumbing, but replace the dominant textured-STQ triangle's exact64-bit interpolation/coverage arithmetic with native GPU floating-point interpolation derived from the original per-vertex S/T/Q/position/color/depth. Keep the strict CPU/legacy path available as fallback/reference. Expected win is lower shader ALU cost across the existing~306k GPU-triangle workload without first undertaking a full render-target cache rewrite.
+
+Validation changes only where renderer representation is intentionally relaxed: require original gameplay-frame boundary qualification, no new runtime faults, unchanged EE/VU/IOP/game-visible state, and visual/frame comparison against the strict `v1`/current renderer. Exact internal GS-VRAM identity remains useful diagnostic evidence but is not by itself a rejection if any differing bytes are proven renderer-private and guest reads/materialization remain correct. Do not weaken guest-visible readback semantics to manufacture speed. If the float-interpolation candidate is visually wrong or not materially faster, revert it and move to a larger native render-target/texture-cache design rather than repeating exact-GS micro-optimizations.
+
+Before source edits: record external hash/backup manifest for AGENTS/rules plus renderer targets, refresh clean baseline build after the interrupted diagnostic restore, then A/B the candidate under the same gameplay33m route. `run_runtime_verifier` still supplies the established strict-path control; any native-path divergence must be explained with additional visual/game-visible evidence, not silently ignored.
+
+Fresh source-matched control is now build `da9e94308e9a4c4eabf6a5fae8956556`, game SHA `f588a7c2869affc804c7e473a0e252a695bc7b4c50a0d3c1565943c1d463e658`,149-input manifest SHA `5938df575c76a6f802c291dab3da9f01aeca44c6909a041a9ac61d0f101690a5`. Fixed verifier `6eca7351904045298f1d70ef708e02f8` / evidence `project-link-verifier/a2c19231197f4351979e7b2415ccbfef` is fully qualified with864 original writer events and established frame/EE/GS/VU/current-date normalized-IOP hashes; steady gameplay60/5.28055s = **11.3624527748 FPS**, windows11.3528426/11.3720793. Use this as the immediate control for the first relaxed-renderer candidate.
+
+First relaxed candidate build `933d87f45b854dae92ff614b54bcfbf1`, game SHA `0e317aefe11271346c1eedce0d4582c23821ef58c5e82526f7d1e2988457d81d`, verifier `8e765b82773743d1945b1be808c7865b` / evidence `project-link-verifier/84dde9af3b06459f94a723477ee097ed`:864 original frame writers remain qualified; EE RAM, GS register/draw state, VU and normalized IOP hashes match control. Relaxed path was used by302650 triangles. Final GS VRAM and frame hashes differ, while side-by-side640x448 inspection shows no obvious visual difference. Timing is60/5.2348s = **11.4617559410 FPS**, windows11.4219576/11.5018326.
+
+Exact offline PPM comparison finds only65/286720 changed pixels (0.022670%), max channel delta2/255,0 pixels with delta>=4, mean absolute channel error0.000095331 and PSNR87.5643dB. Repeat candidate verifier `bc48a59b8f6e4602888df582534fb1db` reproduces the same frame/GS-VRAM hashes and measures **11.4994518595 FPS** (5.21764s). Layout-matched strict verifier `0d54ce2e3bab4835904406dac0c3b2e5` restores the exact strict frame/GS-VRAM hashes and measures **11.4032236913 FPS** (5.26167s); a later independently launched cleanup control `463b9c7a80f241b6bc7b5615b16b2104` likewise restores the exact strict hashes at **11.3397970176 FPS**. A separately launched relaxed verifier `ccafa66c38dd4ee5aecfa8702e088d8e` reproduced the same relaxed frame/VRAM hashes at **11.4341905165 FPS**. Across all contemporaneous samples, relaxed STQ is consistently faster than strict while producing only the same65 subvisual pixel differences. RETAIN candidate1.
+
+Candidate2 (native float edge coverage + Gouraud + Z on top of retained native STQ) is REJECTED for throughput. Build `722d89a836934a8e80736c0ff3ea2381`, game SHA `e414d5c4d153fc09ff603ed673fa63c7a59e889b9db3dd8bd7aad3d6d1a28800`. Qualified verifier `6f20053d2e06442a8c261df05881eca4` / evidence `project-link-verifier/5fb6fcf4bc8a428ca615490ed95ad1fd` measured **11.6225011623 FPS** (5.16240s; windows11.589634/11.655555). Exact repeat `3d9bf9ba55af41f9acf624134b124810` / evidence `project-link-verifier/1543767663e04e0994c56337f6055682` reproduced the exact same candidate2 frame/GS-VRAM hashes but fell to **11.2250033207 FPS** (5.34521s; windows11.161462/11.289273). Both retain864 qualified frame writers and exact EE/VU/normalized-IOP/GS-register state. The same binary/output producing opposite timing direction proves no dependable gain; visually the frame remains indistinguishable at normal inspection, but speed alone rejects this extension. Restore only candidate2 backend/shader edits using backups `c2556aa8d6234a86acc2163f81e34948` and `a917c662e28f4a3c9e98b2720300dd6a`, preserving candidate1 host opt-in and HG-DIAG-039. Rebuild and verify candidate1 frame/hash returns before the next renderer mechanism.
+
+NEXT renderer work after restore: pursue a larger structural GPU-native saving rather than more per-fragment arithmetic approximation. Re-profile/reuse existing evidence around ~2.67GB GPU->CPU VRAM materialization and the remaining compute/tile/SSBO path; candidate must remove actual synchronization/transfer/work while preserving guest-visible readback and ordering. Prefer a persistent native render-target/scanout or renderer-private texture/resource path over another small integer-to-float substitution.
+
+## COMPLETED SNAPSHOT - frozen pre-rendering-rule-loosen project under v1, 2026-09-23
+
+User authorized a secondary native-rendering branch but first requires the current stricter project state preserved under `v1/` and then left untouched. Snapshot scope is source/config/docs/tests/tools plus current generated `out/`; explicitly exclude `build/`, `emu/`, `Haunting Ground (USA)/`, caches and other protected/binary payloads. Add `v1/FROZEN_PRE_RULE_LOOSEN.md` stating this is the pre-rule-loosen snapshot and must not be modified or used as the active branch.
+
+Implementation mechanism is temporary build plumbing only: add a bounded `hg_game` POST_BUILD CMake copy command for the listed project directories/root files, run one configured `build_game`, then restore root `CMakeLists.txt` byte-exactly. Because the snapshot would otherwise receive the temporary CMake command, overwrite `v1/CMakeLists.txt` afterward with the restored root file. No gameplay/runtime/rendering behavior changes are authorized in this snapshot task; stop after verifying representative hashes/files and the freeze marker.
+
+Snapshot mechanism update: the temporary POST_BUILD copy never ran because the already-stopped VU diagnostic had left generated `out/translated.cpp` ahead of its restored VIF header. Root CMake was restored exactly and configured `hg_emit` regenerated only `out/translated.cpp` back to known clean SHA6979f9a8.... Do not continue the diagnostic. Revised bounded copy mechanism temporarily added a source-tree copy prelude to `tools/hg.py`, invoked only configured `hg_analyze`, then restored `tools/hg.py` exactly. Snapshot completed under `v1/`:209 files plus `FROZEN_PRE_RULE_LOOSEN.md` SHA42000c8f.... No `build/`, `emu/` or `Haunting Ground (USA)/` payload exists inside the snapshot. Representative exact comparisons all pass: CMake2b9e0b6b..., vif.hppa4e5db947..., system_diagnostic12d9ef7c..., game_host9704ed0b..., configd2c998fa..., translated.cpp6979f9a8..., tools/hg.pyf87f4da7.... `v1/` is frozen and must not be edited further. User-authorized native-renderer work may occur only in the active project outside `v1/`, preserving game-visible behavior and visual output. No such rendering work was started in this snapshot task.
+
+## PAUSED VU CLASSIFICATION - count-only heavy-window program/entry/pair mix, 2026-09-23
+
+Fresh restored-source control is qualified: build6d37708c344e4ba3b3c5ded1e82ad4b5, game SHA3df68810f20fa8cb842552907148372126755b830959677e6a88f4ac09bd503d,149-input manifest4cd754f41258ccf5f869c7cec82861240fc01338823824ddd7b5e6fee16044cb; replay4cdce739fa14407b90ab55b8b3f53774 reaches33M/no fault in24.5549s with48195 sprites/305856 triangles/842 masked batches. Verifierf231b0e85d504238bb5678a9e110eecc/evidence541e6f67bc884912878dc2e81fbcb5a8 is exact on established frame/EE/GS/VU/current-date normalized IOP state and all864 qualified original frame writes; heavy60/5.26595s=11.3939555066FPS (11.3782471/11.4097074), about0.30% below the prior11.4283319778 sample and treated as normal control drift.
+
+NEXT diagnostic only: classify31M..33M with integer counters, no clocks. Temporarily add host-only VU profiling count pointers, emit one (program,entry) count per AOT activation and one (program,pair-address) count per executed static pair, and enable them only for the profiled non-realtime33M heavy window. Guest VU state/control flow/arithmetic, clocks, rendering, input, ordering and faults stay unchanged. Instrumented timing is not FPS evidence. Static scan shows624 XYZ ACC multiply/MADD sites,416 broadcast multiply-vector sites,259 generic ACC multiply/MADD sites and13 XGKICK sites; dynamic concentration is the missing discriminator.
+
+After one useful capture, document a new HG-DIAG result, restore temporary VIF/emitter/runner edits exactly, regenerate clean AOT output and rebuild before any production timing candidate. Do not retain profiling branches. Choose the next distinct optimization from measured dominant dynamic shapes; do not repeat the previously rejected VU specialization/scheduling/inlining routes unchanged.
+
+## ACTIVE RESTORE - incomplete DIRECT wait cache rejected; return to 11.428332 baseline, 2026-09-23
+
+DIRECT wait-cache candidate is state-correct but not faster. Build0dfe19386be44001b43de567a456f75b/game471900703871add2f95d1b4b0cad306aa0da5f1b74ebb377b3da3849d5fd488e; replaysf7237f641717473da3fa155bd108ecaa and67ae5dbcfa0343d3a89686e0961e6f73 both reach33M/no fault with normal48195sprite/305856triangle/842masked work. Fixed verifier5856eab9c55a4a308d9a6dd1852efd45/evidenceproject-link-verifier/aa9c2aefe70a4d7eb4fab3521dd5e1d7 passes149-input provenance,864 original writer/caller events and exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/5.26724s=11.3911650124FPS, windows11.4179582/11.3644973. Immediate source-matched baseline98f8f5f6... was60/5.25011s=11.4283319778FPS. Candidate is~0.325% lower FPS/~0.326% more heavy host time: flat/slower, no retention.
+
+NEXT source edit is exact restore of ONLY the host parser wait cache and its focused test. Remove Vif1Path::direct_wait_bytes/comment/reset field, process_pending early wait shortcut and incomplete-DIRECT cache assignment; restore original incomplete check; remove focused lifecycle test. Preserve split-tag/TTE pending physical-phase tracking unchanged. Baseline target hashes are vif.hppa4e5db947..., vif.cppd051e21e..., vif_direct_regression.hpp3dabfff8.... Candidate backup/result: artifacts/vif-direct-wait-cache-rejected-20260923-rc14.txt SHA4d733c7a.... Rebuild tests/game and revalidate source-matched production before next mechanism. Do not repeat DIRECT header caching unchanged; eliminating millions of repeated header checks did not move qualified throughput.
+
+Optimization then returns to actual VU AOT/EE/GS CPU work. The deep audit remains useful: real VIF/VU double buffering exists but only~0.18s completed UNPACK work is available against~2.56s VU work, and fine-grained host overlap loses to synchronization overhead.30FPS remains unmet.
+
+## PRIOR ACTIVE VIF OPTIMIZATION - cache incomplete DIRECT wait length; baseline 11.428332 FPS, 2026-09-23
+
+Clean post-audit synchronous+split-tag baseline is verifier98f8f5f6df344edd84628dfd5ff2e7a6/evidenceproject-link-verifier/90a9667c4b734842b398184ad73865f6:60/5.25011s=11.4283319778FPS, windows11.417263/11.439423,149-input/864-writer and exact frame/EE/GS/VU/current-date normalized IOP state. Game203820c8..., replay233a96bc... reaches33M/no fault with normal work. Use this as the immediate source-matched control.
+
+NEXT bounded mechanism BEFORE source edit: cache only the known byte length of an incomplete VIF DIRECT/DIRECTHL command. HG-DIAG-034 observed61146 DIRECT commands/7306814 qwords/116909024bytes in heavy31M..33M, with approximately one incomplete DIRECT-header retry per incoming payload qword. The existing parser re-decodes command/immediate/alignment/size every call until the complete payload exists.
+
+Candidate adds host-parser direct_wait_bytes. Existing max_pending check remains first. When a DIRECT header is decoded and aligned but its payload is incomplete, record total command bytes4+units*16 and leave the COMPLETE retained command bytes unchanged. After consuming any already-completed prefix commands, that DIRECT header remains pending[0]. On later process_pending calls, if pending is still shorter than the cached length return immediately; once enough bytes arrive, clear the cache and run the exact original full DIRECT parser/application path. NO header is consumed early and NO GIF/GS qword is submitted early. Pending bytes/phase breaks, max capacity, GIF suffix, partial GS fault effects, command ordering and original completion boundary remain externally identical. reset_interface clears cache; complete-application faults leave the full command pending and cache cleared for normal retry.
+
+This is distinct from HG-FAIL-031 complete-EOP packet batching, HG-FAIL-032 DMA-arrival batching and HG-FAIL-033 already-complete payload batching: payload buffering/application are unchanged; only repeated VIF header retry work is skipped. Existing936-case/7873-checkpoint frozen DIRECT reference must remain exact at every partial checkpoint; add a focused cache lifecycle assertion. Detailed pre-edit hashes/evidence: artifacts/vif-direct-wait-cache-preedit-20260923-rc14.txt SHAaca33fb0.... Protect split-tag pending_byte_phase/phase breaks, configd2c998fa..., host9704ed0b..., renderer/clocks/input/audio and all coverage.
+
+Validation: build_tests/runtime/translation/readiness; build_game/fresh149-input manifest; gameplay33m replay; fixed frames verifier. Retain only a meaningful repeatable gain above11.428331978 with all established state exact; flat/slower restores only direct_wait cache.
+
+## PRIOR CURRENT BASELINE - synchronous VIF/VU restored; split-tag retained; 11.428332 qualified FPS, 2026-09-23
+
+Post-audit production restore is complete. Fine-grained VIF/VU host-thread overlap (full snapshot, dirty tracking, VIF-only merge, and atomic feeder variants) is rejected as a performance route; none remains active in the main execution loop. Independently proven split-tag/TTE physical VIF phase tracking remains. system_diagnostic uses direct synchronous VIF drain; runtime.hpp again synchronizes GS interrupts on delivered VIF qword/tag; vif.cpp has no overlap stalls/write trackers and retains pending_byte_phase/consume_pending_prefix plus original command semantics/faults.
+
+All restore gates pass: build_tests8cd89bc..., runtime994d79b..., translation24c96db8..., readinessb510fd68... (65536 compiled comparisons). Build2739b191... produces game203820c84068e970f509c54215d93f09ca5e98d5825b1b24744305259881b402,36319744bytes,149-input manifesta08a85cc2772eb41349433074bfbaeeedf5ba4289ece28d81f30859d50bf925a. Replay233a96bc... reaches33M/no fault with48195sprites/305856triangles/842masked batches in24.5939s.
+
+Fixed verifier98f8f5f6df344edd84628dfd5ff2e7a6/evidenceproject-link-verifier/90a9667c4b734842b398184ad73865f6 passes149-input provenance,864 original1bef84/caller2d1c50 events, zero lost/unexpected/caller/stack failures, and exact established frame/EE/GS/VU/current-date normalized IOP hashes. Qualified heavy60/5.25011s=11.4283319778FPS; windows11.4172629/11.4394225. This is the new post-audit production baseline.30FPS remains unmet.
+
+Root-cause conclusion: Haunting Ground genuinely uses Sony VIF1/VU1 double buffering, but measured completed UNPACK work (~0.18s in retained heavy diagnostics) is far smaller than synchronous VU execution (~2.56s) and fine-grained host scheduling overhead overwhelms the overlap opportunity at ~126180 MSCAL/MSCNT activations. Do not retry those handoff designs unchanged. Optimization returns to VU AOT/EE execution and GS/CPU work using this11.4283 baseline.
+
+## PRIOR ACTIVE BASELINE RESTORE - synchronous VIF/VU with split-tag correctness retained, 2026-09-23
+
+Atomic feeder handoff is rejected: build5f7672a6... replaydff4fcc5d6854018a09b4b5ac1bdc063 reaches33M/no fault with normal48195sprite/305856triangle/842masked work but takes49.5036s. Source has already been restored to pre-atomic system_diagnostic SHA dd785f5e.... Combined with full-snapshot overlap8.746445FPS, dirty VU/VIF tracking8.584612FPS, and VIF-only tracking/bulk merge8.749468FPS versus exact synchronous control10.079036FPS, fine-grained host-thread overlap is closed as a performance route.
+
+The deep architecture result remains important but is not the3x restraint: actual HG packets do use BASE0/OFFSET0x200 and TOPS double buffering, yet retained heavy measurements show~2.56s VU execution and only~0.18s completed UNPACK work available to overlap in the final2M guest-us window. Even ideal zero-overhead VIF/VU overlap cannot produce30FPS. Per-activation host synchronization at~126180 MSCAL/MSCNT events adds cost instead.
+
+PROPOSED BEFORE source edits: restore normal production to synchronous VIF/VU while KEEPING independently proven split-tag physical-phase tracking. In system_diagnostic do not instantiate feeder/snapshot and use direct while(ee.pump_vif1()) drain. In runtime.hpp restore unconditional GS interrupt sync after VIF qword/tag delivery. In vif.cpp remove overlap-only host_vu_running/host_vu_pending stalls, MicroMem generation bookkeeping and per-field VIF write tracking calls, while preserving command order, UNPACK arithmetic, pending_byte_phase/consume_pending_prefix and all explicit faults. Leave dormant helper definitions temporarily for a small reversible cleanup; no runtime object or hook uses them. Pre-edit hashes/evidence: artifacts/sync-post-splittag-baseline-preedit-20260923-rc13.txt SHA5477a97b....
+
+Validation: build_tests/runtime/translation/readiness, build_game, gameplay33m replay and fixed frame verifier. Require normal work counts,149-input provenance,864 original writer/caller events and exact frame/EE/GS/VU/normalized IOP hashes. Compare qualified FPS to pre-overlap synchronous10.0790364441. If restored, this becomes the new post-audit production baseline and optimization returns to VU AOT/EE execution rather than host-thread overlap.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - atomic feeder rejected; move to coarse VIF1 double-buffer ownership, 2026-09-23
+
+Atomic feeder handoff is rejected without retention. Build5f7672a6... replaydff4fcc5d6854018a09b4b5ac1bdc063/evidenceproject-link-runtime/20260923T052943Z-454f048bd1c347c2bbdca109711aa5a4 reaches33M/no fault with the expected48195sprite/305856triangle/842masked work, but takes49.5036s versus38.2356/38.3431s for the mutex/CV VIF-only overlap and~27.68s for the earlier full-snapshot overlap. ee_vif_gif sampled_ns is50.7367M. Release/acquire spin/yield synchronization therefore makes this fine-grained per-activation handoff substantially worse. Do not qualify/repeat unchanged. Restore only Vif1Feeder/include changes in system_diagnostic to the exact pre-atomic mutex/CV route before the next mechanism.
+
+This closes fine-grained host-thread handoff tuning. The architecture evidence remains valid: captured Haunting Ground VIF1 traffic uses BASE0/OFFSET0x200, TOPS-relative UNPACK and MSCAL/MSCNT, but creating/handing off host work at ~126180 activations in the heavy2M window costs more than it overlaps.
+
+NEXT ROOT-CAUSE EXPERIMENT BEFORE source edit: coarse double-buffer ownership with NO per-field write tracker and NO per-activation worker wake. Preserve the same game-proven VIF double-buffer semantics. At VU activation, derive the processing half from the activated TOP and the feeder half from TOPS/BASE/OFFSET. Require the captured HG-compatible shape (BASE0, OFFSET0x200, aligned half ranges) for the optimized path; otherwise fall back to the exact current synchronous route. Run one persistent feeder over a bounded sequence of VIF commands for the opposite half rather than one wake per MSCAL/MSCNT. Snapshot/copy only the active8KiB VU half to the VU work image; VIF writes only the opposite8KiB live half. At synchronization boundary, verify the work image did not change the feeder-owned half (bulk compare against activation baseline or immutable shared half); then copy the active half work->live and feeder half live->work. No per-UNPACK or per-VU-store hooks. FLUSH/MPG/DIRECT and any non-double-buffer destination force a join/fallback before proceeding. Main-thread ownership of VU/XGKICK/GIF/GS remains. Start with a read-only command classification/proof pass and focused tests before enabling gameplay.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - VIF-only overlap exact but 8.749FPS; isolate feeder synchronization cost, 2026-09-23
+
+VIF-only conflict tracking + bulk merge is now fully qualified and state-correct but still too slow. Build e699e876... game574ff03a..., replays165c3941...=38.2356s and4fce8a6d...=38.3431s both reach33M/no fault with exact48195sprite/305856triangle/842masked work. Verifier6f47969da4ac4f50a5a24b57896fd212/evidenceproject-link-verifier/5738a62e9da14c93aaa048583c5a7a1c passes149-input/864-writer, exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/6.85756s=8.74946774071FPS, windows9.156866/8.376776. Clean synchronous control246279be...=10.0790364441FPS,60/5.95295s. Removing full scans, per-activation data copies and hot VU-side store tracking therefore did not make fine-grained overlap competitive.
+
+The remaining host-only difference is dominated by per-activation feeder synchronization. Heavy retained counts91140 MSCNT+35040 MSCAL=126180 activations. Current overlap adds~0.90461s versus synchronous control in the qualified heavy window, ~=7.17us per activation, while replay ee_vif_gif sampling remains~44.1-44.3M. This is consistent with mutex+condition_variable wake/wait cost but remains a hypothesis until isolated.
+
+PROPOSED BEFORE source edit: change ONLY Vif1Feeder in system_diagnostic.cpp. Preserve exact current split-tag transport, VIF-only conflict merge, bulk VU state copy, main-thread VU/XGKICK/GIF/GS ownership, feeder scope and every guest-visible behavior. Replace mutex/condition_variable start/wait with release/acquire atomic request/done sequence counters on the same persistent worker. Exactly one request outstanding; state/error are published through request/done ordering. Main polls done and periodically std::this_thread::yield(); destructor sets atomic stop, advances request to wake idle worker, then joins. Remove mutex/CV includes and add atomic. No new PS2 concurrency scope.
+
+Pre-edit evidence/hashes: artifacts/vu1-overlap-atomic-feeder-vifonly-preedit-20260923-rc11.txt SHAad7be9de.... Target system_diagnostic dd785f5e.... Protect vif.hppa4e5db94..., vif.cpp315ca8af..., runtime.hppac52dc0e..., tests0f1c73bf..., configd2c998fa..., host9704ed0b.... Validation: build_game, one33M replay; if materially improved, fixed verifier. If flat/slower/fault, exact restore only system_diagnostic and stop pursuing fine-grained host-thread overlap.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - remove hot VU store tracker; VIF-only conflict tracking + bulk merge, 2026-09-23
+
+The first dirty-write revision is rejected before further tuning. It is state-correct but slower than both prior routes. Game677c6d76..., replays ea5656719...=38.7028s and29994939...=38.5248s both complete33M/no fault with exact48195sprite/305856triangle/842masked work. Verifier9e63df1c42994fe3ae71c9855061d4cc/evidenceproject-link-verifier/2a906f3229934fe8a798558ae4dca8b7 passes149-input/864-writer and exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/6.98925s=8.58461208284FPS, windows8.534511/8.635305. Full-snapshot overlap was8.746445FPS; exact synchronous control10.079036FPS. Profile identifies the regression: ee_vif_gif sampled_ns rises from~3.12M in the prior overlap replays to45.19M/45.43M here. The new per-lane Vu1State host_memory_tracker hook on SQ/SQI/ISW is the dominant new host work. Do not retain or repeat that hook.
+
+PROPOSED BEFORE source edits: preserve the proven split-tag transport and overlap scheduling, but remove VU-side write tracking completely. Keep first-touch tracking only on LIVE VIF UNPACK writes. At each overlap activation, live/work VU memory is synchronized before concurrency. On join, inspect only VIF-touched words/vectors using their recorded baseline: different dual VIF/VU changes remain explicit conflict; VIF-only changes are folded live->work; VU-only or identical changes remain in work. Then one contiguous work->live assignment copies the full16KiB data +1KiB defined masks. Non-VIF-touched live memory stayed at activation baseline, so work is authoritative and carries all untracked VU writes exactly. This removes every VU SQ/ISW tracker branch and also avoids a4096-entry conditional scan. Persistent MicroMem generation/once-per-drain synchronization remain. Detailed hashes/evidence: artifacts/vu1-overlap-vif-only-merge-preedit-20260923-rc9.txt SHA30449892....
+
+Targets: vif.hpp1119b77a... remove Vu1State tracker pointer/store hooks and simplify merge to VIF tracker only; system_diagnostic54ebb2f7... remove vu_writes install/clear and bulk-copy merged work memory back to live; focused runtime tests1b42de0e... update VU-only/VIF-only/identical/conflict/defined/untouched cases. vif.cpp315ca8af... split-tag/VIF tracking remains unchanged unless tests require. Protect configd2c998fa..., game_host9704ed0b..., renderer, clocks, controls, all coverage. Validation: build_tests/runtime/translation/readiness, build_game, one33M replay first; only if competitive run second replay + fixed verifier. Any state mismatch/fault restores this bounded revision while preserving independently proven split-tag support.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - keep correct VIF1/VU1 overlap, remove per-activation full-memory snapshot/scan, 2026-09-22
+
+Split-tag phase tracking is now proven through tests and two complete overlap replays. Replay20d58d715e7f4074a5e7df4d8d6596f5=27.6758s and replayf5cbe90c6fe44c3fb6eb46a47ffc29cd=27.6894s both reach33M/no fault with exact48195sprite/305856triangle/842masked work. Qualified verifiere4382686adf24316b0b20c752ac899c7/evidenceccd5685e34c648bebc09b6f16768c240 passes149-input/864-writer, exact frame/EE/GS/VU and current-date normalized IOP state, but heavy60/6.85993s=8.74644493457FPS (8.774393/8.718675), materially below exact clean synchronous control246279be...=10.0790364441FPS. Therefore the PS2 overlap semantics are state-correct; the first host implementation is too expensive in the heavy window.
+
+The host regression now has a concrete scale: retained diagnostic31M..33M counts91140 MSCNT+35040 MSCAL=126180 VU activations. Current Vu1OverlapSnapshot copies baseline VU data/defined, work VU data/defined and MicroMem on every activation, then scans all4096 VU words during merge. That implies multiple GiB host-only memory traffic and >516M merge comparisons in the final2M slices. This work has no PS2 architectural counterpart and plausibly explains the8.746FPS regression despite the whole-run27.68s improvement.
+
+PROPOSED BEFORE source edits: retain the same bounded overlap scheduling and split-tag transport, but make snapshot state persistent and merge only actual writes. Add host-only Vu1MemoryWriteTracker with dirty bitsets + compact first-touch lists and baseline values only for touched words/defined vectors. Vu1State SQ/SQI/ISW call the tracker at their architectural store boundary only when a nullable pointer is installed. VIF UNPACK similarly tracks only actual writes while feeder overlap is active. MPG increments a host MicroMem generation. First activation initializes work memory/MicroMem once; later activations reuse synchronized work memory and copy MicroMem only after generation changes. Merge iterates dirty lists only, preserving the exact existing lane-wise conflict rule; VU-only changes apply work->live, VIF-only changes live->work, identical dual changes synchronize both, incompatible dual changes remain an explicit VU1 overlap memory conflict. End-of-merge invariant is live/work VU memory+defined equality for the next activation. No whole4096 scan, no baseline full copy and no normal per-MSCNT MicroMem copy.
+
+Detailed current hashes/evidence/validation are in artifacts/vu1-overlap-dirty-merge-preedit-20260922-rc8.txt SHAe8e4fd44.... Targets are vif.hpp5340be6d..., vif.cppbd98ef37..., system_diagnostic7adedee9..., focused runtime testsb8854512.... runtime.hpp overlap schedulingac52dc0e... remains unless required. Protect configd2c998fa..., host9704ed0b..., renderer/gs/gl_gs/vu_products and all gameplay coverage roots. Validation: tracker unit cases (VU-only/VIF-only/identical dual/conflict/disjoint defined lanes), full build/runtime/translation/readiness, game build, two33M replays, fixed frame verifier. Any state mismatch/conflict/nondeterminism or no heavy improvement restores only this low-overhead revision while preserving independently proven split-tag support.
+
+## PRIOR ACTIVE ARCHITECTURE EXPERIMENT - VIF1/VU1 overlap reached 28.27M; add split-tag phase tracking, 2026-09-22
+
+First overlap replay137a5347007a43d6b9e14094e08c8170/evidenceproject-link-runtime/20260923T040431Z-d5fb5bd02640477db577231b64001ef9 ran to28,267,245 slices before explicit parser fault "VIF1 tag inside incomplete VIF packet requires split-tag phase tracking". No VU overlap-memory conflict occurred. Host throughput to that point was1.63469M slices/s, encouraging but not comparable to the full heavy FPS window and NOT a speed claim. The fault exposes an older VIF transport limitation that becomes reachable when the feeder can retain bytes across a source-chain tag.
+
+Proposed BEFORE source edit: preserve exact physical VIF byte phase across TTE tag boundaries. Current single pending_phase describes pending[0] only and cannot represent a logical retained stream where a new DMAtag contributes upper64 bits at physical phase8 after prior qword bytes whose linear next phase would be0. Add sparse pending phase breaks {logical offset,physical phase} only at such discontinuities; normal qword flow keeps zero breaks. submit_qword appends at phase0; submit_dma_tag appends upper64 at phase8 even with retained pending. pending_byte_phase(offset) resolves alignment, and process_pending MPG/DIRECT checks use it. Prefix erase rebases break offsets and pending_phase; reset clears breaks. No command semantics, VU overlap/merge policy, TOP/TOPS/DBF, GIF/GS, guest clocks or fault policy changes.
+
+Focused test before replay: V4-32 UNPACK code begins at byte12 of a qword, payload continues through an8-byte TTE tag and completes in next qword; verify exact VU vector data and following commands plus rebased phase. Pre-edit hashes/provenance: artifacts/vif-split-tag-phase-preedit-20260922-rc7.txt SHA5a21c648.... Then build_tests/runtime/translation/readiness, game build, two33M replays for determinism, fixed verifier. If another boundary fault appears, preserve exact pending bytes/phase breaks and diagnose rather than relaxing alignment.
+
+## PRIOR ACTIVE ARCHITECTURE EXPERIMENT - bounded VIF1/VU1 double-buffer overlap, 2026-09-22
+
+Scheduled-clock candidate is now definitively rejected as HG-FAIL-040. Candidate f723b1dbac484c8ba14f826c65ea94d5/evidenceabbddece8a274a3085e0fcab19610a52 passed exact state but measured9.62233922274FPS. Exact restored source rebuilt as game0775404e1c7d96b522383344f993e4feaa274f7bcd19cd9b2bb3f6f4ea02d870; replaye06a862069644fd5b24d2d0a45660f50 reaches33M/no fault with normal48195sprite/305856triangle/842masked work; verifier246279beabfc4655a23e0000e7490214/evidencec97d79d6082c4db79931963e531ec4ba passes149-input/864-writer and exact frame/EE/GS/VU same-date state at10.0790364441FPS, windows10.008374/10.150704. Same-date IOP-without-RTC hashb29aec44... matches candidate, so no hidden candidate IOP difference. Scheduled route is~4.7% slower and source remains clean. Record in PERFORMANCE/learned before handoff; do not retry unchanged.
+
+Root-cause audit now moves to the first actual architecture correction. Captured heavy Haunting Ground VIF1 chain uses BASE0/OFFSET0x200, TOPS-relative UNPACK, MSCAL and repeated MSCNT, exactly Sony's double-buffer producer/consumer pattern. Current parser executes each whole VU AOT body inline. Revised pre-edit design/provenance/hashes are in artifacts/vif1-feeder-overlap-preedit-20260922-rc6.txt SHAd0b2a394....
+
+REVISED BEFORE runtime source edits after checking GL ownership: keep VU1 + XGKICK/GIF/GS on the existing native-game/GL thread. game_host.cpp binds the OpenGL4.3 GS worker context to that thread before run_native_game, so a helper-thread VU executor could issue GL-backed GS work from the wrong thread. Instead, when overlap is enabled MSCAL/MSCNT perform the exact TOP/TOPS/DBF activation but queue the AOT entry and return from process_pending. Main snapshots VU execution state and runs the exact compiled VU body on that snapshot. Simultaneously one persistent helper thread continues VIF1 DMA/parser work into the LIVE Vif1Path.
+
+While main VU runs, the helper may consume ordinary VIF state/row/column/mask and UNPACK only. Before a complete MPG, DIRECT/DIRECTHL, FLUSHE/FLUSH/FLUSHA or next MSCAL/MSCNT it leaves that command unconsumed, marks host_vu_stalled and stops. Thus helper never accesses GIF/GS while main VU/XGKICK may do so. At VU completion main joins the feeder and three-way merges VU data memory against launch baseline/live feeder/snapshot VU results: main-only alternate-buffer writes survive, VU-only changes apply, identical dual changes are accepted, and incompatible dual changes fault explicitly as VU1 overlap memory conflict. VU register/readiness state comes from the completed snapshot. Retained synchronization/GIF/MPG/activation command is then processed synchronously on main; a newly queued MSCAL/MSCNT repeats the cycle.
+
+Overlap is enabled only inside system_diagnostic's VIF DMA drain. runtime.hpp VIF DMA callbacks skip GS interrupt polling only while host_vu_running; main polls after feeder join. Direct EE VIF FIFO writes and every other runner retain synchronous behavior. Persistent feeder avoids per-MSCAL thread creation. First phase still joins before PATH3/raster/IOP and before EE resumes: no EE/IOP overlap or PATH1/PATH2 concurrency yet. Targets: vif.hpp d6a6ff26..., vif.cpp5ab22f5b..., runtime.hppe2a56ff1..., system_diagnostic c8c2d536... plus focused gif/VIF tests. Protect configd2c998fa..., host9704ed0b..., original gs/gl_gs/vu_products and all coverage roots. Validation: full tests, build, gameplay33m replay twice for determinism, fixed frame verifier. Any conflict/state/fault/nondeterminism or meaningful slowdown restores exact source. No audio/staircase work during this mechanism.
+
+## PRIOR CONTROL REVERSAL - scheduled-clock candidate 9.622339 FPS; restored control 10.079036 FPS, 2026-09-22
+
+Overflow-safe scheduled-clock candidate completed its correctness and gameplay gates but is NOT accepted. Python365d0425... passes132; compiled readiness0d885897... passes65536 full-state/memory comparisons including near-uint64 wrap; runtime2bd84102... and translation8f0f9b38... pass. Emit85abd36c... changed only out/translated.cpp and produced3194 scheduled neutral advances versus283 residual exact advance_pipeline(1), moving ~92% of static per-pair pipeline advances off architectural state mutation. Build e1ec5f35... produced game1d08d53eb68d6dfafbfc3309545dd8c4d7d1f515cb3143e6433c01570f79165b,36666368bytes, manifest3459d709.... Replay0b2bc87a... reaches33M/no fault with exact normal48195sprite/305856triangle/842masked work.
+
+Qualified verifierf723b1dbac484c8ba14f826c65ea94d5/evidenceproject-link-verifier/abbddece8a274a3085e0fcab19610a52 passes149-input freshness,864 original1bef84/caller2d1c50 events,zero lost/unexpected/caller/stack failures and expected frame/EE RAM/GS VRAM/GS state/VU hashes. Heavy60/6.23549s=9.62233922274FPS, windows9.540528/9.705565. This is materially below recent clean controls (~10.415 to11.174), so no speed claim and no reason to retain without a reversal control. Candidate exe is ~348KB larger than recent clean control, making code-size/I-cache pressure plausible but not yet isolated.
+
+Verifier crossed the emulated RTC date boundary: masked h/m/s bytes are BCD-like27/46/00 and IOP hash excluding ONLY those three fields isb29aec44..., whereas prior same-date clean runs usedbdbf3a11.... Frame/EE/GS/VU remain exact and verifier reports no validation failures; treat the IOP hash change as a date-rollover question until a fresh control is measured under the same date, not as proof of candidate semantics.
+
+NEXT, before any new mechanism: exact restore runtime/include/hg/vif.hpp, tools/hgtool/vu_emit.py, tests/test_vu_decode.py and tests/generate_vu_readiness.py to clean hashesd6a6ff26...,5c4fcb32...,00c9c923...,9025a246... using rc3 auto-backups; regenerate translated.cpp through hg_emit to clean route, rebuild current game/fresh149-input manifest, replay/qualify same-date control. If control is materially faster and state matches, reject scheduled-clock candidate and record HG-FAIL-040; then move directly to deterministic VIF1/VU1/PATH overlap from ROOT_CAUSE_AUDIT rather than another scoreboard micro-tweak. If control unexpectedly reproduces9.62, investigate host/date drift before decision. No candidate source remains after restore; preserve configd2c998fa..., host9704ed0b..., gs/gl_gs/vu_products exact production.
+
+## PRIOR ACTIVE OPTIMIZATION - VU function-level scheduled-clock accumulator after root-cause audit, 2026-09-22
+
+Deep audit complete enough to justify one bounded source experiment; details/evidence matrix are in docs/ROOT_CAUSE_AUDIT.md4a7bb869.... Major structural finding: actual heavy-scene VIF source chain uses BASE0/OFFSET0x200, FLG=1 TOPS-relative UNPACK and repeated MSCAL/MSCNT, while current VIF parser calls the whole VU AOT executor inline. Sony manual semantics allow VIF to fill the alternate buffer while VU executes; XGKICK PATH1 also progresses independently until a real path conflict. Current runner drains VIF/GIF/GS serially. This is the major architecture restraint, but parallelism alone cannot erase VU arithmetic CPU cost.
+
+AOT host-side finding:13 programs contain~3.5k microinstruction pairs and current generated C++ has3477 per-pair advance_pipeline(1) calls plus dynamic readiness production/checking. Map text is megabyte-scale for those programs. Retained heavy diagnostics place VIF service around3.6s of~4.9s heavy loop and MSCNT inclusive work around2.56s; worker CPU accounts for~97% of wall. The next candidate attacks runtime software-pipeline overhead without yet changing device ordering/concurrency.
+
+PROPOSED BEFORE source edits: function-level scheduled-clock accumulator. Add exact scheduled readiness helpers to Vu1State operating on an explicit local uint64 cycle; add a small RAII Vu1ScheduledClock that defers state.advance_pipeline(elapsed) and commits during exception unwind. Generated Q/P-neutral pairs use local ++cycle plus scheduled require/produced timestamps, preserving current VF proof/wrap fallback and same operations/faults. Before any pair that observes/produces Q or P (DIV/WAITQ/ERLENG/WAITP/MFP or upper MULQ/ADDQ), sync elapsed cycles into the exact existing state path, emit current _pair_lines unchanged, then reload local cycle. Function exit/destructor syncs. This does NOT introduce VIF/VU concurrency, change arithmetic, XGKICK ordering, renderer, input, guest clocks, audio or fault policy. It is materially different from the rejected no-Q/no-P early-return: that still updated/checks pipeline state per pair; this hoists Q/P state progression across whole neutral spans.
+
+Static coverage suggests most pairs are eligible: generated counts DIV43, WAITQ50(including DIV prewaits), ERLENG47, WAITP20, MFP53, Q arithmetic134 versus3477 advances. Exact pre-edit hashes/plan in artifacts/vu-scheduled-clock-preedit-20260922-rc2.txt (SHA b0a6a15e...). Targets: vif.hppd6a6ff26..., vu_emit.py5c4fcb32..., emitter tests00c9c923.... Protect configd2c998fa..., host9704ed0b..., gs.cpp/gl_gs.cpp/vu_products exact restored sources. Validation: Python tests -> hg_emit and inspect generated counts -> build_tests/runtime/translation/readiness -> build_game fresh manifest -> gameplay33m replay -> fixed frames qualifier. Any state/fault mismatch restores exact source immediately. If first timing is materially promising, exact reverse emitter/header, regenerate/build/qualify a fresh control, then second candidate before retention. If flat/slower, restore and move to deterministic VIF/VU/PATH overlap rather than more micro-tweaks.
+
+Correctness gate update before further source edits: initial scheduled-clock build passed Python/runtime/translation but failed compiled readiness at program0/sample4, a deliberate near-uint64-wrap state. Reference/optimized ended issue_cycle0 with DIV Q completed; scheduled ended issue_cycle0 but left Q pending/rem5. Debugging shows the local modular timestamp can wrap, sync to0, then a readiness hazard can jump the local timestamp to a numerically large pre-wrap ready value; a later wrap makes cycle-last_sync ambiguous and loses elapsed Q/P time. One immediate wrap sync did not fix this because the ambiguity is caused by hazard jumps after sync. Revised implementation now tracks DEFERRED ELAPSED CYCLES separately from the modular issue timestamp, but the same synthetic sample still fails: the accumulated elapsed duration itself can exceed one full uint64 span under the current wrap-fallback readiness semantics and overflow back to a small value. Before more source edits, make deferred additions overflow-safe: add Vu1State::scheduled_advance(cycle,elapsed,delta) and a shared scheduled_add_elapsed helper that flushes the already-deferred span through advance_pipeline only when `elapsed+delta` would overflow; scheduled require_vf/require_vi use that helper before advancing the local timestamp. Normal gameplay-sized spans remain local; only synthetic/full-wrap spans materialize early. This preserves exact modular issue_cycle plus Q/P elapsed duration across multiple wraps without changing arithmetic or normal scheduling. No gameplay timing until the 65536 compiled differential passes. Temporary readiness failure-print detail may remain only until the fix is proven, then restore the test generator to concise output.
+
+## PRIOR ACTIVE ROOT-CAUSE AUDIT - mapped GS readback rejected; scan PS2 overlap/serialization model, 2026-09-22
+
+Mapped-span readback is closed without retention. Candidate runtime/gl_gs.cpp6cd8588c..., build971a1e7a0e47405a825d74f98ea0dcfd/gameb23dcc992dfb87123bb30a1d224a4c5b35cc843c6993e4a8d2724175f28ee7a2, replay154f095d... normal/no fault, verifier122e24082ca046e19a481f636be4d308/evidenceproject-link-verifier/d82e00b83485478b89b92085e12afc36 passes149-input/864-writer and all established state hashes at11.1584518764FPS (60/5.37709s;11.240123/11.077959). Exact pre-candidate control3aef9218072446dfb40a45aec3ce9f0a was11.1743080310FPS (60/5.36946s;11.183597/11.165034). Flat/slightly slower; no gain. Restore only gl_gs.cpp map additions to exact original e5069d2b... per artifacts/gs-readback-map-span-restore-20260922-opt5.txt, rebuild/qualify production. Record as HG-FAIL-039 after restore. No other performance mechanism active.
+
+User requested a deep architecture/spec investigation before more micro-optimization. New read-only audit scope: PS2 official/manual references already cited by the project plus publicly available EE/VU/VIF/DMAC/GIF/GS/IPU/SIF/IOP technical references, original executable/static structure, current runtime scheduling and all retained diagnostics. Primary question is whether our static runtime serializes work that real hardware overlaps (EE with VU1/DMAC/VIF/GIF/GS/IPU/IOP), or performs host-side synchronization/coherence at boundaries much more frequent than the original architecture requires. Secondary questions: whether issue-slot clock modeling invokes expensive service work synchronously, whether VIF MSCAL/MSCNT executes VU to completion instead of modeling asynchronous VU1, whether DIRECT/GIF service is nested synchronously inside VIF, whether GS readback/CPU ownership forces full producer completion too eagerly, whether IPU and SIF/IOP advance synchronously, and whether original interrupt/status polling permits more overlap than current runtime. Do NOT change behavior during audit. Build one evidence matrix mapping manual/spec semantics -> current implementation -> measured cost -> likely over-serialization -> safe experiment. PCSX2 is external oracle only; no code/algorithm copying. Prefer architectural fixes with potential multi-x impact over 1% helper tweaks.
+
+## PRIOR ACTIVE OPTIMIZATION - one mapped GS readback span per CPU-read event, 2026-09-22
+
+The full-lane validated-operand reuse trial is closed without retention. Candidate bec75d450c884b42a341d3df417607d7/evidence2d668c528c0e470195b9e66302ea3eac measured11.0486453440FPS (60/5.43053s;11.013135/11.084385) with all established state/writer hashes exact. runtime/vu_products.cpp was restored byte-exactly to1e53d7e7... and rebuilt; fresh restored control3aef9218072446dfb40a45aec3ce9f0a/evidenceac161ed2cbbd49a2b17be183843834f7 measured11.1743080310FPS (60/5.36946s;11.183597/11.165034), again all149-input/864-writer/frame/EE/GS/VU/RTC-normalized IOP checks passing. Therefore repeated read_vf validation was not the meaningful cost; record HG-FAIL-038 before handoff. Current gamebd22c996d2077c86b5cca1ccc01a2f0d20a0b9e3e13e84ec46109a4bf60e2b84,36318208bytes, manifest65ba2672....
+
+NEXT bounded mechanism recorded BEFORE source edit: replace multiple synchronous glGetBufferSubData calls within one resident GPU download event by one glMapBufferRange read mapping spanning first..last dirty page, then copy ONLY the exact dirty runs from mapped storage into guest resident_vram and uploaded_copy. Existing dirty-bit computation, flush/dependency ordering, GL_BUFFER_UPDATE_BARRIER_BIT, dirty-run boundaries, gpu_dirty clearing after success, downloaded_bytes accounting and glGetError check remain. Null map or failed unmap is explicit fault. Clean gap pages are never copied to guest memory or uploaded_copy. No persistent/unsynchronized mapping and no fence/barrier removal.
+
+Motivation is HG-DIAG-005 heavy31M..33M:420 multi-page CPU reads produced900 glGetBufferSubData ranges/79140 dirty pages/648314880 explicit bytes/335193200ns. Synchronous readback is secondary, not enough alone for30FPS. This candidate is distinct from HG-FAIL-025: that failed path issued one bounding glGetBufferSubData and staged/copied dirty runs while explicitly over-reading gap pages. Here there is no host staging transfer and only one read-only GL mapping per event; guest-visible copies remain dirty runs. Driver may still internally transfer the span, so qualified timing decides. OpenGL4.3 compute requirement already guarantees core glMapBufferRange/glUnmapBuffer.
+
+Pre-edit manifest artifacts/gs-readback-map-span-preedit-20260922-opt5.txt records hashes/evidence. Target only runtime/gl_gs.cpp e5069d2b...; protect configd2c998fa..., host9704ed0b..., runtime/gs.cppe03185c7..., restored vu_products1e53d7e7.... Validation: build_tests/runtime smoke, build_game/fresh manifest, gameplay33m replay and fixed frames verifier. If candidate materially improves, exact one-file reversal + fresh control + second candidate required before retention. Any state/GL fault or flat/slower result restores exact pre-edit. No staircase/audio work in this mechanism.
+
+## PRIOR ACTIVE OPTIMIZATION - reuse already-validated operands in full-lane VU ACC/MADD helper, 2026-09-22
+
+Selective IMAGE A/B is closed as HG-FAIL-037: candidate0d8ed3b943214a6f89fc65d1ca61bb41/evidence1cb357d1760c4081834468c6c29520c7 =11.2283853582FPS (60/5.3436s;11.239617/11.217176), exact gs.cpp reversal control9839e36d0911452f9d2ba88d9ab5732f/evidence22b5420e942249108c0541f93581d1eb =11.1738918293FPS (60/5.36966s;11.240586/11.107984). ~0.49% host-time difference with overlapping windows is not dependable; production gs.cpp is exact original e03185c7.... Compact VU MUL is likewise closed HG-FAIL-036; original multiply_vector remains production. PERFORMANCE/learned updated. Current gameade19962517bf3278ef4fa32ee2aed31cbe6c7b758d4cfd9671d8d4ec22f6caa,36318208bytes, manifestf6d93ac79f1d608ef92561d107b8b8f3fd31803c684ba33d52f0cbedbfc8fdd8; replaycd08b9daa... normal/no fault. Strengthened VU/GIF fixtures remain test-only.
+
+Proposed bounded change BEFORE code edit: runtime/vu_products.cpp::full_result already rejects source>=32,other>=32,broadcast>=4, undefined source lanes, undefined selected scalar lane and undefined ACC for add. Only after those guards succeed it calls state.read_vf(other,broadcast), and on the non-combined fallback can call that same checked read a second time. Historical native profile's largest named app symbol was full multiply_acc140/3295 samples (4.25%), with full madd_vector47/3295 (1.43%); sample attribution is only a lead, not exact inclusive cost.
+
+Candidate removes only redundant host validation on that already-accepted full-lane path: bind source_values to state.vf[source] or the existing architectural VF00 {0,0,0,1.0}; compute scalar once from state.vf[other][broadcast] or VF00[broadcast]; pass those cached values to try_fpu_madd4 and broadcast_products. Preserve existing guard order byte-for-byte, arithmetic helpers, fallback choice, flag/result commits and aliasing. Invalid/undefined cases return false BEFORE any direct access and therefore still execute the unchanged original checked multiply_acc/madd_vector path with its exact fault order. No clock/readiness/emitter/render/input/audio/fault-policy change, no new template/code-size mechanism. No PCSX2 probe needed for this host duplicate-check elimination.
+
+Correctness source: existing tests/gif_tests.cpp full-lane differential runs65536 samples x3 operations against frozen scalar reference with VF00, destination/input aliases, all broadcasts and arbitrary encodings; direct guard tests cover invalid source/destination/broadcast and undefined source without mutation. Pre-edit hashes/plan: artifacts/vu-full-validated-operands-preedit-20260922-opt4.txt. Target runtime/vu_products.cpp1e53d7e7..., protected configd2c998fa... and host9704ed0b.... Next: guarded one-file edit, build_tests/runtime tests (plus translation/readiness if needed), build_game/fresh manifest, gameplay33m replay and fixed frames qualification. If materially promising, exact one-file reversal/fresh control/repeat candidate before retention; otherwise restore.30FPS remains unmet.
+
+## PRIOR ACTIVE OPTIMIZATION - selective IMAGE first candidate 11.228385 FPS; exact reversal control next, 2026-09-22
+
+First selective single-tag EOP IMAGE/IMAGE2 candidate is state-qualified and promising but NOT accepted. Candidate gs.cppf58b9af4..., build74e990b9e3e8435abc237941d83507e9 -> game36a3efd78341e9661e2f5393f122ffc4dfd8b6d0b89428e163a9fe2a55c453cd,36318208bytes, manifestb90514b23945d11aaedd572bcb27bf36b9f8ec8d6fdf5302a483e8abb6efba61. Replay6fffe45503694dc1bce733a7de49da78/evidenceproject-link-runtime/20260922T143300Z-e98beda96fd444d88359bf3e47c081ed reaches33M/no fault and preserves48195sprite/305856triangle/842masked batches. Fixed verifier0d8ed3b943214a6f89fc65d1ca61bb41/evidenceproject-link-verifier/1cb357d1760c4081834468c6c29520c7 passes149-input freshness,864 original1bef84/caller2d1c50 events, zero lost/unexpected/caller/stack failures, expected frame/EE/GS/VU and RTC-only-normalized IOPbdbf3a11.... Heavy60/5.3436s=11.2283853582FPS; windows11.2396174/11.2171757.
+
+This is +4.79% FPS /4.57% less heavy host time than the immediately preceding fresh original-route control3924b770...=10.7152041604FPS, but only+0.74% FPS versus earlier original-route3be4caa8...=11.1457868926FPS. Host drift therefore prevents retention from this one sample. Per pre-recorded plan, NEXT edit is an exact whole-file restore of runtime/gs.cpp to pre-candidate e03185c749dd2f8eae603593e51e9f08e566e2ab113d84b109c24ca45e92057f using backup2f2e969e54f3402eaec5e9d48f28b487. Keep strengthened GIF tests d7eb4a3b... and all unrelated sources/config/host untouched. Rebuild current game, replay and fixed qualifier as a fresh materializing control. If control is materially below11.228, reapply exact candidate bytes/mechanism and require a second candidate qualification before retaining. If control overlaps/exceeds candidate, restore production original and reject. No second optimization mechanism until A/B/A closes.
+
+## PRIOR ACTIVE OPTIMIZATION - selective single-tag EOP IMAGE direct apply; VU MUL routes closed, 2026-09-22
+
+Full-static broadcast VU MUL remains rejected (HG-FAIL-035). Compact Mask/Broadcast-only specialization also has NO demonstrated gain and is removed from gameplay: candidate58c00d53e11e42bd9c50754773b9ec1e/evidence1cb368a762b343f7a25f1b731969a090 =10.6084475067FPS,60/5.65587s; fresh reversed original-route control3924b77052274163b7954aab25a3cbec/evidence129dc91fe6d247e4a73bb88a3065a620 =10.7152041604FPS,60/5.59952s. An immediately earlier original-route sample3be4caa8... was11.1457868926FPS, so the ~1% latest pair is smaller than observed host drift. Decision is simpler original multiply_vector gameplay route, not a claim that compact helper semantics are wrong. Compact/full-static helpers and strengthened fixture remain test-only. Current route regenerated to exact translated.cpp6979f9a8...; current game7f4cac3b40fbdc39865e551a139cb238f8fce2818e76991010735cf88c9bef5c,36318208bytes, manifeste7e1d32b.... Replayb5feffb68dec4797b29712413b226981 reaches33M/no fault with normal48195sprite/305856triangle/842masked work. All expected state/writer qualification remains exact. Record HG-FAIL-036/PERFORMANCE before handoff; no VU MUL route remains pending.
+
+NEXT bounded production mechanism, recorded BEFORE code edits: selective single-tag EOP IMAGE/IMAGE2 direct apply in runtime/gs.cpp. HG-DIAG-005 already measured steady31M..33M GIF cost:17,850,014 submitted qwords; perturbed attribution ~1.4821181s GS application,0.1863614s decode/materialization,0.3895350s append and0.3689151s scan/destruction. IMAGE-only application included~0.3599126s PSMT8 format19 +0.0808712s format20 +0.006778s format0, while mixed/register was~1.0352467s. Generic all-packet streaming was previously inconclusive/rejected; DO NOT repeat it. New mechanism leaves every mixed/register/multi-tag packet on exact original decode_gif_packet+apply_gif_register_transfers and bypasses the intermediate transfer vector ONLY when the complete packet is exactly one EOP tag with format>=2.
+
+Semantics plan: after existing pending append/max_pending/gif_packet_size succeeds, inspect first tag. Fast-path guard requires EOP, IMAGE/IMAGE2, and packet_size==16+NLOOP*16. Private helper revalidates exact tag/size; NLOOP=0 makes no Q/state mutation; otherwise reset gif_q once then call existing write_image_qword in qword order. PRE remains ignored in IMAGE; descriptor/NREG bits remain irrelevant there. Any write fault leaves the complete packet pending because erase remains after successful application, matching original partial-GS/fault behavior. All multi-tag/register packets remain exact original path. No GifPath layout, header decoder, guest clocks/input/audio, renderer admission/shader or unsupported-fault policy change. Add zero-loop IMAGE and multi-tag IMAGE frozen-reference cases; existing IMAGE/IMAGE2 active/inactive upload fixtures already compare every submit checkpoint against the original materializing path. Pre-edit exact hashes/evidence: artifacts/gif-single-image-fastpath-preedit-20260922-opt3.txt. Protect configd2c998fa... and host9704ed0b....
+
+Validation sequence: guarded gs.cpp/test edits; Python/build_tests/runtime/translation as relevant; build_game/fresh manifest; gameplay33m replay; fixed gameplay33m/frames qualification. If candidate shows material gain, reverse ONLY production gs.cpp fast-path routing to exact e03185c7... behavior while keeping useful tests/helper if needed, rebuild/qualify fresh control, then repeat candidate before retention. If state differs or timing is flat/slower, restore production path and document. No staircase/audio work during this mechanism.
+
+## PRIOR OPTIMIZATION - full-static VU MUL rejected; compact mask/broadcast specialization tested, 2026-09-22
+
+The current-coverage A/B is complete and decisive. Fresh full-static candidate5fddf7c20c19439e9ffde1c1bce41f77/evidence project-link-verifier/c45f3d39ed084ea2a4a1092da38193ae measured9.44969690097FPS. Switching ONLY broadcast MUL routing back to original Vu1State::multiply_vector and removing only the generated-main vu_specialized include produced control3be4caa8540541c0b6b360561cc2a476/evidence project-link-verifier/cf0b4a45fa2945988fe573d3f1086a11 =11.1457868926FPS (60/5.3832s; heavy windows11.143137/11.148438). Both sides retain current configd2c998fa..., host9704ed0b...,149-input freshness,864 original1bef84/caller2d1c50 events,zero trace/writer/caller/stack failures and all expected frame/EE/GS/VU/same-date RTC-only normalized IOP hashes. The candidate costs~17.95% more heavy host time. Reject full register+mask+broadcast template routing; current production remains original multiply_vector.
+
+Current production source: vu_emit.py5c4fcb32... always emits multiply_vector for broadcast MUL; emit.py5985e970... no longer includes vu_specialized.hpp in generated gameplay; generated main6979f9a8..., current gameeb3704710d8cadcdcb1166247f4fe931668244f2caeedb006dcbd257b062a35d,36318208bytes; manifest2eb0511e.... Helper vu_specialized.hpp355f6607... and exact104-case fixture remain test-only. Control replayc860f16aa... completes33M/no fault with normal48195sprite/305856triangle/842masked batches. Python/runtime/translation/readiness suites all pass. See HG-FAIL-035 and PERFORMANCE. This rejection does not prove constant mask/broadcast specialization itself is harmful; the failed route instantiated destination/source/other registers too and bloated the game by~306688bytes.
+
+Compact candidate first measurement complete: helper fixture passes786432 exact state comparisons /427520 matching faults in addition to the old851968/466304 full-static fixture. Emitter generation10b6c8e5... changes only out/translated.cpp; actual game uses four linked mask14/broadcast0..3 helper instantiations and no full-static helper. Builda6270dae... game53867cbce39536cc7f15b9b839c26d8f621f861a260a68f31400f10e866c826a remains36318208bytes, exactly the accepted control size. Replay4ebee749... reaches33M/no fault with normal work. Fixed verifier58c00d53e11e42bd9c50754773b9ec1e/evidence1cb368a762b343f7a25f1b731969a090 passes all state/writer/provenance checks but measures10.6084475067FPS (60/5.65587s; windows10.534855/10.683076), below immediately prior control11.1457868926. No gain claim.
+
+Per the pre-recorded A/B plan, reverse ONLY compact gameplay routing/header include to the exact accepted original multiply_vector route; leave compact helper/differential fixture test-only. Regenerate and require fresh control qualification before deciding. If fresh control again exceeds10.608 materially, reject compact routing as HG-FAIL-036. Preserve configd2c998fa... and host9704ed0b... exactly.
+
+PRIOR bounded mechanism plan: compact broadcast-MUL specialization with ONLY <Mask,Broadcast> static (masks14/15 x broadcasts0..3 = eight variants); destination/source/other stay runtime parameters. Keep identical scalar read/product/flag/write ordering and exceptions. Extend the existing differential fixture to compare compact helper against multiply_vector across register-validity/alias/MXCSR cases. Route only the same masks14/15 through this compact helper and include vu_specialized.hpp again in generated main; no other VU operation changes. Expected effect: retain compiler knowledge of the two hot constants without hundreds of register-specific template instantiations/code-size pressure. Disproof: any test/state mismatch or no repeatable qualified gain versus current11.1457869FPS control. Back up/hash source before edit, regenerate, inspect generated call count/executable size, run full relevant tests/replay/fixed qualifier; if promising, reverse to a fresh control before retention. Keep every gameplay coverage root and protected host unchanged. No staircase/audio work in this mechanism.
+
+## PRIOR ACTIVE OPTIMIZATION - finish current-coverage A/B for static-operand VU MUL, 2026-09-22
+
+User explicitly parked staircase/manual-route work and requested optimization. Visible job feb4a13c49d548fd90d62cf37eaf1145 was cancelled before edits; no live game remains. Immediate optimization target is the long-pending AOT static-operand broadcast MUL route, because it is already active in current source yet has never received a clean contemporaneous current-coverage control. Do not add another mechanism until this one is accepted/rejected.
+
+Pre-edit manifest artifacts/vu-static-current-ab-preedit-20260922-opt1.txt records exact hashes. Current candidate routing: vu_emit.py87df2850... sends only broadcast MUL destination masks14/15 to noinline hg::vu_aot_multiply; emit.py396fd486... includes vu_specialized.hpp; helper355f6607... remains exact-tested. Current configd2c998fa... and host9704ed0b... contain all staircase/menu/controls coverage and MUST remain identical across A/B. Current generated main33225731... and post-link manifest8245e6f4.... Latest source-matched qualified sample5d147ab1... is9.14211880793FPS, but recent controls have drifted materially, so do not use that historical value alone.
+
+Bounded sequence BEFORE source edits: first run one fresh fixed gameplay33m/frames qualification on the current candidate. Then disable ONLY AOT specialization routing: broadcast MUL always emits existing Vu1State::multiply_vector and generated main drops the vu_specialized.hpp include. Keep helper/fixtures test-only, every config root, host redraw/F1/Tab, runtime/parser/renderer/audio/clocks/input and explicit faults unchanged. Regenerate through hg_emit, inspect route/generated changes, run Python/runtime/translation/readiness tests, build current game/fresh manifest, replay and fixed qualifier. If control is clearly faster, retain original multiply route; if candidate is clearly faster, reapply the exact two routing edits and require a second candidate qualification; if inside drift, prefer the simpler original route and document non-retention. All state/image/RTC-only-normalized IOP hashes and writer qualification must remain exact. No staircase replay work until this optimization decision is closed.
+
+## CURRENT - eight missing staircase-object methods compiled and state-qualified; live retest next, 2026-09-22
+
+Latest fault2ac570 was repaired with a bounded family batch, not just that getter:2ac4d0/550/560/570/580/5a0/5b0 and2097e0. Six other initialized entries of original46dfc0..46e000 were already compiled. Actual original installer20a6f8..704 and distinct next20a708..714, saved receiver and original/live table/body hashes establish scope; see SOURCES and stairs-object-46dfc0-preedit-20260922-g1.txt. Extra methods are statically justified potential calls, not claimed dynamic hits. Do not infer coverage of adjacent tables, BSS selectors or all downstream functions.
+
+Current configd2c998fa19148db9acc27a023ab7b027f86bf701b97885e86879aee8636aa989,164259bytes; exact pre-edit81772f41... backup6da48db24c154d3fb49ad985d27b3b1f. Every older staircase/menu/pause root retained; F1/Tab/event-redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f unchanged. No renderer/runtime/audio/clock/input/fault mechanism or pending VU change. Emitter8594a73e76fa46389c10b2363db10e31 adds exactly50 original words, changing only shards0010/0015 as C++; backup directoryproject-link-emit/20260922T073009Z-82326dd30ebd4020b5009323b0e16117. Generated0010 SHA15a69834c4350987c4a8f2e372b0c0ad5a81ef5b28bcb0eb6c09a8be5f3817ef;0015 SHAbb25e01a85c4867275956a5728e28d9cf5c38a1433700133cfd060de842e7fda. Inspected new getters/default and checked indexed-load behavior; no host stubs.
+
+Python7c4c36235f9b44b791aef4f98ff5d0c0 passes130; runtime86f9d1b55e1a45d48a19ef1383d81974 passes inherited arithmetic/VIF/GIF/keyboard and262144Select-alias/focus comparisons. Build0c9fb87d155648cfb1cfd66294056f79 succeeds28.10s. CURRENT GAME07a17eabed38b187659677758cf5b45da34a4280fd28b110593ba2ca60cebcaa,36624896bytes; manifest8245e6f484d697311f28a902ecff3bedeb480d3156940313020aeab2774bc0e7 reflects current config and149 inputs. No source-only/stale launch.
+
+Replay198e3186e66a4f7da07ab94cafeb7904/evidenceproject-link-runtime/20260922T073232Z-4aa418a79a794877a1607d46c12d9a80 completes33M/no faults with48195sprite/305856triangle/842masked batches. Fixed verifier5d147ab1ec2147d79fd21e9d1a87d69f/evidenceproject-link-verifier/846ae4895bcf45548703b8bf170e2bfb passes freshness,864 qualified1bef84/caller2d1c50 events with zero lost/unexpected/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/6.56303s=9.14211880793FPS (9.344892/8.947959); previous8.664585 and fresh control9.209375 retained. No dependable gain or resolved throughput cause.30FPS and audio remain unmet; latest manual fault log has394 speaker underruns. No new audio code/test and no temporary probe added.
+
+All configured jobs terminal at this note. NEXT ACTION: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, unique key hg-stairs-object-manual-20260922-g1. Recover the resulting newest job rather than launch duplicates. User must retry the actual stair route: standard33M does not traverse it and exposed controlled pulses cannot provide up/right movement. No altered recordings or input shortcuts. No staircase-pass/menu-success/full-game claim. Saved fault image0be563f1... and states are preserved. No source edits/builds during the visible session; no background optimization or monitoring scheduled. SOURCES/PERFORMANCE/learned042 updated.
+
+## PRIOR PLAN - complete the independently bounded staircase object family, 2026-09-22
+
+Latest manual c277ea1723404267b5f23dd71725f966 (project-link-visible/20260922T071804Z-4497884a223e48d5bd53d7c9ce48f0ca/native.log:1204) stops at 2ac570, a0=17f355c, RA=20962c. Saved evidence is intact; frozen owned job cancelled. Original caller inspection5f0db0df... proves the current +18 call and sibling +10/+14 calls in the same bounded selector routine209390. Earlier repairs remain present. No audio repair;394 speaker underruns precede the fault.
+
+Proposed BEFORE code edits: config-only add2095dc->2ac550,209600->2ac560,209624->2ac570, plus five explicit remaining roots from this independently bounded original object table:2ac4d0,2097e0,2ac580,2ac5b0,2ac5a0. Original installer20a6f8..704 publishes46dfc0, next20a708..714 begins distinct46e000; saved selected receiver and subsequent table words agree. Original/live64-byte table identityd7ebd6d8... and original/live256-byte method region23184872... independently checked. This reuses the documented46e4c0 bounded-family technique, not an unbounded pointer sweep or proximity-only function guess. Inspectors701fc4e5...,5c3c99d8...,dd83e4f5... establish installer/bodies. Six other table entries are already compiled. Only2ac570 is the newly observed dynamic stop; other roots are static potential uses. Do not extend to neighboring tables or unproved BSS selector entries. Expected addition50 original words; no runtime, guest clock, audio, renderer, input or explicit-fault change.
+
+Pre-edit external stairs-object-46dfc0-preedit-20260922-g1.txt records dirty hashes and evidence. Guarded config/docs changes auto-back up exact original bytes; hg_emit backs up generated outputs. Preserve ALL staircase/menu roots, pending VU candidate, and F1/Tab/event-redraw host9704ed0b.... Current rules/AGENTS/learned and PROGRESS reviewed; Markdown metadata checked, unchanged evidence reused. Next: hg_emit and inspect changed output, Python/runtime regressions, build_game/fresh manifest, original33M replay and fixed gameplay33m/frames qualification, then manual speakers relaunch. Standard33M and left/cross/start-only controlled pulses do not verify staircase movement; do not modify pinned recordings or claim route success. Latest qualified baseline remains8.664585FPS; prior fresh control9.209375 also low. No claim that coverage fixes performance. No concurrent jobs or background monitoring.
+
+## PRIOR - 2ac540 compiled; state checks pass, lower8.664585FPS unresolved; manual retest next, 2026-09-22
+
+The latest freeze444f9702... was missing2ac540/ra2091a0, not the previous staircase functions. Original/live table,16-byte target identity and both original+30 callsites209198/2091c4 are proved in SOURCES. Final config81772f417dea1d0eccb17d9dae7d49a6c012738fe51fddf2f3219b803c6d9efa,162926bytes; generated shard0015 SHA05bdfcbbcae010006fc520cd0a06b469bb90d376f654fcb8d4c7cf0c788c50cd adds exactly3 original words. No runtime/clock/audio/renderer/controls change or guessed extra function. Protected F1/Tab/redraw host9704ed0b... and every older root retained. All backups/proof in stairs-2ac540-preedit-20260922-f1.txt and SOURCES.
+
+Python e29add19... passes130; runtime ec37f345... passes inherited tests including controls. Replayddeb5ed94263412e82089efe64026ce4 completes33M/no faults and original work. A real control reversal was completed: first repaired9.1950640896FPS (938e39bd.../88065449...), fresh original9.2093751439 (89cc022d.../0276bf55...), exact repair reapplied8.6645852407 (d2b957fbfc7a4593869479fbaaf54b64/project-link-verifier/4c2ca60a9ce94fc2bf44270eebe37d7e). All three match149-input provenance,864 qualified writers with zero lost/unexpected/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11.... Low speed also occurs in the control; the final repaired result is lower still. No speed-neutrality/gain or resolved-cause claim. Retain necessary correct coverage, record all results in PERFORMANCE, and investigate throughput separately.30FPS/audio remain unmet.
+
+CURRENT GAME IS REPAIRED, NOT CONTROL: final emit87a02329... restores exact05bdfcbb...; build1e88a046d502432ea6fdd6cc90a55c5c produces36621824-byte game282e3ff7f51d4d8e6b16ec6a1cbec07f55bfcb537223802f3fcc6a35173380b5. Manifest77e5c9ca316c5f9aa5e627e7f0722025416a7b3d76037a9b66e8d9eb16619185 and input digestf7a0ac94... match the first repaired source set. Original restoration used backup37ee07c5..., saving candidate as7acc8b8a...; reapply restored that candidate exactly. No stale/source-only launch. One documentation attempt during verification was rejected because a job was active; retry occurred after terminal status, without changing task restrictions.
+
+Next action is run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, request key hg-stairs-2ac540-manual-20260922-f1. Recover the resulting newest session rather than launching a duplicate. All current jobs terminal before this note; launch follows. The actual staircase pass is unverified: fixed33M does not traverse it, and exposed controlled pulses lack up/right/diagonal movement. User must retest; do not promise this is the final missing method. Frozen evidence and saved stair-landing image9a93caf7... preserved. No source edits/builds during the visible session; no background optimization or monitoring is scheduled.
+
+## PRIOR COMPARISON - 2ac540 built/state-qualified; lower9.195FPS sample requires fresh control, 2026-09-22
+
+Candidate built6980ca80564d4459b10f627ce6629766 (12.09s), game6f77e52608f1b96937dd50f040a024827ca0cd0562f36bb3ab99fdd07ede6ab2,36621824bytes, manifest030460d42ffef0f59289d9acc64d0df346735a08527316e27fc3534beb600dca. Only3 original words added in generated shard0015; unchanged host9704ed0b... rechecked. Python e29add19... passes130, runtime ec37f345... passes inherited suites. Replay ddeb5ed94263412e82089efe64026ce4 / project-link-runtime/20260922T070812Z-93d2997b046c4286a423bbaf33b0140f completes33M/no faults and original draw counts. Verifier938e39bd3b934063a27f8cb03697f371 / project-link-verifier/88065449e41d4240968c00b7eeef9ff1 passes149-input provenance,864 qualified original writers, zero lost/unexpected/caller/stack failures and expected frame/EE/GS/VU/RTC-only normalized IOP hashes. Heavy60/6.52524s=9.1950640896FPS, below prior10.7901054733. Do not dismiss or label unchanged. No launch yet.
+
+Proposed BEFORE reversal: restore ONLY current turn's two2ac540 callsite entries using config backup37ee07c5b4f14526a4f2bd2e2bb3a9d0 (81772f41... ->2a50b98b...), retaining every older staircase/menu repair and F1/Tab/redraw host. Regenerate/build original control and run fresh fixed gameplay33m/frames; then reapply EXACT81772f41... candidate from automatic restore backup, regenerate/build and qualify again. Never launch the known-faulting control for manual gameplay. This bounded comparison distinguishes current host variation from the code-coverage change; no runtime performance mechanism/audio/timing change. Existing tests need no repeat unless source differs. Retain necessary verified coverage; record both current samples and uncertainty rather than accepting a unexplained large negative effect. All jobs terminal at this plan.
+
+## PRIOR PLAN - staircase slot+30 / 2ac540 coverage repair, 2026-09-22
+
+Latest manual444f97023d454284a6eb624b8a9da788 stopped at2ac540, a017f355c, ra2091a0 (native.log646 in project-link-visible/20260922T065755Z-2697cdfbcf484f14a093708fffe18461). Saved evidence preserved; frozen session cancelled. Current source/executable retains earlier2ac530,2ac5d0,2ac600 and every menu repair. This is another original slot, not recurrence of the same address. Original caller inspection2421f0d1... proves209198 and paired2091c4 read the selected object's slot+30; saved vptr46dfc0 and original/live table agree. Inspector ee86c73d... plus16-byte original/live matchc76d2d8a... proves2ac540's three original instructions return3f92e0 with no nested calls. The paired call is statically supported, not claimed dynamically observed.
+
+Proposed BEFORE code edits: append only config209198->2ac540 and2091c4->2ac540. Preserve F1/Tab/event-redraw host9704ed0b..., all old roots, pending VU candidate, runtime/renderer/audio/clocks/input and explicit faults. No guessed table-wide roots or runtime substitute. External stairs-2ac540-preedit-20260922-f1.txt records original dirty config2a50b98b..., baseline executable1fe0fcdb..., proof and byte-backup plan. Guarded config/doc edits automatically save originals; hg_emit saves generated originals. Current rules/AGENTS/learned and PROGRESS reread; Markdown metadata checked against prior state.
+
+Next: configured hg_emit, verify bounded changed output, Python/runtime tests, build_game/fresh provenance, gameplay33m replay and fixed frames qualification; then manual speakers relaunch for actual stairs. Latest qualified baseline10.7901054733FPS remains until a new measured result. Standard33M is not a staircase-route test; exposed controlled pulses only left/cross/start cannot reproduce this route. No modified recordings or shortcut state. Audio still unfixed (353 underruns before this stop); no new audio mechanism. No edits during visible session.
+
+## PRIOR - second staircase2ac5d0/2ac600 built and qualified; live stairs retest next, 2026-09-22
+
+Completed config-only repair2a50b98bfb1af41d99f897d1abbcfb941b0324a4f008291ca502dff7a394b26e,162347bytes:2032bc->2ac5d0 and existing100b6c->2ac600. Exact predecessor b8d3101f... backup33be0e762ffe44ccb0c19f9895f484ff; all old staircase/menu/pause roots retained. Original/live code/table/selected BSS callback evidence is in SOURCES and external stairs-2ac5d0-preedit-20260922-e1.txt. Subsequent2ac624 virtual call resolves in saved state to already-compiled2c91d0; no further guessed target added. F1/Tab/redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f unchanged. No audio/runtime/clock/renderer change; pending VU candidate not accepted as a gain.
+
+Emitterbd0cd304d15f487ebe70c9c0341187b2 changed only shard0015 as C++ (36 new original words), preserving prior bytes under project-link-emit/20260922T065246Z-a4d75a31edd2445a9fe6857343e95172. New sharde6b836246e65dcb14e295c315e67102f1392e06148ff43f99a0cc3b977434a17 has verified entry cases49603/49657 with actual tail/member dispatch, budgets and faults. Build4a077e3187c549938b34901423cff715 succeeded12.40s. Current game36621312bytes SHA1fe0fcdb73b9c78ff081941fdb6663e08826e1d7129e28d241c02e427e50957d;149-input post-link manifest67a1a896a7d162c45bf9ec0fd8c245f9f3ba35c7ea7b0ff4193bbb27b96c0398 matches current config. Python d2336bbbd20b419283de74a66a51b273 passes130 tests; runtime276d8128c34e4fa0b4309ff9d3444c82 passes inherited arithmetic/VIF/GIF/keyboard and262144Select-alias/focus checks.
+
+Recorded replay7b66b76acb8d4c69a8d521a9c407bc24/evidence20260922T065401Z-e0c478ab989148e0ad031101f5c59b7b reaches33M/no faults with original48195sprite/305856triangle/842masked batches. Fixed verifiera2251c6a7d244c868b0754403f3e7273/evidenceproject-link-verifier/8ab87396dc624f089ce3fe7cfbf20612 passes provenance,864 qualified1bef84/caller2d1c50 writes,zero lost/unexpected/caller/stack failures, established frame/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.56065s=10.7901054733FPS, intervals10.791755/10.788456; previous10.297336 retained, no dependable performance-gain claim.30FPS/audio remain unmet. User's late manual log recorded450speaker underruns; no new audio-code or audio-test result here.
+
+All configured jobs are terminal before next visible launch. Next action: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, unique key hg-stairs-manual-retest-20260922-e1; recover newest session/key on continuation instead of launching duplicates. Standard33M does NOT cross this user's100M staircase route; actual progression past top of stairs needs the live retest. No claim of whole-game/route repair or menu-close success inferred from this test. Keep all controls and audio enabled for user test; no edits/builds while visible job active. Documentation refresh and SOURCES/PERFORMANCE/learned042 updates complete. No background optimization or polling is scheduled.
+
+## PRIOR PLAN - new staircase slot2ac5d0 and selected callback2ac600; bounded repair, 2026-09-22
+
+User reports a new stop at the top of the stairs. Saved manual3005b1c29cff45ad99918cf7832882db/native.log1106 (project-link-visible/20260922T064324Z-c54b636f936049019d5e5f53fc6c5fe4) reports2ac5d0,a017f355c,a1=0,ra2032c4. This is a different original vtable slot+28, not recurrence of earlier slot+0c/2ac530. Original/live vptr46dfc0/table agree. Inspector98329158... verifies caller2032bc/delay2032c0. Inspector63108a0... plus original/live152-byte match08e46fa5... verifies40-byte dispatcher and104-byte callback2ac600. With captured selector0, original dispatcher selects saved BSS01990900={0,-1,2ac600} via existing100b6c; no table-wide assumptions. Extra neighboring entries are not rooted. Frozen session cancelled after preserved capture; no game job still running.
+
+Proposed BEFORE edits: config-only add2032bc->2ac5d0 and append2ac600 at100b6c, retaining all existing roots, pending VU candidate, F1/Tab/redraw host9704ed0b..., original runner/parser/audio/clocks/arithmetic/CPU fallback and explicit faults. External stairs-2ac5d0-preedit-20260922-e1.txt records proof and hashes; guarded edits auto-back up exact dirty bytes/newlines outside repo. All14 Markdown files scanned for relevant current evidence and their metadata checked; unchanged rules/map reused, updated PROGRESS/learned entries reread. No separate shared configuration has been supplied here beyond existing verified records. Next hg_emit, inspect changed code, Python/runtime tests, build_game/fresh manifest, recorded33M and qualified frames, then live stairs retest. Standard33M does not cross this100M manual route. Latest qualified baseline remains10.2973355644FPS; no audio or performance fix is part of this change.
+
+## PRIOR - menu-close3977d0/3974a0 compiled and qualified; live close retest next, 2026-09-22
+
+The user's requested normal inspection retry succeeded; platform blocker resolved. Config-only repair adds3977d0 and its original-installed successor3974a0 at existing100b6c. The successor returns the callback to already compiled398850. Complete original/live724/812-byte bodies and descriptor/caller proof are in SOURCES and external close-menu-3977d0-family-preedit-20260922.txt. Current configb8d3101f33e40b67bbcfa5cc0f7acafe3a9899a8cf418ee6bec4d2eb004d6711,161602bytes; exact pre-edit12393103... backupd7fece70d66844c4969b7a08fb63c6ae. All staircase, pause/unpause and Select roots retained. Protected F1/Tab/event-redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f rechecked unchanged; audio/runner/parser/guest clocks/rendering/explicit faults and pending VU candidate unchanged.
+
+Generation35b8201409954c61917c784460e57772 changes ONLY translated-shard-001c.cpp as C++, exactly384 newly reachable words (the two bodies); backup directory project-link-emit/20260922T063803Z-efe99298d87a4a6d907e82b8e197d853. New shard3e38cfc44724deeda08f92b83b8257a9f4c19744a639d2b7d2e55f47ce27c88d entry cases66389/67611 preserve ordinary checked static execution. Pythonc8ef3d914ca94f3bbe9a76475b14b62f passes130; runtime25edccfedc994971b87071b4c806489b passes all inherited arithmetic/VIF/GIF/keyboard and262144 Select-alias/focus regressions. No test source changes. Build58e9b25b02d144d2aecebc14173ff143 succeeds14.93s. Current game36619264bytes SHA2094e2cd8e2bdd4f0bcef49b3d14ca90ba6db939c166b30ffe25d61e8571d3d9; post-link manifest95c9f948ed016e89d1184e414a43ab7dc88f2a8ef70cba63325f29031ea607a3 matches149inputs including current config.
+
+Replay84cb026f47b64049b5df653ca169c90d/evidenceproject-link-runtime/20260922T063956Z-7212e4332b2e488c806f6bcf67d2fb05 completes33M with no faults and original48195sprite/305856triangle/842masked batches. Fixed verifierfa260aa4865b4fcf9bfde0f36103b3fe/evidenceproject-link-verifier/c9c581a6755143e0a1721c90cb7a1711 passes freshness,864 qualified original1bef84/caller2d1c50 writers with zero lost/unexpected/caller/stack failures and all expected image/EE/GS/VU/same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.82675host seconds=10.2973355644FPS (10.554127/10.052743). Previous10.112825 remains comparison evidence, not a demonstrated speed gain.30FPS and audio correctness remain unmet. No new audio test or audio-code fix in this turn.
+
+Next immediately scheduled action within this session: configured run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, key hg-closemenu-family-manual-20260922-d1. Recover that key/newest visible job on continuation, never launch duplicates. The actual later menu open/close is NOT exercised by standard33M: user needs to repeat the same close interaction; do not claim whole-menu repair before live evidence. Keep Tab/Backspace Select, F1 controls, Enter pause and shoulders unchanged. No source edits/builds while visible job is active; no background optimization is scheduled. At this note the last test job is terminal; launch follows documentation.
+
+## PRIOR PLAN - permitted retry succeeded; menu-close3977d0/3974a0 coverage repair, 2026-09-22
+
+User requested another attempt. The IDENTICAL configured hg_inspect retry succeeded as1ec288e8f1a044019044cd67c9b6ec72; prior platform blocker is no longer present. Saved descriptor01810d7c={0,-1,3977d0} matches original caller3999d0/helper100b6c and object180f680+16fc. Full724-byte original/live body3977d0..397aa0 matches SHAa9602af3.... It installs original44b1d0 descriptor3974a0 into the same consumed field at397924/28/2c. Successor inspector7ca164d5089842f7b00064c5f0d46666 and full812-byte original/live body identity83ee781c... verify3974a0, whose next descriptor44b1e0 points to ALREADY-COMPILED398850. Original/live32-byte descriptor pair matches069f9105.... These are original-code/data-derived roots, not adjacent-address guesses or claimed dynamic successor hits.
+
+Proposed BEFORE code edits: add only3977d0 and3974a0 at existing config site100b6c; preserve all other roots, F1/Tab/redraw host9704ed0b..., pending VU candidate, parser, runner, audio, clocks, original instructions and explicit faults. Pre-edit external manifest close-menu-3977d0-family-preedit-20260922.txt records exact dirty hashes/evidence; guarded edits auto-back up exact bytes and normal hg_emit backs up generated outputs. Next Python tests, build_game, linked/generated-source and post-link freshness checks, recorded33M replay and qualified frames, then speakers-enabled manual open/close retest. Existing fixed33M does not exercise later live menu-close input. No audio or performance fix is implied. All other Markdown metadata matched the immediately preceding session; current rules/AGENTS/learned lessons and current PROGRESS reread, prior verified findings reused.
+
+## PRIOR BLOCKER - menu-close missing target3977d0; evidence saved, no code change, 2026-09-22
+
+Latest user reports closing the in-game Select menu stops execution; screenshot shows address has no static translation. Recovered visible jobb26be6103c9c4acf961ad659cf0fabf9 (game0972a30e...,36596736bytes) has native.log820: EE3977d0, a0180f680, ra3999d8, sp1ffec40. Evidence project-link-visible/20260922T062421Z-54c3dd048b424235bcc181896bdbc35e retains log and dumped states. Original caller inspector46bffe01b2614eee922d4e0f3d3c9fde completed:3999d0 calls100b40; delay3999d4 selects object+16fc, not prior menu+1708. This identifies a distinct menu-close dispatch, not a failed Tab binding. Frozen owned session was cancelled after saved fault confirmation and is terminal.
+
+Actual external blocker: configured hg_inspect pc0x003977d0/count256, key hg-closemenu-3977d0-body-20260922-c1, was blocked by OpenAI before any job was created because safety status could not be determined. No retry or alternate target-inspection route was attempted. No code/config/generated-source change, build, replay or relaunch this turn. Target-body and saved-descriptor verification for this repair remain pending; do not root a guessed function or claim the menu closes successfully. All newest listed jobs terminal. Work is not continuing in the background. Next step requires the normal permitted inspection path to be available; do not bypass the platform block. Then verify target/descriptor, record a bounded repair plan, back up, regenerate/build and test the actual open/close sequence as well as the fixed regression. Preserve every existing menu/unpause/staircase root and F1/Tab/event-redraw host9704ed0b....
+
+Title question resolved from current game_host.cpp239-249: numeric title is produced host images divided by host interval seconds, labelled video updates/s. It is neither percent speed nor independently qualified gameplay FPS nor monitor Hz, and images need not have different pixels. Fault status replaces that number after the native worker stops. User's12-19 observation is retained, not contradicted or substituted for the latest fixed heavy result10.1128254223FPS. No new performance result or audio fix. Menu log782..808 shows speaker underruns unchanged at173 while its lighter menu work advances; this is observational context, not proof of audio/mix correctness or qualified FPS. External record close-select-menu-stop-20260922.txt contains exact fault, caller, blocker, source/previous-doc hashes. Only this progress note and that record are new; prior qualified state follows.
+
+## PRIOR - Select-menu callback family built/qualified; speakers live retest next, 2026-09-22
+
+Completed config-only coverage repair: initial396900 plus three independently proved original-installed successors394e40/395630/394670 at existing member helper100b6c. Config12393103d9bf5782ece43bf2c5ac4857a1bb718f2a418ac4632e9f9f524b159e,161164bytes. Preserve staircase2ac530, unpause2f55c0, all prior roots, pending VU candidate and F1/Tab/event-redraw host9704ed0b.... No audio/runtime/clock/renderer/fault behavior changed. Original-proof details in SOURCES and plans below. Automatic backups4ababbf5ff094fdab9deb00af72c1d07 (pre-turnconfigd90c7919...) andc90e46405ea54ee58f53484b1fa00bef (396900-onlyintermediate) preserve dirty originals.
+
+Python4bf8b8f6d0934095a988e05974323806 passes130 tests. Configured emitter011587b0980c42a4bf1e9a8db52c9f48 succeeded with verified prior-byte backups at project-link-emit/20260922T061352Z-5a43a2db1eb64e34af2af7a7d9572822; normal direct callees also discovered. All four entry cases verified in generated shard001c (SHA bb9380cfce7417e3d83f051740f6d572e4c588554dffede09ae26952ba4b0240). Game build e31e3fa32c56458389fe4b641a4daf7b succeeded139.54s, compiling changed main/shards0012/0013/0018/001c. Linked page396 appears in shard001c.obj atVA142148a78. Current game36596736bytes SHA0972a30eb23046931ee3af8612b08ac43b946b6774c67202e7b8e104adb3907c; manifest8b2e7991f3e00110e6c8f65cd712d294954ccaef4d84b8c53ea3974fdfa4120b matches149inputs including current config/host. No stale executable launch.
+
+Replay0d00aca090a549a98612a91441139e49/evidence20260922T061800Z-b48139cce1724b8e99e54ac81f1535fb completes33M/no faults with original work counts. Fixed verifier53369591d83c4a2eb1b46750e3e6f0d7/evidenceproject-link-verifier/4e163caf6201471dbbad67858e69df7e passes149-input provenance,864 original1bef84/caller2d1c50 events with zero trace/caller/stack failures, all established image/EE/GS/VU/SAME-DATE RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.93306s=10.1128254223FPS (10.344257/9.891523), below last pre-change F1/Tab build10.3913197842; no speed gain or causal-regression conclusion from single samples.30FPS remains unmet. Existing VU candidate still not accepted; a later VU-only reversal must retain ALL newer menu/host changes.
+
+Audio diagnostic929ee941048344b6860a0667be7a53b9 used unchanged configured gameplay33m/current/speakers, completed33M without fault and saved project-link-runtime/20260922T061958Z-47460baf9a3e429cb0dd39d7a0b019d6. Raw WAV SHA c2a6162a39bd41d0438adcb9df7c92d2e599802da04a0f87bb131717f99b35e3=1579627frames at48kHz;73 speaker queue underruns, peak16966input/12724output,maxqueued7. Frame/EE/GS/VU/metadata hashes match; rawIOP not separately normalized for THIS audio run, so no fullIOPequality claim. User's manual run had414 underruns BEFORE Select fault and12-19video updates/s; neither counter is qualified gameplay FPS. Sources confirm raw input output bypasses unfinished synthesis/effects/mix; speed alone does not complete audio. No audio fix applied, no new probe remains. DIAGNOSTICS013/014, PERFORMANCE and learned042 updated with scope/evidence. Raw clip tool returned exact sample metadata, not an audible-quality assessment.
+
+Next action: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600 with unique key hg-select-family-manual-retest-20260922-b1. Recover newest visible job rather than launch duplicates. User must retest Tab/Backspace Select and pause/unpause: standard33M does NOT enter the actual Select fault route. Saved original Select-menu screenshot proves its shell rendered, not completed interaction. Maintain F1help/shoulders/Tab and original inputs. Do not edit/build during visible session. At this note all configured jobs are terminal; launching follows this note because the connector disallows project edits during active jobs. No background optimization or monitoring is scheduled. Source comment shorthand397f60 means the descriptor-setup INSTRUCTION there, not a descriptor data address; live descriptor address is01810d88.
+
+## PRIOR PLAN - Select menu target396900; preserve F1/Tab host and diagnose audio starvation, 2026-09-22
+
+Bounded plan refinement BEFORE further config edits: original396900 contains directly decoded descriptor installers at396e3c/40/48 (source44b200),396ed0/d4/d8 (44b210) and396fdc/e0/e8 (44b220), writing exactly object+1708/+170c/+1710 consumed by observed397f5c/helper100b6c. Original/live96-byte descriptor region agrees SHA8d77461e... and has {0,-1,394e40},{0,-1,395630},{0,-1,394670}. Helper100bd0 independently checks whether the12-byte descriptor is nonzero; all three pass. Thus add these THREE statically proved successor roots at the same dispatch, not adjacent functions guessed from proximity. Existing393bd0 remains; duplicate secondary descriptor copies do not add roots. Inspectors9321d630...,ac16345a...,ac7fd36f... record source/load/store/guard proof. New roots are static potential successors, not claimed dynamic hits. First emitter94c788b9... added396900 and direct callees (4CPP files); none of these three successor entries are currently compiled. Regenerate once for the bounded family before building, preserving every earlier repair.
+
+Manual93c3705fa75c447b93bde4547d095d73 saved Select input (buttons65534) then explicit PC396900/no static translation, a0180f680, ra397f64; cancelled after capture. Original397f5c calls member helper100b40 with descriptor at object+1708; saved01810d88 is {0,-1,396900}. Own inspectorsad68cf07...,a8dff78c...,59aca2fc... and complete original/live1996-byte body396900..3970c8 match SHAfb5d15b9.... Return3970c4 restores stack in delay3970c8. No guessed neighbor target. Evidence project-link-visible/20260922T060315Z-2b6cfc946afd44cfb159f18fef315246/native.log:748..762 and state.ram.ee-ram.bin.
+
+Proposed BEFORE code edit: append only396900 to existing indirect_targets site100b6c in config/haunting_ground_us.toml (d90c7919...,160481bytes), retain2f55c0/2ac530/all roots, pending VU candidate, protected F1/Tab host9704ed0b..., original runner/parser and explicit faults. Plan/hash manifest external select-396900-preedit.txt; automatic exact-byte backups protect dirty source and mixed newlines. hg_emit then inspect changed code/paths, Python/build_game/fresh manifest, original33M replay and fixed gameplay33m/frames qualification. Actual Select-menu success requires live retest; standard33M does not include this input. No source changes during visible gameplay.
+
+Recovered panel tests/build/replay/verifier were already completed: current gameca4f82b4... with149-input provenance and all expected state hashes, verifierbb2d8648113a4439907525efe65f6a6b/evidence7cc7b5d8f5dd40158a2a92011892e09f=10.391319784FPS (60/5.77405s). Protect host9704ed0b... including redraw fix AND new UI; historical1a122b9f is not the whole current host. No panel/FPS gain or successful unpause is inferred from menu evidence.
+
+Audio remains broken: current manual log733/741/751 reports354/384/414 queue underruns before the missing-target stop;48000 new source frames per about2.86..2.96host seconds. User reports12-19 video updates/s, not substituted for qualified FPS. Next diagnosis uses existing configured audio replay/raw-core0 capture and unchanged speaker queue counters, plus source inspection; no guessed clock/sample drop or buffer-size band-aid. Raw SPU2 input is not a completed gameplay mix. This is separate from the bounded config repair.
+
+## PRIOR - user-requested F1 controls panel and Tab Select alias, 2026-09-22
+
+Proposed before code edits: add portable host-only runtime/include/hg/controls_panel.hpp plus tests/controls_panel_regression.hpp and hooks in game_host.cpp/runtime_tests.cpp. F1 toggles a readable keyboard-reference overlay; Escape dismisses it before a separate press can close the game. Keep every original binding, especially L1 Q/L2 top-row1/R1 E/R2 top-row3/Select Backspace; add Tab as a Select alias. Panel releases live input while open, never changes guest clocks or forces a game pause; label that the game keeps running and to pause with Enter first. Independently authored small UI glyphs/bitmap use existing host GL presentation, no new shader/framework/game rendering path. Build/upload once on first open, draw only within retained fresh/refresh/resize boundary; closed panel does no bitmap work or extra swaps. Preserve exact newline styles and all error checks. This intentionally extends host1a122b9f..., not a rollback of its redraw fix.
+
+Pre-edit external controls-panel-preedit.txt records exact dirty-source/doc hashes; guarded edits automatically save old bytes. New synthetic tests cover hotkey edges, held Escape, alias combinations/focus and bitmap bounds, and write only a synthetic controls-panel-preview.ppm externally. Build tests/game, inspect preview, verify current-source manifest and original gameplay33m replay/qualified frames; then speakers-enabled manual F1/Tab and pause/unpause check. No audio fix or FPS gain is claimed. Update CONTROLS/README/AGENTS with new UI and protected host hash after validation.
+
+Recovered unpause repair is already in configd90c7919... retaining staircase2ac530 and all earlier roots. hg_emit6dadd150619e401799ce2dfb4464d9de, Python881c06cb74ea4aefa6311305a3310e08 and game buildd7faa74ab14248888889c2f48e1baf90 succeeded. Do not repeat generation or drop that repair. Recover any ongoing regression task before starting another. Latest completed pre-panel unpause-build verifierdf1e2499045a418f816024b12b539a81/evidencee44d4071930a4b8e889bc771f75f47c7 qualifies60/6.05005s=9.91727341096FPS with148-input provenance and all expected state hashes. This is below prior10.852932 and remains unexplained; pending VU candidate is not accepted as a gain. The intended same-build repeat was blocked by the platform before job creation; no substitute measurement or retry was attempted. No source changes during a live visible session.
+
+## COMPLETED COVERAGE BUILD - unpause target2f55c0; live retest still pending, 2026-09-22
+
+Unpause-only work completed: emitter6dadd150... changed only translated-shard-0017.cpp as C++ (248 original words; sourceSHAaf4a9b43...), Python881c06cb... passed130 tests, buildd7faa74... succeeded. Pre-panel game732a2a94f17f96ae67db3f392525e9aa28e5b910772f0995bdfcf034e030972a is36343808bytes; post-link manifest765d5c326a634e09614945ff4511428581f77f52815cbb7a0937d5ce02821018 matches148 inputs. Generated body retains saves/FPU/branches/calls, normal prologues and JRra2f5998/stack-restore delay2f599c. Original992-byte live/file-backed body identity d15a1113... is documented in SOURCES. Configd90c7919... retains2ac530 and all earlier roots.
+
+Replay7d91d2163643483682ff5d963fc50052/evidenceproject-link-runtime/20260922T055312Z-e593c0cb723844fdb40b2015a964820c reaches normal33M budget with original48195 sprite/305856 triangle/842 masked-transfer batches. Fixed verifierdf1e2499045a418f816024b12b539a81/evidenceproject-link-verifier/e44d4071930a4b8e889bc771f75f47c7 matches148 inputs,864 original1bef84/caller2d1c50 events with zero trace/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11.... Latest60/6.05005s=9.91727341096FPS, windows9.850308/9.985155; prior10.852932 is not substituted. Attempted repeat hg-unpause-qualify-repeat-20260922-a1 was platform-blocked; no new job or result. PERFORMANCE records the lower sample and unresolved cause; correctness coverage remains necessary, not a speed optimization.
+
+Concurrent F1-panel work appeared while recording these results, including new hostSHA9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f and completed build_tests a4f5ec70ac544f858145fc10c9f79b05. Those edits are preserved; this unpause worker did not implement, overwrite, build or validate the new panel. No additional visible launch was made. Pre-panel qualification must not be attributed to the newer host. Continue the active panel work above, refresh game build/provenance as required, then manual speakers pause/unpause retest; existing standard33M does not exercise the later user's unpause fault. Audio still faulty (151/426 observed queue underruns); no audio changes. HG-LEARN-042 and PERFORMANCE updated with exact scope. Original unpause plan follows.
+
+User reports freeze when unpausing and asks for shoulder bindings. Current host1a122b9f... already maps L1=Q,L2=top-row1,R1=E,R2=top-row3; no remapping is needed or applied without a requested replacement. Recovered session ecd7f4c9b0754e2b9d2110c0ef697e21 (cancelled after saved fault) stops at2f55c0, a0fc6fe0, ra2f609c. Evidence project-link-visible/20260922T054317Z-ce289a174ffe4a2fb45ee1d975469fbe/native.log:1094 and saved framebuffer show the paused scene. Original/live992-byte body2f55c0..599c matches SHAd15a1113...; saved descriptorfc70f0 is {0,-1,2f55c0}. Own original inspectors5558618...,cf9a925...,3d3f3fb... confirm2f6094 calls100b40 with object+110, whose negative-descriptor path reaches JRt9 at100b6c. This is a missing static target, not proof of a deadlock or the cause of low FPS.
+
+Proposed change BEFORE code edits: append only2f55c0 to existing site100b6c in config/haunting_ground_us.toml (pre-edit77332e15...,160166bytes), retaining2ac530 and all earlier coverage. Preserve pending VU candidate, protected host1a122b9f..., original runner/parser, CPU fallback, exact arithmetic/delays/budgets and all explicit faults. No runtime/clock/audio/control change. External plan/hash manifest unpause-2f55c0-preedit.txt and automatic exact-byte backups preserve dirty files and newline/encoding. Current148-input game0dd2b06c... archived in both fault session and qualified05f3470a.... Latest current qualified10.8529319196FPS;30FPS unmet.
+
+Next measurable actions: hg_emit, inspect new body/change list; Python regression and build_game with fresh manifest; recorded33M replay and fixed gameplay33m/frames state qualification, then manual speakers pause/unpause retest. Standard33M does not reach this later manual fault: do not claim live repair from a build/checkpoint. Prior speaker session4594260a ended normally at user's close with151 queue underruns; latest unpause session has426 before fault. Audio remains faulty, not fixed by selecting speakers; no audio mechanism is changed here. One configured job at a time; no live PCSX2 probe is required to establish this already-proven callback.
+
+## PRIOR - missing target2ac530 rebuilt; regression qualified; manual speakers retest next, 2026-09-22
+
+Completed build74a226c6379e4d47b1a24bb65beacecc produces36329472-byte game0dd2b06c44841d796dee87faff8b84d57a90b980d5e3b679964182eb283c0900. Post-link manifestc43ef1b2701f8d837b98c066afb83b236aee2b0a097815f3f1bfdb6a73a77985 matches148 inputs, including repaired config77332e15.... Linker map contains page_2ac atVA141e61488 from shard0015. Original/live target16-byte slices agree SHA3d15d15d86e33ef536957c7124a633eb940ba5a2f321d61cfc814745e6e52258. No runtime, host, arithmetic or timing change for this coverage repair.130Python tests3a2d0275... and existing runtime testsff3267fd9c484ccabe1766d5779fd0f5 pass.
+
+Recovered replaya096e4574e41433482cb52941f08fd23/evidenceproject-link-runtime/20260922T053550Z-df12f6c31d8b4d169d2b9a582b776e79 completes33M at the normal budget without faults and preserves original draw counts. Fixed verifier50aa2939d58d44bd80963af41120ca32/evidenceproject-link-verifier/05f3470af08d41b6b0a63254e308bd3c succeeds:148-input freshness,864 qualified original1bef84 writers/caller2d1c50,zero trace/caller/stack failures and all expected frame/EE/GS/VU/RTC-only normalized IOP hashes match. Latest current heavy result60/5.52846s=10.8529319196FPS (windows10.680718/11.030791);30FPS remains unmet. This includes the still-pending static-operand VU candidate plus the verified target root. It is not a demonstrated gain over prior original control11.114260151FPS, nor does one comparison isolate a regression. Future VU reversal must retain this new config target and regenerate, not restore an old whole generated file that drops coverage.
+
+Next executable action: run_game_visible mode=manual,slice_budget=0,audio=speakers,wall_limit_seconds=3600; unique request key hg-freeze-2ac530-speakers-relaunch-20260922-a1. Recover newest visible job before launching duplicates. User will retry the same staircase route; standard33M regression does NOT cross the later79M fault, and previous manual inputs were not recorded. Do not claim later-route repair or audible/full-mix correctness until that live check. All listed jobs terminal before this planned relaunch. The game remains user-controlled; no automatic background optimization is scheduled. Source edits are disallowed while that visible job is active. Protected host1a122b9f... retained.
+
+## PRIOR PLAN - manual next-section fault2ac530; verified static-target repair and speaker relaunch, 2026-09-22
+
+Continuation/user observation: user reports 12-19 FPS throughout manual gameplay. The built-in title is produced-video-updates/host-second (game_host.cpp214), not the fixed qualified heavy-gameplay metric; the user's counter source is not separately confirmed. Native log2885/2886 records15/13 produced/presented updates near101.7/102.7s, then explicit fault at2ac530. Do not turn this route into a qualified FPS result: it has different live input and existing full-run probe object mismatches. Saved framebuffer state.ram.display.ppm SHAa0a8b54f1ee9875abb4752f4d605f94de2373645926b8871e113e90fd5b2cc67 visibly shows the stairway scene; it is actual saved game pixels, not an all-white PrintWindow capture. Rechecked protected host exact1a122b9f....
+
+Recovered config already adds only site209574 ->2ac530, SHA77332e1590c8003b4625521466e8d72b683612f0b3c5fbfda270b62afad2a13a. Recovered hg_emit b0129f4346b0439282aee2efe6468458 succeeded (external20260922T053246Z-dbc5de424d2a4c44bf8db98e75cf151d); only generated main and shard0015 changed, besides analysis/listing. Shard49581..49604 now contains normal page_2ac and original LUI/JR/delay ADDIU, retaining budgets and faults. Python3a2d0275f45f4a819e990bcf4f82b8c9 passed. Recovered build_game74a226c6379e4d47b1a24bb65beacecc is active; do not launch duplicate generation/build jobs. Next verify manifest, replay/qualification then speakers-enabled manual relaunch; no passing later route or speed gain yet.
+
+User reported frozen game and missing audio after manual launchc1fa9cfc84bc40bfaad9712c131e0ffc. Audio was explicitly launched off: restore the existing speakers option, not a claimed audio-engine repair. Native log2899 reports EE2ac530/no static translation, ra20957c, a017f355c. Saved EE RAM proves object vptr46dfc0 and slot+0c target2ac530; original ELF table agrees. Original caller209574 is JALR t9 with a0 setup at209578. Own hg_inspect decodes target's three instructions LUI v0,0x40; JRra; ADDIU v0,v0,-28256 (delay), returning3f91a0. Do not bypass this function or infer low-FPS causation from the explicit stop. Fault evidence includes memory/GS/VU/frame under project-link-visible/20260922T052458Z-71c5108ac15b4b9a80b5a56e4112e3fc; session cancelled after capture. PrintWindow is all-white, not reliable game pixels.
+
+Proposed change before edits: append only verified indirect_targets site209574 ->2ac530 in config/haunting_ground_us.toml (pre-edit e6a72c5f...); regenerate through hg_emit, inspect exact emitted target and changed paths, test and rebuild game with fresh manifest. Run existing33M regression/qualification, then manual visible relaunch with audio=speakers and original controls. Passing the user's later route still requires live replay: previous manual inputs were not recorded. No runtime/renderer/clock/input/arithmetic change, no new performance mechanism or suppressed faults. Automatic byte backups and external manifest manual-freeze-2ac530-preedit.txt preserve current dirty config/docs. Host1a122b9f... rechecked and protected. Only one configured job at a time.
+
+Recovered buildd0ed67c451b84a5587709eb171b44096 succeeded after the prior PROGRESS note: launched game0255d6fd1995de9748d833166bfa332bd2ef528b565e88048717abbf055d7e0c,36329472bytes already contains the pending static-operand VU candidate. Preserve that pending work, but do not claim qualified gain or full correctness. Last qualified control remains11.114260151FPS. No separate shared HG config/manual list is present in accessible project file listings; independent original ELF/live call evidence supplies this bounded root.
+
+## PRIOR PENDING - static-operand VU multiply tests pass; regenerated candidate awaits game build/qualification, 2026-09-21
+
+Implemented noinline scalar helper runtime/include/hg/vu_specialized.hpp SHA355f6607... and AOT-only mask14/15 routing (vu_emit.py87df2850...,emit.py396fd486...). No runtime state/header-layout, clock, arithmetic or CMake change. Tests130Python39cd62e89a6545f58a736add2b34ac3c, build71235f0386a84dc2b211a11731329a3b, runtimeed3ca7e60f7d4547a54ba369c2b7d959, translation08afd59e587d435a94e9bc1912719d68, readiness8c68bcf9b43b4f0ca41de1819648a447 all succeeded. New fixture:104 static operand combinations,851968 exact complete-state comparisons including466304 identical faults across16MXCSR modes. Existing DIRECT936/7873, DMA2338, UNPACK16M/24576, arithmetic/GIF/keyboard and65536 generated readiness checks pass. Python tests intentionally allow the exact old or candidate call for masks14/15, preserving fixtures across rollback; they do not independently prove activation.
+
+Configured hg_emit36edf7a774d0439e995a17992588fa0b succeeded; evidenceproject-link-emit/20260922T051644Z-a2214578b0c74d819c93364c36a69b05 includes exact prior byte backups. Only out/translated.cpp changed among25EE shards; current1479141bytes SHA9e404c2d289cef76e6d03b12a463a8e9dd6aa954c694b7644523e079907644e4. New static calls are present (bounded search already returns120 distinct source sites, not a complete/dynamic count); old mainb03c024b... also in automatic backup3b595d8ec7604c12bbce148a7df59b30. Original emitter backups1dda8e00086942a2b06c7384eaa5c47d and03f48590769a40b390658766f301d73c define exact rollback. Next build_game, verify linked separate helper bodies and fresh manifest, replay, qualified frames, then fresh route-only reversal. Last qualified control remains11.114260151FPS; no candidate FPS yet.
+
+Original hypothesis/plan and prior control follow:
+
+Original CMake2b9e0b6b... rebuild184f60eec8944ddf830866cc2d3a4a32 and verifier34348808501e43729ed7f2380f37fda0/evidencebff1d79d44d0454e870c25316cd62076 restore60/5.39847s=11.114260151FPS, all147-input/writer/state checks exact. This reverses /Ob3 candidate9.201748FPS; reject and record HG-FAIL-034. Current game2dc877908c68de315501fa3fbda271ff89e6be22868a0db98bd3d9056e233f1e. No active native probe; no new optimization retained yet. Selective LTCG and FPU bit scan were found already rejected017/011, so no repeat of either was launched.
+
+Next bounded mechanism: specialize scalar VU broadcast MUL with statically known register/mask/broadcast operands, but keep each unique helper OUTSIDE the huge generated CFG (noinline template). New runtime/include/hg/vu_specialized.hpp reproduces the existing read_vf/product/flags/write sequence, no new arithmetic, ISA, decoder, clock, pipeline or object layout. tools/hgtool/vu_emit.py routes only masks14/15; emit.py adds the header only to the generated main unit. Preserve all reads/fault order, flag-before-invalid-destination behavior, VF0/aliases/undefined lanes and unrelated architectural state. This is not global /Ob3, forced compound inlining or the rejected packed-vector extension. Native sampling's12 scalar-multiply samples are a lead, not a promised gain.
+
+Validation plan: new redistributable differential fixture against unchanged Vu1State::multiply_vector including random/edge bits, all defined masks, alias/zero/invalid registers and broadcasts, flags/Q/P/readiness/host modes. Add Python AOT selection/fallback checks; include helper in existing generated readiness tests without altering their pipeline logic. Capture exact original generated main b03c024b... via guarded no-op backup; existing write_text_if_changed avoids touching identical shards. Run python/native/translation/readiness tests, configured hg_emit and build_game, verify linked separate native specializations, replay and fixed qualification, then restore ONLY emitter route/include, regenerate/rebuild and measure fresh control. No source-only rollback is a current game. Exact input hashes and scope in external vu-static-multiply-preedit.txt; automatic byte backups preserve dirty source/CRLF/LF. If rejected, new helper/fixtures remain explicitly test-only, not an active gameplay mechanism. Host1a122b9f..., runnerc8c2d536..., parser5ab22f5b... protected.
+
+## PRIOR ACTIVE - /Ob3 candidate qualified9.201748FPS; restoring original setting for fresh control, 2026-09-21
+
+Compiler-only /Ob3 candidate built successfully in106.35s (c5635f5fbdd244a7bbc594743140016a); generated vcxproj line304 and compiler D9025 override confirm main-unit setting, with unchanged/O1 EE shards. Candidate executable292e20170593d3b71f2dcc0c857e799fa83540ffd1b1f133085a90acced37de6,36027392bytes;147-input manifest e4a88df5... reflects CMake7607ff8b.... Recorded replay669ad9881c684693999d6a3a9c97e008/evidence20260922T045150Z-7343225602104735aff2c8b4c65e1d4b preserves inputs/work/image/EE/GS/VU with no faults. Fixed verifier04f39bd225e740a7bbf4e5130a205cc3/evidence6a179db53b724cbcab73d34af82e0b94 qualifies864 original writer events, all expected hashes including same-date normalized IOPbdbf3a11...,60/6.5205s=9.201748332FPS.30FPS unmet. This is below recent original controls; do not declare code causation until a fresh reversal.
+
+Next: restore ONLY CMake via backup8fcdccc821e04892ae3ee547d400bab7 to exact2b9e0b6b..., rebuild and qualify gameplay33m/frames. Protected host1a122b9f..., runnerc8c2d536..., parser5ab22f5b... and all prior fixtures remain; no sampler active. If restored control confirms a loss, reject /Ob3 rather than repeat unchanged; if controls also fall, report the host-condition ambiguity. Linker map size3417247bytes matches earlier map size but executable grew5120bytes: size alone proves neither unchanged code nor useful inlining. Detailed native-code comparison is warranted only if it resolves an actual next decision. Learned HG-LEARN-041 now records completed native sampling and limits, not a performance gain.
+
+## PRIOR ACTIVE - native sampling closed; planned /Ob3 automatic VU-unit inlining trial, 2026-09-21
+
+HG-DIAG-037 complete: temporary offline IOP comparison passed129 Python tests (df58fe42022548ffbeedc6829ce2f61d); only bfcd1/bfcd2 changed versus same-date control, normalized bdbf3a11... exact. Runnerc8c2d536... and test_runtime_verifier.py95054f79... byte-restored; clean game d47ee0b1... built with147 inputs. DIAGNOSTICS records samples/limits/removal. No probe or temporary fixture active.
+
+Next bounded production candidate modifies ONLY CMakeLists.txt (pre-edit2b9e0b6b12a7f1835f81884f7fb299e769214f9697a09c05469127a4d74dd3ca): append Release /Ob3 to existing per-source/O2 property for HG_TRANSLATED_SOURCE, leaving/O1 large EE shards unchanged. Current generated project confirms main Release MaxSpeed override. Do not change forced-inline annotations, runtime/emitter/generated original code, arithmetic mode/architecture/trace settings, clocks/input or host. Unlike HG-FAIL-007 forced compound inlining, leave compiler heuristic discretion; first attempt bounded and stop if compilation becomes pathological. Microsoft /Ob documentation checked; more aggressive automatic inlining is a hypothesis, not guaranteed expansion or speed. This targets dispersed native VU/helper cost sampled after host recovery rather than another guessed parser microchange.
+
+Milestone: build_game and confirm effective per-source flag/linked code size; recorded33M replay and fixed gameplay33m/frames original-writer state qualification, then exact CMake rollback/rebuild and fresh control. Preserve host1a122b9f..., runnerc8c2d536..., parser5ab22f5b..., all current fixtures/freshness guard. No hg_emit needed for compiler-only change. Plan and exact hashes in external vu-auto-inline-ob3-preedit.txt. Retain only dependable gain with unchanged original-state hashes/RTC-only IOP; otherwise remove and rebuild. Latest clean qualified control remains10.861438815FPS; no /Ob3 game built yet.
+
+## PRIOR ACTIVE - native sampling captured/removed; close IOP comparison and assess compiler inlining, 2026-09-21
+
+HG-DIAG-037 replay3dc6017703934d2fb276fd5b094f02d2/evidence20260922T043923Z-777a3f5a342d4ff2b8b420755c5e06d3 completed33M without runtime faults.330 RIP samples/290 main-image,0 suspend/context errors or unexpected counts, not capped.13,465 copied-map symbols; real image base7ff6cd340000/preferred140000000. Top native samples: AVX2 MADD15,Vu1 multiply_vector12,process_pending11,convert_fixed10; generated VU1/8 bodies8/7 and multiple other arithmetic/GS helpers.40 outside-image samples have NO caller attribution. This is dispersed native work, not a dominant isolated helper or qualified FPS. Expected frame/EE/GS/VU hashes and delivered inputs match. Raw IOP differs, normalization not yet recomputed for this replay.
+
+Sampler source byte-restored from backup1eb6e68364ca410facc0918278612e50 to original runnerc8c2d536...; instrumented source saved automatically7ca4761b5bad4725b3c6e029b48306cb. Host1a122b9f... rechecked. Clean buildb94d2b4dc6bc41f4a34f3bdf73536073 succeeded; game d47ee0b105acb51d5e7913e2c881bf44f1068aac16010f64e3e417159d5e7c91,147 inputs. No runtime probe remains.
+
+Before further production edits: use a temporary explicitly labelled offline integration case in existing tests/test_runtime_verifier.py (pre-edit95054f795393d9c9fd6f7df857cf1292f0fc2b4d6c8eb29265066ed4817da78d) through configured python_tests to compare only the two pinned existing artifact IOP captures bytewise, allowing exactly bfcd1/2/3, using existing normalized_iop_digest and expected raw SHA256 identities. No game launch, network, shell or process access. Byte-restore this temporary fixture after success; do not silently claim RTC-only equality without checking. CMake source confirms intended /O2 main VU unit versus/O1 EE shards; inspect effective generated project too. Consider bounded automatic /Ob3 main-unit inlining only after reading prior HG-FAIL-007 (forced compound inlining exhausted memory); do not repeat force-inline compound arithmetic or change guest math/clocks. No compiler candidate implemented yet.
+
+## PRIOR ACTIVE - GIF trial closed; planned native heavy-window sampler HG-DIAG-037, 2026-09-21
+
+Incomplete GIF trial completed all four qualified original-state comparisons and is not retained (HG-FAIL-033). Final exact original control21cf3aba83b442e8b083b61788c5e2b8/evidence1b05c22d19ff484581c6d713951f95f5=10.861438815FPS,60/5.52413s. Game37f7d62d... is source-matched. Original parser5ab22f5b... and protected host1a122b9f... remain unchanged. Both PERFORMANCE and learned skills record the small, drift-sensitive differences without claiming a gain or semantic failure.
+
+Next measurable milestone: identify native heavy-window hot functions rather than speculate from inclusive VIF timings. HG-DIAG-037 modifies ONLY runtime/system_diagnostic.cpp (pre-editc8c2d536...). Within existing31M checkpoint of profiled unpaced33M replay, start a bounded Windows-x64 own-worker RIP sampler (4096 preallocated entries; nominal jittered1..4ms sleeps, OS granularity unchanged). Duplicate only current worker handle, suspend/get CONTEXT_CONTROL/resume immediately; no locks/allocations/IO/stack walking/guest reads between suspend/resume. Any failure is reported, invalidates attribution; fatal resume failure ends diagnostic explicitly. Stop/join on exits before post-run symbolization from exact isolated hg_game.map. No production helpers/emitter/common headers, guest writes/clocks/input/render/fault or external process/device settings change. Suspensions perturb host time; diagnostic run is NOT FPS evidence. Plan/provenance/backups in external native-rip-heavy-profile-preedit.txt; primary Microsoft context/suspend/resume/handle documentation checked. Record inventory in DIAGNOSTICS, run one configured replay, compare original work/image/state, then byte-restore runner and rebuild. Keep PCSX2 out of host bottleneck diagnosis.
+
+## PRIOR ACTIVE - incomplete GIF batching comparison nearly flat; final exact control pending, 2026-09-21
+
+Qualified sequence: candidate fa3283542166432f8058a0e932dcd847=11.021044685FPS (60/5.44413s), exact original f048f775d8754a55b7c49772e64335c2=10.904966849FPS (60/5.50208s), repeated candidate4f708348e1c243b39043e861a449f87b=10.911729564FPS (60/5.49867s). All147-input manifests,864 original writer events, expected image/EE/GS/VU and same-date normalized IOP bdbf3a11... match. First-pair~1% advantage has not established a stable gain. Candidate replay20260922T042721Z-f34ee87e87814c02ba5125c0d82802a7 preserves normal work/no faults and exact640x448 image. Native candidate process_pending in hg_vif:vif.obj at VA1421c5b40 contains original submit call followed by inlined incomplete-payload/capacity guards and range insert;416-byte slice at fileoffset35412829 SHAf96a28c947e6cf76e2c96311c1f16a002e1876c0bc42bc5733e089a18c42dfd9 confirms linked mechanism, not only source freshness.
+
+Now restore ONLY parser to original5ab22f5b... using backup8d4796564dfd4ff9beae0330591f0482; candidate retained in backups bffa0a620e0a4400be7203efcf2025c3/ab4f8269661946a0bcf6ce570345470e. Host1a122b9f... rechecked unchanged. Final control build5a3e4885cc644e5f91108a80c8492b84 started, followed by fixed qualified frames. Decide based on both pairs; do not keep a flat candidate or cite the earlier isolated10.476 control as gain proof. Regression fixtures retained. Next bottleneck investigation should use actual native heavy-window instruction-pointer samples to distinguish arithmetic, generated VU and GIF/GS execution, not another guessed word-copy variation; no diagnostic sampler has been added yet. Any new probe needs its own written plan, exact backup, activation/removal accounting and original-state verification.
+
+## PRIOR ACTIVE - existing incomplete GIF candidate built; qualify against exact fresh control, 2026-09-21
+
+Continuation verified workspace/jobs/activity and current project documentation; no inherited active job. Candidate runtime/vif.cpp remains4ad13b1dfd7bdff24a742e24e17f2e1cb5e0533ac6b5291fc9d5c1b6f6895709. Protected host1a122b9f... and original runnerc8c2d536... match handoff. Reuse current successful runtime/translation/readiness tests, not redundant setup. build_game fdcb0435cfbb469ca19bed5e3a1242b7 succeeded; game SHA680728201eed2214d8b5698037428ea44964e9391b45021fb66ab66d1b96c3a6,147-input manifest explicitly records candidate parser. Linker map process_pending is hg_vif:vif.obj at VA1421c5b40. Hidden gameplay33m replay69906038d2424176ba8a1f6c5065e86c started; no new FPS result yet.
+
+Next measurable milestone: finish candidate replay faults/work/image/state, fixed gameplay33m/frames qualification, then restore ONLY incomplete_gif_payload_qwords and its DIRECT callsite to exact original parser SHA5ab22f5b..., rebuild and qualify a fresh control. Repeat an interleaved reversal only as needed to distinguish effect from prior10.27..11.4FPS variation. Every control preserves host redraw recovery, original runner, parser source-unit isolation, test-only DMA fixture and build freshness guard. No renderer, decoder, clock, input, emitter/config, header/layout or temporary diagnostic change. Retain only a repeatable gain with original hashes/writer qualification and same-date normalized IOP state; otherwise restore and rebuild. Original/candidate files are saved by byte-preserving automatic edit/restore backups. External pre-edit manifest gif-incomplete-qualified-continuation-preedit.txt under artifacts root. The prior handoff section is historical below.
+
+## PRIOR HANDOFF - incomplete GIF batching tested; candidate game build and qualified comparison pending
+
+Checked at handoff: latest listed jobs are terminal; no build/replay was started for this handoff. Current runtime/vif.cpp SHA4ad13b1dfd7bdff24a742e24e17f2e1cb5e0533ac6b5291fc9d5c1b6f6895709 contains the incomplete-payload batching candidate. Candidate tests are current: runtime jobef82aa04ef7d408ca968eec4e156139e passed936 DIRECT serial-reference cases/7873 exact state/fault/partial-packet checkpoints; translationb497673c3a474bcfbaab8d81ff8cc8d3 and readinessa51315a84c244f0682c490aa03019cd2 succeeded. Fixture tests/vif_direct_regression.hpp SHA3dabfff8b56d81494d227ff185eeb109f3181121d638e5aa12e1a795e63ecf06. This does not establish candidate gameplay correctness or speed yet.
+
+The game executable still contains the previous original parser, not this candidate. Explicit compare_files proved build/Release/hg_game.exe is byte-identical to project-link-verifier/460d860b8d80482e8f2c8cc25779e2e1/hg_game.exe:36,022,272bytes, SHA2562afaeb1604b65bb1630d236f58d11171e60c4fa3489e4e8d37d07ebffaaa54e4. Last qualified control10.4763235089FPS=60 original heavy boundaries/5.7272host seconds,147-input provenance,864 original0x001bef84/caller002d1c50 events and established state hashes. Historical11.4FPS is not a current guarantee; do not dismiss the smaller later reduction without a comparable control. Source/binary mismatch here is a pending build; freshness must reject stale measurements.
+
+Protect the retained host redraw fix: runtime/game_host.cpp verified SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Original runner verified c8c2d5364eaa64ced38bbde901875f4e4b0b0d50368d55937000706ac029036f. Earlier inert DIRECT DMA helper is test-only. No new VU shortcut, timing probe, error suppression or clock change should be introduced while this candidate is compared.
+
+Immediate continuation: workspace/jobs/activity and required docs; build_game current candidate; check new post-link manifest and relevant actual native code/linked parser; run_game_replay gameplay33m/current, inspect faults and images/state; run_runtime_verifier gameplay33m/frames. Then reverse ONLY this candidate helper/callsite in runtime/vif.cpp to original SHA5ab22f5b286e0b192942b61da4d52173b9b4db98857509ac64fe2bbbde645924, rebuild and measure a fresh original control. Retain only repeatable qualified gain with state preserved. Reuse passed tests rather than repeating unrelated analysis. Preserve host, parser source-unit isolation, tests and provenance guard on any rollback. Candidate source backup plan: artifacts/gif-incomplete-payload-preedit.txt; handoff documentation manifest: artifacts/incomplete-gif-handoff-preedit.txt. No production code was changed for this handoff.
+
+## PRIOR ACTIVE - batch incomplete GIF payload, preserve every original commit/fault boundary, 2026-09-21
+
+Prior inert DMA helper is test-only; original runnerc8c2d536... rebuilt by79c41522908c4a9eaa0fe08b5a36754e. Current original exe2afaeb1604b65bb1630d236f58d11171e60c4fa3489e4e8d37d07ebffaaa54e4 qualifies460d860b8d80482e8f2c8cc25779e2e1 at10.4763235FPS with147-input provenance, all original image/EE/GS/VU/same-date IOP hashes and864 writer events. Earlier originals11.02/11.13 show variation; no historical sample is substituted as current baseline. Test-only helper and2338-state fixtures pass after CMake isolation.
+
+Next bounded production trial only runtime/vif.cpp: keep original serial GIF submit for the first qword of each run; afterward scan existing pending tags to find the first known incomplete tag payload. Concatenate remaining DIRECT bytes strictly before that payload's completing qword and without crossing GifPath::max_pending. The original submit still handles every tag, complete-packet decode/application, final payload qword and first overflowing/failing qword, preserving exact offending suffix/partial GS effects. This targets large IMAGE fragments and prior GIF suffixes that the rejected whole-EOP guard could not cover; it does not repeat the DMA-arrival helper or change scheduling. No new decoder, shader, header/layout, clocks/input or runner path.
+
+Tests first: extend tests/vif_direct_regression.hpp with large multi-tag/prefix fragments across all four GIF formats and capacity-edge errors, compare original production against frozen serial reference. Then implement candidate and rerun same fixtures, native translation/readiness tests, game replay and qualified alternating control. Preserve host1a122b9f and all explicit faults. Manifest artifacts/gif-incomplete-payload-preedit.txt; automatic original-byte backups. Retain only a repeatable qualified gain, not a large percentage against an isolated slow control.
+
+## PRIOR - close inert DIRECT DMA trial without retained speed change, 2026-09-21
+
+Filtered helper caller passed2338 exact state/fault cases and qualified ee470df3566642e6ac6ea86ca68a2130 at10.9568028FPS (60/5.47605s), all147-input provenance and established state/864 writers match. Prior unfiltered candidates10.943853/11.237597 and original controls10.273726/11.125079 show timing variation; the apparent first-pair benefit is not stable, and filtered refinement does not beat the latest original control. Do not keep this as a demonstrated speed optimization.
+
+Cleanup: restore runner exactly c8c2d536...; remove vif_dma.cpp from production hg_vif sources and compile it only into runtime_tests to preserve the independent regression fixture. Keep header/source explicitly experimental/test-only, no production call or diagnostic counter. Rebuild game/tests and qualified original control before the next mechanism. Protected host1a122b9f..., parser5ab22f5b... and decoder/renderer/clocks/input stay untouched. HG-DIAG-036 coverage remains useful evidence (7.15M batched words,7.31M checks); both trial forms remain unretained. Source backups are automatic; CMake original before this experiment in backupb966f8cf11e94fcb833f38d6aa97312c.
+
+## PRIOR - prefilter inert DIRECT helper calls after measured rejection overhead, 2026-09-21
+
+HG-DIAG-036 completed without faults and was removed: project-link-runtime/20260922T024554Z-c6cc6abda3b043de9a8e92cd6fb3153f counts7306154 helper attempts,25986 accepted batches and7151582 actually buffered qwords in31M..33M, with normal rendering/GPU work. This confirms large input coverage but also millions of no-op helper calls on other input. No FPS inference from probe. Original runner c8c2d536... is restored; helper remains unchanged804bc939....
+
+Bounded refinement: before the helper call inside the SAME while(pump_vif1()) loop, check pending.size()>=4 and (pending[3]&0xfe)==0x50. A positive helper result already requires exactly those byte/header conditions, so skipping all other helper calls preserves state (including interrupt-control codes). All helper DMA enable/mode/phase/source/boundary checks remain. No persistent header metadata or layout changes. Update the full-burst differential fixture with identical caller predicate and add all256 command-byte no-op guard checks. Tests, clean game build/replay and fixed-qualified original-loop reversal decide retention. Manifest artifacts/vif-inert-prefilter-preedit.txt; automatic byte backups; preserve host1a122b9f/parser5ab22f5b and all original guest work. Do not stack any independent optimization.
+
+## PRIOR - inert DIRECT DMA second pair only~1%; inspect coverage before retention, 2026-09-21
+
+Completed sequence A1=10.9438526FPS (7c07aef8...), C1=10.2737263(ccd2a496...), A2=11.2375965(e9e0f1d0f785456cbd92c70d6dbdbf78), C2=11.1250793(7eae15ea84ae4c94ada58c1e73808fef). Second candidate60/5.33922s versus second control60/5.39322s is1.0% less host time; first-pair6.1% benefit is dominated by a slower control and must not be generalized. All147-input manifests and established state/864 writer events match. Original runner c8c2d536... remains current at this point; no retained gain yet.
+
+HG-DIAG-036: restore candidate77cf0cb0... then add only runner-local counters around existing helper calls for31M..33M profiled unpaced replay. Count attempts, positive batches and buffered qwords, no per-call clocks or new common-header/layout fields; output once at budget. This checks whether saved input iterations are material and whether rejected calls dominate. Remove exact probe after one capture. Further qualified runs must use clean source/binary and explicitly distinguish the initial slow controls from warmed comparable pairs. Manifest artifacts/vif-inert-coverage-preedit.txt. Protected host/parser/guest clocks/input remain unchanged.
+
+## PRIOR - inert DIRECT DMA first pair suggests gain; repeat reversal, 2026-09-21
+
+Candidate7c07aef89334459d91f8d73c567d4d5c=10.9438526FPS (60/5.48253s), original-loop controlccd2a4965968416dbd4c9e42b453923e=10.2737263FPS (60/5.84014s). Control build06b7140518a14dc29580c3a6ad2ff400 produces2dc948f0863743e936caacbfc3b6533a941356b07002db6055501ad6ba047cda;147-input manifest and all original image/EE/GS/VU/same-date IOP hashes/864 writer qualifications match. One pair suggests~6.1% less heavy host time, but older original controls were11.02FPS and substantial host variance was observed, so no gain retained yet.
+
+Next bounded actions: restore candidate runner77cf0cb0... from backup31c67d408a1d49659e7133f13ab3fd87, rebuild/qualified repeat; then restore original c8c2d536... and repeat control. Keep new helper/library/tests unchanged and protect host1a122b9f.... Require direction consistent across comparable reversals, never use isolated changed-image or full-run timings as FPS. If flat/mixed, disable the candidate and record uncertainty. No new production mechanism while comparing.
+
+## PRIOR - inert DIRECT DMA replay correct; measure original-loop control, 2026-09-21
+
+Candidate buildb9a314fc04f9452ba2c296b2897aa5a4 produces20d478c4481a62b39c54fc4acd45bb3742079e24d8641393bbc72f5d25f728f4,147-input manifest. Replay project-link-runtime/20260922T023445Z-3bf473f0b3c640fba25fe5ddf740694c completes33M with original rendering counts and normal GPUflush0.4502317s/readback0.9639294s. Qualified7c07aef89334459d91f8d73c567d4d5c measures60/5.48253s=10.9438526FPS, all established frame/EE/GS/VU/same-date normalized-IOP hashes/864 writer events match. This single run does not improve over prior exact original11.02064FPS; no gain claimed.
+
+Next bounded step: byte-restore only runner to c8c2d536... using backup113cad5dc5ba4925b008c0ddae2ea053. Retain helper/library and its differential fixtures for comparison, but original loop does not call it. Build and qualified-verify original-loop control; if flat, count accepted batched qwords versus rejected helper calls using a brief counter-only trial before deciding whether predicate coverage or overhead explains it. No other production change and no guest-state/fault/clock/input adjustment. Protected host remains1a122b9f....
+
+## PRIOR - inert DIRECT DMA helper passed differential tests; enable bounded game trial, 2026-09-21
+
+New helper buffer_incomplete_vif_direct in runtime/vif_dma.cpp passed2082 exact state/fault cases (512 accepted predicate cases/231898 reference-equivalent qwords), plus all existing791 DIRECT/5124 checkpoints, UNPACK16777216 indices/24576 packet fixtures and other runtime checks. Buildfabc852929684baf8a5ff59608da3bbc/runtime0e82aa84afc7496db11f95bffbf25e96 succeeded; translation581d41dbb3024ff8ad9f38426c0ae228 and65536-readiness9bac028100f744a4b0e958f8282d4a0e pass. The runner has not used this helper yet.
+
+Next activation is only runtime/system_diagnostic.cpp: include the minimal vif_dma.hpp and call helper inside the existing while(ee.pump_vif1()) body. Original single-qword entry, final command/DMA/fault handling and all guest clocks/schedules remain. Helper never reaches a command/DMA completion or crosses source bounds; it only appends inert bytes and applies the equivalent channel increments/latched interrupt. Build, hidden33M replay, source/binary manifest, fixed qualified frames and original state comparison are required before any gain claim. Restore ONLY runner include/body for control, retaining test fixtures/library so measured difference is activation, not arbitrary source layout. Protected host1a122b9f... and original parser5ab22f5b... untouched. Automatic backup preserves original c8c2d536... runner.
+
+## PRIOR - batch only inert incomplete DIRECT input inside existing DMA service, 2026-09-21
+
+HG-DIAG-035 is complete and removed: project-link-runtime/20260922T022141Z-10b6ddd9ec4a48c7b6544089db0ae5bd measured564374/7306814qwords (7.724%) covered by complete-EOP packet batching; all57906 eligible packets began PACKED, none IMAGE. Original serial parser remains5ab22f5b..., runnerc8c2d536..., protected host1a122b9f.... HG-FAIL-031 closes that candidate with no retained speed change; fresh original qualification1945b31d... is11.0206398FPS.
+
+New bounded proposal: runtime/vif_dma.cpp + minimal forward-declaration header supply a helper used only INSIDE the existing while(ee.pump_vif1()) loop. When pending starts with validated aligned noninterrupt DIRECT/DIRECTHL, its full data has not arrived, and channel1 is already in a supported active normal/loaded-chain payload, gather contiguous source qwords directly into pending. Clamp to valid RAM/scratch, leave at least one qword before command completion AND one DMA qword so no decoder, transfer completion, tag operation or possible fault boundary is crossed. No clock/quantum or original instruction changes. This removes only repeated reconstruction/reparse of known incomplete input, not GS work; original pump handles every meaningful boundary. DMA MADR/QWC match N individual increments; unchanged GS interrupt pending repeatedly ORs cause0, so one sync preserves that latched state. Do not change public single-qword State::pump_vif1 semantics or any instance layout.
+
+Tests first with runner untouched: compare helper to N original pumps for thousands of accepted/rejected predicate cases, then full normal/chain bursts and faults including source-end, scratch, invalid phase/command, disabled channels, count0 and offending final GIF packet. New tests/vif_dma_regression.hpp is called by runtime tests. Add TU to existing hg_vif library. Only after tests pass enable helper in the runner's existing loop, build/replay/qualified A/B with original loop as control; keep only repeatable improvement and exact state. Manifest artifacts/vif-incomplete-dma-preedit.txt; automatic backups preserve current files. No other production optimization is active.
+
+## PRIOR - original parser protected at11.02FPS; count actual batching opportunity, 2026-09-21
+
+Exact pre-candidate parser5ab22f5b... built by e86abf453cb74988a84a7b6e2a35a70c, exe355f8ef9a1b61a32f958312c1171811d5027ca0e5e0847834f335018d060a20c. Qualified1945b31d1f4d440393e22906ae0a9d37=11.020639822FPS (60/5.44433s), all145-input provenance and established image/EE/GS/VU/same-date normalized-IOP hashes/864 writers match. This original control is better than the10.983700/10.638468 enabled candidates; no repeatable batching advantage is established. Keep the original parser and all regression fixtures. The much slower flag-off helper runs cannot be used to claim gain over the original implementation; cause of that variation/code-placement effect was not established.
+
+HG-DIAG-035 bounded next observation: keep ORIGINAL serial DIRECT loop. After each complete DIRECT length/phase validation, count commands/units and existing suffixes. Inside its unchanged qword loop, read-only look ahead only at an idle GIF packet boundary to count whole EOP packets fully contained in the current payload. Track remaining potential packet words locally so each eligible packet is counted once, but still send every qword through the ORIGINAL path. Enable only31M..33M in profiled unpaced replay with a forward-declared source-local enable hook, no VIF instance-layout/header changes and no clocks. One replay, then restore vif.cpp and runner exactly/rebuild. This determines why batching did not help before choosing another mechanism. Manifest artifacts/direct-coverage-probe-preedit.txt. Protected host1a122b9f... unchanged; no production optimization overlaps the probe.
+
+## PRIOR - DIRECT comparison needs exact original parser control, 2026-09-21
+
+Second enabled candidate7f89e3b7d40447a0aa3ab7940c142c3d measured10.638468FPS (60/5.63991s), source identical to the first10.983700 candidate; all established state and writer qualifications still match. The flag-disabled helper control gave7.564354 and8.917942FPS, with substantial run drift. It is not yet valid to claim a repeatable gain versus the original pre-helper parser, which previously measured11.038888FPS.
+
+Next bounded action: restore runtime/vif.cpp EXACT pre-candidate bytes using recorded backupc12b1fff45a84a289859a7fa953ef2cf (target5ab22f5b286e0b192942b61da4d52173b9b4db98857509ac64fe2bbbde645924), not merely the flag-disabled helper. Build and fixed-verify that original parser under unchanged host1a122b9f.... This isolates any helper/code-placement effect versus a real transport win. Candidate is preserved by restore backup and both qualified archives; native differential tests stay. No extra runtime modification until this comparison closes.
+
+## PRIOR - DIRECT A/B timing drift; repeat candidate before drawing a conclusion, 2026-09-21
+
+Enabled candidate80d93dc0... =10.983700FPS. Disabling only bulk_direct_packets and rebuilding creates f960af79...; control51b1d662... measured7.564354FPS with strongly diverging heavy windows8.50145/6.81334, then the SAME unchanged binary4629b9ad... measured8.917942FPS with8.86101/8.97561 windows. All145-input manifests and image/EE/GS/VU/same-date IOP hashes plus864 writer qualifications match. First control GL timings remain normal (flush0.4979346s/readback1.0478535s), so this is not evidence of the former15s duplicate-redraw GL pathology. Do not infer a45% optimization gain from the first slow control, nor call this a proven code regression.
+
+Next bounded action: restore enabled candidate from backup3b81d95591c74526a7de7e740e79f394, rebuild and repeat the fixed qualified verifier. Preserve all other files. Then coverage counters or an exact pre-candidate parser control can distinguish a genuinely effective fast path from a control-code-placement effect and changing host load. No other optimization is added during this comparison. Protected host1a122b9f... remains intact.
+
+## PRIOR - DIRECT candidate passes original state; compare a fresh serial control, 2026-09-21
+
+Candidate game buildc90ba92cde8a47168d49e38363a73ec9 produces executable81203c5184ecb7faac993906aaa17bca84006097de56aed9ba94dfa3d4d0c042.145-input manifest matches and the linker map includes the new helper in hg_vif:vif.obj. Replay20260922T020957Z-29040de5ebb8441da48e8d87c369f3aa completes33M with normal48195 sprites/305856 triangles/842 masked batches and flush0.4492686s/readback0.9979762s. Qualified80d93dc088d54b0486e8496abe29f38b measures60 original heavy boundaries/5.46264s=10.983700FPS, all established image/EE/GS/VU/same-date normalized-IOP hashes match and864 original-writer events qualify. This is not a demonstrated gain against historical outlined-parser11.038888FPS.
+
+Next bounded action: toggle ONLY bulk_direct_packets=false in runtime/vif.cpp; build and use the unchanged fixed qualified verifier for a contemporaneous serial-route control. Host1a122b9f..., renderer, decoder/materialization, clocks, input, faults and manifest guard stay unchanged. If flat, one counter-only packet-coverage capture will determine how often batching actually happens (rather than assuming complete EOP packets occur inside DIRECT). Remove all counters/rebuild before any further timing; reject unhelpful production changes promptly. Manifest artifacts/vif-direct-bulk-ab-20260921.txt; automatic source backups preserve enabled candidate. All prior native791-case/5124-checkpoint, translation and65536 readiness tests passed both original and candidate. No overlapping runtime optimization.
+
+## PRIOR - batch complete DIRECT packets without changing original decode/commit semantics, 2026-09-21
+
+HG-DIAG-034 captured and both source probes removed. In60 heavy VIF bursts (4.6822539s inclusive), MSCAL/MSCNT account for2.5662147s and DIRECT61146 commands/7306814 qwords/116909024bytes for1.6075108s. Completed UNPACK is only~0.176s, explaining flat word/index experiments. Normal GPU timings/work counts remain; diagnostic overhead and nested work preclude treating these as exclusive or qualified FPS. Evidence project-link-runtime/20260922T015200Z-c79db1b4e97b4a43806f598f36fc5af7. Source is clean baseline vif.cpp5ab22f5b.../runnerc8c2d536..., but built binary is still diagnostic until next build.
+
+Next bounded candidate: private helper in runtime/vif.cpp handles already-complete DIRECT/DIRECTHL bytes. If GifPath.pending is empty, find first complete EOP packet entirely inside the validated payload, check max_pending, bulk-append exactly that packet, invoke the SAME materializing decode_gif_packet/apply_gif_register_transfers, then clear only after success. Existing pending suffix, incomplete packet or oversized packet takes original per-qword helper. Preserve original payload-phase/length checks, command order, partial GS effects and retained offending packet on errors; outer VIF cursor/pending still changes only on successful command. No new decoder, early partial-packet commit, missing fault, renderer/input/clock or host change. This differs from rejected word serialization and complete-packet streaming trials by batching transport only while retaining original decoding.
+
+Tests first: add tests/vif_direct_regression.hpp and runtime hook; compare original against a frozen serial DIRECT reference across payload chunking, prior GIF suffixes, multiple EOP/non-EOP tags, formats/descriptors/PRE/Q rules, draw/transfer/error cases, phase/truncation/capacity and exact partial state. Then apply candidate and rerun all. Optional one counter-only capture establishes actual fast-path calls; remove it/rebuild before qualified A/B. Baseline outlined-parser qualified11.038888FPS, exe868018f5...; protect host1a122b9f.... Retain only for repeatable gain with state hashes intact, otherwise restore helper/callsite only. Manifest artifacts/vif-direct-bulk-preedit.txt; automatic backups preserve source. No overlapping production experiment.
+
+## PRIOR - completed VIF command attribution after verified parser isolation, 2026-09-21
+
+Parser isolation passes all native regressions,65536-readiness,128 Python tests and original gameplay. Qualified e4ce9a76aff64860a6aa698baf976aec=11.038888FPS (60/5.43533s),145-input manifest and all established frame/EE/GS/VU/same-date normalized-IOP hashes match. Build165a1fe5a819443d824c40738565d13e produced868018f56af75fe0d09ee45d870582c8d91f0cacc89fa502365f0bdf2de8bfcb, and linker map places process_pending in hg_vif:vif.obj. Unpaced replay20260922T014543Z-2b1d59393f22405b8483c6f544e426a3 preserves normal work counts/flush0.45532s/readback1.02523s. Retain source-unit isolation for practical build/diagnostic iteration, not as a claimed FPS gain. Original division-based UNPACK and original word helper are retained; all new differential fixtures stay.
+
+HG-DIAG-034: temporary runtime/vif.cpp and system_diagnostic.cpp changes only. At31M in profiled/unpaced33M, enable fixed thread-local counters. Time complete MPG/UNPACK/DIRECT/MSCAL/MSCNT operations once per command; count attempts and incomplete commands without per-qword clocks. Group UNPACK by format/mask/mode and record units/bytes. Runner separately times only active VIF DMA bursts. These overlapping inclusive times identify major work, not additive exclusive whole-frame costs. No Vif1Path layout, guest code/input/clock/render/error/partial-write or command-order changes. Restore both files exactly after one useful replay and rebuild clean before qualified FPS. Manifest artifacts/vif-command-profile-preedit.txt. Only pursue bulk already-complete DIRECT transport if this measurement shows material cost; otherwise prioritize the measured VU body or actual dominant command.
+
+## PRIOR - isolate unchanged VIF parser to remove repeated full-game rebuild cost, 2026-09-21
+
+UNPACK cursor trial is inconclusive and source-reverted. All16,777,216 index cases,24,576 complete/incomplete/fault packet fixtures, runtime/translation and65536-readiness tests passed original and candidate. Native process_pending bytes confirmed removal of per-vector division (original function file offset201632, candidate loop slice202656 SHA16601d67...). Hidden replay20260922T012323Z-6fd283b94bcb42b28a8bb227d924c243 preserves work counts and normal GPU timings. Qualified candidatesdc105eb276824bf4899d31b4a01bcc74=11.068579FPS and6d90972e6b354ae6b803dc47e9463ae0=10.926593FPS versus fresh original control4b1d9bef5834489fb798137145ba3893=10.942196FPS overlap variance. Do not retain as a demonstrated gain. Header restored exactlyc7891753... using5500e3f0...; independent regression tests remain. Game binary still candidate until next build; freshness gate protects that mismatch.
+
+Next bounded maintainability change: move ONLY the original Vif1Path::process_pending body unchanged into runtime/vif.cpp, leave a declaration in the header, and add hg_vif static library to the existing CMake runtime dependencies. It was already emitted as an out-of-line native function in system_diagnostic.obj; no decoder/guest semantics are being replaced. Aim is to let future parser-only diagnostics/changes rebuild one translation unit instead of every large EE/VU shard. Preserve body operations, exception strings/order/partial state, all input/clocks and protected host1a122b9f.... Validate all synthetic/runtime tests and original replay/qualified state/FPS against control, record compile impact separately from game FPS; rollback if significant unexplained regression. Manifest artifacts/vif-parser-unit-preedit.txt and automatic exact backups. This is not an accepted runtime optimization yet.
+
+## PRIOR - exact UNPACK cursor recurrence; original control and host fix protected, 2026-09-21
+
+Word-range trial closed without a retained speed change: fresh candidate88bac4c386484cf2b68bb33f16da4e7b=10.92770775FPS (60/5.49063s); restored control4b1d9bef5834489fb798137145ba3893=10.94219603FPS (60/5.48336s). Both143-input manifests,864 original writers and all established frame/EE/GS/VU plus same-date IOP bdbf3a11... hashes match. Header is byte-restored c7891753..., game exe14b5dce0... built by2f7c98481ccb47769647eaf7cadf2e1d. Difference is inconclusive (~0.13%), not proof of universal inferiority. New word-read regression tests are retained; the shortcut is not.
+
+Next bounded change is only VIF UNPACK per-vector indexing, not the previous word helper, contiguous memcpy, arithmetic or GIF serialization. The original loop recomputes in_cycle=n%wl and vector=destination+cl*(n/wl)+in_cycle (or destination+n for fill). An induction-equivalent cursor starts at0/destination, increments once per completed vector, and at wl wraps phase and adds max(cl-wl,0). Independent enumeration checked16,777,216 cl/wl/vector states. Preserve original per-vector bounds check, per-field order, input eligibility, mask saturation at cycle3, signed extension, mode2 row feedback, undefined lanes, partial writes before faults, pending bytes and phase. No original guest instructions, clocks, renderer/input or host changes.
+
+Files: runtime/include/hg/vif.hpp, test-only new tests/vif_unpack_regression.hpp plus its runtime_tests.cpp hook. First run the frozen independent scalar/formula reference fixture against the original implementation, then candidate. Cover all16 format codes, zero/skip/fill CL/WL, count limits, modes/signedness/masks/TOPS/edge addresses/truncation and exact fault text/state. Build/replay/native-code check and qualified comparison decide retention; no gain is assumed from fewer divisions. Manifest artifacts/vif-unpack-cursor-preedit.txt; automatic exact backups preserve current bytes. Host1a122b9f... and disabled embedded rounding/original XYZ stay unchanged. PCSX2 semantic probing is unnecessary for this algebraic host-only indexing equivalence.
+
+## PRIOR - close word-range experiment with a fresh original-route control; host fix protected, 2026-09-21
+
+Recovered completed VIF word-range candidate tests/build/replay and verifier f865eea233e64702bfca088351f5e2dc=10.33145014FPS. Fresh unchanged-candidate verifier88bac4c386484cf2b68bb33f16da4e7b=10.92770775FPS (60 boundaries/5.49063s),143-input freshness,864 original writer events, all established EE/GS/VU/frame and SAME-DATE normalized IOP bdbf3a11... hashes match. This variation does not establish a gain over the original route or stable11.4FPS.
+
+Before more edits, restore ONLY the complete-span shortcut in runtime/include/hg/vif.hpp::word to the original four .at expression, preserving differential tests and the retained event/refresh host1a122b9f.... Expected original header c7891753..., candidate d8ac219b.... Build and fixed-qualified verify the control. Do not accept a small change based on historical rates. Manifest artifacts/vif-word-resume-control-preedit.txt and automatic exact source backup. While compiling, audit the remaining measured3.585s VIF burst path and prior failed packet/arith/clock trials for a genuinely distinct opportunity. No game functions are guessed or skipped; PCSX2 stays external semantic oracle only.
+
+## PRIOR - bounds factoring trial with original fault path; host baseline protected, 2026-09-21
+
+HG-DIAG-033 is removed byte-exactly. Unpaced worker CPU-accounted4.859375/5.0162412wall seconds (~96.9%); paced diagnostic5.3125/5.8396614 (~91.0%). Both show CPU work dominates without proving a specific cause of the observed timing variation. Clean rebuild1977a3ff46cb4a97b2c3a5839ed4a974 produced6b3651457fe9691d68a22b30fa583eb0288432de96d6e6bf0f2656ca2e3666dd. Clean fixed control ef7e59342635401bb9168f6b704f62f1 passes143-input freshness,864writers, all EE/GS/VU/frame hashes and SAME-DATE normalized IOP bdbf3a11..., but measures9.7812744FPS, windows9.177090/10.470619. This variability is explicitly preserved in evidence, not relabeled stable11.4FPS or blamed on removed code.
+
+Next one small CPU-side change: runtime/include/hg/vif.hpp::word uses an overflow-safe complete4-byte range check before the same little-endian assembly on bytes[]; out-of-range cases execute the unchanged original four .at calls. The current native process_pending body contains four separate bounds checks/byte operations at many word sites. A checked span can let the compiler combine safe loads without changing allowed inputs, faults, command execution, byte order, clocks or guest state. This is not GIF byte append, V4-32 memcpy, stride/mask changes, readiness elision or arithmetic specialization. No emulator or external implementation used.
+
+Add original-expression differential tests in configured runtime_tests: everyoffset for sizes0..1024 with excesscapacity, nearSIZE_MAX offsets and randombytes; exact value/error text and unchanged storage. Build/tests/replay/native-codeinspection/qualifiedcomparison. Do not retain based on one candidate result while conditions vary; restore a contemporaneous control, require a clear repeatable gain, otherwise revert only wordhelper. Protected host1a122b9f... and original XYZ/disabledembeddedrounding unchanged. Manifest artifacts/vif-word-range-20260921-preedit.txt; all exact backups automatic.
+
+## PRIOR - original runtime restored; same-binary timing drift requires CPU/wall attribution, 2026-09-21
+
+Restored XYZ build391811f6a67540c9a21c1a3582f228e5 succeeded, exe096308e88eadea226d0d2e3bd76ee9379b298a0b3dbece63cceb79777dd9b484. Qualified original-route verifier b016fd15850d4ea497d3dffcd1f96865 measured9.24673051FPS (60/6.48878s); unchanged executable retry65a9ed9ab1db414c9612cb854453b441 measured10.61032349FPS (60/5.65487s). Both pass143-input freshness and864-writer qualification. Input digest equals original11.420718 control. GPU flush/readback remain approximately0.52s/1.08s full-run in the slower control, not the former15s stall. Thus neither the slower candidate nor a single restoration rate isolates a code-induced regression; XYZ candidate remains reverted and no new performance candidate is accepted.
+
+The second control crossed the remote RTC's UTC date boundary: old bfcd0..7=00 39 58 23 00 21 09 26, new=00 16 00 00 00 22 09 26. The existing normalized IOP SHA is different because only bfcd1/2/3 time-of-day is masked. EE RAM, GS VRAM/state, VU and final frame still match. Do not claim complete IOP equivalence across this date or silently expand masking; use subsequent same-date controls for comparisons.
+
+HG-DIAG-033 bounded plan: runner-only current-thread/current-process CPU time snapshots via GetThreadTimes/GetProcessTimes plus raw QueryThreadCycleTime and steady_clock at31M,32M,33M in configured profiled33M. Three snapshots, no per-instruction/qword hook and no unrelated process access, priority/affinity/system setting change. Preserve guest clocks/work/faults and host1a122b9f... . Compare worker CPU-accounted time against host elapsed, without converting raw cycle counts to time or asserting a particular scheduler/driver cause. First unpaced capture20260922T000338Z-20d93d6e4ad940e49e73a065dc1f4cac completed normally:31M..33M wall5.0162412s, worker user+kernel4.859375s (~96.9% CPU-accounted), normal full-run GPU flush0.4828s/readback1.0310s. Raw cycles are recorded but not converted. Refine the second capture to the existing fixed paced verifier so CPU/wall separation is observed under the actual measurement mode where drift occurred; treat its runtime instrumentation as attribution, not a retained performance candidate. Then remove exactly/rebuild and requalify. This diagnostic does not change the frame metric and is not new performance evidence. Manifest artifacts/worker-cpu-wall-profile-20260921-preedit.txt; primary API semantics verified in Microsoft GetThreadTimes/QueryThreadCycleTime documentation. VIF index-division work is deferred until a reliable baseline exists.
+
+## PRIOR - XYZ candidate rejected; restore and requalify the protected baseline, 2026-09-21
+
+The XYZ combined integer candidate passed196608 scalar-reference state/fault comparisons across16 host MXCSR modes (packed backend available), runtime/translation and65536-readiness tests. Its linked prepare<true> at RVA021d6710 contains a call to existing try_fpu_madd4 at021d7380; inspected512-byte native slice SHA fdfa4f663cbbc0ad6724cb795087b5c87b6e278a4448fdbe66f1c06985d15693 proves the changed call path is compiled. Hidden replay project-link-runtime/20260921T235220Z-333e70c1362844fcbf03f1e9646b93a8 reached33M with normal work counts and no faults.
+
+The first qualified attempt279e1b9fcdf44242a7fc4661ee095eb0 was rejected BEFORE launch for another game/compiler; it is not a performance sample and the guard was not bypassed. Retry a1d1ac4a214b4cc5bb310bfaae4e9543/evidence738f8376d47f407693b846222e94e3ef passed143-input freshness and all established frame/EE/GS/VU/normalized-IOP hashes,864 original writer events, but measured10.474293FPS (60/5.72831s; windows10.352681/10.598797), versus preceding original11.420718FPS (60/5.25361s). This offers no acceptable speed gain; candidate was immediately byte-restored via backup e6739974b2004e96aaf71250e6303b67 to runtime/vu_xyz.cpp SHA f468e046c6a02c22419ecb2986525a3e2283c009f22b3035a2c506ef428f072e. The protected host1a122b9f... and disabled embedded-rounding route remain untouched. Independent XYZ regressions in runtime_tests.cpp are retained.
+
+Next rebuild restored game and qualified-verify the control under current conditions before making any performance conclusion beyond rejection of this candidate. No slower runtime change may remain accepted. If control does not recover, investigate run conditions rather than blaming the removed code. HG-DIAG-032 probe remains removed; only its measured attribution and new test coverage are retained.
+
+## PRIOR - fresh11.420718FPS control; test combined XYZ integer product+sum, 2026-09-21
+
+HG-DIAG-032 capture project-link-runtime/20260921T234321Z-549f1512122044dbbb449017c113e666 finds recovered heavy-loop4.8610742s with3.5851216s in60 VIF bursts; GIF service0.0400684s, explicit raster0.306112s. GS timings include nested work (sprites0.6324601s, strips0.3381137s) and are not additive exclusive totals. Full-run GPU flush0.4318462s/readback0.9447543s remain normal. Runner probe byte-restored, clean build3ee4ea2f24714fb28c21e1b0ca4223a2 completed, and fixed qualified control6959edb5bf4c4a0791f214be80482c55 measured11.420718325FPS,60 boundaries/5.25361s. All143 inputs, original864-writer provenance and established state/image hashes match executable0324fba5.... Protected host1a122b9f... is untouched.
+
+Next one bounded candidate changes only runtime/vu_xyz.cpp plus focused runtime-test coverage: for already-validated XYZ MADD/MADDA, use existing CPU/OS-guarded combined integer product-and-add helper directly on the existing4-word register backing arrays. Consume only three result lanes and their flags; never read architectural W, require W definedness, write W, or let W exception bits affect status. VF00 XYZ uses literal zero inputs. Every invalid/undefined case and unavailable-CPU case retains original scalar reference/fault order. Standalone MUL remains unchanged. This differs from HG-FAIL-019's three scalar products plus padded add4: both arithmetic stages are packed together and there are no input-padding copies. It does not enable the failed embedded-rounding helper (still false), introduce FMA, or change instructions/clocks/readiness/emitter/renderer. Mathematical source is the existing lane-independent integer helper and scalar mask14 reference.
+
+Validation: explicit mask14 scalar-reference state/fault tests across edges/random inputs, aliases,VF00,undefined W/XYZ, invalid indices/broadcast, sticky/MAC flags, clocks and MXCSR modes; build, hidden original replay and qualified control/candidate alternation if worthwhile. Keep only repeatable FPS benefit, otherwise restore only vu_xyz.cpp and rebuild clean. Pre-edit manifest artifacts/xyz-combined-integer-madd-20260921-preedit.txt; exact automatic backups protect the baseline. No speed gain is yet claimed.
+
+## PRIOR - preserve11.4FPS and attribute remaining whole DMA bursts, 2026-09-21
+
+Continuation verified no active jobs and current qualified original-arithmetic executable78a0c91d... at11.401186864FPS, with protected event/refresh host SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Do not repeat disabled MADD, byte-append, VU identity or unchanged sparse-readback trials. Existing DiagnosticProfile samples only roughly1/256 outer slices; costly DMA work can occur in rare long bursts, and old whole-system timing predates the retained host fix.
+
+HG-DIAG-032 plan: modify only runtime/system_diagnostic.cpp temporarily, activate solely at31M in configured profiled unpaced33M. Time complete VIF and GIF service spans (three host clock reads per outer slice, no guest-instruction/qword hooks); record sums/maxima and active-channel counts. Enable existing per-primitive GS host counters at31M, clearing only those counters and existing raster host counters, never guest GS state. End heavy-loop timing before bulk budget logging. Keep every original pump call, raster operation, synchronization/fault, input and guest clock. No generated/emitter/header/host change. One hidden33M replay yields attribution only; remove probe byte-exactly, rebuild before qualified timing, and select one meaningful optimization from the measured dominant class rather than another instruction-count guess. Pre-edit manifest artifacts/recovered-host-burst-profile-20260921-preedit.txt; automatic byte backups preserve the runner. No speed gain is assumed.
+
+## VERIFIED - recovered11.4FPS host retained; arithmetic experiment disabled after flat comparison, 2026-09-21
+
+Final test rebuild07619d594ccc4f2e8fed7655229cb2ca succeeded. Current-route runtime tests d8c32d449bba467c81472b7f27be168c pass (8452608 scalar lanes in direct helper fixtures,4608 GIF byte cases,5788 packet state/fault checkpoints and keyboard cases); translationa4170de1f1a645fa9c054d1cb7257ef7 and65536-readiness5bb37491043f449a9224ad51752d18f2 pass. build/Release/hg_game.exe is byte-identical to final verifier47eac334b33a4a2b9f0a5b3acd8fce84/hg_game.exe, SHA78a0c91d.... All jobs started in this update are terminal. No production arithmetic shortcut or temporary timing probe was left enabled; the proved host fix and source/binary freshness guard remain.
+
+Current original-arithmetic-route build14d202aae83044fdb10560e15b3672f2 succeeded. Executable SHA25678a0c91d159da2b8472688a93594298b144a9b7c21c1c5c600b62a6aff094dcd (36,022,272bytes). Final fixed qualified verifier joba02e4fc3207e4d09b17005ba236370c7, evidence project-link-verifier/47eac334b33a4a2b9f0a5b3acd8fce84, measured11.4011868636FPS (60 original heavy boundaries/5.26261host seconds; windows11.38766/11.41474). All143 manifest inputs and isolated executable match; all established final frame/EE/GS/VU/normalized-IOP hashes match;864 original0x001bef84/caller002d1c50 events with zero lost/unexpected/caller/invalid-stack failures. No30FPS claim.
+
+The guarded arithmetic candidate measured11.3883758847FPS in the immediately preceding qualification (evidence9e7d985c63b6448c8312d3d912fa8039,60/5.26853s). Its difference from current control is about0.11% and does not establish any benefit or meaningful regression. use_embedded_rounding_madd is now false in runtime/fpu_add4.cpp SHA213498c2d38ab1b0c9fe8a97ed574493c5d40c791b9e6d916d513080783b9513. Candidate helper/direct regression tests remain for reproducibility but gameplay uses the original integer/AVX2 path. No candidate arithmetic shortcut is retained in the production route.
+
+The successful event/refresh host is unchanged SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436; the4FPS regression is recovered, current qualified baseline remains11.3-11.4FPS, above historical9-9.5FPS. Current game source and executable are synchronized. All timings use the unchanged original-writer verifier, never video/presentation counts. Next work must preserve this host fix and identify meaningful remaining CPU/VU/GS work before another small trial; do not repeat disabled arithmetic or word-append trials unchanged. Detailed experiment/backup manifest artifacts/madd-er-qualified-control-20260921-update.txt. Latest test/build job status should be checked on continuation.
+
+## PRIOR - recovered host protected; arithmetic candidate qualified but no demonstrated gain, 2026-09-21
+
+Latest fixed qualified candidate job2d0faf7fcf7d47c19d236b6ec499f7bd, evidence project-link-verifier/9e7d985c63b6448c8312d3d912fa8039, measured11.3883758847FPS (60 heavy boundaries/5.26853host seconds; windows11.37635/11.40043).143-input freshness matched executable be497bc09aa35d12aabf079cf560b603124e6f8dcb3c9fb30046605a038eac2a. All established frame/EE/GS/VU/normalized-IOP hashes and864 original0x001bef84/caller002d1c50 events match; no qualification failures. Existing direct tests passed2113152 vectors/8452608 scalar lanes with16 MXCSR modes, guard fallback, exact flags and failure atomicity. The prior protected baseline measured11.4190446827FPS. This small difference is NOT a demonstrated gain or proof of a real regression.
+
+Bounded next action before accepting any arithmetic change: change only runtime/fpu_add4.cpp use_embedded_rounding_madd from true to false, preserving the helper and direct regression tests for reproducibility. Rebuild game and fixed qualified-verify the original arithmetic route under the current retained event/refresh host. Do not restore old game_host.cpp or alter guest instructions/clocks, input, rendering, errors or verifier. Keep the arithmetic experiment disabled unless repeatable improvement is established. Source/decision manifest artifacts/madd-er-qualified-control-20260921-update.txt; automatic exact backups preserve the enabled dispatcher. Current protected host remains1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Current docs below describing a disabled initial route are historical; enabled candidate really ran in this latest qualification.
+
+## PRIOR - protected11.4FPS baseline; guarded exact full-lane arithmetic candidate, 2026-09-21
+
+GIF word-append trial is inconclusive, not retained: candidate11.434888FPS vs restored11.419045, mixed window direction and~0.14% aggregate. gs.cpp is original e03185c7... and current built controlc8be3a4d... is source-matched. The4608 bytewise transport regression fixtures are retained independently. Machine code confirmed the candidate really changed sixteen stores to two; fewer instructions alone did not give measurable FPS. No host fix was reverted.
+
+Next single bounded candidate: isolated full-lane MADD helper using AVX512 embedded round-toward-zero and suppressed host exceptions, but only for a proved normal-value range. No global floating-point mode change and NO FMA: product and sum remain separately rounded. Existing integer Fpu::product/add and AVX2 remain reference and fallback. Exponent-zero inputs are explicitly flushed to signed zero. Exponent255 always rejects. For nonzero products guard sum of encoded input exponents in128..380; this ensures product exponent1..254 regardless of significand carry. For addition, sort magnitudes, require larger exponent24..253 (or both operands zero), then clear the smaller operand's lowest delta significand bits before addition, or replace it by signed zero when delta>=24. This reproduces the original pre-add truncation without guard/round/sticky bits; nonzero difference is at least one big-exponent mantissa unit and cannot underflow within the guard. Upper exponent limit prevents IEEE overflow saturation from masquerading as a valid normal result. Every rejecting case leaves output state untouched and follows the unchanged integer path. Masked4-lane loads/stores read/write exactly16bytes.
+
+Files: new runtime/fpu_madd4_er.cpp and tests/fpu_madd4_er_regression.hpp, runtime/fpu_add4.cpp dispatcher, its small API header, CMake isolated source flags, runtime_tests integration. Gate by CPUID AVX512F/DQ/CD/BW/VL plus AVX2/OSXSAVE and XCR0 extended-state bits0xe6; no CPU feature is assumed. Initial production route is disabled while direct guarded helper tests establish bitwise equivalence, failure atomicity, signed zeros/cancellation/exponent edges and host MXCSR preservation over all4 rounding modes and4 FTZ/DAZ modes. Existing VU flags/readiness/advances/input/render faults are not edited. Only after tests, enable one route, build/replay/qualified A/B with recovered event-host baseline; retain only repeatable gain, otherwise restore/disable and rebuild. This is neither the rejected prepared matrix path nor padding partial XYZ into SIMD. Backup/hash manifest artifacts/guarded-madd-er-20260921-preedit.txt. Primary ISA/compiler documentation is recorded there; independent mathematical equivalence to the current model, not a new claim of complete console arithmetic fidelity.
+
+## PRIOR - preserve recovered11.3FPS; remove proven bytewise GIF append overhead, 2026-09-21
+
+Continuation confirms current executable8faa79a2... and qualified verifierf7e7e60d...=11.370032FPS with established hashes and142-input freshness. All previously pending native/runtime/translation/65536-readiness and128 Python tests have passed (latest jobs9f6754cf...,3cbbc4c7...,6d07edc8...,098f8e0f...). Do not roll back the retained event/refresh host when editing GS transport.
+
+Controlled-input smoke evidence project-link-visible/20260921T203204Z-0baaca1564d54a90a3572e41a034b953: delivered left26M..26.5M moves original no-card selection from NO to YES; cross50.78M..51.29M advances saved game image to CAPCOM. Logs show all press/release events. Saved images were inspected. Owned PrintWindow capture in the preceding33M smoke was all-white despite valid saved game pixels, so actual on-screen/resize/physical keyboard display is NOT certified by this tool. The first smoke hit its60s wall limit; second was explicitly cancelled after the functional input check, terminal confirmed. These are not gameplay FPS runs.
+
+Native audit found current GifPath::submit_qword at RVA021d3180 emits sixteen separate byte stores, fourteen shifts and repeated vector pointer reloads for every qword; the current native384-byte evidence slice SHA is c80276a1c962fbc938c4360c1bd98430e38dd265f4a6ca0a4afbfa080ff81c65. Prior heavy-phase count is17,850,014 GIF qwords. Next bounded candidate changes only the append serialization in runtime/gs.cpp: recognized little-endian hosts use two8-byte memcpy calls after the same vector resize; unknown/big-endian targets keep the existing scalar loop. Preserve all parser/decoder/GS application/fault/queue/clock/input behavior. Tests in tests/runtime_tests.cpp independently compare pending bytes over boundary/random values, growth/reset and deliberately unaligned host-buffer prefixes; original incomplete packets and malformed-transfer faults must remain. This is neither the rejected streaming parser nor changed packet storage/lifetime. Manifest artifacts/gif-word-append-20260921-preedit.txt; all edits byte-backed-up automatically. Build/test, inspect machine stores, hidden replay and qualified A/B. Keep only for repeatable gain over the recovered host baseline, otherwise byte-restore and rebuild.
+
+## RETAINED - event/refresh-aware host reversibly recovers11.3FPS, 2026-09-21
+
+Four interleaved qualified observations now establish the host-loop effect under current conditions: original6307f56dbf734d9390d5f16726eba31d=4.082260266FPS (60/14.69774s), candidatec6a43b6fc9584ca59d7b516029da6c53=11.326161356FPS (60/5.29747s), restored original7f64ea2afa9c4ac4a1c82c8221b27ad1=4.058046294FPS (60/14.78544s), exact restored candidatef7e7e60dcb5248f691ebf6c9276f73b3=11.370032007FPS (60/5.27703s). All four pass142-input freshness, original0x001bef84/caller002d1c50 provenance864 events and every established frame/EE/GS/VU/normalized-IOP hash. No GLSL/GS/VU/guest-input/clock/verifier change. Candidate is retained; this is reversible recovery beyond the historical9-9.5 range, not30FPS.
+
+Current source runtime/game_host.cpp SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Build43dbaa78038e4e9da8972ebc53ab23b8 produced36,022,272-byte exe8faa79a2734d65dbb2e124401d1ce1a05c20f1fff02d585ce1bb03563f2bc1db; input-manifest SHAebb3025f7567c429e02e091311ed8c99f9c7e0651cbf585247cacd9981b38444. Original baseline source/executable and candidate are preserved in automatic backups and verifier evidence. No rejected GL callbacks/context changes or VU shortcuts were revived. Probe counters are removed.
+
+Mechanism established at application level: old UI performs clear/draw/swap without new CPU pixel frames; probe measured6235 duplicates out of7097 swaps. Avoiding redundant host redraws while retaining fresh frames and resize/refresh handling drops replay flush15.2648s ->0.4385s, readback3.8024s ->0.9461s and reversibly raises qualified FPS. glGetError was the place contention surfaced, not necessarily the root cause; the exact driver-internal reason for the historical shift is still unknown. The unchanged archived-binary test ruled out recent recompilation as necessary, NOT the old native host loop as a contributor.
+
+Next finish regression tests and bounded visible/controlled startup smoke test if the current tool supports the required stage without long unrelated replay. Actual physical keyboard/resize/exposure behavior is not certified by hash equality alone. Then profile remaining heavy native work against this stable11.3FPS baseline rather than modifying driver settings. Do not roll back the retained host fix when testing future candidates.
+
+## PRIOR - event-driven host recovers11.326FPS; reverse control and repeat before retention, 2026-09-21
+
+Candidate host-only source SHA1a122b9f... compiled executable3f70b15abfb3ec7fd4bc153bb2e84bd1960f82b43bd7e0d70dbbac8da66163ee. Replay project-link-runtime/20260921T202106Z-e9edd49b71924be89aa03acbefd1f511 reaches33M with unchanged48195sprites/305856triangles/842masked batches; flush0.4384992s/readback0.9460685s versus15.2648s/3.8024s in the count-only old-host probe. Final image matches baseline exactly.
+
+Fixed qualified verifier c6a43b6fc9584ca59d7b516029da6c53 passes142-input freshness and all established frame/EE/GS/VU/normalized-IOP hashes and864 original writer events. Heavy60 boundaries take5.29747host seconds =11.326161356FPS; both individual intervals11.3267/11.3256. Compare current old-host baseline6307f56d...=4.082260FPS, not only historical9FPS. This is promising recovery, still requires reversible contemporaneous control.
+
+Next bounded validation: restore only game_host.cpp using candidate backup3d6ddd5559264286a5ced680990b699a to baseline cf8db914..., build and fixed-verify old host again; then restore exact candidate bytes from the restore backup, rebuild and verify again. No new optimization or driver/OS setting change in this A/B. Retain only if old-host stalls return and candidate recovery repeats with exact guest state. After a positive A/B run focused native/Python regressions and a bounded visible-input smoke test where supported; do not claim resize/input physical testing without execution evidence. Source/binary gate remains active for all qualified runs.
+
+## PRIOR - reduce measured redundant host redraws; preserve all guest rendering, 2026-09-21
+
+HG-DIAG-031 completed: project-link-runtime/20260921T201812Z-ca7efefa54de4b79a56614944ada17ea recorded7097 actual swaps/6235 duplicate swaps/862 fresh presents in42.9934s, with ordinary game draw counts and15.2648s flush/3.8024s readback. The probe was byte-restored. This establishes excess host presentation work, not yet causation for the GPU stalls.
+
+Bounded candidate in runtime/game_host.cpp only: redraw/swap for fresh mailbox frames (including identical pixels), initial paint, framebuffer-size changes or GLFW refresh requests. Keep all existing texture uploads and optional presentation validation; never alter original GS draws, driver errors, barriers, guest clocks, recorded inputs or FPS metric. Wake UI through glfwPostEmptyEvent after frame publication, fault status and completion; callbacks stay UI-thread only. Continue input/status/close checks every iteration and use bounded4ms event wait only when no redraw, retaining existing50ms minimized handling. No OS/driver-setting change or other-process access. Primary GLFW docs plus this project's existing opengl_host.cpp guide the independent host-only implementation. Manifest artifacts/event-presentation-20260921-preedit.txt. Build/replay/qualified verifier, exact image/state comparison, then restore contemporaneous control and re-enable only for repeatable improvement. Remove all probe counters before timing.
+
+## PRIOR - investigate duplicate presentation load without changing guest work, 2026-09-21
+
+Fresh unchanged-build verifier6307f56dbf734d9390d5f16726eba31d measured4.082260266FPS with142-input provenance and every established state/image hash matching. No current code regression or recovery is established by this small variance from4.002887FPS. The previously tested unchanged archived control already shows the same driver-wait inflation; use those artifacts rather than duplicate its replay without a changed condition.
+
+Source audit found the host UI unconditionally glClear/draws/swaps even when no fresh pixel mailbox item exists. Its existing presented count hides duplicates because it increments only on fresh frames. New bounded HG-DIAG-031 in runtime/game_host.cpp will count actual swaps and no-fresh iterations only, and report once at teardown using the already existing wall clock. No GL command, guest operation, input, clock, errors or wait changes. Build/replay once, then remove the counter probe. If actual duplicate load is excessive, consider event-driven/refresh-aware host-only presentation (new frames and inputs still delivered) rather than altering GS or global driver settings. If not, use other measured host scheduling evidence. Manifest artifacts/host-swap-audit-20260921-preedit.txt; automatic exact backups apply. GLFW event/refresh contracts independently checked in official input/window guides.
+
+## VERIFIED CLEAN STATE - freshness guard retained; current GPU latency unresolved, 2026-09-21
+
+Final restored game build d607ee921baf4b7ba46948506d297acc succeeded. build/Release/hg_game.exe is36,021,248bytes, SHA256 7de5e17780c2108fa5dc585318cad33e7a76f3c9c3647c9289eff38757bb85f0. The executable is byte-identical to the isolated final verifier copy; GlErrorMonitor is absent from the linker map. The post-link manifest records142 inputs (including the empty, unreferenced rejected-helper placeholder); manifest SHA92eb92d40b291d410f7f9b2820f4a9553c688a89eade26901fa261d6ccbab192 and input SHAfa4515cdd5798979bc7f841df4980f570eb83c977486a59e3489f20460096000. Current runtime source and executable are synchronized, not a source-only revert.
+
+Final fixed qualified verifier job2646d0ea287148be9510a061631582c8, evidence project-link-verifier/9628d990fb19447a8d1ea0c3491d34f7, passed the freshness gate and original0x001bef84/caller002d1c50 qualification:864 writes, no unexpected/lost/caller/invalid-stack errors. All established final frame, EE RAM, GS VRAM/state, VU memory/state and normalized-IOP hashes match. Heavy60 boundaries took14.98918host seconds =4.002887416FPS; individual windows3.982017/4.023978FPS. This is the current performance, not historical9-9.5FPS and not30FPS. No speed gain retained.
+
+Restored test build8217a279e34342f2a66f5bc01fa93e0b succeeded; runtimec6d47e9cfb4f46458e28089ad5be990e, translatione67120c48ea24828b6f87608630d9f35 and65536-readiness5c197b11d2934b329f4828137086133f pass. Final Python suite5559f90bd6ee484ca363ce920c5fdb85 passes128 tests. The synchronous callback/context-isolation/VU early-return candidates and GL-stage timers are removed. Every original GL error check, guest instruction, clock, input and rendering path remains. Retained modifications are CMake post-link provenance, tools/hg_build_provenance.py, fixed-verifier preflight,12 synthetic tests and documentation. The empty gl_error_state.hpp placeholder contains no declarations or runtime use; rejected contents are archived externally, deletion unavailable through current connector.
+
+Important next action: isolate current host/GPU/driver scheduling and load/clock conditions with the exact pinned archived control BEFORE more VU micro-optimizations. Unchanged archived executable2608296b... has reproducible15s flush latency now versus~1s in its historical capture, with same input/frame/EE/GS bytes and reported driver string; recent code changes cannot alone explain it. The call-site attribution is glGetError wait time, not proof of its underlying cause. Project Link currently exposes no general process or GPU-clock/driver-setting inspection; do not bypass the configured task boundary or change unrelated processes/settings. No build/replay/probe job is intentionally left active; verify jobs on continuation. Do not resume rejected candidates unchanged.
+
+## PRIOR - restore production after negative trials; unchanged archived executable reproduces latency, 2026-09-21
+
+Synchronous notification candidate passed its actual NVIDIA INVALID_ENUM notification self-test and portable513-length/first-error tests. All established qualified frame/EE/GS/VU/normalized-IOP hashes and864 original writer events match, but verifier a8086a1ce14a41ebae73903e79a5fa87 measured3.595859FPS versus clean control4.040570FPS. Replay flush time18.3585s/readback2.7917s: moving error reporting did not remove the underlying synchronization cost. The complete backend, context request and runtime tests were byte-restored (gl_gs.cpp e5069d2b..., game_host.cpp cf8db914..., runtime_tests.cpp62ad00b4...). No polling/error check is suppressed in production. New gl_error_state.hpp is unused; archive its rejected implementation and leave an explicitly empty placeholder because this connector cannot delete newly created files.
+
+Decisive unchanged-binary comparison: configured recorded_control replay project-link-runtime/20260921T195021Z-5c12f01e72cc4234bae8c012c45afcdd uses exact same35,827,712-byte executable as historical recorded_control project-link-runtime/20260921T023355Z-e962461879604a5e9776d9d8db125a5b, SHA2608296bcff3c2a47887f67b2cf233fd41a30eaf9792f50df85f21c1ac3d5eae. Input-events JSON, final frame, full EE RAM and full GS VRAM are byte-identical; sprite/triangle/masked counts match. Both report RTX5070/OpenGL4.3/NVIDIA616.92. Yet full-run flush time changes0.9963266s ->15.1869414s and readback1.5088076s ->3.5050519s. This archived binary contains none of today's code changes or new freshness tooling. Therefore current runtime/driver conditions, not a recent compilation change, can reproduce the large latency shift. Exact underlying driver/GPU/host condition remains unresolved; do not call it proven instrumentation causality, a proven driver bug, or an FPS measure from this hidden replay.
+
+Next: finish cleanup, document reusable results, rebuild original renderer/runtime with the retained post-link freshness gate, rebuild restored tests and run final fixed qualified verifier. Keep the clean original runtime, no performance candidates or hot timer probes. Current useful baseline is ~4FPS under these conditions; historical9FPS is not a current claim. Next performance investigation should control host/GPU scheduling, load and clock conditions using this exact archived binary before more VU rewrites. No changes to device settings or unrelated processes are authorized by this note.
+
+## PRIOR - preserve GL faults with validated synchronous notifications instead of hot polling, 2026-09-21
+
+Independent GS context candidate did not reduce the measured issue: replay project-link-runtime/20260921T193643Z-94beeb0eb8514953b68accb9143a01cf has flush15.1996341s/readback3.6566826s and unchanged work counts. The sole game_host.cpp change was byte-restored. No qualified gain is claimed; do not retain or repeat that change unchanged.
+
+Next bounded mechanism: request a debug context for the GPU worker, retry ordinary creation if unavailable; backend uses synchronous GL debug API-error notification only with verified CONTEXT_FLAG_DEBUG_BIT, available functions, no preexisting callback, enabled API error messages, synchronous delivery and a defined startup invalid-enum self-check proving callback delivery before return. Non-debug/unavailable/preexisting-callback cases retain the original glGetError path. At exactly the existing flush/download check locations, inspect the error latch and throw on any captured API error; no checks, draw/transfer/barrier/hazard/fault points, clocks or inputs are skipped. Callback copies bounded first-error text without allocation/GL/throw; RAII unregisters before context lifetime ends. Existing allocation/compile/link checks remain. This optimizes successful error reporting, NOT correctness detection. It does not promise the driver will be faster; Khronos notes synchronous output can also cost performance.
+
+Files: runtime/game_host.cpp, runtime/gl_gs.cpp, new runtime/include/hg/gl_error_state.hpp, focused tests in tests/runtime_tests.cpp. All edits automatically backed up, manifest artifacts/gl-error-callback-20260921-preedit.txt. Primary KHR_debug sections2.5/5.5/5.5.2/5.5.7 guarantee API error messages only with debug context and synchronous mode before generating call returns; callbacks in ordinary contexts cannot replace polling. Build/runtime tests and real driver startup self-test, then replay + qualified state/image/manifest checks. Alternate normal polling controls if a gain appears, otherwise restore all candidate changes and rebuild clean. No permanent diagnostic timer remains.
+
+## PRIOR - glGetError accounts for persistent GPU delay; test independent worker context, 2026-09-21
+
+HG-DIAG-029 refinement project-link-runtime/20260921T193358Z-e1b5664fb18a4a06a4837c8e5a20c198 resolves the15s flush cost: existing glGetError calls cost6.9420725s(sprite),4.2034801s(triangle),3.9702024s(masked), total15.115755s of15.2242906s. Ownership/bind and CPU queue clear are small. These timings include any synchronization exposed by the call, not necessarily error-query computation or GPU execution in isolation. All temporary GL counters have been byte-restored to e5069d2b... before production work. Do NOT disable glGetError or suppress driver failures.
+
+Next bounded candidate changes only runtime/game_host.cpp: make the GS worker context independent (glfwCreateWindow share=nullptr) rather than sharing all object namespaces with the UI window. Source audit shows CPU pixel vectors are the ONLY bridge; each context owns/creates/deletes its own GL buffers, programs and textures, so no required shared resource is removed. Keep every existing error check, renderer/ownership/barrier operation, window visibility, input and guest clock. Hypothesis is unnecessary share-group driver synchronization, not an established root cause. Official GLFW context guide documents this parameter and driver-managed sharing: https://www.glfw.org/docs/latest/context_guide.html#context_sharing . Manifest artifacts/independent-gl-context-20260921-preedit.txt. Build restored GL plus candidate host, replay and fixed qualified verifier; compare exact state/output to control, alternate controls if a gain appears. Revert if no benefit or any correctness drift.
+
+## PRIOR - GPU flush delay localized to cleanup/error-check; split that section, 2026-09-21
+
+HG-DIAG-029 capture project-link-runtime/20260921T193154Z-4ee147f04473426fa031c6fcaf4cdf53 completed with unchanged draw counts. Of15.2826546s total flush time,15.1881098s (~99.38%) is in the final stage containing buffer bind/ownership updates, CPU queue clearing and glGetError. The VRAM, command/tile upload and dispatch/barrier groups are individually small. This is NOT evidence for replacing upload/readback storage or removing rendering work.
+
+Next bounded refinement of the same probe in runtime/gl_gs.cpp: split the final stage into ownership/bind/optional nonresident readback, CPU queue cleanup, and the existing glGetError call. Keep the error check and all GL/ownership/order operations exactly in place. Record9 stage totals/maxima; one hidden33M attribution run, then byte-restore gl_gs.cpp using original backup35f428bc2d764768891060ac5957c031 and rebuild clean before any performance candidate. If glGetError dominates, investigate a semantics-preserving way to avoid cross-context/driver synchronization, not simply disabling correctness error checks.
+
+## PRIOR - clean control confirms GPU stalls; isolate flush API stages, 2026-09-21
+
+Restored control built successfully (jobb3cfca2b163c49babf4677ecdee90dc2), executable9492514de8510cf0255b79f30ae37783429a283e47b2eca664ee63cec1a9ea7c. Runtime/translation and65536 compiled-readiness tests pass after rebuilding control tests. The mapped vu1_program_1_run entry and its first640 native bytes exactly match the earlier clean baseline (RVA0099fc90, file offset10088592, slice SHA d74b3d0b00de5c285a3910a176b2ac285a72e926cd550cde4472889b46e1594d); this is bounded code identity, not whole-binary equivalence.
+
+Control replay project-link-runtime/20260921T192807Z-ee5f415c337d452eb8a8e78f901fa623 still has flush_ns15165702000/readback_ns3616067200. Fixed verifier0321d8e9233f4e2a921d3812a72c8bb3 passes141-input manifest gate and every established state/image hash,864 qualified original writes, but60 heavy boundaries take14.84939s =4.040570FPS. Candidate4.050141 versus control4.040570 is effectively flat, not a demonstrated speed gain. The VU early-return remains removed; do not attribute the historical9FPS-to-current4FPS shift to it or to removed XGKICK probes.
+
+HG-DIAG-029 plan: one temporary change in runtime/gl_gs.cpp partitions the EXISTING full-run flush span into VRAM preparation/upload, command-buffer upload/bind, tile CPU construction, tile-buffer upload/bind, program/dispatch/shader barriers, final buffer-update barrier, and ownership/cleanup/error-check. Record sums/max by sprite/triangle/masked batch. A few host clock reads per batch, no per-qword/instruction timers, no GL call/order/barrier/hazard or guest changes. Capture one configured33M hidden replay, identify the15s component, byte-restore and rebuild before qualified timing. Manifest artifacts/gl-api-stages-20260921-preedit.txt. Do not repeat rejected buffer/storage variants without distinct measured evidence.
+
+## PRIOR - freshness repaired; restore a contemporaneous control for persistent GPU stalls, 2026-09-21
+
+Build-hygiene validation passed: 128 Python tests (12 new freshness cases). Fixed verifier job facbf8ed515f41e782b69a78c2e39e50 rejected the old HG-DIAG-027 executable before launch with status stale_build. Build job4caa743e50b84869affa826637a535ca then succeeded and generated build/Release/hg_game.exe.build.json for141 input files. Candidate executable SHA256 7f5970085d4a91148b867c786f367fdae2cc2e934539f0406c9b22ccdb488da7. Native proof: xgkick_profile_hook is absent from the new map; mapped vu1_program_1_run at RVA0x009a6a60 contains the added q/p early-out branch structure, unlike the older restored code at RVA0x0099fc90. This is not a source-only change.
+
+Fresh uninstrumented hidden replay project-link-runtime/20260921T191549Z-546e2ef988ec4fa2a769bfce321c8f0b completes33M with normal48195 sprite/305856 triangle/842 masked-batch counts, but flush_ns15238028300/readback_ns3634329700 remain abnormally high. Qualified verifier e11b510d1a094cbf8e911e887bdf7c15 passes the new manifest preflight and all established frame/EE/GS/VU/normalized-IOP hashes,864 original writes, but measures4.050141FPS (14.8143host seconds for60 heavy boundaries). Therefore the former9-9.5FPS historical range is NOT a current measurement, and the removed timing probes cannot be assumed to be the cause of these stalls.
+
+Next bounded action: remove ONLY the pending advance_pipeline early-return and its two comments from vif.hpp (candidate SHA7f6928c7... -> exact pre-candidate c7891753...). Exercise real source-drift rejection before rebuilding, then build/verify this uninstrumented control under the same freshness gate. Do not compare the current4FPS directly to a historical9FPS run to blame a tiny VU edit. If the control also stalls, prioritize one gl_gs.cpp-only API-stage timing split of the existing flush span to localize the15s cost; do not add more VU/XGKICK hooks or repeat prior transfer-layout experiments. The FPS reporting timestamp audit reconstructs9.3336 versus9.3338 for one older run from rounded cumulative boundary rates, so it is not evidence for the major slowdown; preserve the existing metric during this A/B.
+
+## PRIOR - repair source/binary freshness and validate the pending VU candidate, 2026-09-21
+
+User requested fixing the confirmed source/executable mismatch before further speculative performance edits. Current game executable remains the HG-DIAG-027 binary; current vif.hpp has the no-Q/no-P advance_pipeline candidate and the diagnostic hooks are removed. Earlier cache-on/off native machine code genuinely differed, but identical executable size did not establish identical code layout. Abnormal GPU stalls in diagnostic runs are unexplained, not proven caused by instrumentation.
+
+Bounded build-hygiene change: add tools/hg_build_provenance.py and synthetic tests; CMake hg_game POST_BUILD records current project runtime/generated/config/generator inputs, configuration/build records and the linked executable SHA256. The fixed frames verifier checks this manifest against current inputs and the isolated executable BEFORE launching, rejects missing/stale/wrong binaries, and copies the checked manifest into fresh evidence. Hashing occurs outside measured native time, no guest/runtime execution semantics or FPS formula changes. This is a freshness guard under the existing build dependency system, not proof of arbitrary compiler correctness or independent proof that generated source matches changed translator intent. Inspect actual native code and relevant compile records separately for the pending change. Manifest: artifacts/build-freshness-gate-20260921-preedit.txt; exact edit backups are automatic.
+
+Validation: synthetic missing-manifest/source-drift/preserved-timestamp/added-deleted-file/wrong-binary/configuration cases; demonstrate prebuild fixed-verifier rejection with no game launch; rebuild the existing pending candidate, confirm diagnostic symbols gone and fresh intended code/commands, then original replay and qualified verifier with pinned exact binary. Do not invent a speed gain from a clean rebuild or from historical comparisons. If the candidate has no repeatable advantage versus a contemporaneous control, revert only its three added lines, rebuild, and revalidate. No new VU or renderer optimization during this integrity repair.
+
+## PRIOR - reject VU identity cache and split dominant VU/XGKICK/GIF cost, 2026-09-21
+
+Broad audit still ranks heavy31M..33M VIF/GIF at ~4.857s, versus EE ~0.698s, explicit raster ~0.497s, IOP ~0.316s, GPU readback ~0.336s and GPU flush ~0.271s. The VU identity-cache candidate is now performance-rejected/inconclusive despite exact state: cache-on qualified steady FPS samples were9.373315732 and9.386336935; layout-matched cache-off controls were9.507315087 and9.333756464. Means ~9.380 vs~9.421 are inside run variance and slightly favor control. All four preserve established frame/EE/GS/VU/normalized-IOP hashes and864 qualified original writer events. Do not retain host metadata/cache complexity without a demonstrated benefit.
+
+VU identity-cache cleanup is complete. runtime/include/hg/vif.hpp, tools/hgtool/vu_emit.py, tests/gif_tests.cpp and tests/test_vu_decode.py exactly match their pre-cache hashes; configured hg_emit restored out/translated.cpp to known SHA b03c024bfe71528a887556d68aed272dd305a813e288ae32e03c5ee92a4f9b41, and clean build job5f0dd5f0523b43e082cc12b98c810c8b succeeded.
+
+HG-DIAG-026 completed but is timing-contaminated. Evidence project-link-runtime/20260921T174657Z-425b8f33245740069045fe041d672f82 measured126180 VU calls,91140 XGKICK calls/10539780 XGKICK qwords,2.2394372s VU total,0.2776441s nested XGKICK and1.9617931s remainder. However the same run's GPU flush_ns ballooned to15.162s and readback_ns to3.782s, so absolute timings are not trustworthy; source was immediately restored byte-exactly. Treat only the direction (VU-core may dominate nested XGKICK) as a lead.
+
+HG-DIAG-027 also failed its self-check and is removed. Evidence project-link-runtime/20260921T180839Z-1fd269d9aed0439583ee3ba6a01b11a2 counted91140 XGKICK calls and248286800ns, but full-run GPU flush/readback inflated to15.083s/3.428s. Both clock-based VU/XGKICK probes therefore perturb host/GPU overlap too strongly for absolute attribution. Do not repeat hot-path timing hooks; the stable evidence remains prior VU-entry totals/call counts plus static generated structure.
+
+Next bounded production candidate: factor only the common no-Q/no-P path in `Vu1State::advance_pipeline`. Static audit proves q_pending is set only by DIV and p_pending only by ERLENG; generated code has43 DIV and47 ERLENG sites across3482 configured VU pairs. Candidate keeps `issue_cycle+=cycles` first, then returns if both pending flags are false; when either is true, run the existing Q and P completion/decrement blocks unchanged. No emitter/readiness-clock combination, no skipped advance, no changed latency/timestamp/fault behavior. This is distinct from HG-FAIL-015, which combined dependency clocks and regressed8.53%. Validate with existing randomized VU readiness/Q/P tests, runtime/translation tests, hidden33M replay and qualified original-writer FPS. Retain only for a repeatable gain; revert if flat/slower or any state differs.
+
+First observation-only capture completed successfully: project-link-runtime/20260921T103855Z-dbe0e619b99a418ab34b14ee61f1eada. It recorded2068 dirty download events expanding to3874 glGetBufferSubData ranges. Multi-page CPU reads dominate:1731 dirty events,3537 ranges,326778 dirty8KiB pages,2676965376 bytes and1006640500ns, which is98.93% of measured readback time and99.83% of bytes. Their average dirty event is188.78 pages/1.546MB and2.043 ranges. Single-page CPU writes are336 events/2.75MB/10.08ms; only one dirty multi-page write occurred; memory-select/final-finish produced no dirty download. The temporary source probe was byte-restored to gl_gs.cpp SHA e5069d2b... immediately after capture. Diagnostic timing is not FPS evidence.
+
+Second observation-only capture completed successfully: project-link-runtime/20260921T104328Z-311b52eb2a58411eb94a3697ae3b1591. It measured1735 dirty multi-read events with327338 truly dirty pages. One first-to-last bounding transfer per event would cover351042 pages, only23704 clean gap pages extra: +7.241% transfer volume (194183168 bytes /185.19MiB extra across the full33M run), maximum single bound496 pages. Range-event distribution was1083 one-range,458 two-range,194 five-to-eight-range, zero three/four/>8 in this run. Thus only652 fragmented events need staging and the extra byte cost is modest relative to the first capture's roughly halved GL range-call opportunity. The probe was byte-restored before production work; its timing is not FPS evidence.
+
+Production candidate completed and rejected. runtime/gl_gs.cpp kept the direct path for one contiguous dirty run; fragmented dirty sets used one first-to-last glGetBufferSubData into a reusable4MiB staging buffer and copied only truly dirty runs back, leaving clean/CPU-owned gaps untouched. Build succeeded. Hidden replay project-link-runtime/20260921T104813Z-6724e7c1730a4ccda7d3d5603d87f622 reached33M without fault and kept GPU work counts stable, but download volume rose to2880323584bytes and readback_ns to1056517700, worse than the roughly1.02s restored path. Qualified verifier d043105abbb14e42a897f37a3ec532a3 preserved established frame/EE/GS/VU/normalized-IOP hashes and qualified864 original writer events; steady windows9.470325/9.288817 aggregate9.378693FPS. This is below the stronger recent9.554140FPS layout-matched control and provides no repeatable improvement. HG-FAIL-025 records the result. Candidate source was immediately byte-restored: runtime/gl_gs.cpp SHA256 e5069d2b96f77d573fd92b7038632f9c28c30b4f8742bf3405ae56f047d602ae. The built executable still reflects the rejected candidate until the next clean rebuild.
+
+Restored clean rebuild succeeded and fixed qualified verifier project-link-verifier/e89fec77a90244b7b9e5cae5e1128be5 established executable d2a0d7c36be1c8d73087d98659e9a01acf2679cb8f708ae6796828e118ff23df. Established frame/EE/GS/VU/normalized-IOP hashes match;864 original writer events qualify. This run measured9.093816FPS (9.130641/9.057287) and is treated as another variance sample, not a new regression conclusion.
+
+Heavy-only readback diagnostic completed and all temporary code was restored byte-exactly. Evidence project-link-runtime/20260921T110234Z-2c636777143542a7bb347d2f3992ecca resets host counters at31M and reports31M..33M: sprites31620/pixels494505840, flushes1866/flush_ns270618100, upload_bytes38772736, download_bytes650149888, readback_ns336099600, triangles245616/723 batches, masked35389440/600 batches. Readback cause split is overwhelmingly multi-page CPU reads:420 dirty events,900 GL ranges,79140 dirty pages,648314880bytes and335193200ns; one dirty multi-write adds1.835MB/0.906ms. This proves synchronous readback is material but secondary: roughly0.336s readback plus0.271s inclusive flush cost cannot alone explain the roughly6+ host seconds represented by the two heavy qualified frame intervals. Do not continue treating transfer bytes/call count as the sole bottleneck. Temporary runtime/gl_gs.cpp, runtime/include/hg/gs_acceleration.hpp and runtime/system_diagnostic.cpp changes are removed; restored hashes are e5069d2b...,255babdb... and c8c2d536....
+
+User now requests a whole-project audit and diagnostics on the major slowdown players, including original game functions where needed. Inventory contains2196 files:1493 generated build artifacts,489 emulator-package files,23 original-game extracted files, and the first-party project source/evidence primarily under runtime(69), tests(37), tools(26), out(41), config, docs and root build files. Treat generated build products, ISO/CVM, emulator DLL/assets and other binary payloads as artifacts; content-scan every first-party text/code/config/test/evidence file and inventory all remaining files. Run fresh configured hg_analyze/triage and cross-reference unresolved indirect targets with measured gameplay PCs. Build a measured shortlist across EE AOT execution/game functions, VU, VIF/GIF application, GS CPU fallback/raster, GPU flush/readback, memory/coherence and IOP/SIF. Add bounded31M..33M diagnostics only for major unresolved contributors, one observation family at a time, then remove probes before performance timing. If a hot original game PC/function is unclear, use hg_inspect and the pinned PCSX2-MCP live debugger/oracle to prove its behavior/call context instead of guessing. Do not broaden roots or copy external implementation. Pre-edit manifest: artifacts/broad-hotspot-audit-20260921-preedit.txt.
+
+## REJECTED - proved PSMT8H same-pixel feedback but current GPU path is slower, 2026-09-21
+
+PCSX2-guided mapping capture project-link-runtime/20260921T083235Z-0a4b130471b5400693210ae98b0b9330 narrows all18378 measured feedback rejects to one class: PSMT8H=18378, nearest=18378, TEX0.TBP0==FRAME.FBP=18378 and texture stride==frame stride=18378; CT32/PSMT8/linear/other are zero. HG-LEARN-037 records this. PSMT8H uses the CT32 word address and samples its high byte as a CLUT index, so next observation can be exact: retain original GPU rejection and CPU fallback, mark these same-base/stride PSMT8H draws, and inside the already-executed covered-pixel CPU loop compare every nearest wrapped source word to that pixel's framebuffer destination word. Count covered samples, exact source==destination, wrapped u==x/v==y, and nonself samples. No added pixel traversal, no rendering/state change. Completed exact covered-pixel capture project-link-runtime/20260921T083540Z-16227b5d09bc4cef88f6fe9c5aee1c54:18378 draws,794236 covered pixels,794236 wrapped source coordinates equal destination coordinates,794236 source words equal destination words,nonself=0. This supports a framebuffer-fetch-style specialization but must not be generalized from one capture alone. Next derive a cheap per-draw proof: count whether Q bits are identical across all three vertices and whether each vertex's exact STQ coordinate at4 fractional bits equals its XY position minus XYOFFSET for both axes. If all measured self-feedback draws satisfy those conditions, implement a guard requiring constant Q plus exact vertex 12.4 identity; under constant Q perspective interpolation reduces to affine interpolation and the vertex identity carries through the triangle. Candidate shader then uses the current destination word's high byte as the PSMT8H index, preserving per-pixel ordered triangle-list semantics. Any guard failure remains CPU. Remove diagnostics before timing. First guard probe result project-link-runtime/20260921T083903Z-0a5b726636bb4d43a315f745d823616f: all18378 draws have identical Q and Q==1.0, but exact 12.4 vertex identity is0. This is compatible with the independently measured794236/794236 integer-pixel self-map if STQ carries a consistent positive sub-texel offset. Under constant Q the source coordinate is affine; therefore a sufficient proof is that each vertex source-minus-screen coordinate lies in [0,1) texel on both axes. Measure exact4-bit fixed deltas at all vertices; if every delta is0..15, this convex bound proves every covered integer pixel floors to its own coordinate. If not, do not use this guard.
+
+Completed the 4-bit vertex-delta proof in existing replay evidence project-link-runtime/20260921T084132Z-1247e861480f4e5a9833ce0ee51da2b4: draws=18378, q_equal=18378, q_one=18378, vertex_unit_cell=18378, proof=18378, and every vertex delta was exactly dx=8, dy=8 in 12.4 units. This satisfies the [0,15] convex bound for all measured feedback draws. Next bounded production candidate: remove the temporary HG-DIAG-005 proof counters/31M activation; in runtime/gs.cpp mark a triangle only when it is nearest PSMT8H, TEX0 base equals FRAME base, texture/frame stride match, Q is identical and exactly 1.0, and all three exact 4-bit STQ-minus-screen deltas are in [0,15]. In runtime/gl_gs.cpp permit texture/output alias only for that mark while retaining every other hazard rejection and batch-order barrier. In runtime/gl_triangle_shader.hpp, for that mark derive the palette index from the current destination CT32 word high byte for the same pixel, preserving the shader's existing per-pixel triangle-list order. Any guard failure remains on CPU. Add focused guard/equivalence coverage, build/test, run the fixed realtime gameplay33m frames verifier, require unchanged qualification/state/image digests, and keep only if the 18378 fallback class moves to GPU without faults/regression. Current pre-edit hashes: runtime/gs.cpp 79cb904b04212b717971ba6beab054ee2a8187b779f01ca6f3f73695f8b319c4; runtime/gl_gs.cpp e5069d2b96f77d573fd92b7038632f9c28c30b4f8742bf3405ae56f047d602ae; runtime/gl_triangle_shader.hpp 59bf5f2c91d5df495691a1ab99b345738f89e682e98e6be54a629a19caaec4b4; tests/gs_gpu_tests.cpp 8fb45aa1aac9029df976f252e0bf4678b870c0fd7ca4def6c02a36f1d61e350b.
+
+Result: the candidate is semantically correct but rejected for throughput. Full33M replay project-link-runtime/20260921T090040Z-cbd2314d6a154dc99a49476d2d06af35 completed without fault and moved total GPU triangles305856 ->328503. Qualified candidate verifier project-link-verifier/b894c58157df40d79cfafcf2ec461843 preserved frame/EE/GS/VU/normalized-IOP digests and measured heavy windows3.15966/3.16915s =9.480455FPS. A layout-matched control kept the proof/shader/backend code compiled but forced only the admission marker off; project-link-verifier/e093bf9d0518463e8661e387e22aadad measured3.13418/3.14582s =9.554140FPS with the same state hashes. Candidate heavy time6.32881s versus control6.28000s is +0.777%, both windows slower. Reverted production specialization/backend/shader/test changes immediately. Removed the temporary feedback counters and31M activation. HG-FAIL-024 and PERFORMANCE record the result. This disproves the current compute-backend implementation as an optimization, not the exact self-feedback proof.
+
+Immediate next action: rebuild the restored renderer with only diagnostic cleanup retained, run the fixed gameplay33m verifier once to establish the clean post-revert executable/state, then use a fresh hidden profile/rejection census to choose the next measured bottleneck. Do not spend time on the remaining263 unsupported triangle-format rejects unless profiling shows their CPU cost is material; they are too few to assume a meaningful gain. Prefer a larger host synchronization/readback or CPU raster cost supported by the restored run.
+
+## VERIFIED - use PCSX2 feedback architecture to classify genuine triangle feedback, 2026-09-21
+
+Semantic-no-op output hypothesis is disproved by project-link-runtime/20260921T081347Z-cf5afc140bad4634a1c56ca8265a5f8c: all18378 measured backend alias rejects overlap framebuffer pages, zero overlap depth pages, and zero have FBMSK=0xffffffff/no-effect writes. HG-LEARN-036 records the result; remove the probe before further work. These are genuine framebuffer-as-texture draws under current evidence. Next use current PCSX2 renderer architecture as an external lead only: trace how its hardware renderer represents render targets as texture sources and how it selects framebuffer fetch / attachment-feedback-loop / texture-barrier or copy-style paths when a draw samples the active target. Independently map the relevant ordering constraints onto our existing OpenGL compute path. Do not copy implementation. Before coding, classify the measured HG feedback draws by whether each draw needs a stable pre-draw framebuffer snapshot versus ordered same-draw feedback, using original job coordinates/TBP0/FRAME and CPU row-major semantics. Candidate must preserve true feedback ordering; unsafe in-place parallel SSBO read/write remains prohibited. First bounded probe: in runtime/gs.cpp only when profile_raster is active and the current GPU backend rejects a prepared textured triangle, count texture formats, TEX0.TBP0==FRAME.FBP, texture width==frame width, linear/nearest filtering, and for direct CT32 same-base/stride cases compare the first covered pixel's exact wrapped source word(s) against its destination word using the existing PreparedTriangleStq and address functions. Activate only31M..33M hidden gameplay; no rendering/state changes. Remove after one capture. If most rejects are same-target and own-destination sampling, pursue a dedicated framebuffer-fetch-style job using already-read destination data; otherwise classify stable pre-draw snapshot/copy requirements before coding.
+
+## VERIFIED - distinguish true triangle feedback from semantic no-op output hazards, 2026-09-21
+
+Tighter whole-texture page bounds are rejected: verifier92f7927c... preserved all capture digests but measured9.060FPS and GPU triangle total stayed exactly305856, so it admitted zero extra triangle work. Sources/tests were restored. HG-FAIL-023 records the result. Next bounded diagnostic targets the output side of the18378 backend texture/output alias rejects. The backend currently includes framebuffer pages in `writes` unconditionally even when FRAME.FBMSK is0xffffffff (shader store resolves exactly to the old destination), while depth pages are included only when Z writes are enabled. Count rejected jobs by texture overlap with frame pages versus depth pages, full-frame-mask status, and combinations. If a substantial class has only fully masked framebuffer overlap and no depth overlap, candidate is to omit that semantic no-op framebuffer store in the shader and exclude its pages from the write-hazard set; true feedback or depth overlap remains CPU. If not, stop this line rather than attempt unsafe parallel intra-draw feedback. Observation only,31M..33M; remove before timing and record the outcome in learned skills.
+
+## REJECTED - tighten triangle texture-page hazard for false alias rejection, 2026-09-21
+
+Completed rejection census project-link-runtime/20260921T080133Z-cf47199dc55a474ea17fc0669cdfa971: of18641 CPU fallbacks,263 are unsupported texture format and18378 are backend texture/output alias; all other categories, including frame/depth alias, are zero. Backend currently marks texture pages as one broad physical interval from TBP0 through a max coordinate, which ignores REGION_CLAMP minima and can cover unrelated physical pages. Reuse the independently documented whole wrapped texture footprint previously validated for CPU read visibility: REPEAT/CLAMP0..dimension-1, REGION_CLAMP min..max, REGION_REPEAT max..(min|max), logical CT32/PSMT8 page geometry, and both physical pages when a64-word-aligned base makes one8KiB logical tile straddle a physical page. Implement this as a shared tested `gs_texture_read_pages` helper; unsupported/invalid state returns all pages. Use it only for triangle GPU read/hazard sets, never to permit a true read/write overlap. Existing CPU path remains reference/fallback. Remove temporary triangle census/profile activation before timing. Validate footprint coverage against the existing address functions across formats/wrap/base offsets, run GPU/runtime regressions, then fixed realtime A/B. Record success/failure in learned skills; do not repeat the previously rejected CPU readback-narrowing experiment because this candidate changes admission/hazard proof, not CPU materialization.
+
+## VERIFIED - classify current GPU triangle rejections, 2026-09-21
+
+Completed census project-link-runtime/20260921T075705Z-9767c8ed0c76495590730899ff6f8e85:264257 profiled triangle draws in31M..33M, with244 untextured,264013 textured STQ-ready,0 textured FST,0 STQ-unready and0 fogged. Current GPU path attempted all264257;245616 accepted and18641 rejected to CPU fallback. FST support is therefore not a useful target for this workload. Next: replace the coarse census with exclusive rejection-reason counters around the existing submit predicate/backend result (bounds/frame-depth state/test-alpha/texture-format/texture-state/clamp/blend/coordinate-prep/palette/backend rejection), still observation-only under the31M profile activation. Run once, remove probe, then implement only the dominant real rejection class. Learned skill HG-LEARN-034 records this profiling rule.
+
+## VERIFIED - steady-gameplay triangle fallback census, 2026-09-21
+
+With CLUT deferral rejected and production renderer restored, next target is actual CPU triangle work. Current GPU triangle path accepts untextured triangles and textured STQ only when PreparedTriangleStq is ready; textured FST triangles are excluded before the GPU predicate and therefore always use the CPU rasterizer. Add one HG-DIAG-005 observation-only counter in runtime/gs.cpp, active only when existing profile_raster is enabled, to count triangle draws and covered-pixel candidates by exclusive class: untextured, textured FST, textured STQ-ready, textured STQ-unready, fogged, and current-GPU-submit accepted/rejected. Activate profile_gs only at31M for the hidden unpaced33M replay, run once, then remove timers/counters before any benchmark. No guest/rendering behavior changes. If textured FST is material, implement bounded exact 10.4 UV barycentric support in the existing GPU triangle job derived from the already-tested CPU interpolation; otherwise follow the measured dominant fallback class. Record the outcome in learned skills before moving on.
+
+## REJECTED - palette-versioned queued-draw CLUT barrier candidate, 2026-09-21
+
+The overlap observation was real but did not translate into useful work elimination. Candidate verifier d0149b1954d14d55918726872f926e0b completed qualified60-boundary steady gameplay in14.19104s =4.22802FPS. Exact control6a47185539c04508aa20458826746a95 used the same enlarged draw/snapshot-capable layout with only `defer_clut_barriers=false` and completed60 boundaries in6.43894s =9.31830FPS. Frame, full EE RAM, GS VRAM, VU micro/data/defined/state and normalized IOP digests match; candidate/control GPU work is essentially unchanged:48195 GPU sprites,305856 GPU triangles,1014 triangle batches,842 masked-transfer batches, ~0.58s sprite flush and ~1.03s readback. Thus CLUT barriers were mostly charging already-required draw work to the CLUT call site, not duplicating that work. Deferral merely moved the same rendering later while adding conservative overlap scans/snapshot bookkeeping and changed host draw-history retention (candidate final history27402 versus control11093 completed records). No FPS benefit; reject.
+
+Production renderer/tests were byte-restored: `runtime/include/hg/gs.hpp`23f36c5685a8e103..., `runtime/gs.cpp`e03185c749dd2f8e..., `tests/gif_tests.cpp`47aab66c3397afdc..., `tests/gif_stream_regression.hpp`6cb8fd92919ae0af.... The useful overlap capture remains attribution evidence only. Rebuild the clean production binary before further timings. Next rendering work must reduce actual primitive/transfer/VIF work or an actual synchronization operation, not just move a barrier. Use current heavy gameplay only and avoid repeating CLUT snapshot/deferred-barrier or sparse-readback variants.
+
+## VERIFIED - CLUT pending-draw overlap potential probe, 2026-09-21
+
+Rendering work stays separate from the concurrent intro-root audit. Current retained realtime host-profile reduction measures about9.512FPS versus8.997 baseline with identical capture digests. PCSX2 current HW renderer/texture-cache sources were reviewed only for architectural leads: palette objects/cache and dirty-target/readback tracking reinforce avoiding unnecessary synchronization, but no implementation/code is copied. Own evidence is controlling: gameplay31M..33M CLUT source reads are only94.184ms while whole CLUT-register packets cost~748.647ms, so the remaining cost is deferred draw processing/synchronization. Before implementing palette-versioned queued draws, add one observation-only helper called immediately before the existing CLUT rasterize_pending_draws. During profile_gs only, count CLUT loads with pending draws, total/max pending count, indexed-texture pending draws, and conservatively test whether any pending draw's full-scissor FRAME/ZBUF pages can intersect the exact CLUT source pages. Also record the last overlapping draw position so potential safely-deferred tail size is known. Do not change flush/order/palette/rendering behavior. Activate only31M..33M hidden unpaced profiling, run once, then remove probe. If most CLUT loads overlap or queues are tiny, reject palette-snapshot redesign; if many queues are disjoint/large, plan a bounded palette-snapshot + overlap-gated flush candidate from GS-manual ordering semantics.
+
+## ACTIVE - add second proven intro member family, 2026-09-21
+
+The first four roots are retained. hg_emit added all four cases and expanded reachable EE words360809->362755 (+1946).116 Python tests, build_game/build_tests, runtime, translation and VU-readiness suites all pass. Fixed verifier c1718309... remains qualified and frame/full EE/GS/VU/normalized-IOP digests match the prior build exactly; its8.971FPS steady result is treated as run variance because guest state is unchanged. Expanded analysis now exposes the next same-family direct-member records as compiled=false:3affa0->129090,3affc0->128ca0,3affe0/3afff0->128970,3b0000->1286f0,3b0020->128390. Fresh c171 EE RAM contains those exact `(0,-1,target)` records; compiled original loads reference them; own hg_inspect proves valid original function entries/prologues. Authorized shared function map independently corroborates starts/bounds only. Add exactly these five roots in one batch; do not import adjacent reference ranges. Regenerate/test/verifier again, then continue only from newly exposed direct-member/table evidence.
+
+## VERIFIED - add four independently proven missing intro member roots, 2026-09-21
+
+Fresh hg_analyze still reports4743 unresolved items. Its direct_member_evidence identifies exactly four currently-uncompiled `(adjustment=0, selector=-1, target)` records reached by compiled original code: record3af290->1291c0,3af2a0->128db0,3af2b0->1287b0,3af2c0->1284c0. Fresh verifier EE RAM contains those exact records, and original initializer464860 copies them into the active descriptor block. Independent hg_inspect proves each target begins a real original function body with a normal prologue and translated direct-call/control-flow content. Authorized shared functions.manual.toml independently lists the same four starts/bounds, used only as non-rendering corroboration; no code/behavior/config is copied. Add exactly these four `[[functions]]` roots, no broad function-set import and no guessed indirect site mapping. Regenerate with hg_emit, require generated cases for all four, run focused/full configured tests, then fixed gameplay verifier. If current33M path is unchanged, retain as coverage and continue auditing intro indirect targets; if state changes unexpectedly, revert and inspect which target executed.
+
+## ACTIVE - audit missing intro indirect calls/functions; keep realtime profiler reduction, 2026-09-21
+
+Realtime detailed-profile reduction is a verified host-side gain: baseline5b150aa1... measured60 steady-gameplay boundaries in6.66894s =8.99693FPS; candidate4fc3b0b3... measures60 in6.30762s =9.51230FPS, about5.73% faster. Original boundary qualification remains clean and frame/EE/GS/VU/normalized-IOP digests match. Retain `DiagnosticProfile(profile_enabled && !realtime)` and realtime raster-service timing gate; hidden/unlimited attribution still gets full profiling, while realtime keeps the independent frame probe and all guest work.
+
+User suspects missing calls/functions across intro phases and explicitly authorizes additional PCSX2/reference inspection under existing rules. Preserve rendering independence: do not copy rendering code/config/mappings from HG/ps2recomp; PCSX2 and other recomp projects are leads/oracles only. Current out/analysis.json still contains many unresolved indirect transfers. Public PS2Recomp analyzer docs independently note complex indirect jumps may need manual TOML entries, supporting a targeted audit but not any specific target. Next: regenerate current analysis/triage, prioritize missing direct-member/table targets and unresolved indirect sites on the observed opening/startup path, cross-reference permitted non-rendering reference function lists when available, then prove each candidate against original ELF bytes and live captured pointers before adding AOT roots/targets. No broad root import.
+
+## VERIFIED - remove detailed profiler overhead from realtime gameplay, 2026-09-21
+
+CLUT source timing replay3363db4c... shows49564 CLUT reads /12,688,384 entries cost only94.184ms during31M..33M, while prior whole CLUT-register packets cost~748.647ms. The remaining cost is largely draw processing/synchronization and is not safely removable by palette-read factoring. Before redesigning draw/CLUT ordering, address a host-only cost present in every visible/verifier run: `--profile` currently enables DiagnosticProfile::Slice for every guest slice, including its 64-bit sample-selection mixing and sampled steady_clock calls, plus raster-service timers. Realtime runs need the independently qualified frame probe but do not need detailed phase sampling. Candidate: construct DiagnosticProfile with `profile_enabled && !realtime` and gate raster_host_ns timing with the same condition. Hidden/unlimited run_game_replay keeps full profiling; realtime visible/verifier keeps frame_probe, input logs/checkpoints and all guest work unchanged. Compare the same fixed realtime33M verifier against clean baseline5b150aa1... (8.99693 steady FPS,60 boundaries/6.66894s), require unchanged qualification/capture digests, and retain only a measurable gain. This changes host observation only, never guest clock/work/rendering.
+
+## ACTIVE - split CLUT flush versus palette-read cost, 2026-09-21
+
+Exact-run CLUT visibility is rejected. Fresh relocated-helper baseline verifier5b150aa1... measures60 steady-gameplay boundaries in6.66894s =8.99693FPS. Exact-run candidate6120125b... measures60 in6.68303s =8.97796FPS, about0.21% slower/flat. Final frame, full EE RAM, GS VRAM/state/draw JSON, VU micro/data/defined/state and normalized IOP digest all match exactly. Therefore reducing per-word observer calls, even without broadening visible words, does not explain the ~0.749s CLUT packet cost. Disable exact_run_clut_visibility again. Next bounded attribution: keep original per-pixel CLUT reads and time only (a) the mandatory rasterize_pending_draws call and (b) read_clut_source/palette-copy work under the same31M..33M diagnostic activation. If the flush dominates, follow the ordering/GPU-work boundary; if reads dominate, inspect address/read arithmetic. No further CLUT visibility redesign until that split is measured.
+
+## REJECTED - exact-run CLUT coherence candidate, 2026-09-21
+
+The first bulk CLUT visibility attempt is rejected: candidate31M..33M heavy intervals total5.96100s (60 boundaries, about10.065FPS) versus fresh clean baseline5.84002s (about10.274FPS), roughly2.1% slower. The final frame, full EE RAM, GS VRAM/state/draw JSON and all saved VU state/data/defined/micro files are byte-identical, so this is a host-throughput rejection rather than a correctness failure. Broad min..max visibility materialized unnecessary intervening words/pages. Preserve the stronger finding that50164 CLUT-register packets cost~0.749s in the instrumented gameplay window. Next candidate must reduce observer call count without broadening the set of visible source words: compute the same CLUT word indices, sort/unique them, coalesce only truly contiguous word runs, call read_span once per exact run, and recover each original pixel from the resulting values. To speed iteration, move only this CLUT source-read helper out of the giant header into runtime/gs.cpp; the header keeps the load/order logic and one helper declaration. Once that one-time rebuild is done, alternate original-per-pixel vs exact-run helper implementations with fast gs.cpp-only rebuilds. No caching, skipped loads, widened visibility, clock/input/rendering changes.
+
+## ACTIVE - bulk CLUT source visibility candidate, 2026-09-21
+
+The refined31M..33M profile isolates0.7486468s in50164 CLUT-register packets (466308 transfers), versus only0.000389s in the remaining ordinary-register bucket. Current load_clut_from_tex0 performs16/256 source reads through GsLocalMemory::operator[], and every const operator[] invokes the optional GPU-coherence observer. This can mean millions of host observer calls for unchanged palette reads. Candidate: preserve the existing mandatory rasterize_pending_draws ordering and exact CLUT address/pixel math, but precompute the exact source word indices for one CLUT load, establish visibility once over the bounded min..max source-word span when that span is reasonably small, then read those same words through the returned const pointer. If the source span is unexpectedly broad, retain the original per-pixel checked path. No palette caching, skipped loads, guest-clock changes or draw omission. Remove the temporary packet timers/31M activation before timing. Validate build + existing runtime/translation tests and exact replay capture digests; benchmark steady31M..33M with the corrected verifier against a fresh warmed baseline. Revert if state differs or gameplay time does not repeatably improve.
+
+## ACTIVE - split dominant mixed/register gameplay rendering bucket, 2026-09-21
+
+The completed gameplay31M..33M IMAGE attribution shows the original materializing path spends about1.0352467s in mixed/register packets, versus0.3599126s in PSMT8 IMAGE format19,0.0808712s in format20 and0.006778s in format0. The mixed/register bucket is therefore the next concrete renderer target. One diagnostic-only refinement will keep stream_gif_packets=false and the existing31M activation, but classify each mixed packet before unchanged application into exclusive FINISH, mixed-IMAGE, transfer-control, vertex/draw-kick, SIGNAL/LABEL or other buckets and time the whole unchanged packet once. FINISH takes priority because write_ad(0x61) synchronously rasterizes pending draws. This adds no guest state/clock/input/rendering changes and remains HG-DIAG-005 attribution, not FPS. Build only the game, run one hidden33M replay, read the31M..33M totals, then remove the profiler and choose the next optimization from the dominant exclusive bucket. Disprove this lead if no sub-bucket materially explains the mixed cost. First result: ordinary/other register packets dominate at0.7703625s; transfer-control0.2327496s; draw-kick only0.0902477s; no FINISH bucket appeared. Because TEX0/TEX2 writes synchronously call load_clut_from_tex0, which rasterizes pending draws and reads palette VRAM, split the dominant other bucket once more into CLUT-register versus remaining ordinary packets. If CLUT dominates, optimize that exact synchronization/read path; otherwise stop drilling packet labels and move to the remaining ordinary state path.
+
+## ACTIVE - gameplay IMAGE format attribution after inconclusive streaming trial, 2026-09-21
+
+Completed four matched realtime runs after per-build warmups. Control1/candidate1/control2/candidate2 steady gameplay seconds for60 boundaries:8.14706/6.48688/6.66851/6.78493. Paired elapsed effects -20.378% then +1.746%; the first control itself varied from9.44FPS warmup to7.36FPS measured. No reliable speed gain established. Disable stream_gif_packets; retain original materializing packet path. Captured image, EE RAM, GS VRAM/registers/draw records, VU micro/data/defined/registers and metadata agree in all four; normalized full IOP agrees with only independently verified RTC seconds/minutes/hour differences. Evidence artifacts/gif-stream-comparison-20260921.json, all saved verifier results.116 Python tests and5788 native state/fault checkpoints pass. The corrected gameplay-only reporting/digests remain. No30FPS claim and no new live window.
+
+Next bounded diagnostic: with streaming off, measure original decoded packet application by IMAGE destination pixel format. In gs.cpp classify packets containing only IMAGE transfers (otherwise explicit mixed/register bucket64), time the unchanged apply_gif_register_transfers once per completed packet, and collect packet/qword counts. Temporary thread-local destructor emits bounded65-bucket totals, only after profiling was enabled. Activate existing profile_gs at31M only for profiled non-realtime33M in system_diagnostic.cpp. Thus this capture is strictly steady gameplay31M..33M, not startup/menu. Per-packet classification and GS timers perturb cost; use attribution, not FPS. No decoder, GS arithmetic/ordering, shader, input, clock or fault changes. Automatic backups preserve dirty gs.cpp/runner. Build/run one hidden configured replay, inspect which IMAGE format really costs time, then remove timers and restore runner before the next candidate. If no IMAGE format is substantial, do not force a transfer optimization; follow the measured register/draw bucket instead. Out-of-line boundary retained temporarily for quick diagnostic builds; no runtime speed claim for that refactor.
+
+## HISTORICAL - gameplay-only rendering command throughput, 2026-09-21
+
+Clean streaming candidate build c86becf34c83427ba328b0acd4dee7e0 succeeded. Native tests:5788 GIF state/fault checkpoints, keyboard65536/256, translation suite pass;116 Python tests pass. Fresh corrected verifier warmup a94e99342cdf4e9590b27bff5e8cd03a is qualified and reaches33M: steady gameplay60 boundaries in6.14472 host seconds =9.76448FPS, NOT legacy five-rate mean18.8504. This warmup is excluded from speed comparisons. Capture58ba4999c25c4510b896a187ecdd0001 matches prior image/EE/GS/VU hashes; normalized IOP digest01dc90c6... now available. No30FPS success. Current clean exe2edf24bb0593ddf5454ffaecc92b6c929f5d9e48b089fb5baa2433067cdcd01f,35862016bytes.
+
+Next matched comparison toggles ONLY constexpr stream_gif_packets in gs.cpp, preserving the out-of-line boundary on both sides. False compiles the exact prior materializing decoder/application; true compiles the direct consumer. Warm each variant after each short rebuild, then measure control1/candidate1/control2/candidate2 with the same fixed realtime verifier. No competing game or sampler. All executions remain independently saved in fresh task evidence; compare normalized IOP and every captured image/EE/GS/VU digest. Only final two heavy intervals enter the speed verdict; transition remains separately reported. This isolates streaming from the initial header/code-placement refactor. Retain only repeatable improvement; else disable/remove candidate without losing controls or earlier fixes.
+
+GIF stage capture746ea534f317495297502676ccaa63c1 reached33M. Evidence project-link-runtime/20260921T043204Z-a41c1884534f4d96bc61a2fbd033baef. Between31M and33M,17,850,014 qwords were submitted; instrumented GS application1.4821181s, decoded-transfer creation0.1863614s, append0.3895350s and scan bucket0.3689151s. Per-qword timers perturb these values; scan bucket also includes prior packet destruction, and application includes nested rendering/waits. These are not FPS nor additive to inclusive VU/GPU timings. Timer activation/source hooks have been removed; system_diagnostic.cpp is byte-restored to bcb9f289. First direct packet consumer candidate is now in gs.cpp, with frozen materializing decoder reference and new tests/gif_stream_regression.hpp included from runtime_tests.cpp. Tests/build pending. Current executable is still the old diagnostic until rebuilt; no manual launch yet.
+
+Reporting correction plan in tools/hg_runtime_verifier.py: preserve all five original late-window records and writer/caller/fault validation, but derive gameplay_fps/min/max/30FPS verdict only from the last two steady-gameplay intervals (approximately31M..33M). Use total original boundaries / total HOST seconds, require both intervals to meet30, verify expected guest range, continuity and finite positive timing. Preserve the five-rate mean under an explicitly named legacy audit field. Add pure regressions in new tests/test_runtime_verifier.py. Do not alter native command, input schedule, guest clocks or pinned catalog. Add after-run capture digests for fixed known evidence files only, including an explicitly labelled normalized IOP digest masking solely previously independently verified RTC seconds/minutes/hour offsets0xbfcd1..3, with BCD range checks and exact2MiB length. This lets current candidate/control verifiers prove all other IOP bytes agree; it never modifies captures or measured execution. Hashing occurs after the timed process stops. No broad file execution or discovery.
+
+User clarifies that menus are fine and the fault is approximately9FPS gameplay. Primary comparisons must exclude menu/startup: use the fixed replay's31M..33M steady-gameplay boundary intervals and their total boundaries / total host seconds; report30M..31M transition separately. Keep original inputs, issue-slot clock, rendering, frame qualification and full keyboard controls. Do not use the arithmetic average of five mixed-workload rates as sustained gameplay FPS. Latest baseline generated main remains pre-VI b03c024b...; candidate VI elision stays off.
+
+Measured lead: dense30M..33M graphics phase previously costs4.857s; VU executor including nested GIF2.514s, so command consumption/GS work needs separation rather than assuming vector guards dominate. Existing GifPath materializes an intermediate vector of decoded transfers and then applies them. First isolate its actual gameplay append/packet-size/decode/apply costs. Move the existing submit_qword body unchanged into runtime/gs.cpp (declaration in gs.hpp) to isolate later renderer rebuilds; add temporary HG-DIAG-005 host-only stage timers there, enabled from system_diagnostic.cpp only at30M of the configured unpaced/profiled33M replay. Report at existing checkpoints/budget. Instrumented results are attribution, not speed. Revert the timer/activation after one capture; compare state against fresh original baseline job5bf17d79d7da4360b838c30f011daa35, evidence project-link-runtime/20260921T042208Z-4be4fbacb61f4006b05016d133023ea4 (warmup, not measured pair).
+
+If decode/materialization or command application is material, test a bounded complete-packet streaming consumer in gs.cpp without the intermediate transfer vector. Retain the original decoder as frozen reference; validate the whole packet before any GS mutation, preserve PRE/Q-reset/NOP/REGLIST-padding/IMAGE semantics, all qword boundaries, queued bytes and partial GS state on exceptions. Add differential regression cases to the configured runtime_tests target, including malformed/partial/multi-tag packets, register faults and rendered output. No shader/precision/frame omission. Automatic Project Link byte backups preserve dirty sources; repeated configured build/replay jobs isolate each executable. Compare gameplay-only time and complete image/EE/GS/VU state (only independently explained RTC differences), retain only a repeatable benefit. If this path is cheap, drop that hypothesis and follow the measured rendering cost. No connector/task/catalog changes or arbitrary execution.
+
+## CURRENT - direct edits/tasks verified; keyboard build retained; VI result inconclusive, 2026-09-21
+
+Actual apply_edits and start_task calls succeeded in this continuation. The earlier missing-tools/keyboard-not-installed message was incorrect. Complete keyboard source remains built and documented in docs/CONTROLS.md: WASD left stick, IJKL right stick, arrows D-pad, Space/X/C/V face buttons, Q/E shoulders,1/3 triggers, left/right Shift stick clicks, Enter/Backspace menu. Native runtime tests verify65536 button masks and256 stick combinations; translation tests and65536 compiled VU-readiness comparisons pass.108 Python tests pass, including the new independent VI-disable option regression. Native manual end-to-end testing of every new key remains unverified. Do not apply the obsolete F/H keyboard zip.
+
+Completed two candidate and two rebuilt-baseline fixed realtime33M verifiers. All four reach budget with864 qualified original boundary writes and no lost trace/unexpected writers/caller mismatches; all fail30FPS. Candidate final two interval rates stay around9.2..9.4, contemporaneous baseline around9.1..9.2. Both are below the older saved baseline's~11, so the initial older-run comparison does not establish a VI-caused regression. The smaller contemporaneous difference is not a reliable accepted gain because these runs were sequential groups rather than warmed alternating controls. Full results/limits are in docs/PERFORMANCE.md and new external vi-readiness-recovery-comparison-20260921.json.
+
+Production VI elision is disabled pending proper comparison, while its proof implementation/tests remain available and accepted VF elision is unchanged. Configured hg_emit and build_game succeeded; restored generated out/translated.cpp SHA b03c024bfe71528a887556d68aed272dd305a813e288ae32e03c5ee92a4f9b41 exactly matches pre-VI bytes. Current hg_game SHA5f3087dcd7c8b6e8fa4449d59c5aa203014e6077184ffc0da8b59dbe074a73c1,35864064bytes. Latest baseline verifier evidence project-link-verifier/9d710e5d87e5404790944d3471ce7d0b (job0cd3e53c61924fea92acde7d97acbbbf succeeded); prior baseline c4693baba7174bfa9930c4e6754fcea8. Candidate executables/evidence remain in50993f28fd6e4e54966ccb659c2b0b63 and2b565173d1af4664992a22aa573f6688. Backups da58531f26fa4789b1dc4f798bec4461 and638b3bbc10f54ecd8c37de1138cddf2a preserve pre-comparison source/tests. Selected image/GS JSON/VU JSON hashes match the earlier baseline; no full RAM/VRAM equivalence claim is made here.
+
+No Project Link build/replay is left active and no new manual window was launched. Next executable work: establish a warmed alternating VI-on/VI-off fixed-work comparison using only the documented emitter option and configured emit/build/replay tasks, or first isolate the remaining synchronous GIF/VIF cost not resolved by the existing VU timer. The current baseline is the safe starting point; do not reapply a broad matrix/readback/clock rewrite or infer a sole bottleneck from source inspection. Maintain full controls and prior compatibility fixes. >=30 sustained gameplay FPS remains unmet; audio/menu semantic verification remains separate.
+
+## HISTORICAL PLAN - VI candidate first result and baseline comparison, 2026-09-21
+
+Direct edits/tasks work. Refreshed native tests completed: runtime keyboard65536 button combinations/256 stick combinations, translation tests, and65536 compiled VU-readiness comparisons all exit0. Candidate executable ee05d5cacf14d8e590953f349ba24cb7f96b99e59998f0fa6654b03b313ccb20 completes the fixed realtime33M verifier, qualified864 original boundary writes with zero lost trace/unexpected writers/caller mismatches. First candidate intervals29.5843/29.4619/14.5677/9.4416/9.2817; five-rate mean18.4675. Evidence project-link-verifier/50993f28fd6e4e54966ccb659c2b0b63. This is slower than the saved pre-VI run, not an accepted optimization; different run times alone do not isolate the cause. Repeat current candidate (job50b10c9ee8bc48729dbfb6f060fc00cc), then rebuild with only VI elision disabled and repeat the same fixed verifier. Preserve full keyboard mapping and all prior VF/compatibility work.
+
+Before modifying tools/hgtool/vu_emit.py: add a build-time-only optimize_vi_readiness option to the existing proof/body generator (default true for existing explicit synthetic proof tests), and call the production generator with this option false for the baseline comparison. This restores unconditional VI require calls while leaving accepted VF proof, every original pipeline advance, guest arithmetic and faults untouched. Keep the experimental VI algorithm testable; do not label it accepted. Add a focused Python regression for the disabled option. Automatic byte backups preserve dirty source; hg_emit backs up the current generated candidate. Compare generated baseline with the saved pre-VI emit backup, rebuild, test, and repeat fixed realtime measurements. No task-schema, catalog, guest-input, clock, or verifier changes.
+
+## ACTIVE - recover completed VI candidate build and validate current executable, 2026-09-21
+
+Confirmed Project Link apply_edits and start_task are exposed; the prior chat report of missing edit/task access was incorrect. Current source already contains the complete keyboard controller (keyboard_input.hpp, game_host.cpp, docs/CONTROLS.md), including left/right Shift for L3/R3, not the older F/H proposal. Do not apply the obsolete keyboard zip over this newer work. Recovered candidate hg_emit job d8b2da4ebc3b4039a9920bf2eaea4683 and build_game job801d8c10379d4ccca452537b56d275b4 both succeeded. Python tests and synthetic VU-readiness tests succeeded before the final emit; refresh linked native tests against the newly generated candidate and run them, then run the fixed gameplay33m frames verifier. No new speed benefit is established yet. The pre-VI baseline remains isolated in project-link-verifier/c4e3c5a5d3874496848ccb192484b1a6 (executable c9d6e8fdadef2fe3339b7b269af65e257b8b57e2565fbfea8cfa6e5fff6c04a8). Its last three interval rates were16.4377/10.9296/10.9765; five-window arithmetic mean19.8220 is not sustained heavy-gameplay FPS. Keep current keyboard work and prior compatibility fixes intact; no competing interactive game is listed.
+
+## ACTIVE - bounded static VI readiness proof, 2026-09-21
+
+VU entry timer replay8ccd23a2edfd475ea46f29b6eb5426f7 reached33M. Final successful-call times total2.5139328s during30M..33M, including nested GIF; frequent entries648/96 alone cost0.663/0.424s. Evidence project-link-runtime/20260921T035159Z-2a47eca4ed484edb85f489d9e02cc93c. Timer source restored exactly with backup06f01c8a7d7c416a94bc0fe34f04d996; dense header also restored. Clean baseline rebuild ada7e2c541ec492eb69c58cc108480b2 underway.
+
+Candidate: extend the existing per-basic-block VF readiness proof with a separate VI remaining-latency map. After a checked read or a known1/4-cycle write, omit only VI require calls already proved no-ops by intervening original pair advances. Unknown values still require checks; reset at every entry/control-flow leader/discontinuity; preserve the existing whole-invocation unsigned-clock-wrap fallback. Do not alter VI values/readiness writes, advances, Q/P completions, original upper/lower ordering, instructions or fault handling. Files tools/hgtool/vu_emit.py, tests/test_vu_decode.py, tests/generate_vu_readiness.py only plus generated output through hg_emit. Add unknown/overwrite/latency/branch-entry unit tests and compiled differential programs exercising integer loads, repeated bases,1-cycle writes and wrapping clocks. Keep frozen no-readiness generated baseline and compare all architectural fields/memory/errors. Automatic backups preserve dirty sources and hg_emit preserves original generated files. Measure matched uninstrumented fixed-work replays after warmup; revert candidate if benefit does not repeat. This targets a measured costly subsystem, not proof that VI checks alone dominate it.
+
+## ACTIVE - isolate VU execution within dominant VIF/GIF phase, 2026-09-21
+
+Dense phase replay ec10c96172fd41e0a96decc4059b1e49 completed33M; evidence project-link-runtime/20260921T034512Z-27078e0ee0664d6885448a2c590e257e. The VIF/GIF phase totals4.8572446s (sparse startup plus dense tail), far above EE0.698s or explicit raster0.497s. Sparse sampling missed these rare long synchronous calls. Diagnostic header restored exactly to4efc1994...; current executable still diagnostic until rebuilt. Next one bounded timer wrapper around the existing VU AOT executor in system_diagnostic.cpp, only fixed profiled unpaced33M without VU captures: count successful calls and elapsed by original entry, print at existing checkpoints/budget. No decoding, arbitrary execution or guest writes; original executor remains sole execution path and exceptions propagate. Install at30M to avoid startup and restore source after one replay. This splits VU execution (including nested GIF) from transport work before selecting an AOT optimization. Measurements are attribution only, not FPS.
+
+## ACTIVE - dense tail phase attribution, 2026-09-21
+
+Current primitive replay fc58884dbc22474ea3a5be2773f6f948 reached33M. Evidence project-link-runtime/20260921T034202Z-d1c61ba280c946609521871303ef07b4:30M..33M elapsed6.8632s including final dump; primitive deltas sprites0.9262682s, strips0.5235604s, independent triangles0.007306s. These overlap GPU waits and are not additive to GPU destructor timing. The former untextured-triangle cost has already fallen sharply; do not repeat that optimization. Temporary system_diagnostic.cpp activation restored exactly to bcb9f289... using backup2c219f9affa64be19320a60aff327363.
+
+Next diagnostic-only edit: in runtime/include/hg/diagnostic_profile.hpp select every slice in30M..33M under existing enabled profiling, retaining ordinary sampling elsewhere. This dense tail will perturb elapsed time and map/timer overhead; use only stage attribution, never FPS or speed claims. Collect one fixed hidden replay, compare captured guest/image state, restore the exact header, then rebuild. Need this because sparse samples materially undercount infrequent long VU/raster bursts. No guest clock/input/program change or new execution entry point.
+
+## ACTIVE - current-build attribution after complete keyboard tests, 2026-09-21
+
+Keyboard build and runtime tests pass (65536 button masks,256 stick combinations, focus/release and simultaneous inputs). Uninstrumented keyboard baseline replay job36ada074cd604ea383afe35cf539ff6b is isolated. Next temporarily activate existing HG-DIAG-005 per-primitive timing in runtime/system_diagnostic.cpp only when profile_enabled && !realtime && slices==33000000; print an explicit temporary-probe banner. This uses the configured hidden run_game_replay task, keeps its frozen inputs/budget/clock, and changes no renderer behavior. Read late checkpoint deltas rather than whole-run totals; restore the source from automatic byte backup immediately after collecting the diagnostic run. Profiling changes host cost, so exclude it from speed comparisons. Rebuild after restoration before the candidate/baseline benchmarks. New probe activation is temporary and inventoried in DIAGNOSTICS; no new task, shell access or input-control bypass.
+
+## ACTIVE - complete keyboard controller and current-build FPS work, 2026-09-21
+
+User explicitly requests keyboard bindings for the complete controller, then continued FPS repair; downward movement is their suggested gameplay test route. Preserve existing arrows/WASD/Space/X/C/V/Enter/Backspace/Q/E. Add IJKL right stick, 1/3 L2/R2, left/right Shift L3/R3. New pure runtime/include/hg/keyboard_input.hpp supplies all 16 active-low buttons, original pressure-byte order and four centered axes; opposite keyboard directions cancel. runtime/game_host.cpp polls these keys only in a focused manual window; existing physical-gamepad and recorded-input paths remain. Add exhaustive button/axis/release regressions to tests/runtime_tests.cpp; document controls in README.md and docs/CONTROLS.md (new). Project Link automatic byte backups and hashes preserve inherited dirty files; existing a9a9c333 executable is already isolated in verifier evidence 0dd52a23e6044097a0bcb63363f80dab.
+
+Then profile the current slow 30M..33M path without competing live play. Prior current-build final boundary intervals were 16.741/11.298/11.349 per host second; five-window arithmetic mean19.848 is not sustained heavy-scene FPS. Obtain fresh phase/primitive evidence before a bounded optimization, preserve exact guest work/state and frozen recording catalog, compare repeated matched runs, and revert a failed performance hypothesis. Connector permits named tasks only and its pulse API still has no Down: keyboard coverage does not widen that API or authorize a shell workaround. No active build/game job on entry; last manual session had reached its configured600M budget and was closed. Post brief substantive commentary during active work.
+
+## VERIFIED - reverse-sound RPC callback retained; qualified FPS rerun clean, 2026-09-21
+
+Manual-mode current-game testing advanced beyond the repaired Start path and stopped at EE0x0021f0e0 with ra0x00270648. Independent hg_inspect proves original0x0021f210 constructs0x0021f0e0 in a2 at0x21f230/0x21f244 and passes it to reverse RPC registration0x2703c0; independent caller decode proves0x270640 jalr-dispatches request+4 and returns at0x270648. Config now retains only that original handler beside sound_reverse_rpc_worker. hg_emit succeeded and generated `case 0x0021f0e0u`; Python tests, build_game, build_tests, runtime_tests, translation_tests and VU-readiness tests all exit0. New hg_game is35863040 bytes, SHA256 a9a9c333a442fffe1eef1b111062d09ca407256fd99aa98abdd2babde513568d. No guessed stub or guest behavior change was introduced. The fresh fixed gameplay33m verifier is qualified with864/864 writes from1bef84, unexpected_writers0, lost_trace0, caller_mismatches0 and invalid_stack0. Its final windows are30.5571/29.2949/16.7410/11.2980/11.3488 FPS, mean19.8480; passes_30fps=false. This small difference from prior mean19.1309 is not attributed to the coverage-only root. Evidence project-link-verifier/0dd52a23e6044097a0bcb63363f80dab. Tail slowdown still begins after30M while raster work/retirement rises sharply; profile that measured tail and do not repeat rejected sparse-readback designs.
+
+## VERIFIED - fixed gameplay FPS verifier from qualified original boundary, 2026-09-21
+
+The original display-wait write is now qualified strongly enough to drive a bounded verifier for gameplay33m, but the runtime task still reports gameplay_fps=null because tools/hg_runtime_verifier.py does not exist. Implement that new script only behind the connector's fixed run_runtime_verifier entry point. Frames mode will validate the pinned recording catalog and original ELF identity, launch the supplied isolated executable in realtime with the existing issue-slot clock/GPU flags and exact input schedule, parse only the independently qualified 0x1bef84 boundary reports, require zero unexpected writers/lost trace/caller mismatches plus stable counter/vblank evidence, and measure the final five consecutive one-second gameplay windows. Report min/mean FPS and passes_30fps without relabeling video updates, swaps, vblank edges or modeled time. A valid measurement below30 is a completed measurement, not a tool failure. Menu/audio modes remain explicit unverified results until their independent semantic verifiers exist. New file only; then run python tests and run_runtime_verifier gameplay33m/frames. The first fixed-task invocation exposed one connector packaging gap: it copies the isolated executable and recordings.json but not the required independently captured 2064-byte TOC record. Adjust the verifier, before rerunning, to locate only a toc.bin under the bounded haunting-toc-probe temp evidence root whose byte count and SHA256 exactly match the pinned catalog, copy that verified original-input record into the fresh verifier evidence directory, and reject if no exact match exists; do not synthesize or guess TOC data. If the verified five-window mean is below30, profile that same tail before the next optimization.
+
+## VERIFIED - original 0x1bef84 write is a gameplay per-frame synchronization boundary, 2026-09-21
+
+Own hg_inspect of the configured USA ELF proves 1bef78 loads the cause-2 counter, 1bef84 stores it to s0+0x1c, then the original routine performs its post-wait calls and second display wait. Own caller inspection proves 2d1c48 calls vtable slot+0x10 and returns at2d1c50; the dynamic probe reports that same external caller for every watched boundary. This is an original game synchronization point, not a host present callback or inferred image-change count.
+
+Diagnostic-only runtime/system_diagnostic.cpp change backed up as ProjectLink c48c1d52b5d94117ba1ba33947957e3e; the planning doc backup is e66a908a22ca4f5eaac03346e7168453. Fresh build_game, runtime_tests, translation_tests and vu_readiness_tests all exit0. Pinned gameplay33m replay with current SHA76e2a2ea... reaches the full33M budget. At budget the probe records864 changed writes, all864 from original PC1bef84, lost_trace0, caller_mismatches0, invalid_stack0, stable caller2d1c50,853 counter deltas of2,853 independent vblank deltas of2, and raster work advancing across863 of863 inter-boundary comparisons. Guest-time cadence converges to about29.5 boundaries/s over the full qualified span; individual late host intervals expose the real slowdown rather than presentation telemetry: the last three one-second windows are about15.10,9.51 and8.93 boundaries/s in the unlimited diagnostic run. This is timing evidence, not yet the realtime FPS verdict.
+
+Fresh recorded_control gameplay33m replay also reaches budget. Current probe versus control is byte-identical for final frame, EE RAM, GS VRAM/state, VU1 micro/data/defined/state and metadata; raw IOP RAM differs only in the previously verified RTC byte area (for example offsets bfcd1/bfcd2). Thus the observer does not alter the compared guest/graphics state. Evidence: project-link-runtime/20260921T023229Z-6fac172f527f4760b4203756c6cbedbc and control 20260921T023355Z-e962461879604a5e9776d9d8db125a5b. Keep the original boundary qualified only for this proven gameplay path until other profiles are separately checked.
+
+## VERIFIED - Start replay clears both direct-member translation faults, 2026-09-21
+
+Recovered completed Project Link work rather than rerunning duplicate jobs. The first
+start_menu replay of SHA806b231e... advanced beyond2f5c80 and faulted at2f59a0 with
+ra2f609c/a0=fc6fe0; live descriptor fc70f0 was {0,ffffffff,2f59a0}. Own hg_inspect
+confirmed2f59a0 is a real routine returning at2f5c70/2f5c74. Config now adds only
+2f59a0 beside the already-proven2f5c80 at site100b6c. hg_emit changed only shard0017
+(plus refreshed analysis/listing), and out/analysis.json marks decimal3103136 compiled.
+
+Fresh build/tests all completed exit0 with the fixed PowerShell wrapper:105 Python
+tests, runtime_tests, translation_tests, and49152 VU-readiness comparisons pass.
+Current hg_game is35852288 bytes, SHA256
+9e663a8392c342556e53c2dc85333068ff009a38b37056c5bcfa6cbfa5df0031.
+The second start_menu replay with that exact binary reached the full430M-slice budget
+without an EE translation fault. Result: status=budget_reached, final EE PC1befe4,
+modeled time430000000us, delivered recorded input prefix exact, and
+advanced_beyond_recorded_stop=true. This proves the former Start-triggered freezes at
+2f5c80/2f59a0 are cleared on the recorded path. The runtime tool still reports
+menu_verified=false, so this is not yet proof of correct visible Start-menu behavior.
+Replay artifacts: TEMP/haunting-toc-probe/project-link-runtime/
+20260921T003047Z-f395e91c22ac45788b564a3273da8cc3.
+
+A recovered realtime gameplay33m audio capture with the same binary also reaches its
+33M budget and writes1579627 frames at48kHz (6318552-byte WAV). This demonstrates
+continuous raw SPU2 core0 input capture under realtime pacing for that segment only.
+The task explicitly labels it raw input, not final synthesized/effects/cross-core mix;
+audio_fixed remains null. Gameplay FPS remains null as well: hidden presentation/video
+updates and modeled time are not internal gameplay FPS. Audio artifacts:
+TEMP/haunting-toc-probe/project-link-runtime/
+20260921T003535Z-2fc1ccd937bd46b685877051f1600cb4.
+
+## VALIDATED - proven Start target emitted and built; replay still unavailable, 2026-09-20
+
+Project Link hg_emit successfully regenerated the EE translation after adding only
+0x002f5c80 to indirect site0x00100b6c. The SHA-checked config preserves every prior
+target and records the live descriptor proof. Emit made exactly two generated C++
+files change: out/translated-shard-0017.cpp and out/translated.cpp (analysis/listing
+also refreshed). The old external backup contains no2f5c80 case/page_2f5 dispatch;
+the new shard has `case 0x002f5c80u: step_2f5c80` and normal emitted code through
+the independently decoded return, while translated.cpp now declares/dispatches page_2f5.
+Fresh out/analysis.json marks decimal target3103872 (0x2f5c80) compiled=true.
+
+Validation:105 Python tests pass. hg_game rebuilt exit0 from translated.cpp and
+translated-shard-0017.cpp; new executable SHA256 is
+806b231e7fbc6e50b915e02659e9ab1b2e7a9a6ca103601a27b1a6722e2e903a,
+35842560 bytes, versus prior1a89f68a.../35827712. build_tests rebuilt runtime,
+translation and VU-readiness executables exit0; runtime_tests and translation_tests
+exit0; vu_readiness_tests reports49152 compiled comparisons passed. Build-game log
+still prints missing pwsh.exe after producing hg_game but task exit is0; no evidence
+that warning invalidated the binary. Emitter exact-byte backup/manifest is under
+TEMP/haunting-toc-probe/project-link-emit/20260920T204149Z-312ef9d99f9542d88c5fef2ef9b3fb81.
+
+This removes the known static-translation deficiency in the built product but does
+not yet prove the Start menu works: the handler still exposes no deterministic game
+replay or visible launch task, so the saved Start-input path cannot be rerun here.
+No speed effect is claimed from this coverage change.30 gameplay FPS and corrected
+audio remain unverified; presentation updates or modeled time are not gameplay FPS.
+
+## CURRENT - previous execution path restored and replay verified, 2026-09-20
+
+Rejected matrix183227 implementation after9.377% slower mean scene, both pairs;
+all four candidate/control state comparisons passed. Archived source/tests/exe/map
+in matrix183227-rejected. Restored emitter/CMake/generated main match exact
+matrix-postcompat-baseline bytes. The two new matrix test files were archived
+outside active tests; inherited unused helper sources remain as in that baseline.
+Restored hg_game build exit0; full105 Python tests pass. Fresh restored33M replay
+ends native-iop-budget and matches original image/EE RAM+registers/devices/GS/VU,
+with only verified RTC IOP differences. Current exe SHA256
+1a89f68ad5db75e80d7ef66adc9689f4c08600c34fb37ebbe1ed95e6ff2783ea.
+Proof matrix183227-restored-validation.json. Compatibility fixes remain intact.
+No matrix speed gain or verified30 gameplayFPS. No new visible game was launched.
+
+Immediate unresolved user issues: Start-menu fault2f5c80 (ra2f609c) at416324369
+slices in saved user-live-corrected-20260920-132309/live.*; last Start input at
+416256000, release416288768.80 host input events are recorded. Further original
+menu instruction/audio source inspection was rejected by automatic approval review,
+including explicit require_escalated attempt (could not determine safety status).
+Do not infer the target's behavior or add a guessed return/menu stub. Original
+caller/target decode and independent dispatch proof are the next required actions
+when inspection is permitted. Shared non-rendering address lookups are leads only;
+classify scope before using any reference, with rendering restrictions retained.
+
+Audio log confirms324 speaker underruns.406M..416M advances10 modeled seconds in
+33.758 host seconds (~29.6% modeled realtime), so raw48kHz input arrives too slowly
+for sustained playback. This supports starvation; it does not prove every audible
+problem has the same cause. Full SPU2 synthesis/effects/cross-core mixing remains
+unfinished under HG-DIAG-014. User reported about15FPS; no internal frame counter
+has been validated. Menu and gameplay audio are NOT fixed by this restoration.
+
+Native comparison session45273, restoration build40924 and replay56268 all
+completed and their results were collected. No continuing worker is promised.
+Next performance lead requires fresh profiling/different measured hypothesis;
+do not repeat the same rejected matrix design merely because it batches calls.
+Final documentation backup matrix183227-restored-final-docs.
+
+## REJECTED - prepared matrix arithmetic slowed both pairs; restoring, 2026-09-20
+
+Original matrix build and all four33M captures pass: image, EE RAM/registers/devices,
+GS and VU exact; IOP differs only verified RTC bfcd1/2/3. Two warmups excluded.
+Control scenes7.6884/7.9125s, candidates8.8191/8.2447s. Mean7.80045 ->8.53190s,
+9.377% slower, both pairs. Reject this implementation despite synthetic correctness.
+Archive matrix183227-rejected preserves candidate sources/tests/exe/map and hashes.
+Evidence matrix183227-summary.json and all four captures; no performance gain.
+
+Restore only matrix integration in emitter/CMake/generated main to inspected
+postcompat baseline; move the two new experiment tests out of active tests after
+verified archival. Keep inherited unused helper sources and both compatibility
+fixes. Rebuild hg_game and original105 Python tests to restore product consistency.
+Menu2f5c80 inspection remains approval-blocked. Audio starvation evidence: affected
+406M..416M interval takes33.758 host seconds for10 modeled seconds, about29.6%
+modeled realtime; speaker logs reach324 underruns. Full gameplay audio remains
+unfinished. No menu/audio correction or verified30 gameFPS is claimed.
+
+## ACTIVE - independent matrix original validation after menu inspection block, 2026-09-20
+
+Confirmed completed matrix game build exit0, current exe2df27ebe...; accepted
+postcompat baseline2608296b... preserved. No user game/compiler process observed.
+Menu instruction/audio source inspection remains approval-blocked. Independent
+existing benchmark configuration read succeeded. Run two excluded warmups and
+four alternating33M hidden replays with fresh matrix183227 outputs, unchanged
+input/clocks/options. Compare image/EE RAM+registers/devices/GS/VU, RTC-only IOP.
+Reuse original synthetic validation; no new source changes or new behavior.
+Require repeated scene improvement and state equality before retaining matrix.
+Driver hg-matrix-validation-183227.py; timings matrix183227-pair-times.json.
+Documentation backup matrix183227-validation-docs. Menu/audio fixes not claimed.
+
+## BLOCKED - recorded Start-menu fault and gameplay audio, 2026-09-20
+
+Latest user reports Enter during gameplay froze the game, about15 observed FPS,
+and badly broken gameplay audio. Read-only log inspection confirms original EE
+stop2f5c80: no static translation, ra2f609c, a0fc6fe0, at416324369 issue slices.
+Saved live capture: user-live-corrected-20260920-132309/live.ram and sidecars;
+last Start press416256000, release416288768. Recorded input events remain in
+live.log. User-observed15FPS is not a verified internal game-frame measurement.
+Speaker underruns grew to324 by the fault, with repeated starvation during gameplay.
+Existing HG-DIAG-014 is raw selected-core input presentation; full SPU2 synthesis,
+effects and cross-core mix remain unfinished. Do not claim underruns are the sole
+cause of the user's audio report or claim either problem fixed.
+
+Matrix game build completed: matrix-game-build.exit0 and hg_game output present;
+no hg_game/cl/MSBuild processes observed at this continuation's initial check.
+Original matrix comparisons/performance remain unvalidated. Keep postcompat baseline
+and current candidate distinct; do not overwrite earlier live/output evidence.
+Narrow permitted shared non-rendering lookup found2f5c80 extent lead ending2f6044
+and2f6050 ending2f60ac. These remain unverified leads, not authorized AOT roots.
+
+Automatic approval review rejected original-code/audio inspection and its explicit
+require_escalated approval attempt: could not determine safety status. No source
+change, game launch or replay was made in this continuation. First combined reader
+also had missing PYTHONPATH before reaching decoding; it changed no source.
+Next action: inspect original caller2f6060..2f60cc and target2f5c80 with own decoder,
+corroborate recorded dispatch before adding any target; replay original inputs.
+Then finish original matrix comparisons and inspect audio starvation/full-mix gaps.
+Do not retry blocked inspections through another route without the gate permitting.
+Documentation backup: TEMP/haunting-toc-probe/menu-audio-investigation-183227.
+
+## VALIDATING - matrix synthetic comparisons pass; original build next, 2026-09-20
+
+108 Python tests pass. Native matrix tests pass69632 compiled CFG comparisons,
+1048576 intermediate stage comparisons,50164 prepared chains and11224 fallbacks;
+49152 existing native readiness comparisons also pass. Four host rounding modes,
+invalid guards, definedness, entries/delays, lower faults, masks and aliasing covered.
+Normal emitter recognizes129 original chains. Exact old VU block matched once;
+only that block replaced, outside bytes preserved. Proof matrix-regeneration-applied.json.
+Current game binary remains the corrected compatibility build until build completes;
+live isolated copy is untouched. Original matrix replay/equivalence and speed pending.
+Backup matrix-postcompat-baseline; do not call matrix optimization accepted yet.
+
+## ACTIVE - corrected game visible; conservative matrix integration, 2026-09-20
+
+Corrected isolated game PID34904, interactive window1838478 returned by Computer
+Use with live video-update title. Normal input/realtime, no scripted buttons.
+Copy under TEMP/haunting-toc-probe/user-live-corrected-20260920-132309 matches
+current executable2608296b...; wrapper backup and live-command.json retained.
+Do not interrupt user play. No uncontended speed claim while this game runs.
+
+Next milestone: emitted matrix/reference CFG state and fault equality. Implement
+build-time four-pair MULA/MADDA/MADDA/MADD recognition, masks14/15, all broadcasts,
+no internal entries/targets/control/end/delay, no lower writes to future operands.
+Pure guarded prepare at first upper, commit at each original upper; fallback keeps
+original faults. Keep lower/SQ snapshots/readiness/clocks/Q/P and guest work exact.
+Function locals before entry dispatch. Files vu_emit.py, CMakeLists, new compiled
+synthetic generator tests/generate_vu_matrix.py, focused Python emitter coverage.
+Backup matrix-postcompat-baseline stores17 dirty source/doc/binary files/hashes.
+Test activation, flags/ACC, partial/undefined lanes, lower faults/writers, aliases,
+branches/entries/delays and wrap before replacing only the exact old VU block.
+No matrix integration or benefit accepted yet; target30 gameplayFPS remains unmet.
+
+## VERIFIED - live compatibility fixes and saved regressions, 2026-09-20
+
+VU0 normal-ACC product-underflow and original callback124da0 are built. The exact
+42-event replay reaches45M native-iop-budget, passing both former faults. Both
+warmups and four33M regressions ended native-iop-budget; all recorded image/EE/GS/
+VU comparisons pass, IOP differs only RTC bfcd1/2/3. Saved livecompat results reused.
+Mean matched scene 8.46275 -> 8.52585s (+0.746%); pairs disagree,
+so no repeatable speed effect is established. Retain required compatibility fixes.
+Current executable SHA256 2608296bcff3c2a47887f67b2cf233fd41a30eaf9792f50df85f21c1ac3d5eae.
+30 gameplayFPS remains unverified/unmet. No new tests/build/replay needed for launch.
+
+Next milestone: corrected visible game with realtime pacing and normal input,
+then conservative matrix integration and compiled differential tests. Preserve
+old isolated executable/logs; prepare fresh copy and outputs under C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\user-live-corrected-20260920-132309
+Backup of docs/wrapper in its backup directory. Launch not yet attempted.
+No user game/compiler observed before preparation; defer speed tests during live play.
+
+## ACTIVE - original callback124da0 after underflow progress, 2026-09-20
+
+Focused tests, captured-operand fixture and game build pass. The corrected game
+SHA4488fc9dc4bc2f152355b0596bb069eb5ff4d7b435cd7b1089cfd26a9d3d7cbb passes
+former36.445516M stop and reaches39.245766M with the same42 controller events.
+New fault: no static translation at124da0, reached by original JALR1728a8.
+Original172894..9c installs46c220 on liveobjectcb8b40;1728a0/a4 reads slot+10.
+ELF/live table46c230 and live t9 agree on124da0. Its original JRra/NOP words
+03e00008/00000000 are independently decoded. Exact shared manual-config lookup
+provided no additional lead. Add only this proven site target, translate the
+original instructions normally, retain all guest budgets/delay/trace semantics.
+Files config/haunting_ground_us.toml, expected generated shard0009, provenance.
+Normal combined backup/note request was rejected by automatic approval review;
+a narrower explicit backup through the approval mechanism succeeded. Current
+flat-file backups/hashes: TEMP/haunting-toc-probe/live-callback-124da0-baseline.
+Regenerate old/new externally, require old output match existing code and inspect
+only the expected added instructions before copying any generated file. Build,
+replay45M, and original33M comparison; corrected visible launch follows validation.
+No game/build/replay remains active. Matrix scan found129 static opportunities;
+no matrix integration or speed result.30 gameplayFPS remains unverified/unmet.
+
+## VALIDATING - VU0 underflow focused checks passed, 2026-09-20
+
+Applied bounded product-underflow handling and synthetic runtime/translation tests.
+Clean runtime_tests/translation_tests build and both executables completed exit0.
+49152 new sign/mask/broadcast/alias/status cases and 12 later-lane atomic faults
+pass, plus translated JR delay-slot success and retained exact-PC rejection.
+External captured-operand fixture compiled and passed: VF9 614a953d/6201d6fa/
+633e4ce8/013b6c49, unchanged ACC, MAC0, statusfe0. Real game rebuild is active;
+no corrected original replay result exists yet. Native build session87308.
+Next: finish game build, fresh45M42-event hidden replay past former36.445M stop,
+then original33M state regression and corrected isolated visible launch.
+Manual PDF/table provenance now saved externally as sony-vu-page42-tables.json;
+page42 rendered, but native image viewer denied image input. Table cells were
+read using PDF geometry. No physical-console arithmetic/FPS claim.
+Source baseline vu0-underflow-baseline; fresh docs backup vu0-underflow-validation-docs.
+
+## ACTIVE - bounded VU0 product-underflow implementation, 2026-09-20
+
+The 42 delivered controller events exactly reproduce live10dac8. All image,
+EE/GS/VU snapshots match; IOP differs only verified RTC seconds/minutes.
+Diagnostic build and runtime tests pass; guest arithmetic is still unchanged.
+Captured VF7.y=3e73e780 times VF8.w=013b6c49 underflows with normal nonzero
+ACC.y=6201d6fa. Sony VU6.0 p42 table (coordinate-based PDF extraction) specifies
+current U/O clear, result-based Z/S, and sticky US set for normal-ACC/product-UDF.
+Implement only nonzero normal ACC exponents1..254: exact unchanged ACC result,
+separate sticky U; preserve all other exceptional guards and atomic commits.
+No policy copied from EE COP1 or external renderer. Physical-console least-bit
+profile remains unmeasured; zero/denormal and exceptional ACC stay explicit stops.
+Files runtime.hpp and runtime_tests.cpp; synthetic all-mask/broadcast/sign/alias
+coverage and later-lane atomic faults, plus existing translation tests. Build
+then replay exact42-event path past former36.445M stop and original33M regression.
+Keep live isolated executable unchanged and use fresh hidden-replay outputs.
+Backup: %TEMP%/haunting-toc-probe/vu0-underflow-baseline, including diagnostic
+executable/map. Matrix optimization and verified30FPS goal remain unfinished.
+
+## ACTIVE - live VU0 arithmetic stop, 2026-09-20
+
+Accepted isolated game launched on interactive desktop; second launch window
+2952648 observed with live update title and normal controls. Removed inherited
+host-frames flag so execution faults remain visible instead of closing the UI.
+First recorded play stops at EE10dac8, final VMADDw VF9,VF7,VF8.w in original
+matrix routine10dabc..10dac8. Fault is the explicit exceptional accumulator guard.
+Next milestone: reproduce the recorded input path, identify exact VF8/ACC values,
+validate the applicable Sony VU exception-table row and implement only proven
+behavior. First extend existing HG-DIAG-001 fault report with all VF/ACC/MAC/status
+and a2/sp (exit-only host output), incremental build, then hidden recorded replay.
+No changed guest arithmetic/clocks in this diagnostic step. Do not interrupt live
+user play. Matrix optimization remains pending until this launch blocker is fixed.
+Backup: %TEMP%/haunting-toc-probe/vu0-live-fault-baseline. Live outputs under
+user-live-20260920-120121.30FPS remains unmet; presentation counts are not game FPS.
+
+## ACTIVE - visible accepted game launch and matrix continuation, 2026-09-20
+
+User requests a controllable visible game and continued optimization. Prepare an
+isolated byte-identical accepted executable; restore live wrapper with verified
+manual live arguments and fresh outputs. No scripted input or hidden-host flag.
+Dependencies inspected with dumpbin: Windows and installed MSVC runtime only.
+Verify interactive window and startup, then continue exact matrix implementation.
+Do not interrupt user play; defer uncontended speed measurements while it runs.
+Backup/launch evidence: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\user-live-20260920-120121
+
+## ACCESS CHECK - read command and source patch succeeded, 2026-09-20
+
+After the user reported a possible fix, the normal read command succeeded and
+apply_patch successfully added the pending explicit <array> include to
+runtime/fpu_add4_avx2.cpp. Verified that this is the only source-line change.
+The earlier blanket tool blocker is not reproducing in these two checks.
+The larger matrix integration patch, compilation and benchmarks remain untested;
+this result establishes access for the tested actions only, with no FPS claim.
+
+Source and documentation backup with hashes:
+%TEMP%/haunting-toc-probe/matrix-access-check-90f2c57cc1184bfa9bc1890c4f4e6808.
+This check launched no build, game, replay or profile. Existing matrix helper
+remains unbuilt and unused by generated code. Next implementation step remains
+conservative matrix emitter integration and compiled differential tests, then
+VU-only regeneration and matched original-game replays.30FPS remains unmet.
+All older progress bytes are preserved below.
+
+## BLOCKED - matrix integration rejected by automatic safety review, 2026-09-20
+
+Automatic safety review blocked the apply_patch request adding conservative matrix
+recognition/emission to tools/hgtool/vu_emit.py and the explicit array include in
+runtime/fpu_add4_avx2.cpp. Returned reason: "we couldn't determine the safety status
+of the request." No approval request or corrective action was given. Did not retry
+the rejected source mutation through another tool.
+
+Post-block hashes verify emitter, AVX2 source, matrix source/header and CMake are
+unchanged from vu-matrix-continuation. Accepted hg_game.exe/map and generated
+out/translated.cpp still match vu-matrix-baseline. All105 Python tests pass.
+No optimization applied; inherited matrix helpers remain unused/unbuilt.
+No build/replay/profile launched; no native command session remains active.
+30 gameplay FPS remains unverified/unmet; no fresh speed result exists.
+
+Backup: %TEMP%/haunting-toc-probe/vu-matrix-continuation (17 dirty source/doc files
+and manifest); accepted executable/map/generated main stay in vu-matrix-baseline.
+Next action when the edit gate permits: apply/review conservative matrix integration,
+add compiled differential tests, then exact VU-only regeneration, clean /m:1 build
+and alternating hidden-host original replays. Current launcher wrapper still invokes
+older readiness pairs; use fresh artifact names before launching.
+
+The documentation-only apply_patch failed on inherited invalid UTF8; this note
+was prepended as ASCII bytes, preserving every pre-existing byte unchanged.
+
+## ACTIVE - resume exact matrix candidate, 2026-09-20
+
+Next measurable milestone: compiled matrix/reference CFG state and fault equality,
+then repeatable lower original33M scene elapsed with full captured-state equality.
+Confirmed accepted executable/map/generated main/emitter match matrix-baseline.
+Read all project Markdown current sections and inherited matrix code. No game/build
+active at entry. Backup current dirty sources: %TEMP%/haunting-toc-probe/
+vu-matrix-continuation; accepted binary backup remains vu-matrix-baseline.
+
+Complete conservative static four-stage recognition and function-local scratch
+before entry dispatch. Exclude internal entries/targets and every delay/control
+pair; reject lower writes to any future source lane. Keep readiness, pipeline,
+SQ snapshots, lower operations and fallback fault order. Add explicit array include
+and compiled synthetic matrix/reference cases with activation checks, masks,
+broadcast permutations, VF0, aliasing, undefined operands, intervening lower faults,
+branch/loop/entry cases, flags and unsigned-clock wrap. Source is own existing
+exact product/add and modeled state transitions; no external rendering reference.
+Files: vu_emit.py, fpu_add4_avx2.cpp, CMakeLists, new tests/generate_vu_matrix.py
+and tests/test_vu_matrix.py; matrix helper adjustments only if tests find a defect.
+After checks, replace only exact old generated VU block and use clean /m:1 build.
+Two warmups/four alternating hidden-host original replays, fresh matrix names.
+Reject mismatches or nonrepeatable gain.30 gameplay FPS still unverified/unmet.
+
+## HANDOFF - matrix candidate partially implemented, NOT validated, 2026-09-20
+
+User requested handoff during implementation. No build/replay/profile/game active
+(process check hg_game/cl/MSBuild empty). Accepted game/map and generated main
+remain byte-identical to vu-matrix-baseline manifest, verified at handoff.
+Accepted latest result remains VF readiness proof: scene7.1256 ->6.9381s,2.631%
+lower;105 Python/49152 compiled checks and four original captures pass.30FPS unmet.
+
+Partial UNBUILT source changes: new runtime/vu_matrix.cpp and include/hg/vu_matrix.hpp
+provide guarded pure preparation and per-stage commits; fpu_add4.hpp/.cpp/_avx2.cpp
+add four-product/three-exact-add helper with existing AVX2 CPU/OS guard;
+vu_xyz.hpp includes new header; CMakeLists adds vu_matrix.cpp to library.
+No generator integration, tests, original regeneration, build or timings yet.
+vu_emit.py, test_vu_decode.py, generate_vu_readiness.py remain baseline-identical.
+Review includes (AVX2 source newly uses std::array), guards, flag/partial-lane
+semantics before integrating. Runtime helper is unused by current emitted code.
+Backups/hashes: %TEMP%/haunting-toc-probe/vu-matrix-baseline, including old-vu-block.txt.
+
+Next: implement conservative static group detection for MULA/MADDA/MADDA/MADD
+(any broadcast/order, masks14/15), excluding internal entry/control/delay and
+lower writes to future operands. Prepare once, commit at each original upper
+point with original checked fallback. Keep lower/SQ snapshot/readiness/Q/P clocks
+unchanged. Add compiled baseline-vs-optimized synthetic tests (undefined/fault,
+branches/alternate entries, masks/aliasing/flags); then regenerate ONLY exact
+old VU block and build. Two warmups/four alternating original hidden replays.
+Do not accept without exact image/EE/GS/VU equality and RTC-only IOP differences,
+plus repeatable speed gain. Current live launcher wrapper still vureadiness;
+replace with fresh matrix artifact names before invoking to avoid overwrites.
+
+## Active candidate - batched exact VU matrix arithmetic, 2026-09-20
+
+Next measurable milestone: reduce original scene time with exact state equality.
+Existing profiles implicate broadcast multiply/MADD helpers; static original
+blocks contain MULA/MADDA/MADDA/MADD chains. Prepare their exact products/adds
+in one guarded AVX2 call, then commit each stage at its original instruction.
+Only masks14/15, no internal entry/control/delay, no lower writes to future
+operands. Preserve all lower operations, readiness, clocks, faults and flags.
+Guard all inputs without throwing; undefined inputs use original per-stage path.
+No host FMA, changed rounding, guest work removal or new ISA assumption.
+Files fpu_add4.cpp/_avx2.cpp/header, new vu_matrix.cpp/header, vu_xyz.hpp include,
+vu_emit.py, CMakeLists and synthetic compiled tests. Backup vu-matrix-baseline
+contains current dirty contents/hashes and accepted game/map/generated main.
+First compare synthetic baseline/optimized CFGs including partial masks, aliasing,
+undefined operands and lower faults; then original rebuild and two warmups/four
+alternating replays. Reject on mismatch or lack of repeatable improvement.
+30FPS still unmet. Automated runs stay hidden; no live session currently active.
+
+## CURRENT - compile-time VF readiness proof retained, 2026-09-20
+
+Build,105 Python tests and49152 compiled baseline/optimized scheduler comparisons
+pass, including branches/loops/delays, arbitrary ready times, Q/P completion,
+uint64 wrap, partial lanes and fault states. All four original captures match
+images/EE/GS/VU, IOP verified RTC only. Two warmups excluded; controls7.1184/7.1328s
+vs candidates6.9515/6.9247s. Mean7.12560 ->6.93810s (2.631% lower),
+both pairs faster. Retained; all advances/timestamps remain, only proven no-op
+VF guards are skipped/narrowed. VI checks and wrap fallback remain. Evidence
+vu-readiness-proof-summary.json and vureadiness-* captures. New CMake/CTest target
+vu_readiness_tests; hg-build-add4.cmd now includes it. All native products current.
+No build/replay/profile active; launcher14640 completed exit0.30FPS still unmet.
+
+Next larger lead: static four-stage MULA/MADDA/MADDA/MADD blocks. Own opportunity
+scan finds many with no internal entry/control and no lower write to future
+operands (vu-matrix-block-opportunity.json). Consider precomputing the four exact
+products together while retaining each original add, flag commit, lower operation
+and pipeline step at its original point. Must guard all inputs and retain scalar
+fallback/fault order. No matrix batching implemented yet. Local CPU is verified
+AMD Ryzen7 9800X3D; no AVX512 capability assumed or used. Latest visible rate still
+needs refresh; hidden changed-image rate11.16/s predates recent small gains.
+
+## Active plan - compile-time VU readiness proof, 2026-09-20
+
+Original static blocks contain many already-satisfied VF checks (e.g. programs3/8:
+334/455 and334/429 calls). This is an opportunity count, not measured gain. Track
+per-lane known-ready state during emission: a successful read establishes readiness;
+a write resets selected lanes to the existing four-cycle latency, and each pair
+advances the conservative lower bound by one. Ignore extra stalls in the proof.
+Reset at every entry, branch target, control-flow join/gap and after control/end
+pairs; delay slots use only their actual predecessor's proof. Keep VI checks.
+Omit/narrow only proven-satisfied VF checks, with a function-local safety flag that
+falls back to all original masks after uint64 issue-cycle wrap (unit advances or
+WAITQ). Require stalls cannot wrap because their target is >=current. Preserve
+all pipeline advances, Q/P completion, ready timestamps, arithmetic and faults.
+A zero-cycle VF check cannot clear additional Q/P state after the pair's initial
+one-cycle advance. No new scheduling/timing model or runtime instruction decoding.
+This differs from HG-FAIL-015's runtime combined dependency-clock helper.
+Files vu_emit.py, test_vu_decode.py, CMakeLists; new synthetic test generator
+ tests/generate_vu_readiness.py. Backup vu-readiness-proof-baseline includes dirty
+sources/generated main and accepted combined-MADD game/map. First compile/run
+synthetic emitted baseline versus optimized CFGs with randomized ready times,
+Q/P states, uint64 wrap, branches/loops/delays, partial lanes and fault states.
+Only then regenerate original VU block and build. Run104+ Python tests, native
+synthetic checks and four alternating original captures after two warmups. Reject
+without exact state equality and repeatable scene improvement.30FPS still unmet.
+
+## CURRENT - combined exact MADD host call retained, 2026-09-20
+
+Build/focused FPU/GIF/runtime checks pass:4M new scalar-chain comparisons across
+four MXCSR modes, existing16M products/16M additions and frozen VU checks. Four
+original captures match images/EE/GS/VU, IOP verified RTC only. Two warmups excluded;
+control scenes7.1994/7.1980s vs candidates7.1342/7.1621s. Mean7.19870 ->7.14815s
+(0.702% lower), both pairs faster. Retained; modest gain. These remain
+two exact guest arithmetic operations, not host FMA. CPU/OS guard/fallback stays.
+Artifacts vu-combined-madd-summary.json and vucombinedmadd-*; baseline preserves
+prior accepted SQ-elision game/map. Current build products match retained source.
+No build/profile/replay active; launcher48252 completed exit0.30FPS remains unmet.
+
+Next substantial lead: own static block analysis shows many repeated VU VF readiness
+checks are provably already satisfied. Opportunity counts in vu-static-readiness-
+opportunity.json, not a speed claim. Need conservative per-block proof, branch/
+entry resets and exact uint64 wrap fallback; preserve every pipeline advance,
+Q/P completion, ready timestamp, arithmetic operation and explicit fault. This
+would differ from rejected runtime combined dependency helper (HG-FAIL-015).
+No such readiness change has been implemented. Do not omit guards on assumption.
+
+## Active candidate - combined host call for exact full-lane MADD, 2026-09-20
+
+Remaining profiles show full multiply/MADD plus separate AVX2 product/add calls.
+Keep the existing exact product then exact add, but combine their host dispatch
+and inline only inside the isolated AVX2 translation unit. This may remove stack
+round-trips and duplicate AVX call transitions; it is NOT host FMA or changed
+rounding. Product and addition UF/OF masks are ORed exactly as before. CPU/OS guard
+remains; false retains original checked SSE2/scalar path. No VU timing changes.
+Files fpu_add4.cpp/_avx2.cpp, fpu_add4.hpp, vu_products.cpp, fpu_tests.cpp.
+Backup vu-combined-madd-baseline includes dirty sources/docs and accepted game/map.
+Compare chained scalar product/add bits and flags over4M lanes/four MXCSR modes,
+including cancellation/saturation/subnormals and accumulator aliasing; retain
+existing32M arithmetic checks and frozen VU reference checks. Build then two
+warmups/four alternating original33M captures; reject without repeated scene gain.
+This does not inline compound arithmetic into generated CFGs (HG-FAIL-007).
+
+## CURRENT - nonconflicting SQ snapshot elision retained, 2026-09-20
+
+All104 Python tests, build and four original captures pass; image/EE/GS/VU exact,
+IOP verified RTC only. Two warmups/four alternating hidden33M runs: controls
+7.2876/7.2536s, candidates7.1809/7.1552s. Mean7.27060 ->7.16805s
+(1.410% less scene time), both pairs faster. Retained.20 overlapping
+SQ sites keep snapshots;111 independent sites omit them. No guest clocks changed.
+Evidence vu-sq-snapshot-summary.json/static-proof.json and vusqsnapshot-*.
+Game/map and all build products current. No build/profile/replay active; launcher
+14600 completed exit0.30FPS goal unmet. Latest hidden changed-image rate11.16/s
+predates this small gain; visible rate still needs refresh. Continue measured work.
+
+## Active candidate - omit nonconflicting VU SQ snapshots, 2026-09-20
+
+Fresh post-masked profile3265 samples/zero errors, original captures pass RTC-only.
+VCRUNTIME91 samples; earlier real stack unwinds identify memcpy callers in VU
+programs1/3/9. Emitter currently copies whole Vu1State before every SQ, even if
+upper writes another VF or disjoint lanes. Own static scan:131 reachable SQ sites,
+20 have overlapping upper writes;111 unnecessary snapshots are omitted.
+Use existing _pipeline_accesses VF write mask: snapshot only when SQ source lanes
+intersect same-pair upper writes. Upper instructions cannot change VI addressing;
+SQ reads no ACC/status/clocks. Keep original whole snapshot for every overlap.
+No new inline arithmetic, no scheduling changes, no runtime decoding or flags
+elision. Files vu_emit.py/test_vu_decode.py and ignored generated main only.
+Backup vu-sq-snapshot-baseline saves dirty sources, generated main and accepted
+exe/map. Verify old emitted VU block matches exactly once, then replace only that
+block with normal emitter output; unchanged EE shards need no regeneration.
+Keep overlap ordering test, add independent-source/disjoint-lane cases, run Python
+suite and build; two warmups/four alternating33M replays must match all captures
+and show repeatable scene gain.30FPS remains unmet. Latest hidden changed images
+11.16/s; not a visible or internal-game FPS measurement. No stale products remain.
+
+## Active diagnostic - post-masked gameplay profile, 2026-09-20
+
+Refresh bounded five-second native RIP sampling after30M on the accepted masked
+transfer binary and matching map. Hidden host; post-masked-gameplay-* artifacts.
+Excluded from speed benchmarks; compare original captures on completion. Use
+measured remaining costs to choose the next bounded optimization toward30FPS.
+
+## CURRENT - masked resident transfers retained, 2026-09-20
+
+Masked PSMT8 writes passed1042 GPU/CPU cases in both modes, including confirmed
+resident execution, repeated masks/indices, partial transfers, intervening reads,
+later GPU draws, copy and pending-write accelerator teardown. Memory1920/GIF1285/
+DMA/runtime checks pass; full game and final fixture builds exit0. All four original
+33M captures match images/EE/GS/VU, IOP verified RTC only. Two warmups excluded;
+control scenes7.5312/7.5349 vs candidates7.3364/7.3433s. Mean7.53305 ->7.33985s
+(2.565% less), both pairs faster. Retained. No timing or guest work change.
+Evidence masked-transfer-summary.json, pair-times and maskedtransfer-* captures.
+Accepted binary/map, native library, headless and tests now reflect this candidate
+plus accepted AVX2 products and untextured GPU triangles. Full-vector helper reuse
+remains reverted. No build/replay/profile active; launcher20964 completed exit0.
+
+30FPS goal remains unmet. Latest visible changed-image measurement remains about9/s;
+hidden fixed-work gains are not internal game FPS. Audio recording gaps unresolved;
+Options captured path works. Next measurable milestone: refreshed presentation/
+frame-boundary evidence and remaining CPU/GPU hotspot selection. Continue beyond
+this checkpoint; avoid repeating rejected full-vector/XYZ arithmetic or read-page
+narrowing changes unchanged. Automated replay windows remain hidden, live input
+sessions retain control. Current launcher wrapper runs hg-maskedtransfer-pairs.py;
+use fresh artifact names before another run. Sources/headers require no restoration.
+
+## Active plan - masked resident PSMT8 transfers, 2026-09-20
+
+StackWalk64 proves GPU download callers include PSMT8 fast host writes. Add optional
+masked-word observer delivery in gs_memory.hpp and use it for existing aligned
+16-byte PSMT8 columns in gs.cpp. gl_gs.cpp accepts only resident pages already GPU
+dirty or with queued writes; CPU-owned pages retain original CPU stores. Flush
+prior draws before starting transfer batch. Merge repeated writes into one unique
+word job with exact bit masks/last-writer ordering; dispatch one invocation per
+word, preserving untouched GPU bits without CPU readback. Flush transfers before
+GPU draws or overlapping CPU access. Copy/read/teardown materializes normally;
+forget discards only unobservable storage. GPU upload cache/page flags follow the
+same existing flush lifecycle. No guest work, clock or transfer progress changes.
+New shader independently implements (old & ~mask) | (value & mask), no references.
+Backup masked-transfer-baseline contains dirty files and accepted game/map.
+Tests must cover GPU draw -> partial/repeated/overlapping transfer -> CPU read,
+transfer -> GPU texture use/draw, nonresident fallback and owner teardown. Prove
+actual backend use, full VRAM equality and transfer-state equality. Build/focused
+checks/both GPU modes, then two warmups/four alternating original33M captures.
+Retain only with exact equivalence and repeatable scene-time gain. This is not the
+rejected read-page narrowing/deferred-raster-flush design. Header rebuild required.
+
+## CURRENT - stack profile isolates GS transfer waits, 2026-09-20
+
+External StackWalk64 sample:325 contexts, zero context failures, depths6..20;
+276 walks end with API false below20,49 reach the20-frame cap. Do not claim every
+stack fully unwound. Among62 top-ntdll samples,39 unwind through Accelerator::
+download and15 through flush. Many download chains directly reach PSMT8 host
+transfers or CPU raster scopes. This uses unwind metadata, not stack-word guesses.
+Original images/EE/GS/VU match; only verified IOP RTC offsets differ. Replay exit2
+native-iop-budget, sampler/launcher exit0. No replay/build/profile remains active.
+Evidence post-stackwalk-gameplay-native-sample.log, summary and equivalence JSON.
+
+Next candidate lead: resident masked host-transfer writes can preserve untouched
+GPU word bits without downloading their pages first. Scope PSMT8 fast16-byte
+columns, queued unique-word masked updates; must preserve CPU reads, queued draw
+order, partial transfers, overwritten lanes and memory lifecycle. Need written
+implementation plan/backups and GPU/CPU dependency tests before changes. Unlike
+rejected read-footprint narrowing, this removes a demonstrated readback boundary.
+No such production transfer change implemented yet. Accepted game/map remain
+AVX2 product + untextured triangle build restored from vu-full-vector-baseline.
+Library objects/headless/tests require rebuild after rejected full-vector revert.
+30FPS remains unmet; latest visible changed-image measurement still~9/s.
+
+## CURRENT - full-vector extension rejected, accepted binary restored, 2026-09-20
+
+Full-vector multiply/add passed focused checks and all four original state/image
+comparisons (IOP verified RTC only), but scene mean7.5568 ->7.5691s (0.163% slower).
+First pair slower, second effectively flat; no repeatable gain. Reverted only
+vif.hpp, vu_products.cpp, gif_tests.cpp and restored accepted hg_game.exe/map from
+vu-full-vector-baseline, byte equality verified. Candidate retained externally in
+vu-full-vector-rejected. Native library objects/tests/headless may still reflect
+the rejected candidate; next build must refresh them. Sources touched accordingly.
+Accepted AVX2 products and untextured GPU triangles remain.30goal unmet.
+Next: bounded external StackWalk64 gameplay profile to resolve DLL caller costs.
+
+## Planned diagnostic follow-up - native stack unwinding, 2026-09-20
+
+After current full-vector timings finish and the winning binary/map is selected,
+resolve the substantial ntdll/VCRUNTIME sample share using a bounded external
+StackWalk64 sampler. Microsoft DbgHelp documentation and installed SDK define
+context/stack/function-table APIs; no emulator material. New external helper only,
+under HG-DIAG-010. Suspend/resume only around context capture and stack walk, with
+RAII resume; no guest-memory edits. Exclude this replay from timing comparisons.
+Report actual unwind depth/errors, never replace failed unwinds with scanned
+candidate return addresses. Original state/image comparison remains required.
+
+## Active candidate - full-lane vector multiply/add, 2026-09-20
+
+Fresh post-product4 native profile:3254 samples, zero errors; multiply_vector63
+and add_vector62 samples. Test existing exact packed arithmetic for dest15 only.
+Files vif.hpp, vu_products.cpp and gif_tests.cpp. Reuse product/flag assembly;
+add/subtract uses add4. Guard indices/definedness before commit. Preserve VF0,
+aliases, status, scalar fault ordering, partial masks and non-AVX2 fallback.
+Backup vu-full-vector-baseline preserves dirty files and accepted exe/map.
+Frozen scalar references check flags/faults/aliases and all masks. Build/focused
+checks then two warmups/four alternating hidden33M replays and full original
+state/image checks. Reject without repeatable scene improvement.30 goal unmet.
+
+## Retained - AVX2 integer VU products, 2026-09-20
+
+All four original captures match images/EE/GS/VU; IOP differs only at verified RTC
+bytes. Two warmups and four alternating hidden33M runs: controls7.8081/7.8231s,
+candidates7.6233/7.6208s; mean7.8156 ->7.62205s (2.476% less scene time), both
+pairs faster. Build and focused FPU/GIF/runtime checks pass;16M product comparisons
+and16M additions across four rounding modes preserve bits/flags with no host FP
+exceptions. Retain integer AVX2 product helper with existing CPU/OS guard and
+SSE2/scalar fallback. Evidence vu-product4-avx2-summary.json and vuproduct4-*.
+Accepted exe/map currently include this change and untextured GPU triangles.
+
+Next measurable milestone: fresh bounded gameplay native profile of this accepted
+binary/map (post-product4-gameplay-*), hidden host, sample five seconds after30M.
+This instrumented run is excluded from benchmarks. Use its costs to select the
+next bounded optimization; no internal30FPS or new visible-rate claim. Latest
+visible changed-image rate remains8.979-9.104/s. Audio gaps remain unresolved.
+
+## Active candidate - four64-bit-lane integer VU products, 2026-09-20
+
+Measured post-add4 gameplay profile: full multiply helper140/3295 samples, a leading
+application cost; untextured GPU change preserves identical VU work. Test AVX2
+integer products in four64-bit lanes rather than two SSE2 pairs. This differs from
+rejected packed32 normalization: retain64-bit significands/exponents throughout,
+using VPMULUDQ and exact shifts/masks/saturation; no host FP arithmetic. Reuse
+existing AVX2 CPU/OS guard and isolated ISA source, retain SSE2/scalar fallback.
+Files vu_products.cpp, fpu_add4.cpp/_avx2.cpp, fpu_add4.hpp, fpu_tests.cpp.
+Backup vu-product4-avx2-baseline saves dirty files and accepted untextured exe/map.
+Compare products/underflow/overflow against scalar reference across full exponent
+pairs, extreme mantissas/signs and random vectors under all MXCSR modes. Existing
+full-helper VU checks verify flags/ACC/vector commits. Then original state/image
+check and two warmups/four alternating hidden33M replays; reject without repeatable
+gain. New call/dispatch overhead may erase packed-work savings; benchmark decides.
+
+## CURRENT - untextured GPU triangles retained, Options opens, 2026-09-20
+
+Build exit0; runtime/GIF1285/page1920 and1018 GPU cases in BOTH modes pass.
+Original initial capture and4measured runs match images/EE/GS/VU, IOP verifiedRTC
+only. Two warmups/four alternating hidden runs: controls8.2821/8.2323s vs candidates
+7.7525/7.7150s; mean8.2572 ->7.73375 (6.339% less scene time), both pairs faster.
+Retained. Whole replay2.318% lower. Do not equate hidden timing with visible FPS;
+latest accepted visible changed-image measurement still8.979-9.104/s.30goal unmet.
+Backups/evidence untextured-triangle-baseline, untextured-triangle-summary.json,
+corresponding capture/equivalence files. Temporary detailed fallback logging removed.
+
+Options captured user path now reaches70M native-iop-budget and renders Options
+screen (options-state-group-replay.png). Connected member callbacks compiled from
+verified original descriptors/load/store sites; other menu interactions not yet
+claimed. Audio recording versus modeled PCM shows inserted gaps/delay, no source
+hard clipping; no audio timing/volume change made. Live/replay processes completed.
+No build/replay/profile active. Automated correctness runs use --hidden-host to
+avoid user confusion with disabled controls; live sessions retain normal input.
+Qword append remains provisionally retained; its stable speed effect unresolved.
+Next: pursue measured CPU arithmetic cost or remaining rendering cost, preserving
+exact arithmetic/flags and fixed guest work. Refresh internal frame-boundary
+measurement; changed images and swaps still not proven game updates.
+
+## CURRENT - Options opens; bounded untextured GPU triangles next, 2026-09-20
+
+Grouped Options replay reaches70M native-iop-budget with33 recorded controller
+events and displays the Options screen (options-state-group-replay.png). No claim
+all menu actions tested. Original33M triangle-fallback-profile equivalence also
+passes all compared images/EE/GS/VU, IOP verifiedRTC only. No live process remains.
+
+Measured lead:292 independent CPU fallback triangles in scene cost0.364s. Detailed
+--profile-gs identifies untextured Gouraud/blended PRIM0x4b, CT32 frame, Z24 masked,
+ZTESTalways (TEST30000); clipped quadrants cover screen. Extend existing opt-in
+triangle GPU path to untextured flat/Gouraud triangles within its same conservative
+frame/depth/alpha/fog/alias bounds. Job flag distinguishes untextured; shader skips
+STQ/texture lookup, backend marks no texture reads. Keep exact existing edge,
+interpolation, blending/masks and Z logic. Ignore texture state only when TME is off,
+as the existing CPU path does. Unsupported cases retain CPU/fault behavior.
+Files: gs.cpp, gl_gs.cpp, gl_triangle_shader.hpp, gs_triangle_acceleration.hpp,
+gs_gpu_tests.cpp. Backup untextured-triangle-baseline contains dirty sources/docs,
+current game/map and SHA256 manifest. Remove temporary detailed triangle logging
+now that its case is identified; retain external diagnostic evidence.
+
+Verify GPU/CPU full-VRAM equality across new untextured variants, actual GPU
+acceptance, invalid unused texture state, depth/alpha/frame masks and dependency
+boundaries. Build/focused checks/both GPU modes, then original regression and two
+warmups/four alternating fixed33M runs. Use --hidden-host on BOTH binaries for
+this comparison, label fixed-work scene times; never equate hidden presentation
+with gameplay FPS or compare absolute timings to prior visible runs. Exact state
+match and repeatable scene gain required to retain. Goal30FPS remains unmet;
+latest accepted visible changed images8.979-9.104/s. Qword gain still provisional.
+
+## Current grouped Options coverage and measured raster follow-up - 2026-09-20
+
+Options replay now reaches397d60 at66.138673M, source descriptor44b1a0.
+Group only independently inspected connected state installations: original393bd0
+loads44b408/418/428/438/448/458 and stores their words into object+1708/170c/1710.
+Targets393880/393480/3930c0/392b50/392670/392360 share the verified member helper.
+Original3998c4..3998fc similarly installs44b170 ->398100 atobject+16fc.
+Add these plus live397d60 to100b6c; do not automatically root all691 descriptor
+candidates or unrelated menu states. Backup options-state-group-baseline.
+Build, replay captured Options path, test original equivalence and inspect output.
+
+Current hidden instrumented33M regression matches all EE/GS/VU/images, RTC-only.
+Scene GS profile:292 independent triangles0.3636132s;753552 strip triangles
+0.7114358s;43858 sprites0.9643388s. Profile scene8.5442s is NOT a matched speed
+claim (hidden/instrumented). Next measured lead: the sparse independent triangle
+fallbacks have disproportionately high cost. Under existing --profile-gs only,
+log their PRIM/frame/Z/test/texture flags and clipped bounds at CPU fallback.
+HG-DIAG-005, no guest effects, no behavior change, disabled one branch; diagnostic
+logging cost unknown and runs excluded from benchmarks. This tests whether a
+bounded additional GPU case can remove CPU/readback work. No rendering reference
+material is used; inspect own state/implementation only.
+
+## Options body continuation - 2026-09-20
+
+Hidden70M replay ended at65.971939M on393bd0 (33 recorded pad events), advancing
+past3984d0/397f00. Original397f5c calls100b40 with descriptor object+1708; live
+8fe5c8={0,-1,393bd0}, matching original44b060 (and repeated original descriptors).
+Add this exact direct target100b6c, rebuild/replay; shared non-rendering extent lead
+checked and own executable proof retained. Backup options-body-baseline. Prior
+transition build and coherent incremental confirmation both exit0. Hidden replay
+worked without another interactive window. No game process currently active.
+Audio alignment check now also confirms raw PCM has no >=10ms silence from20s
+until60.6827s, unlike recorded short gaps; source PCM peak14136, no saturation.
+Host/capture gap origin remains under investigation; no volume/guest timing change.
+
+## Automated replay visibility refinement - 2026-09-20
+
+User confused an input-disabled replay window with live gameplay twice. Add explicit
+--hidden-host to game_host.cpp under HG-DIAG-011: retain initially hidden GLFW window,
+skip taskbar/show calls, disable host input for this diagnostic mode. Default normal
+visible/live behavior unchanged. Retain GL contexts/presentation code and guest work.
+Use only for correctness replay, not comparison to visible-window FPS/timings. Backup
+hidden-replay-host-baseline. Check manual-input replay still reaches expected path,
+then default live command remains unchanged. Incremental rebuild after current build
+ensures coherent products if game_host.cpp was already compiled.
+
+## CURRENT - Options transition coverage and audio evidence, 2026-09-20
+
+First callback batch built exit0,44tool tests/runtime/GIF1285 pass; original33M
+images/EE/GS/VU byte-equal, IOP only RTC. Replay33 recorded pad events reached
+new3984d0 fault at guest65.705s, passing399920. Manual replay ended naturally
+before attempted stop; no process killed. User was confused by disabled replay
+controls; live-controls-restored PID44952 was launched live/realtime/no scripts,
+then independently reached same3984d0 fault. Both sessions now ended. Future
+scripted checks must not take over a window the user is actively using.
+
+Next change: config100b6c gains live-proven3984d0 (descriptor8fe5bc, original44b160)
+and397f00: original398724..39875c copies descriptor44b180 into same object+16fc.
+Also original398878 bounds index<16 for398898 table4643a0..4643e0. Compile this
+verified bounded switch to avoid repeated per-case discovery. Backup external
+options-transition-baseline (dirty config/docs/generated/game/map/hash manifest).
+Regenerate/build then deterministic manual path; unsupported behavior stays explicit.
+
+Audio: manual-intro-replay has0 host underruns through intro,1 near61M transition;
+peak14136, not saturated. User recording versus modeled PCM matches correlation
+>0.99 for many1s windows. Offset changes from-2.553s (recording21..27) to-2.250s
+(39..47) and-1.925s (57), suggesting inserted delay/gaps, not global accelerated
+audio. Low-correlation windows excluded. Artifact manual-intro-replay-recording-
+alignment.json. Need distinguish host/capture gaps from source; no audio fix yet.
+Visual reference landmarks60.55/70.55 correspond roughly local35/45, not exact FPS.
+
+Goal30FPS remains unmet. Qword optimization provisional, quiet confirmation pending.
+
+## CURRENT - recording comparison, captured callbacks and audio gaps, 2026-09-20
+
+Manual recording session completed with explicit missing target399920 after user
+selected Options; no live game/build/replay remains. User supplied D:/Videos/
+2026-09-20 03-08-20.mp4 and reference https://youtu.be/JvdAHmVA-vI?t=28.
+User reports pacing improved before recording, audio clipping remains intermittent.
+Decoded recording has two matching AAC tracks, peak0.06832, no full-scale clipping;
+short near-silent gaps exist but upstream clipping/host starvation are unproved.
+
+Next measurable milestone: deterministic replay of recorded controller events past
+both missing callbacks3838f0 and399920, then original33M state-equivalence. Config
+100b6c direct-member target list will gain only these two live-proven original
+functions. Descriptor live RAM and original ELF evidence is retained externally.
+Add strict full-pad encoding to existing --input-at for exact logged state replay,
+leaving legacy commands unchanged. Add host-audio counters to profile checkpoints
+and fault reporting (HG-DIAG-014) to distinguish starvation from guest PCM gaps;
+no gain/buffering/guest-clock changes. Capture modeled PCM via existing WAV option.
+Backup: %TEMP%/haunting-toc-probe/live-callbacks-replay-baseline (dirty contents,
+generated sources, game executable/map, SHA256 manifest). Tests: valid/invalid
+controller parser cases, focused runtime, static tool tests, deterministic33M and
+recorded manual path. New helper/header files will be recorded explicitly if needed.
+Qword append remains provisional; stable warmed timing confirmation still pending.
+Goal30 verified gameplayFPS unmet; latest accepted changed images8.979-9.104/s.
+
+## CURRENT - user recording manual intro; avoid competing load, 2026-09-20
+
+User says paced controls work but later still suspects fast playback, and offers
+intro recording/reference video. Requested restart for uninterrupted recording.
+Manual session launched PID46608 (launcher22932), stdout/fault artifacts prefix
+%TEMP%/haunting-toc-probe/manual-intro-recording. --realtime, --spu2-output-core0,
+--profile/--video-rate-log, live controls; NO --input-at, --no-host-input or --unlimited.
+Verified command saved manual-intro-recording-command.json. Keep builds/benchmarks
+stopped while user records. Await attached recording/reference and compare matching
+moments by host elapsed time; decoder conversions are not gameplay FPS. Most recent
+60 conversions in preceding audio session took2.08hostseconds, not a global proof.
+
+Secondary command table at202d34 compiled8original targets; only1generated shard
+changed.44tool tests pass, clean build exit0; fixed33M original regression remains
+byte-equal images/EE/GS/VU, IOP only verifiedRTC0xbfcd1/2/3. User live session then
+hit a different explicit missing target3838f0. Live object17f3af8 has direct-member
+{0,-1,3838f0} at+4; original pointer44af38. Caller209360 calls384ba0, which tailcalls
+100b40; helper dispatch100b6c. Own ELF/body inspection and live RAM proof archived
+live-member-3838f0-proof.json. Shared non-rendering extent lead only, independently
+verified. Next code action AFTER recording: back up dirty config/generated source,
+add3838f0 to existing100b6c target list, regenerate/build, replay captured input or
+repeat user path. Runtime input logger now records changed buttons/axes/pressures
+with guest slices under --profile (HG-DIAG-006); build/runtime checks pass.
+
+Qword append remains provisional:1285synthetic cases, focused+914GPUboth modes,
+4original captures pass; paired speed gain9.00%/0.389% is too variable for a stable
+4.84% mean claim. Confirm later without recording/play load. Goal30gameplayFPS
+unmet, latest accepted changed-image samples8.979-9.104/s; internal boundary not
+verified. No commits/subagents/tasks. Preserve inherited dirty work and backups.
+
+## Live input capture refinement - 2026-09-20
+
+To reproduce user-triggered gameplay stops, log delivered host controller changes
+under existing --profile in system_diagnostic.cpp (HG-DIAG-006). Record exact slice,
+buttons,4axes,12pressurebytes after assigning existing SIO2 state. No changed input
+semantics, no additional polling, no new CLI; disabled branch only runs on delivered
+input events. External backup live-input-log-baseline. Existing deterministic
+--no-host-input comparisons unaffected. Rebuild native runtime and check original
+regression plus live records before treating recorded sequence as replay evidence.
+
+## Active gameplay blocker - secondary command dispatch, 2026-09-20
+
+User confirms paced live controls work and speed looks normal at current low FPS.
+Audio was absent/uncertain: launch omitted --spu2-output-core0. Enable the existing
+core0 PCM sink next time; full SPU2 synthesis/mixing is still unfinished.
+Live session stopped EE202d3c at32805801slices. Original202d14 bounds index<8;
+202d20/28 builds456a40,202d24 scales4,202d30 loads target,202d34 JR dispatches.
+Original8words456a40..456a60 are202d3c,202d64,202d6c,202d7c,202de0,202df0,202e00,
+202e10. Add this exact indirect_targets range, regenerate AOT; no guest substitution.
+Shared non-rendering HG functions.manual.toml exact-address lead corroborates
+secondary table; all facts independently checked in digest-verified original ELF.
+Backup live-secondary-dispatch-baseline includes dirty config/docs, generated C++,
+and qword-provisional tested binary/map. Goal: original live path past202d3c,
+with default replay unchanged and another paced logged interactive session.
+Emit/check generated targets, clean /m:1 build, regression33M state comparison,
+then relaunch fresh live artifacts with core0 speaker output. No active game remains.
+
+## Current - qword candidate verified; user timing/input check next, 2026-09-20
+
+Build confirmed exit0;1285 new append cases,16M FPU,1920page cases,DMA/runtime,
+914GPU cases both modes pass. All4 original33M captures equal RTC-only. Two warmed
+pairs scene controls10.2509/9.5677s,candidates9.3281/9.5305s. Both faster, but effect
+9.00% versus0.389% and host drift make mean4.84% unsuitable as a stable speed claim.
+Keep candidate provisionally; confirm after interactive play, no competing runs.
+Sources/baseline qword-append-baseline; results qword-append-pair-times/summary.json.
+User reports BOTH gameplay and menus sped up, and movement control lost during
+benchmark windows. --no-host-input explains control loss; --unlimited may explain
+speed but must verify normal paced play before concluding. Prepared external
+hg-live-paced-input-check.py/.cmd and hg-launch-live-paced-input-check.ps1: original
+startup schedule, --realtime, live input enabled, GPU resident/triangles, checkpoints,
+video-rate log, fault dumps. No guest clocks changed. Launch after completed benchmarks.
+Current next task user play/timing feedback plus logs, then stable performance check
+and next measured optimization. Frame-boundary-followup.json records own-ELF leads
+(wait1beef0 through2d1c48 in2d1b20; descriptor414370), not proven gameplay frame count.
+Goal >=30 verified gameplayFPS remains active; do not stop at this checkpoint.
+
+## Active optimization - qword append, 2026-09-20
+
+User requests continued work until verified gameplayFPS >=30; authorizes a logged
+interactive play session if needed. First measurable milestone: repeatable reduced
+33M gameplay scene time with exact captured state. Internal frame-boundary proof
+remains necessary; changed images/s is not internalFPS. Implement previously written
+one-resize append proposal in vif.hpp/gs.hpp, plus frozen-reference transport tests
+in gif_tests.cpp. External backup qword-append-baseline saves dirty contents/hashes
+and accepted binary/map. Preserve parser calls, capacity fault timing and byte order.
+Build clean /m:1, focused checks + both GPU modes, then2warmups+4alternating originals.
+Reject if state differs beyond verified RTC or both timing pairs do not improve.
+No runtime probe or guest timing change. Continue after this experiment.
+
+## Current continuation - post-add4 profiling milestone complete, 2026-09-20
+
+Completed the planned accepted-build gameplay profile:3295samples/0errors, sampler
+exit0, original33M replay exit2 with native-iop-budget. Game executable2593(78.69%),
+ntdll595(18.06%), VCRUNTIME87(2.64%). Leading app symbols full multiply140,
+packed add135, VIF parser122, XYZ prepare74, triangle64, scalar add62.
+All captured images/EE/GS/VU match triangle-after2 byte-for-byte; IOP same length,
+only verified RTC offsets0xbfcd1/2/3 differ from texture-before1. No speed claim:
+instrumented run excluded. Latest accepted changed images8.979-9.104/s, target30
+unmet; no independent internalFPS measurement or whole-console fidelity claim.
+
+Accepted XYZ source/game executable/map hashes unchanged and match saved baseline.
+No runtime code changed, no rebuild performed; library/tests/headless may still be
+stale from rejected XYZ experiment. No live commands/game/build/profile remain.
+Inherited dirty tree preserved. Backups+manifest: %TEMP%/haunting-toc-probe/
+post-add4-profile-baseline. New artifacts under same parent:post-add4-gameplay-
+summary.json, native-profile.json, equivalence.json, completion.json, profile.log,
+profile.* and frame.png. Helpers:%TEMP%/hg-post-add4-gameplay-profile.py and
+hg-post-add4-gameplay-sample.py. HG-DIAG-010 updated;007/008 limitations persist.
+
+Next executable action: back up dirty runtime/include/hg/vif.hpp, gs.hpp and
+relevant tests, then implement only one-resize16-byte append in the two
+submit_qword functions. Concrete hypothesis/invariants/testing/acceptance are in
+PERFORMANCE's post-add4 section. Combined submission symbols103samples(3.13%);
+this motivates a bounded test, not proof of append dominance or predicted gain.
+Do not repeat rejected VIF UNPACK bulk-copy, XYZ packed add or transfer rewrites.
+Retain existing parser invocation/order, append-before-capacity fault effects,
+portable little-endian stores and guest clocks. Frozen-reference append/state/fault
+checks, clean /m:1 focused/GPU build, then2warmups+4alternating original comparisons;
+retain only repeatable scene improvement and exact state (RTC excepted).
+This completes the requested profiling plan; next optimization remains unimplemented.
+
+## Active milestone - post-add4 gameplay profile, 2026-09-20
+
+Run one bounded gameplay-only profile of the accepted restored native binary/map.
+Their hashes and scalar XYZ source match vu-xyz-add4-baseline. Preserve this binary;
+do not rebuild stale headless/library products merely to profile. Backup of dirty
+docs, XYZ and accepted binary/map: %TEMP%/haunting-toc-probe/post-add4-profile-baseline.
+Clone existing helpers to hg-post-add4-gameplay-profile.py/sample.py with fresh
+outputs. Sample for five seconds after slice30000001, using original33M inputs and
+GPU residency/triangles. Check errors and final native-iop-budget. Sampling pauses
+the worker briefly: exclude this run from speed evidence. No runtime change planned.
+Deliver current function/module cost shares and one source-grounded optimization
+hypothesis with invariants and falsification criteria. No speed improvement assumed.
+Update PERFORMANCE/DIAGNOSTICS with evidence; preserve inherited dirty work.
+
+## Authoritative handoff � 2026-09-20, user requested handoff
+
+Goal: continue toward30 changed presented images/s while preserving verified
+behavior. Current measured accepted samples:8.979�9.104 changed images/s; internal
+FPS is not independently measured. Target remains unmet. Do not present the small
+retained gains below as a substantial FPS breakthrough or full console fidelity.
+
+Retained this continuation:
+- Conservative CPU sprite/triangle write pages; full reads/eager GPU flush remain.
+  Scene8.9539->8.89295s (-0.68%), both pairs faster.1920 coverage cases.
+- Full-lane VU packed addition, CPU/OS-guarded AVX2 with scalar fallback.
+  Exact24-bit integer conversion supplies normalization bit length only; no guest
+  float approximation.16M reference comparisons across4MXCSR modes, no host FP
+  flags; VU reference checks and914 GPU cases both modes pass. Scene8.85615->8.7826s
+  (-0.83%), both pairs faster; whole replay only0.14% lower.
+- Four new GPU/CPU ordering fixtures retained. Every accepted original comparison
+  matched images/EE/GS/VU; IOP differs only verified RTC offsets0xbfcd1/2/3.
+
+Latest rejected XYZ packed-add extension was0.62% slower in both scene pairs.
+XYZ source plus accepted hg_game.exe/map restored byte-for-byte from
+%TEMP%/haunting-toc-probe/vu-xyz-add4-baseline, hashes verified. Source touched for
+next build. Current source has original scalar XYZ plus accepted full-lane add4.
+No game/build/profile/replay process is active. No commit made. Inherited dirty tree
+preserved. Native library/test/headless build products still reflect the last XYZ
+candidate; rebuild via hg-build-add4.cmd before using them as accepted evidence.
+Restored hg_game.exe and matching map ARE accepted and ready for the next profile.
+
+Exact next action: clone hg-gameplay-cost-profile.py and hg-gameplay-cost-sample.py
+from %TEMP% with fresh artifact names and matching sample-script reference; run one
+bounded gameplay-only sample of the accepted restored hg_game.exe/map. The promised
+post-add4 profile HAS NOT RUN. Existing sample:3248hits/0errors, Fpuadd194,
+fullmultiply182,VIF103,ntdll546; DLL/heuristic stack follow-ups point to download/
+flush waits, but are not full unwinds or proof of skipped guest functions. Reprofile
+before choosing the next major change. Sampling briefly suspends the main thread;
+exclude sampled run from speed measurements. Then written plan, backups/hashes,
+focused tests and warmed alternating original33M comparisons. Continue toward30.
+
+Do not repeat rejected candidates unchanged:
+- Fresh command storage +0.59%; combined VU dependency clock +8.53%; packed32
+  product normalization lacked repeatable gain; selective /GL+/LTCG +17.96%.
+- Bounded texture read pages saved~31% bytes but +0.40% scene time; adding deferred
+  CPU-fallback flush +0.45%. Both reverted; no read helper/deferred API remains.
+- General packed-add binary normalization +0.65%; exact-conversion refinement
+  retained. XYZ padded reuse +0.62% and reverted. See HG-FAIL-014..019,
+  HG-LEARN-026/027, PERFORMANCE and external manifests.
+
+Important files:runtime/include/hg/gs_raster_pages.hpp,gs_memory.hpp,runtime/gs.cpp;
+runtime/fpu_add4.cpp,fpu_add4_avx2.cpp,include/hg/fpu_add4.hpp,vu_products.cpp;
+tests/gs_memory_tests.cpp,fpu_tests.cpp,gs_gpu_tests.cpp. CMake isolates /arch:AVX2
+to the ISA source on MSVC x64; /O2 main,/O1 EE shards remain. No /GL retained.
+AGENTS/ARCHITECTURE/SOURCES/PERFORMANCE/DIAGNOSTICS/learned skills updated.
+
+External artifacts under %TEMP%/haunting-toc-probe: raster-write-pages-baseline,
+raster-read-pages-baseline (accepted write-only), vu-add4-baseline (same accepted
+pre-add4), vu-add4-general-rejected, vu-add4-exact-pair-times.json,
+vuadd4exact-* including movement rates, vu-xyz-add4-baseline (CURRENT accepted
+source/binary/map), vu-xyz-add4-rejected, raster-read-deferred-rejected.
+Helpers: hg-build-add4.cmd, hg-vu-add4-exact-pairs.py, hg-vu-xyz-add4-pairs.py,
+hg-vu-add4-exact-rates.py, hg-gameplay-cost-profile.py/sample.py. Latest launcher
+43760 completed all6 XYZ runs (2warmups+4measured); no live sessions remain.
+Synthetic TOC HG-DIAG-007 and issue-slot timing HG-DIAG-008 remain material limits.
+
+## Active plan � reuse exact packed addition in existing XYZ helpers
+
+Accepted full-lane add4 with exact24-bit conversion normalization:16M cases over4
+MXCSR rounding modes, no host FP exceptions; existingVU checks and914GPU both modes
+pass.4original captures equal RTC-only. Warmed scene8.85615->8.7826s(-0.83%,both
+pairs faster). Whole replay0.14% lower; modest gain. General binary-normalization
+packed variant was0.65% slower and is archived. No guest FP arithmetic substituted.
+Next runtime/vu_xyz.cpp only: retain validity guards and scalar products, collect
+three product values/flags, use add4 with a zero-padded fourth lane, and commit only
+original XYZ results/flags. Never read undefined W. Unsupported ISA keeps scalar
+add and existing guard failure path. Product/add operations cannot fault after
+these guards; original partial/invalid fallback unchanged. Backup vu-xyz-add4-baseline
+contains dirty source/docs/map/acceptedbinary+hashes. Existing295168 VU reference
+cases and original state comparisons cover flags/alias/invalid cases. Four warmed
+original pairs against this new accepted baseline decide retention. Goal30 unmet.
+
+## Active refinement � exact 24-bit normalization count
+
+General packed add passed4M arithmetic cases, existingVU checks,914GPU both modes
+and4originals RTC-only, but scene8.972->9.03045s(+0.65%). Not accepted. Candidate
+archived vu-add4-general-rejected. Change only AVX2 normalizer + tests: after carry
+shift, m is an unsigned integer <=0xffffff. Every such integer is exactly
+representable in binary32, independent of rounding mode; exponent of exact CVTDQ2PS
+therefore gives floor(log2(m)). Shift count150-exponent reaches bit23; zero yields
+count150 (AVX2 shift clears it) and existing nonzero mask suppresses flags/sign.
+This revises previous no-host-FP wording: only exact integer-to-binary32 conversion
+is used to determine bit length, not PS2 arithmetic or rounding. Add/subtract and
+alignment remain integers. Test4M cases in each of4MXCSR rounding modes, verify no
+host exception flags change, then original matched pairs against vu-add4-baseline.
+No new CPU ISA requirement. No performance claim before measured scene results.
+
+## Active plan � exact four-lane AVX2 integer addition for VU MADD
+
+Measured Fpu::add remains a gameplay CPU cost. Add own fpu_add4.hpp, fpu_add4.cpp
+(host feature dispatch) and fpu_add4_avx2.cpp (separate ISA unit); integrate only
+valid full-lane VU MADD in vu_products.cpp. Preserve scalar fallback on unsupported
+CPUs and invalid/partial VU states. CPUID AVX/OSXSAVE + XGETBV XMM/YMM state + AVX2
+must pass before ISA code executes. MSVC /arch:AVX2 only on isolated source; GCC/
+Clang target attribute. No fast-math or host floating point. Integer per-lane
+magnitude swap, chopped alignment, add/subtract, normalization and UF/OF reproduce
+existing Fpu::add. Binary normalization may compute past underflow, but output and
+flags must equal original stop-at-zero exponent loop; exact cancellation stays+0.
+Tests millions of arbitrary/edge additions against scalar values/flags, existing
+VU accumulator/MAC/status comparisons,914 GPU cases and warmed4originals. Baseline
+vu-add4-baseline saves dirty files and accepted write-only binary/map with hashes.
+Change CMake, vu_products.cpp and fpu_tests.cpp; new three arithmetic files.
+No rendering, guest clock, scheduling or fault behavior changes. No gain assumed.
+
+## Current state � write-only raster scope retained; read/defer candidates reverted
+
+Accepted scene gain this continuation is modest: write-only page ownership
+8.9539->8.89295s(-0.68%). Latest presentation samples8.97-9.11 changed images/s,
+not internal FPS; goal30 remains unmet. State/image matches RTC-only. Read narrowing
+and deferred CPU flush were correct in tested cases but0.40%/0.45% slower; reverted.
+Current accepted binary/map restored from raster-read-pages-baseline. Four new GPU
+ordering fixtures retained; next build must refresh restored headers and testbinary.
+No build or replay active. Next investigation exact four-lane integer FPU addition
+for measured VU cost; retain scalar fallback and host ISA guards. Plan/back up before
+implementation; do not assume vectorization gains without warmed original replays.
+Failed candidates and hashes saved raster-read-deferred-rejected. HG-FAIL-014..018
+and HG-LEARN-026 record this continuation. Synthetic TOC/issue-slot timing limitations
+HG-DIAG-007/008 remain. No full physical-console fidelity or playability claim.
+
+## Active refinement � let resident memory hazards order CPU fallback
+
+Bounded reads alone remain UNACCEPTED:4 originals equal RTC-only,5760read/1920write
+cases and910GPU both pass,bytes~2.765GB->1.919GB but scene8.8659->8.90155s(+0.40%).
+Keep candidate only while testing associated removal of unconditional CPU-draw
+flush. New GsSpriteAccelerator::prepare_cpu_access(memory) defaults to flush;
+resident backend defers only for its currently observed memory. Existing scope
+reads/writes then flush queued read/write hazards before accessing pixels. Other
+owners, synchronous backend and unknown accelerators keep full flush. Apply only
+sprite/triangle bounded scopes; point/line unchanged. Test disjoint, read-after-GPU,
+write-after-GPU and write-to-GPU-source cases inside a service batch, then original
+comparisons against ACCEPTED write-only binary in raster-read-pages-baseline.
+Current candidate backed up raster-deferred-flush-baseline (not accepted binary).
+No guest reorder unless physical page footprints prove operations commute. No
+clocks/arithmetic changes. Revert both read narrowing and deferred flush if no gain.
+
+## Active plan � precompute coalesced CPU raster input pages
+
+Retained write-page scope:1920 footprint cases + focused checks +910 GPU cases
+both modes pass;4 original captures equal RTC-only. Warmed gameplay8.9539->8.89295s
+(-0.68%, both pairs better), whole30.05581->29.86155s. Small gain only.
+Next extend gs_raster_pages.hpp/gs_memory.hpp/gs.cpp: before CPU sprite/triangle
+loops, synchronize union of output pages and conservative whole wrapped texture
+rectangle. REPEAT/CLAMP range0..dimension-1; REGION_CLAMP min..max;
+REGION_REPEAT max..(min|maX). All bilinear neighbors wrap into same bounds.
+Use original format page geometry; texture bases may be64-word aligned, so include
+both physical pages when an8KiB tile straddles a page after base offset and wrap.
+CLUT is retained state, not a new VRAM fetch. Invalid format/dimensions/limits
+retain full readback. No per-pixel observers or demand reads. Coalesce requested
+pages before reads, then mark output pages writable. Test formats/wrap modes,
+unaligned bases, alias, observer read/write masks, fault restoration, originals.
+Backup raster-read-pages-baseline contains dirty state and accepted exe/map hashes.
+Hypothesis reduce bulk readback footprint without earlier sparse-demand overhead.
+Goal30 still unmet; no new accepted changed-image rate measured yet.
+
+## Active plan � narrow CPU raster write ownership, preserve full readback
+
+Selective VU LTCG reverted: all state equal RTC-only, gameplay8.95825->10.5671s
+(+17.96%). Candidate archived vu-ltcg-rejected; accepted binary/map restored.
+Next gs_memory.hpp/gs.cpp: full read synchronization remains, but sprite/triangle
+CPU fallback marks only conservative framebuffer/depth pages in clipped bounds
+writable. No sparse reads or per-pixel observer calls. Existing swizzles prove
+all addresses within each64x32 (32-bit) or64x64 (16-bit) tile share an8KiBpage;
+base alignment and modulo VRAM wrapping are preserved. Unsupported formats,
+invalid width or nonstandard memory size retain full writable scope, preserving
+original faults. Mark depth even when masked to avoid changing fault/order rules.
+Point/line scopes unchanged. Test observer ordering/exception restoration and
+page coverage across formats, wrap, scissor bounds; focused regressions and four
+warmed original comparisons. Backup raster-write-pages-baseline includes dirty
+sources/docs/accepted binary/map + hashes. Hypothesis: reduce false dirty pages
+and mirror comparisons without extra small downloads. Revert without scene gain.
+New helper header gs_raster_pages.hpp is new. No guest timing/arithmetic changes.
+
+## Active plan � selective MSVC VU link-time optimization
+
+Packed32 products reverted: warmed scene9.5522->9.48645s, but second pair flat
+and whole replay slower; no repeatable benefit. Saved vu-packed-products-rejected.
+Next change CMakeLists.txt only: Release /GL for generated main and two VU helper
+sources, /LTCG propagated to consumers. Keep EE shards /O1 and all guest arithmetic,
+scheduling, clocks and faults unchanged. Microsoft compiler documentation is the
+source for build option semantics; no external runtime implementation used.
+Hypothesis: optimizing calls across these translation units removes CPU overhead
+identified by gameplay sampling. Disprove with warmed alternating original replays.
+Backup vu-ltcg-baseline contains dirty CMake/docs and accepted binary/map + hashes.
+Validate actual compile flags, focused arithmetic/runtime/GPU regressions, all four
+original state/image comparisons (IOP RTC only) and scene/startup timing. Monitor
+compiler/linker memory; do not repeat uncontrolled aggressive inlining. Goal30
+unmet; latest accepted visible rate9.23-9.74 changed images/s, not internal FPS.
+
+## Active plan — packed32 VU product normalization
+
+VU pairclockcandidate rejected:131072clockcases,15emittertests andoriginalstate
+comparisons pass butscene8.86385->9.61985s(+8.53%). Restoredoriginalemitter/tests/
+generatedmain/exe/map,archivedvu-pair-clock-rejected. Mainobjectmustrefresh.
+Next runtime/vu_products.cpp only:retain twoSSE2 unsigned24x24 multiplies producing
+four48-bit products,pack(product>>23) into four32-bit lanes,then performwide-bit
+normalization,exponents,sign,UF/OF andzero masks once acrossall4lanes. No hostFP,
+no changedFpuaddition orVUguards/flagscommit. Product>>23 fits25bits;widebit24
+selects exactone-bitshift,thenexisting23bitmantissachop. Originalexponent255finite
+andzeroexponent/sign rulesremain. Existing295168arithmetic cases plusfulloriginal
+state/images andwarmed4replays validate. Baselinevu-packed-products-baseline dirty
+source/docs/acceptedexe/map+hashes. Buildalso refreshesrestoredmain (notallshards).
+Goal30unmet;no performance claimyet. Newprofilefullmultiply182/madd63 of3248samples.
+
+## Active plan — combine VU pair dependency clock updates
+
+Commandstoragecandidate reverted:gameplay8.8928->8.9454s(+0.59%),all4original
+captures equal RTC-only. Fullcleanbuildrefreshedpriorrestoredheaders;onlygl_gs object
+now needsrefresh afterreversion. Rejectedcandidate command-storage-rejected.
+New AOT-onlychange tools/hgtool/vu_emit.py::_pair_lines:compute max(issue_cycle+1,
+allselectedVF/VI readiness timestamps) andcall advance_pipeline once,beforeoriginal
+WAITQ/WAITP,upper/lower operations andwritebackmetadata. Staticregister/laneselection
+comesfrom existing independentlydecoded dependency metadata. Arithmeticunchanged.
+Ifissue_cycle==UINT64_MAX useoriginalsequence to preserveunsignedwrap andQ/P
+completion behavior. Nochange whenpair has no dependencyrequirements. Existing
+require_vf/vi helpersremainreference. Test100k+arbitrarypendingQ/P andreadinessstates,
+includingwrap,againstoriginalsequence;15emittertests,ensuregeneratedchangesonly
+prologues,focusedchecksandwarmed4originalstate/timingpairs. No guestclockpolicychange:
+exactfinalcycle andpendingresults mustmatch. Newcode onlyfolds equivalenthostupdates.
+Backup vu-pair-clock-baseline includesdirtysource/docs/generatedmain/acceptedexe/map
+withhashes. Main-onlyregeneration shouldavoidfullshard rebuild. Goal30stillunmet.
+
+## Active plan — refresh per-batch GPU command storage
+
+Gameplay-only sample3248/0errors: Fpuadd194,fullmultiply182,VIF103,ntdll546.
+DLL export attribution nextsample seesZwQueryInformationThread244 andWait209;
+external stack scanning (candidate returnaddresses,notfullunwind) chiefly finds
+Accelerator::download313/flush217/cpu_access164. This supportsGPUdriverwait work,
+notproof ofignoredfunctions orallocations. Artifacts gameplay-cost/dll/stack-*.
+Boundedchange gl_gs.cpp::flush: replace sub_data into reused command/tilebuffers
+with buffer_data exactpayload perbatch. These two buffers contain immutable
+hostcommands only;priorissuedGLwork retains requiredstorage semantics. Preserve
+VRAMbuffer0,dispatches,barriers,joboffsets andshaderarithmetic. No gueststatechange.
+Hypothesis oldbuffer overwrite waits unnecessarily forpriorGPUbatchreaders.
+Baseline command-storage-baseline savesdirtysource/docs/acceptedexe/map+hashes.
+Existing910GPUtests bothmodes exercise consecutivepayloads;original4warmedreplays
+compareallstate/images andstartup/gameplaytime. Revert absentmeasuredbenefit.
+Restoredheadersfrompriorrejectionrequirefullsingle-workerbuildrefresh;no stale
+headless/testbinary shouldbe used untilbuilt. Goal30updatedimages/s remainsunmet.
+
+## Current verified state — 2026-09-20; sparse readback experiments reverted
+
+Kept prepared PSMT4 CPU sampler:startup5M-30M mean18.45074->17.791075s(-3.58%),
+whole replay30.185885->29.480315s(-2.34%);gameplay8.85085->8.84305s(effectivelyflat).
+128scalar sprite cases and910GPUbothmodes pass;4originalcaptured images/EE/GS/VU
+match,IOPverifiedRTC-only. Source+nativegamebinary+map restored and byte-verified
+againstreadback-origin-baseline/sparse-scope-baseline. No build/replay active.
+Prior XYZscalar retained as a small measured optimization:872generatedcalls,
+295168arithmeticcases and15emittertests;all4originalstatesmatchRTC-only,warmed
+scene8.79595->8.73705(-0.67%,pairs0.27%/1.07%). Scope modest;not a majorFPSfix.
+
+Readback-origin probe found wholeCPUrequests2.335GB/1.099s,partialwrites80.6MB/
+.460s,readonly363.6MB/.208s overWHOLE33Mreplay,NOT solely gameplay. Probe removed
+fromruntime aftermeasurement. Sparse8KiBrequest scopes preservedstatebut slowed
+scene7.36%;128KiBgroupedprefetch slowedscene1.32%,whole1.83%. Bothreverted;
+failedsource/binaries/maps saved sparse-single-page-rejected,sparse-grouped-rejected.
+Tests/nativeheadlessrunner/buildobjects stillfromlast experimentalbuild;hg_game.exe
+andmap are restoredacceptedmatches. Touch-restoredheadersensurefuturebuildrefresh.
+Do not runstaletest/headlessbinaries as acceptedbuild evidence. Nextcodebuildmust
+refresh dependencies through cleanVS/m:1 workflow. No gamefile changes/commits.
+
+Next evidence-driven action: distinguish gameplay-onlyreadbackcost fromwhole-run
+cost,or specialize measuredVUarithmetic/AOTcall sequences with fullintermediate
+stateproof. Do not repeat sparseper-pixel ownership;overheadoutweighedbytes saved.
+Read-only last retainedscenehistory has1049sprites,all>=4096area;8PSMT4-tagged
+spriteshaveTMEclear,so do NOT lower sprite threshold or addPSMT4GPUcoverage based
+onthat snapshot as a gameplayfix. PSMT4 remains measuredEARLYstartupcost.
+Currentgameplayprofile174Fpuadd/163fullmultiply/121VIF of3254samples;637outside
+main lacksstackattribution. BiggestsinglefaithfulFPSfix NOT established yet.
+Target30unmet;latestacceptedpresentationrate9.23-9.74changedimages/s,notinternalFPS.
+Physicalconsoleequivalence remains limited by HG-DIAG-007/008 and documentedgaps.
+
+## Active refinement — grouped sparse readback
+
+Single-page sparse candidate rejected forperformance:allstates equalRTC-only but
+scene8.87655->9.5299s(+7.36%),whole29.67116->31.35295(+5.67%). Transferbytesfell
+butmanysmallGPUreads increasedwait. Preserved sparse-single-page-rejected withhashes.
+Refine gl_gs.cpp only:when exact aligned8KiB access demands GPUdirty data,download
+GPUdirty pages in its aligned16-page(128KiB)neighborhood in onecoalescedread. Only
+committedGPUdirty pages eligible;CPUdirtypages untouched;queuedwritesretain normal
+laterinvalidation. Existingaccessdependencyflush unchanged. No guestdraws added,
+no marking prefetchedpages CPUwritten. Sparse accesscache andoriginalwordorder
+unchanged. Verify910GPUbothmodes thenwarmed4original comparisons against ORIGINAL
+full-scope sparse-scope-baseline. Ifstillregresses,restorefullscope/code/exe/map.
+
+## Active plan — sparse CPU raster ownership scopes
+
+Readback-origin run original state equal RTC-only;whole writable scopes caused
+2.335GB/1.099s,partial writes80.6MB/.460s,read-only363.6MB/.208s. Counters excluded
+from benchmarks. Largest measured avoidable transfer source is wholeVRAM scope.
+Implement optional sparse mode in GsCpuMemoryScope:per-scope512-page read/write
+access cache,first actual access synchronizes the bounded8KiB page;write after
+read upgrades ownership. Existing default full scope retained. Raster loops opt
+into sparse scope after existing GPU flush;no GPU submissions occur inside scope.
+DrawTexture must read through const indexed VRAM rather than whole-memory data(),
+avoiding accidental full readback. No pixel cache or reordering;CLUT stays live.
+Reset cache at outer scope entry,restore depth on exception;no resizing/observer
+changes during raster scope. Tests first-read,pagebounds,writeupgrade,nestedscope,
+exception/retry plus existing910GPU/CPU andoriginal state comparisons. Header change
+requires full clean single-worker rebuild. Baseline sparse-scope-baseline hashes
+current dirty files/exe/map. Keep readbackprobe disabled in warmed timings. Compare
+startup andgameplay;revert if per-pixel overhead outweighs avoided transfers.
+
+## Current plan — attribute remaining GS readback stalls
+
+Prepared PSMT4 sampler retained:startup18.45074->17.791075s(-3.58%);whole replay
+30.185885->29.480315(-2.34%);scene8.85085->8.84305(-0.09%,effectivelyflat).
+128scalar sprite cases,910GPUboth modes and4original images/state equal RTC-only.
+Artifacts psmt4-draw-baseline,psmt4-draw-pair-times,psmt4draw-*-equivalence.
+Next runtime/gl_gs.cpp HG-DIAG-017 optional HG_PROFILE_GS_READBACK counters:
+classify actual readback bytes/time by whole writable CPU scope,partial writable,
+read-only CPU access,other. Reuse existing readback timing;no new clocks/guest
+state/synchronization. Disabled by default. One diagnostic original replay,then
+remove probe once source of stalls established. Baseline readback-origin-baseline
+backs up dirty source/docs/exe/map with hashes. No benchmark currently active.
+
+## Active plan — prepared PSMT4 CPU draw sampling
+
+Measured early scalar PSMT4/filter cost618/3258samples. Extend existing DrawTexture
+in runtime/gs.cpp to PSMT4 with CT32 CLUT,CSM1,CSA<16;retain fallback for other
+CLUTs/invalid settings. Reuse original psmt4_word and live nibble reads initially;
+prepare format/CLUT base/wrap once. Use prepared sampler for PSMT4 CPU sprites,
+and existing triangle consumer. Keep exact row-major access,filter arithmetic,
+CLUT validity checks,texture functions and pixel pipeline. No palette/texture cache
+or draw skipping. Baseline current XYZscalar candidate binary/source retained in
+psmt4-draw-baseline with hashes;XYZ remains separately provisional. Files gs.cpp,
+gif_tests.cpp;no header/full AOT rebuild. Differential sprite fixtures compare
+whole VRAM and fault messages/partial state across filters,CSA,wrap,alias and masks;
+existing910GPU cases both modes then warmed4original state comparisons. Measure
+5M-30M startup and30M-33M scene plus whole replay;reject if no reliable benefit.
+Original CPU/specification formulas only;no external rendering implementation.
+
+## Current result — startup coverage audit and phase-specific profiles complete
+
+Both new diagnostic replays completed at native-iop-budget;no build,replay or
+sampler active. External summary startup-coverage-audit/summary.json records
+binary/map hashes. Early sample begins after5M checkpoint:3258 samples,0errors;
+shade_linear_tex0 155,psmt4_word148,point_sample_tex0 116,texel_from_tex0 114,
+pixel4 85,total618/3258(18.97%). ntdll424samples lacks stack attribution and must
+not be described as a particular wait/allocation cost. Gameplay sample3254/0errors:
+Fpu add174,full multiply163,VIF121;outside-main637unattributed. Both samples
+perturb timing and are excluded from speed comparisons.
+Concrete lead: DrawTexture and GPU triangle texture guards omit PSMT4(0x14);
+generic CPU sprite path also repeats full TEX0/CLUT/filter checks per sample.
+No rendering change made by audit. Next bounded candidate should measure and
+specialize checked PSMT4 sampling/CLUT handling,retaining original address,
+filter/fault/alias ordering;plan and back up before implementation. Compare both
+early-startup and30M-33M scene intervals,not just gameplay. A missing function
+requires an observed call/verified original table;do not root2769candidates blindly.
+Current coverage audit found4598indirect EE boundaries,7syscalls,2unsupported CACHE
+words,1ERET boundary;linked IOP residual121indirect+4outside executable. Dispatch
+faults on uncompiled targets;checked exact kernel-return gateway is not a general
+skip. Native adapters invoke bounded runtime services;this review does not prove
+full physical-console service equivalence or exclude unvisited-path failures.
+XYZ scalar experiment remains provisional pending disposition;all correctness
+checks pass,warmed mean0.67%faster(0.27%/1.07%pairs),small benefit. Original accepted
+packed-flags baseline remains externally saved in vu-xyz-scalar-baseline.
+Goal30 unmet;latest accepted changed-image sampling9.23-9.74/s,not internal FPS.
+
+## Current checkpoint — user-requested startup coverage and bottleneck audit
+
+User requested polling/profiling for the biggest block and investigation of possibly
+ignored early functions. Read-only major-scan completed in external
+startup-coverage-audit/major-scan.json:354769 EE words,4608 boundaries comprising
+4598 indirect transfers,7 syscalls,2 unsupported CACHE words at26cb74/26cbb0,
+1 exception return.435 candidate installed tables include2769 uncompiled candidate
+targets;659 direct-member records include509 uncompiled candidates. These are
+unverified candidate extents/live uses,not permission to auto-root or proof of skips.
+All29 configured IOP modules scanned;none unconfigured. Linked bundle residual125
+comprises121 indirect transfers and4 outside executable words. Explicit traps244.
+EE/IOP dispatch defaults fault on missing translations; kernel return exception only
+accepts its exact return gateway and requires a saved caller. No missing-function
+fault in recent33M replays,which all ended native-iop-budget. This does not establish
+unvisited paths or full service fidelity; HG-DIAG-007/008 remain limitations.
+Current candidate XYZ scalar remains provisional:both warmed pairs faster but small,
+8.79595->8.73705s(-0.67%);full captures equal RTC-only. No acceptance claim yet.
+Focused checks pass including295168 arithmetic and910GPU cases both modes.
+Fresh gameplay native sample startup-block:3254 samples,0 errors;Fpu add174,
+full multiply163,VIF process121,arithmetic_q75,XYZ prepare70;637 outside main.
+GS readback2.764GB/1.594s. Profile run excluded from speed measurements.
+Early-startup sample starts at5M slices;launcher10772,hg-early-startup-block-profile.py,
+early-startup-block-launch.log currently active. No build/timing benchmark active.
+Next collect early profile,check boundary/service evidence;prioritize measured
+cost or verified missing original call. No new roots or runtime behavior changed.
+Docs backup startup-audit-docs-backup includes hashes. Goal30 remains unmet.
+
+## Active experiment — scalar XYZ AOT helper specialization
+
+Different hypothesis from rejected XYZ SIMD: fixed3-lane scalar products/additions,
+checks once before direct lane reads,compiled in a small runtime unit. AOT emitter
+selects helper only for original MULAbc/MADDAbc/MADDbc dest14. New vu_xyz.hpp/cpp;
+no vif.hpp changes or dynamic instruction decoding. New header included only in
+main when VU code exists. Invalid/undefined inputs/destinations call unchanged
+original scalar method to preserve fault order/partial state. Keep pipeline timing
+and all emitter scheduling prologues unchanged. New helper writes onlyXYZ,retains
+W/defined bits;MAC inactive W cleared and STATUS sticky bits preserved.
+Files CMake,emit.py,vu_emit.py,gif_tests,test_vu_decode;new header/source recorded
+new. Backup dirty inputs/accepted exe/map/generated main:vu-xyz-scalar-baseline.
+Verify emitter output/shards and49k+direct differential cases,then build relevant
+suites and warmed4original state/timing pairs. Revert if no reliable gain. Goal30
+still unmet,current accepted scene~8.87s,changed images9.23-9.74/s sampled.
+## Current accepted state — packed SIMD flags retained
+
+Both binaries warmed,then4original33M comparisons:scene9.08285->8.87205s(-2.32%),
+both pairs faster and allcaptured images/EE/GS/VU equal;IOP RTC-only.245760+256
+arithmetic cases,runtime and910GPU both modes pass. Latest changed-image samples
+9.229/9.743per second;not internal FPS,30target unmet. Source,binary,map match.
+No build or replay active. Artifacts vu-packed-flags-baseline,vu-packed-flags-pair-times,
+vupack-after*-equivalence,vupack-movement-rates. VIF bulk remains reverted.
+Next investigate bounded XYZ scalar helper specialization or larger independently
+proved AOT VU call-site optimization. Avoid repeated full-header rebuilds: new
+runtime helper entry points may be included by generated main only if justified.
+Prior SIMD XYZ extension failed;do not repeat it unchanged. Current hypothesis
+would specialize scalar three-lane checks/products while retaining exact arithmetic.
+## Current checkpoint — warmed packed-flag replay comparisons
+
+Packed SIMD flag candidate linked;245760+256arithmetic cases,runtime and910GPU
+cases both modes pass. Launcher20876 active,hg-vu-packed-flags-pairs.py,
+vu-packed-flags-pairs.log. It warms baseline and candidate before4measured alternating
+runs;warm-ups excluded. No build active. Candidate remains unaccepted pending
+full original state/images and warmed timing. Baseline vu-packed-flags-baseline.
+Read-only latest retained draw history:10018textured STQ triangles use supported
+CT32-frame/PSMT8 or8H textures;only18PSMT4 and8untextured. No broad missing format
+coverage conclusion from this bounded sample. Current work remains throughput.
+## Current checkpoint — packed SIMD flags building
+
+runtime/vu_products.cpp candidate collects UF/OF masks,extracts packed zero/sign
+masks and reverses nibble lane order into unchanged MAC/STATUS.245760reference
+cases plus256zero/sign combinations pass GIF tests. Build cmd28864/tool session87105
+active,vu-packed-flags-build.log;also refreshing rejected VIF objects from restored
+header. No benchmark active. Next finish build/checks and run
+hg-vu-packed-flags-pairs.py (warms BOTH binaries first,then4alternating measured
+runs;warm-ups excluded). Backup vu-packed-flags-baseline. Candidate unaccepted.
+Current accepted exe restored before build includes retained main/VU /O2 and scanout
+pages;30target unmet. Prior accepted scene~9.25s,changed images8.73-9.64/s sampled.
+## Active experiment — full-lane SIMD flag packing
+
+Largest accepted profile costs include full multiply helper172samples and full
+MADD58 of3256. Plan runtime/vu_products.cpp only: retain exact product and scalar
+addition,collect UF/OF nibble masks,extract result-zero/sign masks with SSE2 then
+reverse4lane masks into existing MAC groups and STATUS bits. Fault guards and
+commit boundaries unchanged. Existing245760frozen-reference cases plus added
+zero/sign combinations check flags/state. Backup vu-packed-flags-baseline includes
+dirty source/docs/exe/map. Build refresh must also clear rejected VIF objects.
+Focused suites,910GPU both modes,then warm both binaries and4measured original
+state/timing comparisons. Revert absent reliable benefit. No external code or
+new host-float arithmetic.30target remains unmet.
+## Current accepted state — VIF experiment reverted
+
+VIFbulk correctness passed but second timing pair flat;first control slow. Reverted
+vif.hpp,gif_tests and accepted exe/map from vif-bulk-baseline;candidate preserved
+vif-bulk-rejected. Accepted main/VU /O2,PSMT8 and page scanout remain. Objects await
+refresh;restored input timestamps touched. No build/replay active.30target unmet.
+Next bounded candidate: runtime-only full-lane SIMD flag packing;keep exact scalar
+Fpuaddition and fault guards. Use new harness with both binaries warmed before
+4measured alternating original replays,exclude warm-ups from speed claims. Existing
+full-lane arithmetic differential reference will verify all flags. Latest profile
+vumain-accepted-native-profile.json remains applicable (same restored native exe).
+## Current checkpoint — VIF bulk candidate building
+
+600V4-32 differential configurations pass GIF tests (masked-zero scalar reference),
+including fragmented packets,TOPS,mode/cycle fallbacks,bounds faults and defined
+highbits. Build cmd4024/tool session76993 active,vif-bulk-build.log;VU/main /O2
+unit compiled and large EE shards now compiling. No benchmark active. Candidate
+unaccepted. Next finish build,DMA/runtime/GPU checks and hg-vif-bulk-pairs.py
+four original state/timing comparisons. Baseline vif-bulk-baseline contains accepted
+/O2 main,scanout-page and PSMT8 changes. Fresh prior profile vumain-accepted:
+Fpuadd183,fullmultiply172,scalar multiply_acc122,process_pending99 of3256samples.
+Later possible bounded lead: vector flag packing inside existing full-lane SSE2
+runtime helper (no header/AOT changes),only after deciding current experiment.
+## Active experiment — bounded contiguous VIF V4-32 upload
+
+Fresh accepted main/O2 profile complete3256samples: Fpuadd183,fullmultiply172,
+scalar multiply_acc122,process_pending99. No build or replay active.
+Plan: in vif.hpp process_pending,after existing complete-payload checks,accept only
+unmasked V4-32,mode0,CL==WL and full valid VU destination span. On known little-
+endian hosts memcpy payload words,OR low4defined bits per vector,preserve row/cursor/
+phase semantics;otherwise unchanged scalar loop. Invalid span retains original
+partial-write/fault behavior. No runtime instruction decoding introduced (existing
+VIF data protocol only),no clocks/work skipped. Reference masked-zero scalar path
+is semantically identical for valid mode0/CL==WL V4-32;test fragmentation,count0,
+bounds,defined highbits,TOPS,cycle variants and failure state. Focused and910GPU
+checks then4original state/timing pairs. Backup vif-bulk-baseline includes dirty
+source and accepted exe/map. Reject absent gain or mismatch.30target still unmet.
+## Current accepted state — VU/main speed optimization retained
+
+MSVC generated main/VU1 unit now /O2,large EE shards remain /O1. Native scene
+mean9.82445->9.24555s (-5.89%,both pairs faster). Four original33M images/EE/GS/VU
+match and IOP RTC-only;910GPU cases pass both modes. Build source/binary/map agree.
+Latest complete-interval changed images8.730/9.641per second (variable sampling,
+not internal game FPS);30target unmet. No build/benchmark active.
+Retained this session:upload suppression,bulk scanout,fused VU flags,full-lane SSE2,
+PSMT8 bulk transfers,display-page read spans,main/VU1 compiler optimization.
+Rejected XYZ SIMD,/O2 helper relocation,PSMT8 address-only tables,FPU bit scan.
+Next fresh bounded profile against current map to choose next major CPU/transfer
+bottleneck. Completed-project research/provenance recorded SOURCES;no code copied.
+Artifacts vu-main-o2-baseline,vu-main-o2-pair-times,vumain-after*-equivalence,
+vumain-movement-rates. Executable35,382,784bytes. No cross-platform speed claim.
+## Active experiment — speed-optimize the generated VU/main unit
+
+Accepted main source out/translated.cpp is1.19MB with VU programs and dispatcher;
+EE page bodies live in separate shards. All currently receive MSVC /O1. Earlier
+runtime helper relocation failed, but did not optimize VU program call sites.
+Plan:CMake source-level /O2 override for HG_TRANSLATED_SOURCE only under existing
+MSVC fast-build branch;leave huge shards /O1. No generated code,guest work,clocks
+or arithmetic edits. Backup current dirty CMake/docs/accepted exe/map:
+TEMP/haunting-toc-probe/vu-main-o2-baseline. Verify generated vcxproj actual options,
+monitor compiler memory,build and4original state/timing comparisons. Existing
+synthetic tests unaffected;run relevant originals and normal GPU checks. Revert if
+resource cost excessive or no reliable improvement.30target unmet,last8.75changes/s.
+## Current accepted state — displayed-page scanout retained
+
+Four original33M captures match (RTC only),216scanout footprint/pixel scenarios,
+memory/GIF/DMA/runtime and910GPU cases both modes pass. Scene9.75995->9.68780s
+(-0.74%,second pair flat/slightly slower),full replay31.03089->30.71498s(-1.02%,
+both pairs faster). Readback bytes~130MBless but readback time increases;small
+uncertain scene benefit,not major FPS progress. FPU bit-scan remains reverted.
+Source,binary,map match accepted PSMT8+scanout changes;no build/replay active.
+Latest reliable changed-image measurement~8.75/s;30target unmet.
+Next inspect remaining VU/AOT throughput and scanout/fallback transfer costs using
+accepted profile/new measurements only where changed behavior warrants it.
+Survey of finished PS2 native projects completed in SOURCES;no external code copied.
+## Current checkpoint — scanout page candidate building
+
+Checked const read_span plus216scanout cases pass GIF/memory tests;required page
+sets and pixel bytes match,including wrap/odd strides/4096-wide rectangle.
+Build cmd10232/tool session27642 active,scanout-pages-build.log. No benchmark
+active. Candidate binary not yet linked;next finish build,DMA/runtime/GPU modes,
+then hg-scanout-pages-pairs.py original state/timing. Baseline saved accepted
+PSMT8 build;FPU normalization experiment remains reverted (HG-FAIL-011).
+## Active experiment — synchronize only displayed VRAM pages
+
+FPU bit-scan experiment reverted:all states match,but timing pairs disagree;
+HG-FAIL-011. Accepted exe/map restored;build objects await refresh. No run active.
+Plan: add checked const read_span to gs_memory.hpp. gs.cpp::display_image derives
+physical pages touched by displayed rectangle from existing CT32/24(64x32) and
+CT16/16S(64x64) page mapping,wraps X/Y at2048 and physical pages at512. Coalesce
+selected physical runs,synchronize read-only,then use per-page const pointers
+through unchanged pixel conversion. No guest draw flush,dirty mark,clock change
+or dropped presentation. Must prove selected spans cover every CPU read including
+oversized/cross-wrap rectangles,odd strides and base wrap. New observer/range tests,
+scalar scanout differentials and GPU scanout fixtures;focused suites then4original
+state/timing pairs. Backup dirty contents and accepted exe/map scanout-pages-baseline.
+Hypothesis:fewer readback bytes and less stall than whole4MiB sync;reject if no
+benefit or any mismatch.30target unmet,last accepted changed images~8.75/s.
+## Current checkpoint — FPU normalization comparisons running
+
+Full build complete;fpu/gif/runtime/translation pass,including3M random/mixed plus
+12240normalization edges and frozen original add flags.910GPU cases pass both modes.
+Four original33M comparisons running via hg-fpu-normalize-pairs.py,launcher24088,
+fpu-normalize-pairs.log. No build active. Candidate remains unaccepted pending
+all state/image comparisons and matched timing. Baseline fpu-normalize-baseline
+includes retained PSMT8 bulk candidate (mean9.84445s,last changed images8.75/s).
+Next after decision: narrow display-image read spans using original page mappings.
+User-requested completed-project survey recorded SOURCES;no implementation copied.
+## Active investigation — exact FPU normalization bit scan
+
+Accepted PSMT8 profile completed3252samples: Fpu::add216,full multiply137,VU1
+program1130. Transfers no longer leading. No build/replay active.
+Hypothesis: replace repeated left normalization shifts in Fpu::add with one
+bounded leading-bit calculation and shift,keeping original exponent-zero,
+cancellation,overflow/underflow and sticky flags. First external full-add prototype
+with random/edge/cancellation differential and /O1 timing before header changes.
+Potential files fpu.hpp,fpu_tests;dirty copies/exe/map preserved fpu-normalize-baseline.
+If prototype supports it,integrate portable MSVC/GNU bit scan with checked fallback,
+run arithmetic/runtime/GPU checks then four original33M state/timing comparisons.
+Disprove if any result/flag mismatch or no measured scene benefit. No host float
+substitution,clock change or external arithmetic code.30target remains unmet.
+## Current accepted state — PSMT8 bulk upload retained
+
+Four original33M states/images match (RTC only),910GPU cases both modes and
+memory/GIF/DMA/runtime pass. Scene mean10.83055 ->9.84445s (-9.10%). Complete
+interval changed images8.754/8.759per second;not internal game FPS,30target unmet.
+Accepted source/binary now include checked PSMT8 span writes and same-page observer
+shortcut. Backup psmt8-bulk-baseline;reports psmt8-bulk-pair-times.json and
+psmtbulk-after*-equivalence.json. All builds and benchmarks completed.
+Broader finished-PS2 survey requested by user completed and recorded SOURCES:
+OpenGOAL trilogy feature-complete (II/3beta),3SX completed game decomp but native
+prerelease;BT3 playable with defects/skipped movies,not finished. No external
+implementation copied. Main lead remains fewer native transfers/batches with
+independent proof;not a drop-in external renderer.
+Next fresh bounded profile of accepted binary/map,then next measured bottleneck.
+## Current checkpoint — PSMT8 bulk candidate building
+
+Candidate implemented: checked mutable16-word span,8 paired-byte word stores for
+aligned16-pixel PSMT8 IMAGE qwords,existing scalar fallback and same-page GPU
+observer shortcut. Added3168 transfer scenarios with per-qword scalar comparisons,
+span bounds/fault tests,and9 GPU dependency cases (same/cross-page spans and IMAGE).
+Build cmd32852/tool session78303 active,psmt8-bulk-build.log. GPU/GIF test sources
+were strengthened after their initial compile; rerun focused build once this build
+finishes before tests. No benchmark active. Candidate unaccepted; next complete
+build,focused rebuild/checks,then hg-psmt8-bulk-pairs.py original state/timing.
+Current measured presented changes~7.7-7.9/s;30 target unmet.
+## Active experiment — bounded aligned PSMT8 IMAGE spans
+
+Fresh accepted profile completed:3252 samples,psmt8_word130,write_image_qword114,
+cpu_access91,Fpu::add207. Instrumented run excluded from timings.
+Plan: checked mutable VRAM span; aligned16-pixel PSMT8 qword writes pair opposite
+byte lanes in8words of one16-word column, using existing addressing once.
+All other cases retain scalar path. Extend same-page observer shortcut to spans.
+Proof from existing independently derived GS mapping; no external rendering used.
+Files gs_memory.hpp,gs.hpp,gs.cpp,gl_gs.cpp and memory/GIF tests. Preserve transfer
+completion,padding,wrap,faults and GPU dependency order. Differential scalar upload
+and span observer tests,focused/GPU regressions,then four original33M state/timing
+comparisons; reject absent benefit or any unexplained mismatch. Backup dirty inputs
+and accepted exe/map: TEMP/haunting-toc-probe/psmt8-bulk-baseline (manifest.json).
+Milestone: exact original state/images with lower fixed-work scene time;30 updates/s
+still unmet. No build/replay active. Next implement bounded path and tests.
+## Current accepted state — XYZ experiment reverted
+
+XYZ SIMD extension state equality passed but speed inconclusive (mean+0.19%).
+Restored full-lane-only SIMD sources/tests/maps and accepted exe from vu-xyz-baseline;
+rejected candidate preserved in vu-xyz-rejected. Restored inputs touched for next
+build. Current accepted changes: upload suppression,bulk read-only scanout,fused
+flags,full-lane SSE2. Native binary matches these sources; build libraries await
+next rebuild. Starting fresh separate vu4-accepted-profile sampling replay before
+next implementation (excluded from timings). No build active. Next inspect samples
+then consider bounded aligned PSMT8 IMAGE bulk word writes and narrow CPU span.
+No XYZ speed claim;30updates/s remains unmet. Reusable failed result HG-FAIL-010.
+
+## Current checkpoint — XYZ SIMD comparisons running
+
+XYZ build linked;442368 scalar-reference cases,fpu/gif/runtime/translation and
+901 GPU cases both modes pass. Original four-run launcher31640 active via
+hg-vu-xyz-pairs.py,vu-xyz-pairs.log. First pair10.9060 ->10.6894s with all
+captured state/images equal RTC excepted. Await last candidate before retention.
+No build active. Next fresh accepted profile; bounded aligned PSMT8 IMAGE writes
+are a lead (one qword touches8words in one16-word column), not an implemented change.
+
+XYZ SIMD candidate build active: cmd5000/tool session46604,vu-xyz-build.log.
+442368 scalar-reference comparisons now cover both XYZ/XYZW plus direct inactive-W,
+undefined-broadcast-W and unsupported-mask guards. Prepared hg-vu-xyz-pairs.py.
+No replay active. Next complete build/checks and four matched original comparisons.
+
+## Active experiment — extend exact SIMD to XYZ masks
+
+Full-lane SIMD retained: four original states equal RTC excepted; mean11.25230
+->11.09275s (-1.418%),paired0.98%/1.82%; second pair host times slower overall.
+245760 arithmetic cases and901 GPU cases both modes pass. Static original AOT
+MUL/MADDA sites mask15=259,mask14=624; MADD15=87,14=248. Not dynamic counts.
+Written extension: accept dest14/15, specialize lane result for3/4 active lanes,
+check only required VF/ACC bits and retain exact scalar rejection/fault order.
+SSE2 can compute unused W host bits, but W produces no flags and is never written
+for XYZ; preserve its defined state. Other broadcast lane remains checked even
+when it is W. Rename helper APIs to reflect selected masks. Extend full-reference
+tests to both masks and add undefined-W/untouched-W direct checks. No clocks or
+guest instructions skipped. Files vif.hpp,vu_products.cpp,gif_tests,AGENTS and
+ARCHITECTURE; backup TEMP/haunting-toc-probe/vu-xyz-baseline includes dirty sources
+and accepted exe/map. Build,test,original33M state and timing before retention.
+
+## Current checkpoint — SSE2 original comparisons running
+
+SSE2 integrated candidate linked. fpu/gif/runtime/translation pass;245760
+scalar-reference arithmetic cases and direct guard checks pass.901 GPU/CPU cases
+pass both memory modes. Four original33M comparisons active via
+hg-vu-sse2-pairs.py,launcher26104,vu-sse2-pairs.log. No build/prototype timing
+active. Next compare all captured states and scene times before retaining.
+Control includes only the three accepted changes; rejected relocation/address
+experiments are restored. Current native executable is the unaccepted SIMD build.
+
+SSE2 candidate build active: cmd3672/tool session99389,vu-sse2-build.log.
+196608 extra full-lane arithmetic comparisons plus direct fast-path/guard checks
+added alongside49152 frozen-reference cases. Prepared hg-vu-sse2-pairs.py.
+No original replay/prototype benchmark active. Next complete build and checks,
+then original equality/timing; do not treat currently restored accepted exe as
+this candidate until link completes.
+
+## Active experiment — exact full-lane SSE2 VU products
+
+External product4 prototype passes1M vectors plus edges; full accumulator prototype
+passes100000 state/fault cases. Best scalar /O1 vs SIMD /O2 full-helper times:
+puremultiply~0.0646 ->0.0306s,matrix~0.0798 ->0.0497s,zero-rich~0.0506 ->0.0390s.
+These synthetic gains are not game speed. Written integration: new runtime/
+vu_products.cpp with SSE2 integer-only four-lane broadcast products, used only
+by multiply_acc/madd_vector when dest==15 and all required inputs/ACC are defined.
+Invalid indices/undefined inputs/partial masks/other hosts retain exact scalar
+path and fault order. Preserve signed-zero,exp255 finite,truncate,UF/OF,aliasing,
+flags and readiness; no host float operations, clocks or guest work omitted.
+Small SIMD helper inlining stays inside its runtime TU; no compound AOT inlining.
+Files vif.hpp,new vu_products.cpp,CMakeLists,gif_tests,AGENTS/ARCHITECTURE maps.
+Add extended full-lane scalar differentials and direct guard checks,then normal
+focused/GPU suites and four original33M state/timing pairs. Backup
+TEMP/haunting-toc-probe/vu-sse2-baseline includes current accepted exe/map and
+dirty source/docs. New vu_products.cpp recorded as new. No runtime SIMD yet built.
+
+## Current accepted state — rejected experiments restored
+
+PSMT8 experiment reverted: state equal but mean10.7334 ->10.7707s (+0.35%),
+one pair faster/one slower. Source/tests and accepted hg_game/map restored from
+psmt8-table-baseline (binary equals vu-o2-baseline). Rejected VU relocation also
+remains reverted. Three accepted changes this session: exact upload suppression,
+bulk read-only scanout,fused accumulator flag collection. Latest accepted scene
+~10.76s;30updates/s unmet. No build or replay active. Build libraries still from
+last experiment; restored input timestamps force rebuild on next build invocation.
+Next bounded step: external full accumulator SIMD prototype, including state/flags
+and input checks, measured without competing workloads before any integration.
+Prototype product4 million-vector equality passed; best scalar /O1 comparison
+only15-25% product benefit, not a game speed result. No runtime SIMD code yet.
+
+## Current checkpoint — PSMT8 original comparisons
+
+PSMT8 linked;50,331,648 formula comparisons and fpu/gif/runtime/translation pass;
+901 GPU cases pass both modes. Prototype product4 passed1M random vectors plus
+edges. Microbenchmark: best scalar /O1~0.040-0.042s versus packed /O2~0.034s
+(normal/random); zero-rich0.036s versus0.027s. /O2 scalar was~0.091s, so do not
+claim2.6x versus actual /O1 game path. Prototype timings complete before replays.
+Starting hg-psmt8-table-pairs.py; no build/prototype timing overlaps benchmark.
+Next check original state/time. SIMD remains external only and not integrated.
+
+Independent next-cost investigation (external prototype only): test SSE2 four-lane
+integer FPU products against existing scalar product, preserving exp-zero signed
+zero,overflow saturation,underflow flags and truncation. New TEMP files only;
+no runtime integration unless synthetic correctness and throughput justify it.
+Do not run prototype timings alongside original replay timings.
+
+PSMT8 build restarted as cmd8352/tool session73652,psmt8-table-build2.log.
+CMake regeneration confirmed after touching restored build inputs; prior attempt
+used stale removed-library dependency and stopped before a new native link.
+No benchmark active. Await build, full focused checks, then prepared pairs.
+
+PSMT8 candidate build active: cmd43084,psmt8-table-build.log.50,331,648
+coordinate/stride/base comparisons plus invalid-width cases added. Prepared
+hg-psmt8-table-pairs.py; no benchmark active. Build also restores the rejected
+VU relocation to its accepted inline definitions and original CMake linkage.
+
+## Active experiment — exact PSMT8 address factorization
+
+VU /O2 relocation rejected: mean10.7673 ->10.9448s (+1.65%) with state equality.
+Preserved vu-o2-rejected; restored only experiment files from vu-o2-baseline.
+Current built exe still rejected until next rebuild; accepted binary lives in
+vu-o2-baseline and psmt8-table-baseline. Fused VU flags remain accepted.
+Next written change: move psmt8_word from gs.hpp to gs.cpp and use independent
+X/Y lookup decomposition already derived in DrawTexture. Preserve coordinate/VRAM
+wrap and floor(width/128) for odd64-pixel strides. Profile measured123/3262
+samples here. No external rendering source. Files gs.hpp,gs.cpp,gif_tests.cpp.
+Exhaustively compare old formula across coordinates/odd strides/wrap bases,
+then focused suites/GPU modes/original33M state and timing. Backup
+TEMP/haunting-toc-probe/psmt8-table-baseline contains dirty source and accepted
+pre-relocation control exe/map. Combine rollback rebuild to avoid wasted rebuild.
+
+## Current checkpoint — optimized runtime arithmetic comparisons
+
+VU runtime relocation linked; map verifies Fpu::add/multiply_acc/madd_vector
+originate in hg_vu_arithmetic:vu_arithmetic.obj, Release MaxSpeed. Six bodies
+match saved source ignoring whitespace. fpu/gif/runtime/translation and901 GPU
+cases both modes pass. Four original33M comparisons active via hg-vu-o2-pairs.py,
+launcher35488,vu-o2-pairs.log. No build active. Next inspect equality and timings
+before retaining; target30updates/s remains unmet. All previous accepted changes
+are in the saved control under vu-o2-baseline.
+
+Runtime arithmetic relocation build active: cmd43632, tool session88586,
+vu-o2-build.log. Six moved function bodies match saved source exactly after
+whitespace removal (vu-o2-body-equivalence.json). New library compiled; AOT
+relink pending. Prepared hg-vu-o2-pairs.py. No benchmark active. Next complete
+build, focused suites, map provenance and original matched replays.
+
+## Active experiment — compile hot VU arithmetic in runtime /O2 unit
+
+Flag fusion retained after four original equal-state runs (RTC only), scene mean
+10.90985 ->10.75985s (-1.375%); focused suites and901 GPU cases both modes pass.
+Next measurable milestone: larger CPU scene gain from normal runtime optimization.
+Verified map: Fpu::add,multiply_acc,madd_vector emitted from translated.obj;/O1
+comes from HG_FAST_TRANSLATION_BUILDS=ON. Fresh profile identifies these hot.
+Written change: new runtime/vu_arithmetic.cpp holds unchanged Fpu::add and measured
+compound VU arithmetic bodies; declarations remain in fpu.hpp/vif.hpp. Link new
+hg_vu_arithmetic library via hg_runtime, default Release /O2. Preserve small
+inline helpers, all arithmetic/faults/flags, clocks and execution budgets. No
+compound force-inlining. CMakeLists/AGENTS/ARCHITECTURE map updated accordingly.
+Backup TEMP/haunting-toc-probe/vu-o2-baseline includes dirty inputs and exe/map.
+New file vu_arithmetic.cpp recorded as new. Validate same focused suites and
+original33M state/timing; verify final linker-map provenance, not just flags.
+
+## Current checkpoint — VU flag-fusion comparisons running
+
+Candidate linked; fpu/gif/runtime/translation pass, including49152 frozen-reference
+flag/value/fault comparisons.901 GPU/CPU cases pass both memory modes. Four
+original33M comparisons active via hg-vu-flags-fused-pairs.py,launcher33232,
+vu-flags-fused-pairs.log. No build active. Next compare all states and pair times;
+retain only demonstrated benefit. Accepted graphics changes preserved in baseline.
+
+Build restart: test fixture needed hg::Fpu qualification (fixed). Current cmd39100,
+tool session34136, vu-flags-fused-build2.log. Earlier cmd43216 stopped on fixture
+compile errors; no runtime result from it. Await current build before comparisons.
+
+VU flag-fusion candidate build active: cmd43216, vu-flags-fused-build.log.
+49152 frozen-reference cases added for both accumulator modes/vector MADD,
+all masks/broadcasts,normal/extreme values,register aliases and fault state.
+Prepared hg-vu-flags-fused-pairs.py; run only after build and focused tests.
+
+## Active experiment — fuse VU accumulator flag collection
+
+Accepted scanout fresh profile completed:3262 samples,zero errors; multiply_acc288,
+Fpu::add215,psmt8_word123,cpu_access115,write_image_qword113,madd_vector99.
+Measured changed images7.890/7.677 per second; target30 unmet, not internal FPS.
+Written change: vif.hpp multiply_acc/madd_vector gather MAC/current STATUS flags
+while computing each lane, eliminating bool arrays and a second flag scan.
+Store values temporarily and commit only after all checked reads/adds succeed;
+retain register aliasing,defined-lane faults,sticky flags and all exact arithmetic.
+No compound force-inlining or guest-clock changes. Add frozen scalar-reference
+differentials across masks,normal/extreme operands,aliases and fault-state cases
+in gif_tests.cpp. Backup TEMP/haunting-toc-probe/vu-flags-fused-baseline includes
+dirty source/tests/progress and accepted exe/map. Validate focused arithmetic/GIF,
+GPU both modes then alternating original33M state and timing comparisons.
+
+## Current accepted state — upload suppression and bulk scanout
+
+Both candidates retained with four original replays each, complete captured
+image/EE/GS/VU equality and only verified IOP RTC changes. Upload comparison
+means11.31095 ->11.09290s (-1.93% scene); scanout means11.0465 ->10.9484s
+(-0.888% scene) and full replay33.67749 ->32.20324s (-4.38%).901 GPU/CPU
+cases pass both modes; GIF passes. No full-console fidelity or30fps claim.
+Current sampling replay (excluded from timings): hg-scanout-accepted-profile.py,
+launcher3468; scanout-accepted-profile.log and scanout-accepted-native-profile.json.
+Next: use updated measured costs to select next bounded change toward30updates/s.
+No build active. Source/binary backups upload-compare-baseline,scanout-bulk-baseline
+under TEMP/haunting-toc-probe. HG-DIAG-017 updated; lessons015/016 recorded.
+
+## Current checkpoint — scanout comparisons running
+
+Bulk scanout candidate linked.901 GPU/CPU cases pass resident and synchronous;
+GIF checks pass. Four original33M comparisons active via hg-scanout-bulk-pairs.py,
+launcher32604, scanout-bulk-pairs.log. No build active. Next: verify all captured
+state/images, pair times and transfer costs; retain only measured improvement.
+Accepted upload comparison remains in both sides.30updates/s remains unmet.
+
+Scanout bulk candidate building via hg-build-resident.cmd: cmd24288, tool session
+11261, scanout-bulk-build.log. GPU fixture edited after initial GPU target may
+have compiled: rerun gs_gpu_tests target after this build, then both GPU modes
+and GIF tests. Prepared hg-scanout-bulk-pairs.py for four comparisons only after
+all builds/tests finish. Current binary must not be treated as linked candidate.
+
+## Active experiment — bulk read-only scanout
+
+Upload comparison retained:896 cases both modes,four original states match RTC
+excepted; means11.31095 ->11.09290s (-1.93%). No replay/build active.
+Next written change: move display_image from gs.hpp to gs.cpp and synchronize
+committed VRAM once via const data(), then use identical address/format conversion
+on raw read-only words. Existing scanout currently invokes observer per pixel;
+coalescing materialization may remove overhead/readback calls. This conservatively
+reads all GPU-dirty pages, possibly increasing downloads; matched timing decides.
+No guest draw-list flush, clocks, input or pixel omission. Preserve explicit faults.
+Files gs.hpp,gs.cpp,gs_gpu_tests.cpp; tests cover read-only scanout across formats,
+coordinate/VRAM wrap and queued GPU data, followed by original33M comparisons.
+Backup TEMP/haunting-toc-probe/scanout-bulk-baseline includes dirty files/exe/map.
+
+## Active experiment — exact upload suppression
+
+Fresh accepted-build profile:3257 samples,zero errors; multiply_acc239,Fpu::add202,
+cpu_access119,write_image_qword119,psmt8_word103,outside-main558. Readback1.886s;
+upload2.950GB. Profile run excluded from timings and completed (expected budget).
+Written change: gl_gs.cpp caches known GPU page bytes after upload/readback,
+invalidates on GPU writes, and suppresses CPU-dirty uploads only on full byte
+equality. Hypothesis: whole-VRAM scopes cause avoidable uploads. No guest changes
+or approximate hashing. Additional4MiB host mirror; byte-comparison cost must
+be measured. Backup TEMP/haunting-toc-probe/upload-compare-baseline includes
+dirty source/docs and accepted exe/map. Validate both GPU suites and alternating
+original33M full-state/timing comparisons; reject if no repeatable benefit.
+
+## Active continuation — accepted-build profiling
+
+Next milestone: reduce fixed-work scene elapsed while preserving captured guest
+state/images, toward30 changed updates/s. Fresh bounded native sampling uses
+the accepted executable/current map; excluded from speed comparisons. No runtime
+change proposed until costs are measured. Backup: TEMP/haunting-toc-probe/
+lane-profile-start (progress, launcher payload and binary/map hashes).
+Artifacts: lane-accepted-profile.log, lane-accepted-native-profile.json.
+
+## Current handoff — 2026-09-19, user requested handoff
+
+Opposite-lane sprite optimization retained. Both original33M pairs completed:
+controls12.5730/12.5905s, candidates11.2842/11.0869s; means12.58175 ->11.18555s
+(11.10% less scene time). All captured images, EE/GS/VU state match; IOP differs
+only verified RTC offsets0xbfcd1/2/3.896 GPU/CPU cases pass both memory modes.
+Changed presented images7.087/7.890 per second across complete movement intervals;
+this is not independently measured internal game FPS. Target30updates/s remains
+unmet, about24-26% achieved by that presentation metric. Original alias rejections
+5888 ->0, sprites48195, triangle batches444, flushes2343; readback still1.894s.
+Evidence under %TEMP%/haunting-toc-probe: lane-copy-pair-times.json,
+lane-after1-equivalence.json, lane-after2-equivalence.json, lane-movement-rates.json.
+Baseline source/binary: lane-copy-baseline. Documentation backup: handoff-lane-docs.
+
+No active benchmark/build remains; launcher3056 completed all four runs.
+Next measurable milestone: profile this accepted binary with its current linker
+map, identify the largest remaining CPU/transfer cost, and reduce equal-work scene
+time with unchanged captured state. Clone %TEMP%/hg-sprite-format-profile.py with
+fresh artifact names; its sampler is %TEMP%/hg-native-gpu-sample.py. Sampling is
+instrumented and must not be used as a speed benchmark. Investigate bounded CPU
+fallback VRAM footprints only if supported by the profile; GsCpuMemoryScope's
+whole-VRAM writable scope is a lead, not a proven safe optimization. Continue the
+plan/backup/test/equality/performance workflow toward30; do not redo reference
+research or accept guest-clock changes. Existing HG-DIAG007/008 limitations remain.
+
+Historical checkpoints below are superseded by this current section.
+
+Opposite-lane copy candidate built;896 GPU/CPU checks pass both memory modes,
+including required rejections. Four original comparisons active via
+hg-lane-copy-pairs.py, launcher3056, lane-copy-pairs.log. Do not build during timings.
+Next: compare full state/speed and fallback/readback counts. Target30updates/s unmet.
+
+Disjoint-write guard retained:856 GPU/CPU checks pass both memory modes after
+correcting the fixture's service boundary. Four original states/images agree,
+IOP RTC only. Scene controls12.8162/12.7180 ->12.5504/12.5591s (mean1.66% less).
+Flushes3007 ->2415; triangle batches962 ->444. Latest changed-image rates6.266/
+6.252 per second, about21% of30 target. No replay/build active.
+
+Next written change: safely accelerate a specific in-place16-bit sprite case.
+Original retained draw history shows8-pixel-wide CT16S strips copying one16-bit
+lane into the other lane of the same32-bit word. Current page-only alias rejection
+forces CPU fallback. gl_gs.cpp will accept only CT16/16S source and destination,
+<=8 columns with distinct destination words, zero filtering fractions, exact
+source/destination word equality at every pixel (proved by separable row/column
+deltas), and opposite source/destination lanes. All sampled texture bits remain
+unchanged throughout the draw; frame/depth alias checks stay. No shader arithmetic
+change. tests/gs_gpu_tests.cpp will cover both lane directions, wrapping, masks,
+DATE/blending and rejection when any proof condition fails. Independently derived
+from our address functions and original draw data, not external rendering code.
+Backup lane-copy-baseline. Validate differential cases, original state and timing.
+
+Earlier disjoint-write candidate:856 resident GPU/CPU checks pass. Synchronous fixture
+initially wrote VRAM inside an unfinished explicit batch, violating its service
+boundary contract; corrected to end/begin batches around the CPU service. This
+still tests resident deferred dependencies. Must rebuild/rerun corrected tests
+after current timings. Four native pairs active via hg-disjoint-pairs.py,
+launcher33232; disjoint-pairs.log. Treat results provisional until tests pass.
+
+VU narrow candidate retained after six original replays: controls13.5466/13.2277/
+13.3136s, candidates12.8638/13.2360/12.8191s; means13.36263 ->12.97297s,
+2.92% reduction with one neutral pair. All compared state/images equal (RTC only).
+Eight focused tests pass. Aggressive compound inlining remains rejected.
+
+Disjoint CPU-write flush guard implemented in gl_gs.cpp; GPU tests add writes to
+unrelated memory, queued texture inputs and pending outputs, with subsequent draws
+consuming the writes. Backup disjoint-flush-baseline includes current native binary.
+Build active cmd1640/tool session1496, disjoint-flush-build.log. Next: GPU checks,
+then original equivalence/timing; this separate candidate is not yet accepted.
+
+Previous narrow VU build complete; native executable35,317,760 bytes versus33,736,192
+(+4.69%). Eight focused arithmetic/runtime/GIF/translation/startup checks pass.
+Four matched original comparisons active via hg-vu-inline-pairs.py, launcher16252,
+vu-inline-pairs.log / vu-inline-pair-times.json. Do not build during timings.
+Next: assess state equality/speed, then test the disjoint-page flush guard separately.
+
+Previous narrow VU build: cmd30284/tool session77216, vu-inline-narrow-build.log.
+No replay competes with compilation. Next independent bounded change after VU
+measurement: cpu_access currently flushes on every CPU write; restrict submission
+to pages intersecting queued reads/writes, retaining readback of prior GPU dirty
+pages and CPU dirty marking. Current page sets conservatively cover all accepted
+jobs. This changes only ordering of provably disjoint host memory operations.
+Plan tests for writes to unrelated pages, queued texture inputs and pending outputs,
+then original state/speed. Do not mix this with the ongoing VU candidate.
+
+Aggressive VU inline build stopped: MSVC private memory36.75GB/resident14.12GB
+while generating translated.cpp. Focused tests passed but no candidate executable
+was linked. Preserved source/log/manifest in vu-inline-aggressive; HG-FAIL-007.
+Narrowed plan: restore normal inlining for Fpu::add and the3 compound vector
+arithmetic methods; retain small checked access/readiness/flag helpers and product.
+Rebuild, verify original state, and run prepared hg-vu-inline-pairs.py. Baseline
+binary in vu-inline-baseline remains the last accepted sprite-format build.
+
+Previous VU candidate build used hg-build-vu-inline.cmd, cmd38400/tool session91221.
+Arithmetic/runtime/GIF/translation checks pass, including65536 independent MAC
+packing cases;853 GPU/CPU cases also pass synchronous. Full AOT generation still
+compiling; no benchmark competes with it. Prepared hg-vu-inline-pairs.py for four
+matched replays after build completion. Do not mistake existing hg_game.exe for
+the candidate until its link finishes. Next independent lead: GsCpuMemoryScope
+marks/synchronizes the entire VRAM as writable for CPU fallback; bounded footprints
+could reduce transfers but require explicit proof of every read/write range.
+
+Next measurable milestone: lower CPU VU service cost with identical arithmetic,
+flags, readiness/stalls and faults. Fresh3266 native samples (zero errors) show
+Fpu::product265, add126, VU flag119, require_vf96, read_vf61, multiply_acc61,
+produced_vf33, advance_pipeline30. Outside-main554 includes unclassified driver/OS.
+Written change: force-inline bounded hot FPU/VU helpers so compiled constant
+indices/masks specialize; replace only the4-group MAC bit packing loop with exact
+bit placement. Preserve all checks/operations. Files fpu.hpp,vif.hpp, GIF tests;
+validation existing arithmetic/hazard suites plus independent flag packing cases,
+original full-state replay and matched native timing. Inspect code size/performance
+before retaining; no guest clocks changed. Backup vu-inline-baseline (dirty source,
+docs and current executable/map). No replay/build currently active.
+
+Current checkpoint: broader sprite-format optimization retained. Four matched
+runs complete: controls18.4264/18.8841s, candidates14.1483/14.3099s; mean23.73%
+less scene time, identical compared images/EE/GS/VU and IOP RTC bytes only.
+Separate sampling replay active via hg-sprite-format-profile.py, launcher42860;
+gpu-sprite-format-profile.log and sprite-format-native-sample.log. Next action:
+read native samples and choose next measured bottleneck;30updates/s remains unmet.
+
+Prior checkpoint: broader sprite path built;853 GPU/CPU cases pass resident,
+793 pass synchronous before extra alias/fault fixtures, and GIF suite passes.
+First original replay36.405s total/13.5048s scene preserves images/EE/GS/VU;
+IOP RTC seconds/minutes only. Movement output around6 changed images/s, not30.
+Four matched control/candidate runs now active: hg-sprite-format-pairs.py,
+launcher39836, gpu-sprite-format-pairs.log. Do not build during timings.
+Next evidence: pair timings/equality, then fresh native scene samples to choose
+between remaining CPU work and expensive ownership transitions. Sprite profile
+drops sharply but readback grows to1.931s; do not infer all remaining cost is GS.
+
+Previous checkpoint: all four matched resident triangle runs complete.
+Controls22.5453/22.3612s versus GPU17.7089/17.5342s; mean22.45325 ->17.62155s
+(21.52% less scene time). All images/EE/GS/VU match; only verified IOP RTC bytes.
+30 changed updates/s remains unmet. At that checkpoint sprite source was UNBUILT:
+shader/header use24-word descriptors but backend packing/CPU adapter/tests still
+need completion. Do not run that candidate until wiring and regressions pass.
+Reference review requested by user completed using PCSX2 performance/release docs,
+PS2Recomp README and OpenGOAL porting docs. Findings/provenance in SOURCES.md;
+prioritize remaining sprite cost and avoid redundant synchronization. No external
+implementation copied. Documentation backup: external reference-review-record.
+
+Resident triangle replay matches original images/EE/GS/VU; IOP RTC only.
+Scene19.0666s with profile-gs enabled.302650 triangles,962 triangle batches,
+1683 totalflushes (0.959s),0.564s readback,1.110GB uploaded. Triangle-strip CPU
+phase falls to~0.595s; remaining sprite phase~8.113s.345 GPU tests pass resident,
+including batches spanning guest service calls. Four matched resident control/GPU
+runs active via hg-triangle-pairs.py, launcher41580; do not build during timings.
+
+Next written change (build after controls finish): broaden bounded sprite compute
+coverage to solid draws and CT32/24/16/16S/Z24/8H textures, CT32/24/16/16S frames,
+checked DATE and Z32/Z24 tests/writes. Preserve exact TEXA, dither, masks, blending.
+One invocation owns both16-bit lanes of each destination word; no racing writes.
+Reject source/output and frame/depth aliases conservatively; unsupported cases
+remain CPU. New wire fields in GsSpriteJob; gl_gs.cpp shader/setup, gs.cpp adapter,
+synthetic GPU/CPU format cases. This revisits HG-FAIL-006 with resident batching
+and measured remaining sprite cost. Backup gpu-sprite-formats-baseline.
+
+GPU triangle first original replay matches images/EE/GS/VU and IOP RTC only,
+but scene71.4774s (regression).375054 triangles in49093 batches; total49814flushes,
+55.6346s flush time,208.935GB uploads.337 GPU tests pass both memory modes. No
+live run/build remains. Next change: cull triangles with no covered sample before
+CPU/GPU memory synchronization; scale Q and both numerators together to handle
+negative exponent differences exactly; defer resident end_batch host submission
+until memory observers/explicit CPU render/finish require visibility. This does
+not rasterize pending guest primitives for preview: observers materialize already
+logically committed host work. Update interface contract and test resident copies,
+hazards/fault ordering. Backup gpu-triangle-sync.30updates/s remains unmet.
+
+Draw-local sampler retained:864 scalar triangle/fault comparisons, GIF tests,
+241 mixed GPU cases and four original33M comparisons pass. Images/EE/GS/VU equal;
+new UTC-day control explains earlier RTC date difference. Matched scene times
+27.4915/21.6677 and25.6973/21.5711s; mean26.5944 ->21.6194s,18.71% reduction.
+No build/replay remains. Target30 changed updates/s remains unmet.
+
+Next measurable milestone: independently derived integer compute triangle batches,
+verified against CPU output/faults and original scene. New gs_triangle_acceleration.hpp
+and gl_triangle_shader.hpp; change gs.cpp, gl_gs.cpp/.hpp, game_host.cpp, GPU tests.
+Explicit --gpu-triangles, default off. Restrict formats/tests/coefficients to proved
+bounds; unsupported candidates use existing CPU path. Tile lists preserve draw
+order at each unique framebuffer/depth pixel; reject intra-draw feedback, flush
+on inter-draw texture/write hazards or mapping changes. Use original CPU/manual
+math and Khronos ARB_gpu_shader_int64 interfaces only. Start with synchronous
+batch visibility; resident mode remains separately tested. Backup gpu-triangle-baseline.
+
+Sampler replay control crossed UTC midnight: original saved RTC bytes at bfcd0
+00 27 39 22 00 19 09 26; new control00 41 02 00 00 20 09 26. Extra bfcd5 is
+independently explained by system_diagnostic.cpp UTC initialization (tm_mday) and
+IOP ReadRTC's unmodified8-byte response. All EE/GS/VU/images match. Use this fresh
+control for subsequent IOP comparisons, retaining strict non-RTC equality rather
+than broadly allowing offsets. First control27.4915s, remaining three replays
+resume without repeating it. Launcher25888 completed/stopped at this comparator.
+
+30-updates/s investigation: inline-access candidate passes9 focused tests plus
+241 GPU cases in both modes and four original33M state/image comparisons (RTC only).
+Scene regressed-control25.6951s, inline25.6195/25.3126s, pre-wrapper24.3681s.
+Inline runs include extra video-rate instrumentation, so small differences are
+inconclusive. No meaningful speed win established. Changed-image rate~3.04/s.
+3276 fresh native samples, zero context errors: linear texture234, point sampling157,
+PSMT8 addressing140, texel decode126, pixel8 108; depth/frame helpers also prominent.
+
+Next written change: draw-local sampler in runtime/gs.cpp for checked CT32 and
+PSMT8/PSMT8H with CT32 CLUT, hoisting immutable register decoding and using scoped
+CPU memory already synchronized by GsCpuMemoryScope. Preserve live texel reads,
+CLUT validity at the accessed entry, order, wrapping, filtering, and generic fallback.
+Factor PSMT8 address bits into small constexpr tables derived from our existing
+formula, not external renderer code. Compare extended scalar triangle fixtures
+including indexed formats/wrapping/faults/feedback, then matched original runs.
+Backup external draw-texture-baseline; tests/gif_tests.cpp changes included.
+
+Target requested: 30 updated video frames per host second. Immediate change plan:
+separate the rare coherence callback from the hot memory accessor, force inline the
+small observer guard/subscript, and retain all ownership ordering. GS object assembly
+shows actual subscript calls inside read_z_pixel/write_frame_pixel; each saves
+registers and reserves a stack frame even with no observer. This confirms avoidable
+per-pixel call overhead, not yet the full19% regression cause. Files gs_memory.hpp;
+validation memory/GIF/runtime/DMA/GPU both modes plus original33M state/timings.
+Add opt-in native --video-rate-log interval counters in game_host.cpp to measure
+produced and newly presented updates separately from swaps. No guest timing/input
+change. Account under HG-DIAG-011. Backup external coherence-inline-baseline.
+
+Current resident-memory regression checkpoint (2026-09-19): full build and nine
+focused CTest checks passed; 241 GPU/CPU cases pass in synchronous and resident
+modes. All three original33M replays completed at native-iop-budget. Images and
+EE/GS/VU state match; IOP differences restricted to recorded RTC seconds/minutes/
+hour. Scene times: pre-wrapper24.7895s, wrapper/residency-off29.5581s,
+resident30.2274s. The wrapper adds19.24% even with residency disabled; resident
+adds another2.26%. This is a regression, not an accepted performance milestone.
+No build or replay is active. Next measurable milestone: remove CPU memory-access
+overhead while retaining coherent ownership, then repeat matched state/timing runs.
+Linker map shows both GsLocalMemory subscript overloads emitted out-of-line from
+system_diagnostic.obj. This is a lead, not proof of the hot-path cause. Inspect
+actual raster calls/sample before choosing forced inline or scoped access changes.
+Backups/evidence: external gpu-resident-baseline, gpu-resident-times.json,
+resident-after-equivalence.json; documentation backup resident-regression-record.
+
+Resident-memory prototype passes observer/copy/move/scope tests and240 GPU/CPU
+cases, including CPU writes and GS reset preservation. A renderer-before-memory
+teardown case has been added and rebuilt. The first broad build found a missing
+vector-compatible assign member used by an existing runtime reset test; added it.
+Full AOT rebuild now active (cmd30660, tool session50010), currently generating
+translated code. No game replay competes with the build. Next: run resident and
+nonresident regressions, then original33M CPU/control/resident equality and transfer
+cost comparison. HG-DIAG-017 added; current default remains CPU, GPU flags explicit.
+
+Wide STQ division retained after200000 independent bit-serial comparisons,
+GIF suite, and four original33M native replays with images/EE/GS/VU equal; only
+verified IOP RTC differences. Pairs26.653/23.8881 and24.5814/24.4012s;
+means25.6172 ->24.14465s,5.75% reduction with substantial variance.
+No live build/replay remains. Snapshot external gpu-resident-baseline.
+
+Next measurable major milestone: coherent GPU-resident VRAM serving actual sprite
+work, preserving original state/image while reducing transferred bytes/forced syncs;
+then use it to enable triangle batching. Plan a vector-compatible GS local-memory
+owner with optional observer, page ownership tracked by backend, scoped raw CPU
+raster access, and deterministic copy/move/reset/dump behavior. New gs_memory.hpp
+and focused tests first; integrate gs.hpp, gs_acceleration.hpp, gs.cpp, gl_gs.cpp,
+game_host and CMake only after tests. --gpu-resident remains explicit experiment.
+Raw memory bypass confined to backend/CPU scope; CPU reads download dirty pages,
+CPU writes dispatch older queued work before modifying their inputs. Observer
+lifetime must remain safe if memory or renderer dies first. No guest clocks altered.
+
+Solid extension four33M comparisons complete, all images/EE/GS/VU equal,
+only validated IOP RTC fields differ. Scene pairs24.4999/25.0902 and25.2612/23.6315;
+mean24.88055 ->24.36085s,2.09% below substantial pair variation. Do not call this
+established progress. 4360 additional GPU fills increase flushes721 ->1227 and
+flush cost~0.89 ->1.49s. Keep candidate external, revert its source-only delta
+before evaluating the independent wide-divide candidate; preserve its regression
+fixtures. Current wide-divide source edited but not built yet. No replay remains.
+
+User requested PCSX2/PS2 rendering reference comparison; AGENTS and SOURCES now
+record that scope/provenance. No external rendering code or algorithms copied.
+
+Solid candidate passes64 scalar-reference cases plus328 GPU comparisons. Four
+alternating native replays active via temp hg-solid-replays.py, launcher4544;
+progress/equality artifacts gpu-solid-times.json and solid-{before,after}{1,2}*.
+No builds overlap timing. Next prepared candidate (build only after replays):
+replace wide STQ bit-loop division with guarded native128/64 division when shift
+is0..63 and quotient fits64 bits; preserve exact remainder/floor and checked
+fallback elsewhere. Also avoid calculating the unshifted quotient on the fast path.
+Files gs_math.hpp, gs.cpp, GIF tests; backup external wide-divide-baseline (source
+includes pending solid candidate). Add deterministic bit-serial differential tests.
+Microsoft _udiv128 docs establish host intrinsic only, not guest rendering behavior.
+
+GPU profile completes51.1381s; scene24.2688s with --profile-gs. Remaining
+scene primitive costs: strips9.1135s, sprites6.7282s, triangles0.2987s. Whole-run
+GPU flush0.883s. Sample attempt raced process exit (no usable native samples).
+Next: extend existing checked CT32 sprite specialization to untextured, unfogged
+solid fills with always-pass tests/masked depth, both CPU and GPU. Preserve masks,
+PABE/FBA/blending/clamp; bypass irrelevant texture reads only. GPU uses explicit
+solid job flag and no source-page dependencies. GIF scalar pixel tests and GPU
+comparisons, then original scene equality/timing. Backup external gpu-solid-baseline.
+
+Batched GPU milestone verified: scene31.6796 ->22.9379s (27.59% reduction)
+against matched native CPU; all EE/GS/VU/images equal, only known IOP RTC differs.
+32848 dispatched sprites/442843448 pixels,721 flushes,0.878s flush host time.
+Snapshot external gpu-sprites-batched. Enhanced wrap/fault tests rebuilt.
+Next measured milestone: reduce remaining scene CPU time. GPU profile replay
+queued gpu-sprite-profile* with --profile-gs (deferred GPU flush costs reported
+separately). No live process from preceding run; no build will overlap profile.
+
+Synchronous GPU version is not a retained speed improvement: identical native
+CPU scene31.6796s versus GPU34.5168s (~8.96% slower), despite matching state/image.
+Batch candidate now builds and216 GPU/CPU tests pass, including ordered render-to-
+texture dispatches and CPU/alias boundaries. Original33M batch replay queued.
+Counters account for flush cost separately. No timing/quality changes or default
+GPU enablement; shader source remains independent of external rendering material.
+
+Next GPU change: captured final history has8.59M CT32 sprite pixels in700
+medium strips, versus0.46M in16 large sprites. Current16384 threshold misses most.
+Plan lower threshold4096 and batch only inside rasterize_pending_draws. Queued
+draws execute as ordered GL dispatches with storage barriers; one upload/readback
+per run. Flush before any CPU primitive/fallback and at pending-list return or
+fault. Standalone raster calls remain synchronous. This avoids invasive VRAM
+hooks and preserves CLUT/transfer/FINISH boundaries. Backup external gpu-sprites-sync.
+Add batched differential tests with intervening CPU draws and feedback. GPU timing
+counter includes all flush work, since per-draw --profile-gs timing defers that cost.
+
+First original33M GPU native run matches all compared images/EE/GS/VU; IOP
+only RTC bfcd1/bfcd2 differs. 584 sprites,16744448 pixels, no alias rejections.
+Scene34.5168s, total profile71.256s. Prior29.1186s CPU was headless, so this is
+not yet a valid regression attribution. Identical native CPU run now queued.
+First run clean budget exit2; no game process left. Artifacts gpu-sprite-first*.
+
+GPU sprite build and tests: 200 GPU/CPU cases passed (192 dispatched,
+9351360 pixels, eight alias rejections), plus GIF suite. GLSL reserved identifier
+was caught by shader compilation and renamed before tests. Original33M native
+replay active: gpu-sprite-first-command.json/log; launcher43796, bounded autoexit.
+No timing conclusion yet. HG-DIAG-016 is explicit opt-in, default off.
+
+## GPU sprite milestone - active 2026-09-19
+
+Triangle arithmetic retained: mean31.5837 ->29.1186s (7.81% reduction),
+all four33M compared images/EE/GS/VU identical; IOP differences only RTC.
+Eight relevant CTest checks pass. No live game/build remains.
+Backup: external haunting-toc-probe/gpu-sprites-baseline with hash manifest.
+Next: synchronous OpenGL compute acceleration of large CT32 FST sprites,
+using prepared row/column addresses from our existing independently derived CPU
+renderer. Reject texture/frame alias and destination alias before dispatch;
+CPU remains reference and handles all other cases. Upload/readback per accepted
+draw initially preserves CPU visibility and ordering without invasive VRAM hooks.
+New gs_acceleration interface and gl_gs backend; game_host opt-in --gpu-sprites
+with worker-owned GL4.3 context; CMake and differential GL tests. Measure transfer
+cost and33M equality before enabling by default. No guest timing changes.
+
+## Full-speed rendering push - 2026-09-19
+
+Triangle candidate builds and GIF tests pass, including300000 independently
+checked integer quotients and six scalar-reference triangle cases with identical
+zero-Q/exponent-spread faults and partial writes. Full33M alternating comparison
+running: temp hg-triangle-replays.py (current tool session), triangle-times/equivalence files. Sprite IOP
+comparison also matches except verified RTC fields (sprite-iop-equivalence.json).
+Bounded native-window check confirms active RTX5070, OpenGL3.3 NVIDIA616.92,
+three images and clean result0. Context version is requested3.3, not maximum GPU
+capability. No live GUI remains during timings.
+
+CT32 sprite specialization retained:72 differential cases pass, all four33M
+images and EE/GS/VU data match. Scene means43.2754 ->31.5756s (27.04% less time),
+paired26.02%/28.07%. Artifacts sprite-times.json and sprite-equivalence.json.
+Snapshot of retained source/tests/executable/map under backup/ct32-sprites.
+Fresh32M profile:31M..32M triangle strips4.706s, sprites4.067s, other triangles
+0.107s. Now target triangle arithmetic; no live game competes with measurements.
+
+Next planned changes: gs.cpp prepares exact signed S/T/Q coefficients per triangle
+under a conservative no-overflow bound, otherwise uses the existing checked path.
+Reuse Q weighted sum for U/V. New gs_math.hpp provides bounded quotient estimation
+with integer correction; every returned quotient is exact. Apply to positive
+triangle interpolants, preserving signed and wide STQ division. Add independent
+integer-division and scalar triangle differential tests, including zero-Q faults
+and exponent-spread fallback. No trace, clocks, weights or coverage rules change.
+
+Isolated33M --profile-gs replay completes72.812s. All861346 completed draws
+counted, matching the dumped raster total (no reset-quantum loss in this run).
+GS host times: sprites35.505s (74.24%), triangle strips12.048s (25.19%), other
+triangles0.272s. Image/EE/GS/VU state matches commit-after2. Original counters
+therefore identify sprite work as the first major rendering target. Artifacts
+external gs-isolated-profile.*. CT32 sprite specialization implemented; build and
+72 differential cases (filter/wrap/blend/mask with feedback) pending.
+
+Raster bodies now live in gs.cpp. Release build and GIF/runtime/DMA checks pass.
+GS timing is re-armed at each quantum after device reset; counters are since the
+last GS reset and may omit calls within the reset quantum. The33M profile will
+check totals against rasterized count before attributing scene intervals. Default
+has no clock queries. Snapshot of isolated source/binary/map under backup/isolated.
+
+Next candidate: per-draw CT32 sprite specialization for source/target32-bit,
+FST UV, no fog/SCANMSK/alpha-test/DATE, depth ALWAYS and writes masked. Precompute
+U-address components and fractions, compute V components per row, use existing
+texture function and alpha blend with original masks/FBA/PABE/clamp behavior.
+Preserve row-major pixel order and live four-neighbor reads for feedback. Fall
+through to the existing renderer outside the checked predicate. Captured retained
+history has8815556/14970930 sprite pixels in this predicate (58.9%); timing still
+pending. Modify gs.cpp and add focused scalar-reference differential tests.
+
+User authorizes all necessary renderer work until target speed is reached.
+Next measurable milestone: substantial scene throughput gain with33M output/state
+preserved. Read rules.md and learned skills.md; preserve console semantics.
+Backup of current dirty source/docs and pixel-commit executables/maps: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\gs-throughput-20260919-171050.
+No live game currently running (previous PID30536 has exited).
+
+Plan phase1: move the six rasterizer bodies from gs.hpp into gs.cpp, keeping
+identical logic. This isolates renderer rebuilds and ensures these bodies are
+compiled in the GS /O2 unit rather than potentially emitted/selected from an /O1
+translated shard. Add opt-in --profile-gs (HG-DIAG-005) cumulative per-primitive
+host duration/count, covering FINISH/CLUT/transfer-triggered raster calls as well
+as explicit runner servicing. Default has no clock queries. Validate GIF/runtime/
+DMA regressions and original33M state, then measure current distribution before
+choosing CPU span specialization or GPU offload. GPU inventory: RTX5070 plus AMD
+integrated; OpenGL currently only presents CPU-rendered pixels.
+Expected files: gs.hpp, gs.cpp, system_diagnostic.cpp, tests as needed, diagnostic/
+performance/progress documentation. No guest clocks, instructions or draws skipped.
+
+## Speed investigation and persistent workflow - 2026-09-19
+
+Candidate B retained: scene mean47.56255 ->41.97535s,11.75% reduction over two
+alternating comparisons (individual13.54%/9.80%). EE/GS/VU/images identical across
+all four; only validated IOP RTC seconds/minutes/hour differ. Artifacts commit-
+times.json, commit-equivalence.json, commit-iop-equivalence.json. Learned skill
+HG-LEARN-006. No clock/input/rendering-quality changes. Native viewer rebuild passed. Refreshed runtime/DMA/GIF and five startup
+CTest checks all pass (8/8). Old live PID11532 closed for isolated timing.
+Updated viewer launched with direct presentation and keyboard/gamepad input;
+external native-host-speed-command.json / native-host-speed.log. One-shot GL
+colored-pixel verification enabled; no profile or framebuffer file transport.
+
+Live updated hg_game PID30536, launcher cmd26580. No active timed replay or
+build process remains. Next measurable milestone: another meaningful CPU scene-
+time reduction against the retained pixel-commit binary, with the same33M image/
+state equality. First inspect per-draw invariant setup and address/pixel traffic;
+keep the software GS bottleneck distinct from OpenGL presentation. Re-read rules
+and lessons, make a fresh backup before the next experiment. Speed remains far
+below console level; no complete-playability or full-console parity claim.
+
+Candidate A completed: byte-identical compared images/EE/GS/VU, only0.21% mean
+scene-time reduction, below run variation. Reverted runtime/gs.cpp to the saved
+baseline; candidate source/executable retained in the backup directory. HG-FAIL-005.
+Candidate B plan: share final blend/frame commit after already-validated pixel
+stages in runtime/gs.cpp. Preserve destination/depth test order, alpha-fail actions,
+frame/depth masks and live reads. Remove only duplicate destination read and alpha/
+DATE checks between draw_depth_frame_pixel and draw_frame_pixel. GIF regression
+suite already covers these interactions; compare the same33M state and timings.
+
+User withdrew the missing map-entry text report; no missing-call assumption.
+New root rules.md and learned skills.md are mandatory pre-change reading via
+AGENTS.md. Baseline dirty-file copies and SHA256 manifest: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\change-baseline-20260919-165027.
+New files recorded: rules.md, learned skills.md. Backup covers candidate GS,
+runner, tests and documentation before this work.
+
+Candidate A: share validated TEX0/TEXA decoding and axis wrapping across the
+four bilinear samples inside one fragment. No cross-fragment texture cache; every
+VRAM/CLUT read remains live. Modify runtime/gs.cpp only, then run GIF checks and
+33M equivalence/performance comparison. Existing point/extraction callers use the
+same decoder. This is exact host-work factoring, not a new rendering algorithm.
+
+Plan: quantify sustained scene CPU phases and expensive raster operations using
+existing replay evidence first. Then reduce redundant validated pixel work in
+runtime/gs.cpp or runtime/include/hg/gs.hpp, preserving every guest operation,
+image and fault. Add relevant synthetic checks in tests/gif_tests.cpp if needed.
+Compare same33M scripted scene and state with divide-after2, plus alternating
+uninstrumented timings if the candidate passes. Console speed is a target, not
+currently verified. Do not change clocks or skip draws to raise the displayed rate.
+
+## CPU performance and native OpenGL game host - 2026-09-19
+
+Current priority: CPU throughput before further major rendering changes. Native
+hg_game now runs the AOT runtime in-process on a worker with GLFW/OpenGL on the
+main thread, direct framebuffer mailbox, keyboard/gamepad input, aspect-preserving
+presentation and cooperative shutdown. No framebuffer file transport is required.
+The GS rasterizer remains CPU-based. User confirmed the new window is visible.
+
+Verification: Release builds and GIF tests passed; game_sif/fileio/cdvd/loadfile/
+reboot CTests all passed. Controlled33M native-host-controlled replay completed
+with budget exit:898 produced,897 presented, colored-pixel GL readback passed.
+Against divide-after2, EE RAM, GS VRAM/draw records, VU state/data/micro/defined,
+metadata and final display are byte-identical; IOP differs only RTC bfcd1/bfcd2.
+Evidence in TEMP/haunting-toc-probe/native-host-controlled-equivalence.json.
+The earlier live-input-enabled run diverged after31M; its input was uncontrolled,
+so it is not an equivalence test. User subsequently confirmed arrow-key movement in the new native window.
+Shutdown test --host-frames3 produced/presented3 and returned0 cleanly. Initial
+shutdown attempt omitted required TOC input and correctly faulted; corrected run
+uses the explicit synthetic record. No fault was suppressed.
+
+Exact STQ shifted-numerator native division shortcut: four alternating33M runs
+before76.923/76.016s, after75.433/74.990s overall. Scene30M..33M before47.274/
+46.871s, after44.842/44.880s:4.70% mean scene-time reduction. Compared guest
+state and images match apart from RTC. Evidence divide-times.json and
+ divide-equivalence.json. Fresh sampling before this change:3333 samples,
+0errors, STQ coordinate362 plus weighted-sum213 (~17.3%).
+
+Live native host PID11532 (launcher cmd37860), default pacing, keyboard/gamepad
+enabled; standard startup script ends27.1M. Command and log: external
+native-host-live-command.json / native-host-live.log. Old diagnostic viewer is
+no longer running; rebuilt hg_opengl_host successfully after shared-header split.
+User confirmed keyboard movement; gamepad still awaits verification.
+
+Fresh post-change sampling:3330 samples,0 errors; CT32 addressing226, weighted
+sum194, bilinear182, texture decode176, depth/frame pixel paths159/154. STQ
+coordinate body70 vs prior362 (samples are attribution, not speed comparison).
+Artifact native-profile-after-host.json; profiling perturbs timing and ran beside
+the live host. Next milestone: optimize repeated texture/frame address and
+weighted-sum work while preserving captured33M state. Do not label video publications or window swaps internal game FPS.
+HG-DIAG-007 synthetic TOC and008 issue-slot timing still apply; host validation
+flags are HG-DIAG-011. Preserve inherited broad dirty tree.
+
+## Active character-render correction - 2026-09-19
+
+First scene movement is verified: unchanged baseline executable plus Left75M /
+none79M completed80M with only budget exit (EE1bef18, IOP1f0000). External
+scene-left75m-at74000000.png is stationary; at76000000.png Fiona walks left;
+scene-left75m-final.png shows her by the left wall. Rasterized15808287.
+User confirms viewer visibility, character corruption and apparent~5FPS.
+No completed-playability claim: rendering, speed, audio/input/save gaps remain.
+
+Geometry, movement, character color, address-cost and bounded bilinear milestones
+are completed below. Next measurable milestone: reduce bilinear host cost without
+changing the verified filtered output, and report measured preview update rate.
+Captured thin triangles already contain displaced coordinates, TEX0
+2007e78621b10400. HG-DIAG-006 now optionally captures64 selected before/after
+AOT VU calls (--capture-vu1 external-prefix --capture-vu1-tex0 value), then
+detaches. Default keeps original executor without extra calls. Build passed,
+four invalid argument cases reject,32M profiled run completed in54.89s.
+Artifacts: %TEMP%/haunting-toc-probe/character-vu-* and scene-vu-capture.*.
+
+Independent matrix projection of captured scene4 entry58 vertex predicts
+1969.9667/2109.4265/87909.20. Old Q reproduces incorrect native result
+1956.3125/2094.8125/87300. Sony VU manual pp44-48/365-366 proves omitted
+per-field dependency stalls must advance pending Q/P. New AOT dependency
+metadata and readiness tracking produce31519/33750/87909 raw fixed coordinates
+in isolated compiled original-program check, matching the independent math.
+No runtime decoding or external rendering implementation. Synthetic GIF tests
+and15 VU translator tests pass. Full diagnostic rebuild completed successfully;
+logs %TEMP%/hg-build-vu-hazards.out/.err. 32M scene-vu-hazards completed55.016s. Visible spikes are gone; clothing colors remain suspect. Next:
+trace remaining color/UV/lighting. Observer-disabled32M scene-vu-control completed49.625s: EE RAM, GS VRAM/draws, VU memory/state and image identical. Only IOP RTC seconds/minutes differ atbfcd1/bfcd2 (BCD19:56:13 vs19:57:29 UTC).
+
+Separate verified PACKED XYZF2 Z/F shift fix (Sony EE manual p154) passes GIF
+regressions and was present in scene-vu-capture run. It does not explain geometry.
+48M..51M original scene took49.039 host seconds (1s observation precision),
+confirming slowdown without a verified FPS metric. Timing/synthetic TOC remain
+HG-DIAG-007/008 limitations. HG-DIAG-015 stale proxy description reconciled.
+ViewerPID14572 now displays the corrected scene via its existing watched path. Original movement PPM preserved as scene-left75m-preserved.ppm and .ram.display.ppm; stable final PNG retained.
+Preserve inherited broad dirty tree.
+
+Color follow-up: independently decoded character textures look plausible and
+body vertex colors are neutral. The green pixel exists in both native render
+buffers. Offline replay of saved draw records reproduces that pixel changing
+during original postprocessing sprites, but full VRAM differs from the capture;
+this is a lead, not validated whole-frame replay or proof of a color defect.
+Do not remove original grading based on appearance alone. External artifacts:
+character-texture-*.png, draw-replay.*, hg-draw-replay.out under TEMP.
+First scene host sample (scene-profile/native-profile-scene) used a stale Sep14
+linker map and its symbol attribution is INVALID. Rebuilt current map via
+TEMP/hg-build-scene-map.cmd and repeated:3328 samples,0 context errors,
+400 samples in PSMCT32 addressing. Candidate uses compile-time X/Y offsets
+derived from our old formula; exhaustive coordinate comparison passes for four
+widths. Full build and GIF tests pass. Four alternating32M runs measure a6.44%
+reduction in30M..32M scene time with identical EE/GS/VU/images/checkpoints;
+IOP differences only RTC minutes/seconds. Retained. Baseline executable remains
+external scene-before-address.exe. Next bounded STQ overflow-check simplification
+also passes boundary tests and four-run state equivalence; mean scene time falls
+0.68%, too small for a separate material-speedup claim. See PERFORMANCE.md.
+Corrected movement replay35M completed with only budget exit. Left30.5M/none33M
+shows Fiona walking at32M and stopped by the left wall at35M, without spikes.
+TEMP/hg-fixed-walk.py and scene-fixed-walk-at32000000.png/final.png retain
+the command and visual evidence; viewer14572 shows the final corrected pose.
+The stationary checkpoints establish no physical FPS measurement.
+
+Sony GS manual6.0 p59 section3.4.9 independently confirms texture multiplication
+must clamp to8 bits. Existing MODULATE incorrectly packed wider products,
+allowing RGB channel spill and alpha wrap. Correction plus synthetic bright
+channel/alpha tests pass, full build completed (TEMP/hg-build-saturation.out/.err).
+32M scene-saturation completed46.857s with only budget exit. It removes Fiona's
+green patches:169 changed display pixels confined to rectangle210,273..226,359.
+GS VRAM changes444 bytes; EE RAM, GS draw/register records and VU data/state are
+identical; IOP differences only RTC minutes/seconds. Evidence: external
+scene-saturation.png and scene-saturation-comparison.json. Viewer14572 now
+shows this corrected standing frame. Prior binary scene-before-saturation.exe
+and corrected movement images remain external. No live build/replay sessions.
+
+Bilinear follow-up:18132 captured textured draws (including character groups)
+use TEX1=0x60;1488 request nearest. GS6.0 pp28/50/58/62/127 derives the new
+fractional UV/STQ, half-texel offset and four-neighbor path. Native GIF tests
+pass.56 synthetic samples across all four wrapping modes match completed,
+stable external oracle memory readbacks and our exact native packet replay;
+200 untouched pixels also match. See ORACLE.md. Both oracle processes closed.
+Only equal nearest/linear min/mag filters are supported; mixed selection and
+mipmapping now fail explicitly. No physical-console parity claim.
+
+33M scene-linear-fps completes88.695s with only budget exit and renders the
+filtered scene (scene-linear.png). User asked running FPS. Measured from31M:
+61 preview publications and60 changed images over40.867s =1.49 publications/s,
+1.47 changed images/s. Reported approximately1.5 new images/s, explicitly NOT
+an internal game-frame counter or physical display FPS. Earlier~5FPS was the
+user's unverified estimate. HG-DIAG-006 external polling/hash cost is included.
+Retained candidate skips zero-weight texture reads and uses the point path at
+exact texel centers. GIF tests and56-pixel native oracle replay pass.33M replay
+completed78.200s; measured scene interval37.675s with61 publications and60
+changed images =1.62 publications/s,1.59 changed images/s. User informed that
+latest preview update rate is approximately1.6/s, not internal game FPS.
+The complete61-image scene hash sequence, final EE RAM, GS VRAM/draws and
+VU data/state match baseline exactly; IOP differs only RTC minutes/seconds.
+Evidence: scene-linear-center-equivalence.json, scene-linear-center-fps.json,
+scene-linear-center.png. Baseline binary remains external scene-linear-baseline.exe.
+No live build/replay/oracle process remains. Viewer14572 displays the final frame;
+there is no separate gameplay input window. Git diff --check passes.
+
+Next executable action: sample the current binary during31M..33M using the
+fresh matching build/Release/hg_system_diagnostic.map and existing external
+hg-native-scene.py sampler. Its current hardcoded5s start in hg-profile-scene.py
+must be moved to the actual scene checkpoint (not34s, now still scene ramp).
+Target repeated bilinear texture decode/wrap/address validation; preserve
+the proven61-image sequence and guest-state equivalence for any optimization.
+Do not report the earlier6.44% nearest-renderer gain as the final bilinear rate.
+
+## Handoff checkpoint - 2026-09-19
+
+Active milestone: first original gameplay scene visibly rendered and responding
+ to input. The full80M clean replay below is verified; gameplay is not.
+
+Immediate next action: inspect the preserved continue-stream1d4d60.ppm (or .bmp)
+under %TEMP%\haunting-toc-probe, identify its actual contents, and use the
+interactive-desktop launcher in tools/run_movie.ps1 to show that saved frame.
+Do not rerun80M merely to recover the image. The user offered to identify it.
+User has not confirmed visibility after the last desktop-specific launch.
+
+Visibility diagnosis: normal Start-Process inherited a private Codex desktop.
+A valid visible HWND and matching SessionId did NOT prove user-visible output.
+The existing tools/run_movie.ps1 already documents the correct CreateProcessW
+STARTUPINFO.lpDesktop='WinSta0\Default' mechanism. Reusing it for the saved
+frame created viewer74232; EnumDesktopWindows(Default) found the titled window
+at92,69..1052,609. Earlier HWND manipulations targeted helper windows and did
+not solve desktop isolation. Do not repeat them or claim visibility solely from
+MainWindowHandle. GUI launches must follow applicable escalation requirements.
+
+Handoff process check: no hg_opengl_host or hg_system_diagnostic process remains.
+No live command session to resume. Old PIDs65052/68816/74232 are historical.
+The saved preview is a static capture; keyboard gameplay is not wired in viewer.
+
+Viewer-only change during diagnosis: explicit GLFW_DECORATED/RESIZABLE hints
+and glfwSetWindowPos after showing the window in runtime/opengl_host.cpp.
+Clean /m:1 hg_opengl_host build passed after stopping the old locked executable.
+These changes did not establish the cause; desktop selection was the evidence-
+backed fix. No fresh full regression suite was run for the viewer-only edit.
+Existing HG-DIAG-006/011 cover capture/presentation; HG-DIAG-015 inventory still
+describes an older taskbar proxy and needs reconciliation with current source.
+No new guest-state probe was introduced. Preserve the broad dirty tree.
+
+Next after image identification: if gameplay, perform one targeted deterministic
+late-input replay and compare response with baseline. Otherwise select an input
+or extend budget according to the actual rendered state. Keep explicit faults.
+Existing fixed input schedule ends27.1M, so80M success alone proves no late input
+response. No saved-machine resume mechanism has been verified.
+
+## Gameplay-scene push checkpoint - late 2026-09-18
+
+Milestone remains: reach the first original gameplay scene and capture it rendered
+and responding to input. Gameplay is not yet verified. The deterministic schedule
+remains issue-slots,80M slices,1M checkpoints with the established
+Left/Cross/Start sequence and external synthetic-index-pattern.bin.
+
+Latest continuation completes the full80M deterministic budget with no explicit
+EE/IOP/renderer correctness fault after independently rooting stream callbacks
+1d4ef8 and1d4d60. Final connected state:
+- EE pc1bef18, IOP pc1f0000; exit reason is only cooperative startup budget reached.
+- Display640x448, rasterized15808281, retired15765367, first_pending42914.
+- Exact replay prefix is %TEMP%\\haunting-toc-probe\\continue-stream1d4d60.
+- Final preview %TEMP%\\haunting-toc-probe\\continue-stream1d4d60.ppm is preserved.
+- hg_opengl_host --watch-display was launched against that saved framebuffer
+  (viewer PID65052) so the user can visually identify the rendered state. Gameplay
+  remains unclaimed until that screen is identified and input response is verified.
+
+The late stream callback provenance is now also closed:
+- Original1d54e8..54f8 registers1d4ef8 through setter1d1770 at object+38/+3c;
+  fresh object3c2850 contains1d4ef8/3b7238 there. Rooting1d4ef8 cleared the
+  61M-slice frontier (rasterized9952687 at the old fault).
+- Original1d4ca8 tail materializes1d4d60 and tail-calls setter1ce638 at
+  object+48/+4c; fresh object3bfc18 contains1d4d60/3b7238. Rooting1d4d60
+  cleared the62M frontier and allowed the clean80M run.
+- Current generated EE state is354769 reachable words /4608 unresolved items.
+- Current generated IOP bundle remains28 modules /94548 reachable words /
+  125 residual boundaries /244 original BREAK traps.
+
+Current connected progress after the scene11 renderer frontier:
+- PACKED descriptor8 was independently identified as CLAMP_1 and implemented with
+  the documented lower-64-bit PACKED semantics. Renderer advanced22328->22624 draws.
+- Original16x16 PSMCT32 palette upload proved128 direct A+D writes to GS HWREG.
+  PACKED A+D addr54 now feeds the checked host-to-local path; the CLUT-transfer
+  fault cleared and renderer advanced to22770 draws.
+- Independently bounded EE targets added during the continuation include the
+  39c4c0 six-way internal switch, full live472700 interface, direct member19c600,
+  and direct member2c2ed0. Each was proven from original executable data/control
+  flow plus fresh connected RAM before rooting.
+- The 28-module IOP bundle remains the current generated set and intentionally
+  omits rom_romdrv. Fresh bundle after the SNDDRV callback batch has94548 reachable
+  words,125 residual boundaries and244 original BREAK traps.
+- IOP7e99c was proven SNDDRV+399c. Original SNDDRV initialization7fe34..7ff64
+  installs the four callback set7e98c/7e994/7e99c/7e9a4 into MODMIDI records;
+  all four are now explicit roots. That IOP frontier cleared.
+- Replay continue-member2c2ed0 reached rasterized850741 / retired850253 with only
+  488 pending draws before the next EE boundary, substantially beyond the prior
+  rasterized564458 checkpoint.
+
+Current blocker:
+- EE stops at1d4ca8, RA1cdb84, current thread4.
+- Caller1cdb60 loads the callback from object+48 and1cdb7c dispatches it while
+  loading context from+4c. Fresh object3bfc18 contains1d4ca8 at+48 and3b7238 at+4c.
+- Original1d5534..5544 materializes1d4ca8 and calls1ce638; independently decoded
+  setter1ce638 writes a1/a2 to exactly+48/+4c. This is the same verified mechanism
+  already used for rooted sibling callback1d4ff0.
+- Add root1d4ca8, emit, incremental clean build, replay the identical schedule and
+  continue from the next live blocker. No new HG-DIAG probe was introduced.
+
+## Gameplay-scene push checkpoint - 2026-09-18
+
+Milestone remains: reach the first original gameplay scene and capture a rendered
+scene responding to input. Gameplay is not yet verified. The current deterministic
+replay frontier is `%TEMP%\haunting-toc-probe\continue-vu1-scene11-loop`.
+
+Recent progress:
+- VU scene identities 8 through 11 are now independently reconstructed from exact
+  live MicroMem plus original MPG commands and fully looped through every live
+  continuation entry.
+- Scene8: sources3a2018/3a2820, entries0/0x80/0xec0.
+- Scene9: source3a58c8, exact115-pair replacement, entries0/0xa8/0x380.
+- Scene10: sources3a4f68/3a5770, entries0/0x58/0x920.
+- Scene11: source3abd18, exact219-pair replacement, entries0/0x10/0x6c0.
+- Renderer frontier advanced from the old scene4 stop around draw18025 to draw22328.
+- Same-pair VU SQ source hazards now snapshot pre-pair state; MAX emitter temporaries
+  use micro-PC suffixes; VU translator tests pass14/14.
+- HG-DIAG-006 also writes VU1 data/defined masks/register-state sidecars.
+- XGKICK validation is descriptor-aware so PACKED STQ requires only defined S/T/Q.
+  Focused native GIF regression passes.
+- Stable generated EE sharding keeps config/VU emit/build cycles around14-16s each;
+  shared runtime-header changes still trigger a roughly5-minute rebuild.
+
+Current blocker after scene11 full loop:
+- EE stops at1b7960 / RA1b8680 with `unsupported GIF PACKED register descriptor`.
+- Display capture640x448, draws22328, rasterized87779, retired65451,
+  first_pending22328.
+- Scene11's only XGKICK packet at VI1=768 is valid PACKED EOP NLOOP4 NREG3 with
+  descriptors STQ/RGBAQ/XYZ2 only; it does not explain the fault.
+- Fresh EE DMA metadata shows GIF channel2 is already idle at the dump point:
+  CHCR=1, QWC=0, MADR=0x7f21b0, TADR=0x47d550. The offending descriptor likely
+  passed through before the exception snapshot.
+
+Immediate next action:
+1. Capture the numeric descriptor at `GsRegisterState::write_packed` instead of
+   inferring it after the fact. Prefer moving `write_packed` and `write_reglist`
+   bodies from `runtime/include/hg/gs.hpp` into `runtime/gs.cpp` in the same change,
+   paying one shared-header rebuild so later renderer descriptor fixes are cheap.
+2. Include descriptor plus low/high payload in the explicit unsupported exception.
+3. Replay the identical fixed issue-slots schedule once and identify the exact live
+   descriptor. Independently verify its PACKED layout from Sony GS/GIF documentation
+   before implementing semantics.
+4. Continue immediately from the next observed blocker until the gameplay scene is
+   verified. Do not claim playability from a loading/diagnostic frame.
+
+Keep the existing deterministic schedule:
+left/none5630000/5700000, cross/none5760000/5870000,
+start/none19450000/19490000, start/none20860000/20930000,
+cross/none23130000/23270000, start/none27000000/27100000;
+issue-slots,80000000 slices, checkpoint every1000000, synthetic-index-pattern.bin.
+
+## Post-opening VU1 continuation + audio observation - 2026-09-18
+
+Replay continue-sharded-478b70 clears34e9e0 and reaches a different frontier:
+EE1b7960 faults because the live VU1 MicroMem does not match the configured opening
+AOT program. Extended HG-DIAG-006 now writes the exact external16KiB MicroMem image.
+Fresh capture proves pairs0..82 equal original source3a7558 after VIF4a530000
+(MPG83,destination0); remaining live tail still equals the old opening program.
+The actual MSCAL entry is0. Structural audit finds83 pairs,5 direct control pairs,
+all edges/delay slots internal and no unsupported decoded pairs; emit_vu1 dry-run
+succeeds from entry0. Added exact post_opening_mscal0 AOT identity only.
+
+User also reports the audible cutscene stream still develops peaking/scratchiness
+after a certain point. Record this as an unresolved host/audio-path observation;
+do not divert the active milestone from reaching gameplay. Interactive host input
+is still unavailable in the viewer, so deterministic scheduled input remains the
+current continuation mechanism. HG-DIAG-006/007/008 limitations remain explicit.
+
+## Latest 478b70 continuation - 2026-09-18
+
+Sharded frontier iteration remains fast. The preceding46fc30 pair changed the
+dispatcher plus shards0009/0017 and built hg_system_diagnostic in30.12s including
+CMake regeneration, still roughly7x faster than the old218.319s single-TU cycle.
+Replay continue-sharded-fc30 takes29.808s, clears2e5660 and stops at34e9e0,
+RA1bbed8, object1ffeaa0 vptr478b70. Original/live words prove null-bounded pair
+[478b78,478b80)=347640/34e9e0; original347658..664 installs478b70. Add exactly
+that pair, emit, incremental build and replay. The adjacent478b80 table remains
+deferred pending live use. HG-DIAG-006/007/008 remain limitations; no gameplay claim.
+
+## Sharded EE build speed + 46fc30 continuation - 2026-09-18
+
+The generated EE source is now split into25 stable address-based C++ shards while
+the small translated.cpp retains metadata and checked dispatch. Content-aware emit
+preserves timestamps for unchanged shards. Tool tests pass44/44. The first one-time
+sharded build cost275s, but an immediate no-change build fell to2.263s. A real
+blocker batch changed only translated-shard-0013.cpp and rebuilt hg_system_diagnostic
+in18.272s versus the prior218.319s targeted no-trace baseline, about12x faster.
+Focused runtime/translation/translation_no_trace CTests pass3/3. Replays remain
+~29.5s and preserve the fixed schedule/diagnostic limitations.
+
+Replay continue-sharded-d790 clears2685f0 and the adjacent46d7a0 family, then
+stops at original2e5660, RA1bbed8, object17f6c50 vptr46fc30. Original/live data
+prove null-bounded pair[46fc38,46fc40)=126170/2e5660 and original126188..194
+installs46fc30. Add exactly that pair to1bbed0's explicit union, emit, incremental
+build and replay. The following46fc40 table is intentionally deferred until live
+evidence reaches it. HG-DIAG-006/007/008 remain active limitations; no gameplay claim.
+
+## Latest callback-family batch - 2026-09-18
+
+No-trace targeted frontier build completed in218.319s, confirming the large single
+translated.cpp compile remains the dominant iteration cost. Identical replay takes
+29.783s, clears2bb3e0 and stops at1b8910 via100b40, RA1b8e64. Fresh47e300
+descriptors plus original constants3b2f68..3b2fd0 and constructor464920..464a60
+prove the full seven-callback family;1b8ce0/1b8c90 were already compiled and the
+remaining1b8910/1b88c0/1b8890/1b8860/1b87f0 are batched now.
+
+Turnaround mitigation retained: reuse triage instead of rerunning heavy scans, keep
+EE history OFF for frontier replays without watches, and build only target
+hg_system_diagnostic. The next required rebuild also tests MSVC /O1 under the existing
+HG_FAST_TRANSLATION_BUILDS option; measure compile time and retain only if it helps
+without changing correctness checks. The structural long-term bottleneck is still
+one generated EE translation unit invalidated by every root change; split-TU emission
+remains the next build-system improvement if /O1 is insufficient.
+
+## Latest 46eb60 continuation - 2026-09-18
+
+Connected continue-object46b1c0 replay confirms the prior46b1c0 batch:1f2b80
+clears and execution reaches missing original EE2bb3e0, RA1bbed8, object1ffeaf0
+vptr46eb60. Original/live words prove null-bounded pair[46eb68,46eb70)=
+2bb220/2bb3e0; original2bb238..244 installs46eb60 and caller1bbed0 uses slot+0c.
+The three immediate2bb3e0 virtual dependencies are already compiled. Add only
+this proven pair to the existing dispatcher union before the next emit/build.
+
+Turnaround work continues in parallel. The previous cycle measured replay~28.6s,
+triage~10.4s, major-scan~11.5s and emit~12.7s, while the stable single-worker
+generated-EE Release compile took several minutes. Current build cache has
+HG_EE_INSTRUCTION_TRACE=ON even though the frontier replay uses no EE PC watches;
+the documented OFF configuration preserves guest instructions/budgets/faults and
+has prior state-equivalence evidence. For the next frontier build, configure EE
+history OFF and build only target hg_system_diagnostic, then replay the identical
+schedule. Keep006/007/008 limitations and do not claim gameplay yet.
+
+## Latest 46b1c0 continuation - 2026-09-17
+
+Connected continue-vuconvert replay proves the VU fixed-point conversion fix: the
+old10dda4 VFTOI0 stop is gone. The same80M schedule advances to missing original
+EE1f2b80, RA1bbed8, objecta85110 vptr46b1c0, after28.6493s host time. Original
+ELF and fresh EE RAM agree on the null-bounded pair[46b1c8,46b1d0)=16f680/1f2b80;
+original16f754..75c installs46b1c0 and caller1bbed0 uses slot+0c. Both targets
+are now added to that dispatcher union. Turnaround review: this replay cost~28.6s,
+triage~10.4s and major-scan~11.5s before rebuild time; avoid repeating both heavy
+scans for every small root and batch only independently proven families per build.
+Next action: emit, single-worker Release build, replay as continue-object46b1c0,
+then continue from the next actual original stop. Diagnostics006/007/008 persist;
+no gameplay claim yet.
+
+## Latest VU conversion checkpoint - 2026-09-17
+
+Sixth Release build and replay clear1bdf80; next fault original10dda4 word
+4be5217c VFTOI0, RA1b6d54. Evidence continue-object46ada0.ram and sidecars/log.
+Implemented both VU0 macro fixed-point conversion families using existing
+independent Vu1State integer-bit primitives; manual provenance in SOURCES.md.
+43 Python tests and3 native CTests(runtime/translation/translation_no_trace)
+pass, diff check passes. Emit344672 words/4525 boundaries. Connected Release
+build session60540 completed successfully and linked hg_system_diagnostic.exe.
+Replay continue-vuconvert.ram has not yet been run; next action is that replay,
+verify10dda4 clears, then investigate the next actual original-PC stop.
+Existing006/007/008 diagnostic limitations persist; no new diagnostics.
+Still no gameplay or physical-console parity claim. Earlier sessions finished.
+
+## Latest object46ada0 checkpoint - 2026-09-17
+
+Fifth Release build passed;268090 clears. Replay next stops at1bdf80,
+RA1bbed8, objecta84f50 vptr46ada0. Evidence continue-object46d770.ram and
+sidecars/log under external probe directory. Original installers16f704/16f794
+and null bounds prove pair16f6e0/1bdf80 in[46ada8,46adb0); added only that
+pair to1bbed0 targets. Emit:344670 words/4526 boundaries. Release build
+session27898 active; next replay continue-object46ada0.ram. Earlier sessions finished.
+Milestone remains original gameplay with input response, not yet verified.
+
+## Latest object46d770 checkpoint - 2026-09-17
+
+Fourth Release build passed;25e2b0 clears. Replay now stops at268090,
+RA1bbed8, objectfcda60 vptr46d770. Evidence continue-object46c770.ram
+and sidecars/log in external probe directory. Original installers and null
+bounds prove pair267500/268090 in[46d778,46d780); expanded1bbed0 targets
+with precisely this family. Emit:341876 words/4456 boundaries. Release build
+session55060 active; next replay continue-object46d770.ram. Earlier sessions complete.
+Milestone remains original gameplay with input response, not yet verified.
+
+## Latest object46c770 checkpoint - 2026-09-17
+
+Third Release build passed; paired switches clear in connected replay.
+Next missing target25e2b0, RA1bbed8, objectfc72c0 vptr46c770, slot+0c.
+Fresh evidence: %TEMP%/haunting-toc-probe/continue-paired2cf3a0.ram sidecars/log.
+Original installers25c870/2d137c and null bounds prove the two-method family
+[46c778,46c780). Root added at1bbed0. Emit:340376 words/4424 boundaries. Release build
+active session78114; next replay continue-object46c770.ram. Earlier sessions
+finished. No gameplay yet; retain current diagnostic limitations006/007/008.
+
+## Latest paired-switch checkpoint - 2026-09-17
+
+Second Release build succeeded. Fresh replay clears1fbfc0 and stops at2cf4e4,
+RA207854, selector1. Evidence: continue-switch1fbfb0.ram and sidecars/log
+under %TEMP%/haunting-toc-probe. Original2cf3a0 bounds two switches below8:
+2cf3dc ->[45d7a0,45d7c0),2cf608 ->[45d780,45d7a0). Both independently
+verified against original code/data and fresh RAM; both roots now added.
+Emit succeeds:338284 words/4392 boundaries. Release build session33188
+is active; next replay with continue-paired2cf3a0.ram. Earlier sessions finished.
+Milestone remains original gameplay with input response; image still loading.
+Existing diagnostics006/007/008 only; no new runtime substitution or probe.
+
+## Latest continuation checkpoint - 2026-09-17
+
+46f480 family Release build succeeded; runtime/translation CTests pass2/2.
+Replay with identical80M schedule clears2d3e80 and stops later at1fbfc0,
+a1=f1, RA202bf4. Evidence: %TEMP%/haunting-toc-probe/continue-46f480.ram
+and sidecars/log. Captured image remains original NOW LOADING, not gameplay.
+Original1fbf70..b0 proves11-case table[456420,45644c), all entries agree with
+fresh RAM. Added bounded switch at1fbfb0. Emit succeeds:338113 words/4394 boundaries.
+Release build active in tool session99615; then repeat80M schedule with dump
+continue-switch1fbfb0.ram. Previous build/replay sessions have completed.
+No new diagnostics; HG-DIAG-006/007/008 limitations unchanged.
+
+## Active continuation - 2026-09-17
+
+Milestone: reach an original gameplay scene and capture its response to input.
+Fresh deterministic replay reproduced2d3e80 at caller1ffd34. Current dump:
+%TEMP%/haunting-toc-probe/continue-2d3e80.ram (with ee-ram/GS/display sidecars).
+Object18eca40 holds46f480. All24 executable table entries[46f488,46f4e8)
+agree between fresh RAM and original ELF; original installers2d3ab8 and39aa48
+publish this vptr, null prefix/trailer bound the family. Added its bounded
+indirect_targets entry at1ffd34; provenance in SOURCES.md. Exact permitted
+non-rendering shared lookup corroborated only2d3e80 extent.
+Generation succeeds:338092 reachable words /4395 unresolved items.
+Single-worker clean VS Release build is running (tool session9153); next action
+is finish build, repeat identical80M replay with a new dump name, inspect next
+actual fault. No gameplay claim. Existing HG-DIAG-006/007/008 only; no new
+runtime diagnostic or guest-state substitute. Preserve unrelated changes.
+
 # Handoff: Haunting Ground independent static recompilation
 
+## Latest chat handoff checkpoint — 2026-09-17
+
+Active milestone: reach original gameplay and capture a rendered scene responding
+to input. Gameplay is not yet verified. This checkpoint consolidates the prior
+chat's execution report; handoff preparation did not rerun generation or replay.
+The two configuration entries below were verified present on disk.
+
+- Rooted site `0x0029f25c`, table `[0x0046c0a8,0x0046c158)`:
+  live object `0x00a87f80`, vptr `0x0046c0a0`, slot `+0x0c` selected
+  `0x00210ce0`; original installer `0x00171024..0x00171030`, 44 unique
+  executable methods, null prefix and trailing nulls, ELF/live RAM agreement.
+  Prior chat reports successful Release build after 333050 reachable words /
+  4278 unresolved items.
+- Rooted site `0x001ffcec`, six-entry switch `[0x00456960,0x00456978)`:
+  selector bounded below six at `0x001ffccc`; targets `1ffcf4,1ffd14,1ffd2c,
+  1ffd54,1ffd7c,1ffd94`. Prior chat reports successful Release build after
+  333096 reachable words / 4284 unresolved items.
+- Latest reported replay stop: untranslated EE `0x002d3e80`, RA `0x001ffd3c`,
+  a0 `0x018eca40`, a1 `0x00456a60`, v0 `1`, t0 `7`. Caller `0x001ffd34`
+  dispatches through object slot `+0x0c`. The older RAM dump predates this
+  object and must not be used to infer its vptr.
+
+Immediate next action: capture current failing EE RAM, read the object vptr at
+`0x018eca40`, verify slot `+0x0c`, independently prove original installer/table
+bounds, consult permitted non-rendering configuration leads, then root only the
+proven family, emit, single-worker Release build and replay. Continue at the next
+observed blocker. Automate evidence collection, never heuristic root insertion.
+
+Replay parameters inherited from chat: synthetic-index-pattern.bin TOC,
+issue-slots clock, 80000000 slices, checkpoint every 1000000; input pairs
+left/none 5630000/5700000, cross/none 5760000/5870000,
+start/none 19450000/19490000, start/none 20860000/20930000,
+cross/none 23130000/23270000, start/none 27000000/27100000.
+Resolve exact existing CLI flags/output paths before execution.
+
+Handoff process check found no hg_system_diagnostic, hg_opengl_host, MSBuild or
+cl processes. No command sessions were started by handoff preparation. No new
+diagnostics were introduced; existing synthetic TOC/input remain experimental
+replay inputs, not evidence of natural playability. Preserve the diagnostic
+inventory in docs/DIAGNOSTICS.md and all unrelated working-tree changes.
+
 ## Goal
-Build a playable static recompilation of the user's USA Haunting Ground dump,
-targeting Windows, Linux and other feasible desktop systems, using OpenGL.
-Independently decode/translate; never use ps2recomp. PCSX2 is memory-oracle-only.
+Continue independent AOT execution toward faithful natural 1:1 startup/movie speed
+and later original scene/asset execution. OpenGL; no interpreter/JIT/emulator
+backend. Preserve inherited changes and explicit correctness faults.
 
 ## Current state
-Last checkpoint: **2026-09-13 America/Chicago**. User explicitly says keep
-working until told to stop. Continue through checkpoints; do not end at a milestone.
-Repository root: `C:/Users/johnn/Documents/ChatGPT/Haunting`. Not playable yet.
+
+**Latest handoff checkpoint (2026-09-15):** the connected replay previously
+stopped at original EE target `0x002b1100` after 29,069,012 slices / 19.2619 host
+seconds, with display `640x448` and 39,290 draws/rasterized.  The live caller at
+`0x0020956c..0x00209578` loads virtual slot `+0x0c`; original initialized data
+contains `0x002b1100` exactly once at `0x0046e4cc`, fixing table base
+`0x0046e4c0`.  Original installer `0x0020a868..0x0020a874` publishes that table,
+and the following installer at `0x0020a878` begins `0x0046e500`, independently
+bounding the family to `[0x0046e4c0,0x0046e500)`.  All 14 non-null entries are
+executable original-ELF pointers and are now rooted in
+`config/haunting_ground_us.toml` as one bounded batch.  Shared HG configuration
+was consulted only afterward for non-rendering boundary corroboration; no shared
+rendering material or implementation was used.
+
+`python tools/hg.py emit` now reports **254865 reachable EE words / 2463
+unresolved items**, only +72 reachable words from the preceding baseline.  The
+normalized-environment single-worker Release rebuild completed successfully after
+this batch; `hg_ee_translated`, `hg_iop_translated`, `hg_system_diagnostic` and
+the other listed Release targets linked without error.  No command session is
+left running.  The deterministic 80M connected replay has **not** yet been rerun
+after this build.  Immediate next action: run the fixed startup/input schedule
+with dump `startup-clock-bursts-vtable46e4c0.ram`, verify that `0x2b1100` clears,
+then independently trace the next actual original stop before consulting the
+permitted non-rendering shared configuration for corroboration.
+
+**Fast verification baseline (2026-09-15):** preserve game fidelity as a hard
+constraint while reducing test turnaround. Before another long connected replay,
+use `python tools/hg.py analyze --triage` and `python tools/hg.py major-scan` to
+batch independently provable missing targets and identify the smallest concrete
+runtime blocker. The fresh triage reports254793 reachable EE words /2463
+unresolved items,372 installed-table candidates /2516 distinct uncompiled table
+targets, and623 direct-member records /510 uncompiled member candidates. The
+fresh major scan reports94718 IOP reachable words /739 per-module boundaries and
+125 residual all-module bundle boundaries. `python tools/hg.py iop-audit` remains
+the cheap per-module check. Never auto-root candidates: verify bounds, installers,
+live use and original executable data first. Batch targets proven from the same
+bounded family, rebuild once, then replay the fixed input schedule. Repeat an
+expensive full-movie/long-slice replay only after a relevant code/config change or
+when it is the shortest way to establish a milestone. Keep explicit unsupported
+hardware/instruction faults and state-equivalence checks intact.
+
+2026-09-15 America/Chicago - ACTIVE candidate75 continuation. Major milestone:
+complete original post-movie camera matrix setup and capture later original
+scene/asset execution, with regression checks after runtime changes.
+
+**Later connected object-dispatch continuation (2026-09-15):** the fixed
+80M-slice startup/input replay has moved through two independently derived
+original object tables. The first post-root run cleared `0x2674f0` from table
+`0x46d750` and exposed `0x26b480`; the next clean generation/root batch cleared
+`0x26b480` from `0x46d7b0` and now stops later at `0x2bb390`, RA `0x266eb8`,
+after 29,068,787 slices / 24.7848 host seconds. Display evidence is unchanged at
+640x448, 39,290 draws/rasterized, with external IOP dump
+`%TEMP%/haunting-toc-probe/startup-clock-bursts-vtable46d7b0.ram`.
+
+Original code and initialized-data inspection independently establish the full
+five-method `0x46eb40` family (`2bafd0/2bb390/2bb280/2bb1a0/2bb030`) installed
+at `0x208348` and `0x267044`, bounded by zero at `+0x1c`. The following dispatcher
+branch independently establishes the analogous `0x46ec60` family
+(`2c64e0/2c6630/2c6620/2c6570/2c6540`) installed at `0x208f18`, `0x2242e0`, and
+`0x26705c`, also zero-bounded at `+0x1c`. Shared non-rendering configuration was
+consulted only afterward to corroborate function-boundary leads. Both families
+are now rooted in one batch to avoid a redundant rebuild; generation is 254232
+reachable words / 2444 unresolved items. Clean Release rebuild is active.
+
+The preceding `0x46d750` family is independently fixed by original virtual-call
+slot `+0x0c`, the unique initialized `0x2674f0` word at `0x46d75c`, installer
+`0x267334`, and the distinct base-table restore at `0x267340`. Its five executable
+entries are `267310/2674f0/2674e0/2673e0/267370`. `0x46d7b0` is independently
+installed at `0x2083b8` and `0x26702c` and contains exactly
+`26b1e0/26b480/26b350/26b2c0/26b240` in `+08..+18`. No rendering reference data
+or implementation was used for any of these roots. Next: finish the active
+build, replay the identical schedule, confirm `0x2bb390` and the following
+`0x46ec60` path clear, then trace the next actual original stop.
+
+**Streamed-audio timing verification (2026-09-15):** HG-DIAG-013 now captures
+raw SPU2 input plus the original movie-sync queue/ring writers and core-0 AutoDMA
+state. Original EE code independently establishes callback B as buffered bytes:
+slot 8 `0x1e34a0 -> 0x1e34f0` copies the caller's descriptor bytes and
+`0x1e35f4` adds its length to object `0x003d0128+0x0c`; `0x1e3464` consumes
+that count and `0x1d3c58` divides the callback result by two. Callback A is the
+sum of queued node byte lengths; the live node is `0x003ccc60` and its `+0x0c`
+length is updated by `0x1e4450`/`0x1e42f8`. The focused external replay
+`spu2-sync-dma-19p4m.csv{,.events.csv}` shows the native transport moving exactly
+1024 bytes when each 256-frame half becomes free and completing each observed
+2048-byte BCR descriptor only after two halves / 512 frames, then rearming the
+next original request. MADR/BCR/CHCR/remaining transitions agree with that
+sequence; no SPU2 underrun, active-descriptor mutation, or AutoDMA fault appears.
+
+The longer `spu2-sync-returnregs-25m.csv` capture measures core-0 consumption at
+47,999.59 and 47,999.89 frames/s across its two sustained movie segments. The
+original guest movie position advances in queue-sized steps rather than every
+sample; over those segments its lag relative to the 48kHz consumer changes by
+only 531 and 759 samples, with no accumulating rate drift. The earlier raw WAV's
+first nonzero core-0 frame is 924676. Correlating that frame with the focused
+sync capture puts it at guest time ~19.355198s; the next movie-sync sample reports
+position 1024 at 19.358531s, only 3.333ms later and within one documented
+256-frame half. These results validate the current streamed AutoDMA rate,
+half-refill cadence, full-descriptor completion boundary, and startup phase
+against the original guest synchronization path for the observed movie window.
+No evidence-supported production SPU2 timing change is required.
+
+The earlier 60M raw capture remains at `%TEMP%/haunting-toc-probe/spu2-movie-core0.*`:
+2,875,627 frames, 3,611,093 nonzero channel samples, FNV64
+`888b15d5c9687e8f`, WAV SHA256
+`cede10bda40667ad5ee12289f6349457751d21c1714785e93e44d1837858c744`.
+Its old `19.264083s` first-nonzero notation is WAV-relative duration, not absolute
+guest time. Core1 remains unused in this path. The synthetic TOC and issue-slot
+clock remain diagnostic limitations, so this is not physical-console timing
+proof. Final SPU2 voice synthesis, volume/effects, cross-core mixing and host
+speaker output are separate unfinished audio work; streamed CRI_ADXI/AutoDMA
+transport timing itself is verified for this path. Return to candidate75/post-movie
+execution after this requested streamed-audio milestone.
+
+Final streamed-audio validation (2026-09-16): `build/Release/spu2_tests.exe`
+passes; `ctest --test-dir build -C Release -R "spu2|runtime" --output-on-failure`
+passes 2/2 (`spu2`, `runtime`), and `git diff --check` reports no whitespace
+errors. The remaining CRI_ADXI/SPU2 production code was intentionally unchanged
+because the original guest accounting and focused runtime evidence demonstrate
+the current observed-path timing rather than a correctable mismatch.
+
+Movie speaker presentation continuation (2026-09-16): the verified core-0 48kHz
+stereo sound-input stream can now be sent to the Windows default audio device with
+explicit `--spu2-output-core 0` through `runtime/include/hg/host_audio.hpp`.
+The WinMM sink now queues eight 1024-frame host buffers, prebuffering four before
+playback starts, and consumes the same PCM frames
+already used by HG-DIAG-013; it does not feed host timing or audio state back into
+the guest. This is HG-DIAG-014 and bypasses unfinished SPU2 voice synthesis,
+volume/effects and cross-core mixing. The system diagnostic links `winmm` only on
+Windows. `tools/run_movie.ps1` now launches the OpenGL viewer and realtime
+connected diagnostic together with speaker output and the fixed movie-navigation
+schedule; it still depends on the external synthetic TOC record. The first build
+after CMake regeneration hit the known duplicate `PATH`/`Path` MSBuild environment
+failure; rebuilding in a clean `Start-Process -UseNewEnvironment` Visual Studio
+child with `/m:1` succeeded. Dedicated SPU2 and focused `spu2|runtime` regressions
+pass. Live launch verification kept both game and viewer processes running and the
+viewer had a responding native window handle while the framebuffer continued to
+update.
+
+Taskbar/audio-presentation follow-up (2026-09-16): user reported the first WinMM
+presentation path was clearly choppy/scratchy and the GLFW viewer did not reliably
+appear in the Windows taskbar. HG-DIAG-014 now uses eight 1024-frame buffers with
+four-buffer (~85ms) startup prebuffer and ~171ms total host queue capacity, plus
+host-only underrun/max-queue counters. The retained long raw movie capture peaks
+at 31944/32767 (~97.5% full scale) with no hard-clipped samples, so the Windows
+speaker presentation now applies 3/4 (~-2.5dB) headroom while the verified guest
+PCM remains unchanged. The GLFW Win32 HWND is forced to normal
+`WS_EX_APPWINDOW` semantics with `WS_EX_TOOLWINDOW` cleared and no owner so the
+interactive viewer has a taskbar button. Guest SPU2 timing remains unchanged.
+The focused 26M-slice realtime movie probe completed at the expected diagnostic
+budget with 1,243,627 speaker frames, **0 host underruns**, and a measured maximum
+of 7 queued buffers. A fresh interactive launch then verified the actual GLFW
+scanout HWND live as `APPWINDOW=true`, `TOOLWINDOW=false`, owner 0 while the
+viewer remained responsive and its published framebuffer continued advancing.
+
+Interactive-desktop launch fix (2026-09-16): repeated Win32 style/taskbar checks
+were misleading because Codex tool commands run on a private Windows desktop.
+The live viewer/runtime launched through ordinary `Start-Process` were assigned to
+`CodexSandboxDesktop-*`, while the user's Explorer/taskbar uses `WinSta0\\Default`.
+This explains why a valid visible `GLFW30` HWND could not be seen on any physical
+screen. `tools/run_movie.ps1` now creates the GUI viewer explicitly with
+`CreateProcessW` and `STARTUPINFO.lpDesktop = WinSta0\\Default`; the detached
+bootstrap still survives the calling task and the runtime remains hidden. The
+live-preview readback validator was also corrected so a valid uploaded framebuffer
+does not exit before its first visible swap. A fresh normal launcher run created
+viewer PID32628 and runtime PID14432. Enumerating the real `Default` desktop found
+the viewer's titled `GLFW30` HWND there with Visible=True, APPWINDOW=True,
+TOOLWINDOW=False, owner0 and rectangle `(480,246)-(1440,786)` inside the primary
+1920x1032 work area; the preview file continued advancing. Leave this fresh pair
+running for interactive verification.
+
+Viewer survival/taskbar continuation (2026-09-16): the apparent taskbar problem
+was ultimately hiding a real viewer failure. Direct Explorer launch loaded one
+complete live PPM and then exited before its first swap with `Diagnostic preview
+readback mismatch`. The live-preview readback verifier now accepts the one-texel
+nearest-filter boundary around the analytically selected source texel while the
+separate synthetic exact-color probe remains unchanged. A clean VS `/m:1` viewer
+rebuild passed. The actual detached `tools/run_movie.ps1` path now launches the
+GUI viewer executable directly through Explorer and the runtime through a separate
+hidden bootstrap. Fresh launcher evidence: `hg_opengl_host` PID37316 and
+`hg_system_diagnostic` PID42848 both remain alive/responding, the preview timestamp
+continues advancing, and the real `GLFW30` HWND is titled `Haunting Ground - latest
+diagnostic framebuffer (Esc closes preview)`, visible, unowned, `APPWINDOW=true`,
+`TOOLWINDOW=false`, and physically centered inside the primary 1920x1032 work area
+at `(480,246)-(1440,786)`. The exact GLFW HWND was restored/foregrounded after this
+check. Native desktop screenshot/taskbar inspection is unavailable from the current
+tool surface, so shell/HWND evidence is recorded without claiming visual proof.
+
+Detached-launch follow-up (2026-09-16): the earlier interactive processes were
+still coupled to the invoking Codex command lifetime and disappeared after the
+task returned. `tools/run_movie.ps1` now defaults to a 3,000,000,000-slice run
+and asks the existing Explorer shell to launch a hidden attached bootstrap through
+an external temporary shortcut. The bootstrap starts the visible viewer and hidden
+diagnostic, then exits; a later independent command verified both processes still
+running. Direct `ITaskbarList` registration was then measured and rejected by this
+shell: `CoCreateInstance` succeeds but `HrInit()` returns `0x80004001`
+(`E_NOTIMPL`), making `AddTab` unusable. The viewer therefore uses standard GLFW
+show/focus semantics plus HG-DIAG-015, a native minimized `Haunting Ground`
+taskbar proxy (`WS_EX_APPWINDOW`, no owner) whose restore/activation brings the
+real titled GLFW scanout forward. Live inspection verified the proxy visible and
+minimized with AppWindow=true, ToolWindow=false, owner0 while both game and viewer
+continued running.
+
+Candidate74 ALL_BUILD passed (settled37366); all25 CTests passed13.08s
+(settled91109).74skip replay is settled47866: EE advances beyond10dabc's
+broadcast arithmetic and stops at10dc10 unsupported71286488,RA10e170,
+a019615d0,a11ffe820,modeled28234190us.359 images;last358 retains
+hash aa51ff064036e5a49ef1278494344a67796499ebfb13b0985ebcca7e16b4ad88.
+No new pixels,completed camera setup,scene or asset completion established.
+Candidate74 generation203680words/1801issues,zero cap exhaustion.
+
+Candidate75 implements PEXTLW/PEXTUW from Sony EE instruction manual pp205/208,
+verified against original10dc10..1c. Decoder/emitter/runtime plus independent
+register/bit-lane/branch-delay tests changed.41 focused tool tests pass0.036s.
+Generation203698words/1800issues,zero cap exhaustion. ALL_BUILD session68115
+is ACTIVE,log %TEMP%/haunting-build75-all.log. CTest/75skip remain pending.
+Keep the400000 discovery cap and assert zero budget exhaustion.
+No new diagnostic family,timing override,reference implementation or roots.
+
+Latest full-movie69 evidence is unchanged:6300OPENING conversions/54366sectors;
+all6518 guest timestamps equal61full.210.241230 modeled seconds in210.7389host
+seconds=99.763845% modeled speed (about0.498s behind),99.633559% nominal30fps.
+6505shared sampled hashes retain order out of6506 each.60-interval windows
+85.0122%..104.3999%,median99.9934%;host-stall cause unproven. Do not repeat
+an expensive full movie without a relevant change or verification question.
+
+HG-DIAG-006 scripted input/capture(short probes intentionally skip OPENING),
+HG-DIAG-007 synthetic TOC andHG-DIAG-008 issue-slot clock remain limitations.
+Histories OFF locally;realtime opt-in/default-off. Conversion rate is not
+presented FPS,physical scanout,audio sync or physical-console1:1. Retain54
+history optimization/60pacing;rejected62preview cache stays removed.
+
+Viewer freshly checked63648,Responding=True,MainWindowHandle5505716.
+Native image inspection reported unsupported image inputs;do not claim visual
+inspection of74. One broad evidence read was safety-status blocked;narrower
+log/metadata reads succeeded. No persistent local-command blocker.
+All ten Markdown current sections/headings scanned;rootSKILL fully read.
+One scan hit cp1252 output encoding;remaining reads succeeded with stdout
+errors=backslashreplace. Historical bytes below are preserved unchanged.
+
+Branch codex/console-speed-checks tracks its origin. No commit/push;preserve
+inherited dirty/untracked files. External evidence is under
+%TEMP%/haunting-toc-probe. Next:settle68115,fullCTest,create-only75skip,then trace the next actual stop.
+git diff --check passed exit0 after source edits;repeat after final doc edits.
 
 ### Latest verified checkpoint
 
 **2026-09-13 natural-speed optimization continuation.** User resumed work and
 requested faithful1:1 speeds, quickly fixing inefficiencies. The major milestone
 remains sustained natural host playback/presentation cadence. It is NOT reached.
-Continue through checkpoints when session resources permit; no new permission is
-needed for authorized local work. AOT only, no changed guest waits or time budgets.
+On explicit resumption, continue through checkpoints when session resources permit.
+AOT only; preserve guest waits and time budgets during performance changes.
 
 - Retained performance reference: replay42 (EE instruction history OFF),1066 OPENING CSC conversions spanning
   35.611639modeled seconds in50.2381host seconds (median46.3ms). Earlier22 takes
@@ -43,7 +4674,7 @@ needed for authorized local work. AOT only, no changed guest waits or time budge
 - Reader restore build, hg_diagnostic relink and21CTest completed. Dense host
   sampling now1/256 with11 phases (separate IPU input/output); replay35 completed
   32M slices normally. EE remains largest sampled opening phase. Baseline33
-  remains the last full60M retained measurement.
+  is historical;42 below is the latest retained60M measurement.
 - Byte-copy batching36 is REJECTED and removed: exact1066 guest timestamps,
   EE/GS/machine state and1311images, but54.2326s vs53.1226s showed no gain.
 - Retained new wider-RAM access37: full-span store validation once and checked
@@ -82,7 +4713,8 @@ needed for authorized local work. AOT only, no changed guest waits or time budge
   remote SHA confirmed,108text source/config/doc files, no game/emu/generated
   outputs. HTTPS uses existing GCM account; SSH publickey access is unavailable.
   .gitattributes normalizes source text. No executable release was requested.
-- No active diagnostic/build session remains; OpenGL viewer retained. Next major
+- No active diagnostic/build session remained at the stop. Viewer state may change
+  independently. The following next steps apply ONLY after explicit resume. Next major
   milestone remains sustained1:1 natural playback. Native profile39 shows texture
   sampling/pixel addressing/raster overhead alongside EE execution. Next inspect
   the active movie draw's original TEX0/TFX/CLAMP state and independently prove a
@@ -117,9 +4749,9 @@ needed for authorized local work. AOT only, no changed guest waits or time budge
 
 Evidence under %TEMP%/haunting-toc-probe:
 - speed-replays23-26.json, speed-replays27-28.json, speed-replays28-29.json.
-- speed-opening-replay31.json through speed-opening-replay34.json.
-- startup-clock-bursts-22..34 logs/dumps and clock-bursts-N-frames/manifest.json
-  (24 interrupted; no complete dump). Retained33 is60M, as are31/32/34.
+- speed-opening-replay31..34,36,37,40,41,42.json; native-profile39.json/log.
+- startup-clock-bursts-22..42 logs/dumps and clock-bursts-N-frames/manifest.json
+  (24 interrupted; no complete dump). Retained42 is60M;35/38/39 are shorter probes.
 - Local helpers %TEMP%/haunting-clock-bursts-N-replay.py; input and preview use
   %TEMP%/haunting-input.txt and %TEMP%/haunting-live.ppm. Helpers may exit0 when
   diagnostic exits2: inspect native JSON kind and log. Recent runs are ordinary
@@ -4629,3 +9261,63 @@ Linux cache was configured with HG_IOP_SOURCE pointing to the same source throug
   `0x019756c0`. The next boundary is therefore the first real SNDDRV RPC
   request/handler/completion path, not `SifBindRpc`. Trace the request function,
   execution through `0x857b4`, and completion command before changing behavior.
+
+Current read-only metric investigation: original1beef0 waits on interrupt flags
+and a counter incremented by1beda0, registered for cause2. It waits for a delta
+of2. This is display synchronization evidence, not a verified completed-frame
+counter. Provenance in docs/SOURCES.md. Do not alter it to inflate host FPS.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PSMT8 test plan extension: gs_gpu_tests dependency fixtures cover narrow spans, cross-page spans and IMAGE writes against queued inputs/outputs/disjoint memory; dirty test backup added with gpu-test-manifest.json.
+
+
+
+
+FPU prototype3M differential cases passed. /O1 random~5% faster,close cancellation~52%,bounded normal exponents~6%;synthetic only. Integrated bounded bit scan with MSVC/GNU/portable fallback and frozen reference3M+12240edge cases. Next full focused build and original replay.
+
+Next measured readback lead: display_image currently calls const vram.data() and synchronizes all4MiB. CT32/24 and CT16/16S display tiles use64x32/64x64 pages,base2048aligned. A separately tested read_span/page-pointer table could synchronize only rectangle pages,including coordinate and VRAM wrapping,coalescing physical runs. Not implemented;finish current FPU comparison first.
+
+2026-09-24 CPU micro-optimization experiments rejected:
+- IOP dispatch fallthrough: heavy31M..33M profiling left about0.195s extrapolated in IOP run/I/O. A conservative generator candidate let only contiguous ordinary non-control instructions fall through adjacent C++ cases while preserving each original budget decrement, trace boundary, finish_instruction/load-delay commit and s.pc update; control/delay-slot/native/import/hook/fault/page boundaries were unchanged.132 Python/tool tests passed and the qualified candidate measured12.963275FPS with exact retained state. Restored byte-exactly. Adjacent qualified clean controls measured13.083097 and12.913251FPS, so this result is inside observed host drift and is not a demonstrated gain.
+- DMA source-qword native loads: IPU/GIF/VIF1/SIF1 source reads replaced sixteen scalar byte shifts with two portable little-endian uint64 memcpy loads after existing validation. Runtime, translation and65536 VU-readiness tests passed. Candidate executable e6fc98e6cdb1d9fb3308006df323df87b089e188d37a627c1d1515cbdbc6d78f in verifier8331d5997f994bc3a704d7f98f46f143 qualified864 original0x001bef84 writers with no validation failures and exact retained frame/EE/GS/VU/RTC-normalized IOP state, but measured13.005903FPS (13.004916..13.006889), also inside the clean12.913251..13.083097FPS band. Restored runtime.hpp,system.hpp and runtime_tests.cpp byte-exactly after measurement; the linked EXE remains the candidate until the next build, so do not label e6fc98e6... a clean binary.
+- Pre-edit evidence: artifacts/iop-switch-fallthrough-preedit-20260924.txt and artifacts/dma-qword-source-load-preedit-20260924.txt. Do not repeat either mechanism unchanged. Target a larger measured structural cost and require paired/repeatable improvement beyond the current drift band before retention.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

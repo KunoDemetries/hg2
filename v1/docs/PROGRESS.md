@@ -1,0 +1,8582 @@
+## ACTIVE SNAPSHOT - freeze pre-rendering-rule-loosen project under v1, 2026-09-23
+
+User authorized a secondary native-rendering branch but first requires the current stricter project state preserved under `v1/` and then left untouched. Snapshot scope is source/config/docs/tests/tools plus current generated `out/`; explicitly exclude `build/`, `emu/`, `Haunting Ground (USA)/`, caches and other protected/binary payloads. Add `v1/FROZEN_PRE_RULE_LOOSEN.md` stating this is the pre-rule-loosen snapshot and must not be modified or used as the active branch.
+
+Implementation mechanism is temporary build plumbing only: add a bounded `hg_game` POST_BUILD CMake copy command for the listed project directories/root files, run one configured `build_game`, then restore root `CMakeLists.txt` byte-exactly. Because the snapshot would otherwise receive the temporary CMake command, overwrite `v1/CMakeLists.txt` afterward with the restored root file. No gameplay/runtime/rendering behavior changes are authorized in this snapshot task; stop after verifying representative hashes/files and the freeze marker.
+
+Snapshot mechanism update: the temporary POST_BUILD copy never ran because the already-stopped VU diagnostic had left generated `out/translated.cpp` ahead of its restored VIF header. Root CMake was restored exactly and configured `hg_emit` regenerated only `out/translated.cpp` back to known clean SHA6979f9a8.... Do not continue the diagnostic. Revised bounded copy mechanism: temporarily add a source-tree copy prelude to `tools/hg.py`, invoke only configured `hg_analyze`, then restore `tools/hg.py` exactly. The prelude copies only runtime/tests/tools/config/docs/out plus root project text files into `v1/`; no build/emulator/game payloads.
+
+## ACTIVE VU CLASSIFICATION - count-only heavy-window program/entry/pair mix, 2026-09-23
+
+Fresh restored-source control is qualified: build6d37708c344e4ba3b3c5ded1e82ad4b5, game SHA3df68810f20fa8cb842552907148372126755b830959677e6a88f4ac09bd503d,149-input manifest4cd754f41258ccf5f869c7cec82861240fc01338823824ddd7b5e6fee16044cb; replay4cdce739fa14407b90ab55b8b3f53774 reaches33M/no fault in24.5549s with48195 sprites/305856 triangles/842 masked batches. Verifierf231b0e85d504238bb5678a9e110eecc/evidence541e6f67bc884912878dc2e81fbcb5a8 is exact on established frame/EE/GS/VU/current-date normalized IOP state and all864 qualified original frame writes; heavy60/5.26595s=11.3939555066FPS (11.3782471/11.4097074), about0.30% below the prior11.4283319778 sample and treated as normal control drift.
+
+NEXT diagnostic only: classify31M..33M with integer counters, no clocks. Temporarily add host-only VU profiling count pointers, emit one (program,entry) count per AOT activation and one (program,pair-address) count per executed static pair, and enable them only for the profiled non-realtime33M heavy window. Guest VU state/control flow/arithmetic, clocks, rendering, input, ordering and faults stay unchanged. Instrumented timing is not FPS evidence. Static scan shows624 XYZ ACC multiply/MADD sites,416 broadcast multiply-vector sites,259 generic ACC multiply/MADD sites and13 XGKICK sites; dynamic concentration is the missing discriminator.
+
+After one useful capture, document a new HG-DIAG result, restore temporary VIF/emitter/runner edits exactly, regenerate clean AOT output and rebuild before any production timing candidate. Do not retain profiling branches. Choose the next distinct optimization from measured dominant dynamic shapes; do not repeat the previously rejected VU specialization/scheduling/inlining routes unchanged.
+
+## ACTIVE RESTORE - incomplete DIRECT wait cache rejected; return to 11.428332 baseline, 2026-09-23
+
+DIRECT wait-cache candidate is state-correct but not faster. Build0dfe19386be44001b43de567a456f75b/game471900703871add2f95d1b4b0cad306aa0da5f1b74ebb377b3da3849d5fd488e; replaysf7237f641717473da3fa155bd108ecaa and67ae5dbcfa0343d3a89686e0961e6f73 both reach33M/no fault with normal48195sprite/305856triangle/842masked work. Fixed verifier5856eab9c55a4a308d9a6dd1852efd45/evidenceproject-link-verifier/aa9c2aefe70a4d7eb4fab3521dd5e1d7 passes149-input provenance,864 original writer/caller events and exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/5.26724s=11.3911650124FPS, windows11.4179582/11.3644973. Immediate source-matched baseline98f8f5f6... was60/5.25011s=11.4283319778FPS. Candidate is~0.325% lower FPS/~0.326% more heavy host time: flat/slower, no retention.
+
+NEXT source edit is exact restore of ONLY the host parser wait cache and its focused test. Remove Vif1Path::direct_wait_bytes/comment/reset field, process_pending early wait shortcut and incomplete-DIRECT cache assignment; restore original incomplete check; remove focused lifecycle test. Preserve split-tag/TTE pending physical-phase tracking unchanged. Baseline target hashes are vif.hppa4e5db947..., vif.cppd051e21e..., vif_direct_regression.hpp3dabfff8.... Candidate backup/result: artifacts/vif-direct-wait-cache-rejected-20260923-rc14.txt SHA4d733c7a.... Rebuild tests/game and revalidate source-matched production before next mechanism. Do not repeat DIRECT header caching unchanged; eliminating millions of repeated header checks did not move qualified throughput.
+
+Optimization then returns to actual VU AOT/EE/GS CPU work. The deep audit remains useful: real VIF/VU double buffering exists but only~0.18s completed UNPACK work is available against~2.56s VU work, and fine-grained host overlap loses to synchronization overhead.30FPS remains unmet.
+
+## PRIOR ACTIVE VIF OPTIMIZATION - cache incomplete DIRECT wait length; baseline 11.428332 FPS, 2026-09-23
+
+Clean post-audit synchronous+split-tag baseline is verifier98f8f5f6df344edd84628dfd5ff2e7a6/evidenceproject-link-verifier/90a9667c4b734842b398184ad73865f6:60/5.25011s=11.4283319778FPS, windows11.417263/11.439423,149-input/864-writer and exact frame/EE/GS/VU/current-date normalized IOP state. Game203820c8..., replay233a96bc... reaches33M/no fault with normal work. Use this as the immediate source-matched control.
+
+NEXT bounded mechanism BEFORE source edit: cache only the known byte length of an incomplete VIF DIRECT/DIRECTHL command. HG-DIAG-034 observed61146 DIRECT commands/7306814 qwords/116909024bytes in heavy31M..33M, with approximately one incomplete DIRECT-header retry per incoming payload qword. The existing parser re-decodes command/immediate/alignment/size every call until the complete payload exists.
+
+Candidate adds host-parser direct_wait_bytes. Existing max_pending check remains first. When a DIRECT header is decoded and aligned but its payload is incomplete, record total command bytes4+units*16 and leave the COMPLETE retained command bytes unchanged. After consuming any already-completed prefix commands, that DIRECT header remains pending[0]. On later process_pending calls, if pending is still shorter than the cached length return immediately; once enough bytes arrive, clear the cache and run the exact original full DIRECT parser/application path. NO header is consumed early and NO GIF/GS qword is submitted early. Pending bytes/phase breaks, max capacity, GIF suffix, partial GS fault effects, command ordering and original completion boundary remain externally identical. reset_interface clears cache; complete-application faults leave the full command pending and cache cleared for normal retry.
+
+This is distinct from HG-FAIL-031 complete-EOP packet batching, HG-FAIL-032 DMA-arrival batching and HG-FAIL-033 already-complete payload batching: payload buffering/application are unchanged; only repeated VIF header retry work is skipped. Existing936-case/7873-checkpoint frozen DIRECT reference must remain exact at every partial checkpoint; add a focused cache lifecycle assertion. Detailed pre-edit hashes/evidence: artifacts/vif-direct-wait-cache-preedit-20260923-rc14.txt SHAaca33fb0.... Protect split-tag pending_byte_phase/phase breaks, configd2c998fa..., host9704ed0b..., renderer/clocks/input/audio and all coverage.
+
+Validation: build_tests/runtime/translation/readiness; build_game/fresh149-input manifest; gameplay33m replay; fixed frames verifier. Retain only a meaningful repeatable gain above11.428331978 with all established state exact; flat/slower restores only direct_wait cache.
+
+## PRIOR CURRENT BASELINE - synchronous VIF/VU restored; split-tag retained; 11.428332 qualified FPS, 2026-09-23
+
+Post-audit production restore is complete. Fine-grained VIF/VU host-thread overlap (full snapshot, dirty tracking, VIF-only merge, and atomic feeder variants) is rejected as a performance route; none remains active in the main execution loop. Independently proven split-tag/TTE physical VIF phase tracking remains. system_diagnostic uses direct synchronous VIF drain; runtime.hpp again synchronizes GS interrupts on delivered VIF qword/tag; vif.cpp has no overlap stalls/write trackers and retains pending_byte_phase/consume_pending_prefix plus original command semantics/faults.
+
+All restore gates pass: build_tests8cd89bc..., runtime994d79b..., translation24c96db8..., readinessb510fd68... (65536 compiled comparisons). Build2739b191... produces game203820c84068e970f509c54215d93f09ca5e98d5825b1b24744305259881b402,36319744bytes,149-input manifesta08a85cc2772eb41349433074bfbaeeedf5ba4289ece28d81f30859d50bf925a. Replay233a96bc... reaches33M/no fault with48195sprites/305856triangles/842masked batches in24.5939s.
+
+Fixed verifier98f8f5f6df344edd84628dfd5ff2e7a6/evidenceproject-link-verifier/90a9667c4b734842b398184ad73865f6 passes149-input provenance,864 original1bef84/caller2d1c50 events, zero lost/unexpected/caller/stack failures, and exact established frame/EE/GS/VU/current-date normalized IOP hashes. Qualified heavy60/5.25011s=11.4283319778FPS; windows11.4172629/11.4394225. This is the new post-audit production baseline.30FPS remains unmet.
+
+Root-cause conclusion: Haunting Ground genuinely uses Sony VIF1/VU1 double buffering, but measured completed UNPACK work (~0.18s in retained heavy diagnostics) is far smaller than synchronous VU execution (~2.56s) and fine-grained host scheduling overhead overwhelms the overlap opportunity at ~126180 MSCAL/MSCNT activations. Do not retry those handoff designs unchanged. Optimization returns to VU AOT/EE execution and GS/CPU work using this11.4283 baseline.
+
+## PRIOR ACTIVE BASELINE RESTORE - synchronous VIF/VU with split-tag correctness retained, 2026-09-23
+
+Atomic feeder handoff is rejected: build5f7672a6... replaydff4fcc5d6854018a09b4b5ac1bdc063 reaches33M/no fault with normal48195sprite/305856triangle/842masked work but takes49.5036s. Source has already been restored to pre-atomic system_diagnostic SHA dd785f5e.... Combined with full-snapshot overlap8.746445FPS, dirty VU/VIF tracking8.584612FPS, and VIF-only tracking/bulk merge8.749468FPS versus exact synchronous control10.079036FPS, fine-grained host-thread overlap is closed as a performance route.
+
+The deep architecture result remains important but is not the3x restraint: actual HG packets do use BASE0/OFFSET0x200 and TOPS double buffering, yet retained heavy measurements show~2.56s VU execution and only~0.18s completed UNPACK work available to overlap in the final2M guest-us window. Even ideal zero-overhead VIF/VU overlap cannot produce30FPS. Per-activation host synchronization at~126180 MSCAL/MSCNT events adds cost instead.
+
+PROPOSED BEFORE source edits: restore normal production to synchronous VIF/VU while KEEPING independently proven split-tag physical-phase tracking. In system_diagnostic do not instantiate feeder/snapshot and use direct while(ee.pump_vif1()) drain. In runtime.hpp restore unconditional GS interrupt sync after VIF qword/tag delivery. In vif.cpp remove overlap-only host_vu_running/host_vu_pending stalls, MicroMem generation bookkeeping and per-field VIF write tracking calls, while preserving command order, UNPACK arithmetic, pending_byte_phase/consume_pending_prefix and all explicit faults. Leave dormant helper definitions temporarily for a small reversible cleanup; no runtime object or hook uses them. Pre-edit hashes/evidence: artifacts/sync-post-splittag-baseline-preedit-20260923-rc13.txt SHA5477a97b....
+
+Validation: build_tests/runtime/translation/readiness, build_game, gameplay33m replay and fixed frame verifier. Require normal work counts,149-input provenance,864 original writer/caller events and exact frame/EE/GS/VU/normalized IOP hashes. Compare qualified FPS to pre-overlap synchronous10.0790364441. If restored, this becomes the new post-audit production baseline and optimization returns to VU AOT/EE execution rather than host-thread overlap.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - atomic feeder rejected; move to coarse VIF1 double-buffer ownership, 2026-09-23
+
+Atomic feeder handoff is rejected without retention. Build5f7672a6... replaydff4fcc5d6854018a09b4b5ac1bdc063/evidenceproject-link-runtime/20260923T052943Z-454f048bd1c347c2bbdca109711aa5a4 reaches33M/no fault with the expected48195sprite/305856triangle/842masked work, but takes49.5036s versus38.2356/38.3431s for the mutex/CV VIF-only overlap and~27.68s for the earlier full-snapshot overlap. ee_vif_gif sampled_ns is50.7367M. Release/acquire spin/yield synchronization therefore makes this fine-grained per-activation handoff substantially worse. Do not qualify/repeat unchanged. Restore only Vif1Feeder/include changes in system_diagnostic to the exact pre-atomic mutex/CV route before the next mechanism.
+
+This closes fine-grained host-thread handoff tuning. The architecture evidence remains valid: captured Haunting Ground VIF1 traffic uses BASE0/OFFSET0x200, TOPS-relative UNPACK and MSCAL/MSCNT, but creating/handing off host work at ~126180 activations in the heavy2M window costs more than it overlaps.
+
+NEXT ROOT-CAUSE EXPERIMENT BEFORE source edit: coarse double-buffer ownership with NO per-field write tracker and NO per-activation worker wake. Preserve the same game-proven VIF double-buffer semantics. At VU activation, derive the processing half from the activated TOP and the feeder half from TOPS/BASE/OFFSET. Require the captured HG-compatible shape (BASE0, OFFSET0x200, aligned half ranges) for the optimized path; otherwise fall back to the exact current synchronous route. Run one persistent feeder over a bounded sequence of VIF commands for the opposite half rather than one wake per MSCAL/MSCNT. Snapshot/copy only the active8KiB VU half to the VU work image; VIF writes only the opposite8KiB live half. At synchronization boundary, verify the work image did not change the feeder-owned half (bulk compare against activation baseline or immutable shared half); then copy the active half work->live and feeder half live->work. No per-UNPACK or per-VU-store hooks. FLUSH/MPG/DIRECT and any non-double-buffer destination force a join/fallback before proceeding. Main-thread ownership of VU/XGKICK/GIF/GS remains. Start with a read-only command classification/proof pass and focused tests before enabling gameplay.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - VIF-only overlap exact but 8.749FPS; isolate feeder synchronization cost, 2026-09-23
+
+VIF-only conflict tracking + bulk merge is now fully qualified and state-correct but still too slow. Build e699e876... game574ff03a..., replays165c3941...=38.2356s and4fce8a6d...=38.3431s both reach33M/no fault with exact48195sprite/305856triangle/842masked work. Verifier6f47969da4ac4f50a5a24b57896fd212/evidenceproject-link-verifier/5738a62e9da14c93aaa048583c5a7a1c passes149-input/864-writer, exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/6.85756s=8.74946774071FPS, windows9.156866/8.376776. Clean synchronous control246279be...=10.0790364441FPS,60/5.95295s. Removing full scans, per-activation data copies and hot VU-side store tracking therefore did not make fine-grained overlap competitive.
+
+The remaining host-only difference is dominated by per-activation feeder synchronization. Heavy retained counts91140 MSCNT+35040 MSCAL=126180 activations. Current overlap adds~0.90461s versus synchronous control in the qualified heavy window, ~=7.17us per activation, while replay ee_vif_gif sampling remains~44.1-44.3M. This is consistent with mutex+condition_variable wake/wait cost but remains a hypothesis until isolated.
+
+PROPOSED BEFORE source edit: change ONLY Vif1Feeder in system_diagnostic.cpp. Preserve exact current split-tag transport, VIF-only conflict merge, bulk VU state copy, main-thread VU/XGKICK/GIF/GS ownership, feeder scope and every guest-visible behavior. Replace mutex/condition_variable start/wait with release/acquire atomic request/done sequence counters on the same persistent worker. Exactly one request outstanding; state/error are published through request/done ordering. Main polls done and periodically std::this_thread::yield(); destructor sets atomic stop, advances request to wake idle worker, then joins. Remove mutex/CV includes and add atomic. No new PS2 concurrency scope.
+
+Pre-edit evidence/hashes: artifacts/vu1-overlap-atomic-feeder-vifonly-preedit-20260923-rc11.txt SHAad7be9de.... Target system_diagnostic dd785f5e.... Protect vif.hppa4e5db94..., vif.cpp315ca8af..., runtime.hppac52dc0e..., tests0f1c73bf..., configd2c998fa..., host9704ed0b.... Validation: build_game, one33M replay; if materially improved, fixed verifier. If flat/slower/fault, exact restore only system_diagnostic and stop pursuing fine-grained host-thread overlap.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - remove hot VU store tracker; VIF-only conflict tracking + bulk merge, 2026-09-23
+
+The first dirty-write revision is rejected before further tuning. It is state-correct but slower than both prior routes. Game677c6d76..., replays ea5656719...=38.7028s and29994939...=38.5248s both complete33M/no fault with exact48195sprite/305856triangle/842masked work. Verifier9e63df1c42994fe3ae71c9855061d4cc/evidenceproject-link-verifier/2a906f3229934fe8a798558ae4dca8b7 passes149-input/864-writer and exact frame/EE/GS/VU/current-date normalized IOP state, but heavy60/6.98925s=8.58461208284FPS, windows8.534511/8.635305. Full-snapshot overlap was8.746445FPS; exact synchronous control10.079036FPS. Profile identifies the regression: ee_vif_gif sampled_ns rises from~3.12M in the prior overlap replays to45.19M/45.43M here. The new per-lane Vu1State host_memory_tracker hook on SQ/SQI/ISW is the dominant new host work. Do not retain or repeat that hook.
+
+PROPOSED BEFORE source edits: preserve the proven split-tag transport and overlap scheduling, but remove VU-side write tracking completely. Keep first-touch tracking only on LIVE VIF UNPACK writes. At each overlap activation, live/work VU memory is synchronized before concurrency. On join, inspect only VIF-touched words/vectors using their recorded baseline: different dual VIF/VU changes remain explicit conflict; VIF-only changes are folded live->work; VU-only or identical changes remain in work. Then one contiguous work->live assignment copies the full16KiB data +1KiB defined masks. Non-VIF-touched live memory stayed at activation baseline, so work is authoritative and carries all untracked VU writes exactly. This removes every VU SQ/ISW tracker branch and also avoids a4096-entry conditional scan. Persistent MicroMem generation/once-per-drain synchronization remain. Detailed hashes/evidence: artifacts/vu1-overlap-vif-only-merge-preedit-20260923-rc9.txt SHA30449892....
+
+Targets: vif.hpp1119b77a... remove Vu1State tracker pointer/store hooks and simplify merge to VIF tracker only; system_diagnostic54ebb2f7... remove vu_writes install/clear and bulk-copy merged work memory back to live; focused runtime tests1b42de0e... update VU-only/VIF-only/identical/conflict/defined/untouched cases. vif.cpp315ca8af... split-tag/VIF tracking remains unchanged unless tests require. Protect configd2c998fa..., game_host9704ed0b..., renderer, clocks, controls, all coverage. Validation: build_tests/runtime/translation/readiness, build_game, one33M replay first; only if competitive run second replay + fixed verifier. Any state mismatch/fault restores this bounded revision while preserving independently proven split-tag support.
+
+## PRIOR ACTIVE ARCHITECTURE OPTIMIZATION - keep correct VIF1/VU1 overlap, remove per-activation full-memory snapshot/scan, 2026-09-22
+
+Split-tag phase tracking is now proven through tests and two complete overlap replays. Replay20d58d715e7f4074a5e7df4d8d6596f5=27.6758s and replayf5cbe90c6fe44c3fb6eb46a47ffc29cd=27.6894s both reach33M/no fault with exact48195sprite/305856triangle/842masked work. Qualified verifiere4382686adf24316b0b20c752ac899c7/evidenceccd5685e34c648bebc09b6f16768c240 passes149-input/864-writer, exact frame/EE/GS/VU and current-date normalized IOP state, but heavy60/6.85993s=8.74644493457FPS (8.774393/8.718675), materially below exact clean synchronous control246279be...=10.0790364441FPS. Therefore the PS2 overlap semantics are state-correct; the first host implementation is too expensive in the heavy window.
+
+The host regression now has a concrete scale: retained diagnostic31M..33M counts91140 MSCNT+35040 MSCAL=126180 VU activations. Current Vu1OverlapSnapshot copies baseline VU data/defined, work VU data/defined and MicroMem on every activation, then scans all4096 VU words during merge. That implies multiple GiB host-only memory traffic and >516M merge comparisons in the final2M slices. This work has no PS2 architectural counterpart and plausibly explains the8.746FPS regression despite the whole-run27.68s improvement.
+
+PROPOSED BEFORE source edits: retain the same bounded overlap scheduling and split-tag transport, but make snapshot state persistent and merge only actual writes. Add host-only Vu1MemoryWriteTracker with dirty bitsets + compact first-touch lists and baseline values only for touched words/defined vectors. Vu1State SQ/SQI/ISW call the tracker at their architectural store boundary only when a nullable pointer is installed. VIF UNPACK similarly tracks only actual writes while feeder overlap is active. MPG increments a host MicroMem generation. First activation initializes work memory/MicroMem once; later activations reuse synchronized work memory and copy MicroMem only after generation changes. Merge iterates dirty lists only, preserving the exact existing lane-wise conflict rule; VU-only changes apply work->live, VIF-only changes live->work, identical dual changes synchronize both, incompatible dual changes remain an explicit VU1 overlap memory conflict. End-of-merge invariant is live/work VU memory+defined equality for the next activation. No whole4096 scan, no baseline full copy and no normal per-MSCNT MicroMem copy.
+
+Detailed current hashes/evidence/validation are in artifacts/vu1-overlap-dirty-merge-preedit-20260922-rc8.txt SHAe8e4fd44.... Targets are vif.hpp5340be6d..., vif.cppbd98ef37..., system_diagnostic7adedee9..., focused runtime testsb8854512.... runtime.hpp overlap schedulingac52dc0e... remains unless required. Protect configd2c998fa..., host9704ed0b..., renderer/gs/gl_gs/vu_products and all gameplay coverage roots. Validation: tracker unit cases (VU-only/VIF-only/identical dual/conflict/disjoint defined lanes), full build/runtime/translation/readiness, game build, two33M replays, fixed frame verifier. Any state mismatch/conflict/nondeterminism or no heavy improvement restores only this low-overhead revision while preserving independently proven split-tag support.
+
+## PRIOR ACTIVE ARCHITECTURE EXPERIMENT - VIF1/VU1 overlap reached 28.27M; add split-tag phase tracking, 2026-09-22
+
+First overlap replay137a5347007a43d6b9e14094e08c8170/evidenceproject-link-runtime/20260923T040431Z-d5fb5bd02640477db577231b64001ef9 ran to28,267,245 slices before explicit parser fault "VIF1 tag inside incomplete VIF packet requires split-tag phase tracking". No VU overlap-memory conflict occurred. Host throughput to that point was1.63469M slices/s, encouraging but not comparable to the full heavy FPS window and NOT a speed claim. The fault exposes an older VIF transport limitation that becomes reachable when the feeder can retain bytes across a source-chain tag.
+
+Proposed BEFORE source edit: preserve exact physical VIF byte phase across TTE tag boundaries. Current single pending_phase describes pending[0] only and cannot represent a logical retained stream where a new DMAtag contributes upper64 bits at physical phase8 after prior qword bytes whose linear next phase would be0. Add sparse pending phase breaks {logical offset,physical phase} only at such discontinuities; normal qword flow keeps zero breaks. submit_qword appends at phase0; submit_dma_tag appends upper64 at phase8 even with retained pending. pending_byte_phase(offset) resolves alignment, and process_pending MPG/DIRECT checks use it. Prefix erase rebases break offsets and pending_phase; reset clears breaks. No command semantics, VU overlap/merge policy, TOP/TOPS/DBF, GIF/GS, guest clocks or fault policy changes.
+
+Focused test before replay: V4-32 UNPACK code begins at byte12 of a qword, payload continues through an8-byte TTE tag and completes in next qword; verify exact VU vector data and following commands plus rebased phase. Pre-edit hashes/provenance: artifacts/vif-split-tag-phase-preedit-20260922-rc7.txt SHA5a21c648.... Then build_tests/runtime/translation/readiness, game build, two33M replays for determinism, fixed verifier. If another boundary fault appears, preserve exact pending bytes/phase breaks and diagnose rather than relaxing alignment.
+
+## PRIOR ACTIVE ARCHITECTURE EXPERIMENT - bounded VIF1/VU1 double-buffer overlap, 2026-09-22
+
+Scheduled-clock candidate is now definitively rejected as HG-FAIL-040. Candidate f723b1dbac484c8ba14f826c65ea94d5/evidenceabbddece8a274a3085e0fcab19610a52 passed exact state but measured9.62233922274FPS. Exact restored source rebuilt as game0775404e1c7d96b522383344f993e4feaa274f7bcd19cd9b2bb3f6f4ea02d870; replaye06a862069644fd5b24d2d0a45660f50 reaches33M/no fault with normal48195sprite/305856triangle/842masked work; verifier246279beabfc4655a23e0000e7490214/evidencec97d79d6082c4db79931963e531ec4ba passes149-input/864-writer and exact frame/EE/GS/VU same-date state at10.0790364441FPS, windows10.008374/10.150704. Same-date IOP-without-RTC hashb29aec44... matches candidate, so no hidden candidate IOP difference. Scheduled route is~4.7% slower and source remains clean. Record in PERFORMANCE/learned before handoff; do not retry unchanged.
+
+Root-cause audit now moves to the first actual architecture correction. Captured heavy Haunting Ground VIF1 chain uses BASE0/OFFSET0x200, TOPS-relative UNPACK, MSCAL and repeated MSCNT, exactly Sony's double-buffer producer/consumer pattern. Current parser executes each whole VU AOT body inline. Revised pre-edit design/provenance/hashes are in artifacts/vif1-feeder-overlap-preedit-20260922-rc6.txt SHAd0b2a394....
+
+REVISED BEFORE runtime source edits after checking GL ownership: keep VU1 + XGKICK/GIF/GS on the existing native-game/GL thread. game_host.cpp binds the OpenGL4.3 GS worker context to that thread before run_native_game, so a helper-thread VU executor could issue GL-backed GS work from the wrong thread. Instead, when overlap is enabled MSCAL/MSCNT perform the exact TOP/TOPS/DBF activation but queue the AOT entry and return from process_pending. Main snapshots VU execution state and runs the exact compiled VU body on that snapshot. Simultaneously one persistent helper thread continues VIF1 DMA/parser work into the LIVE Vif1Path.
+
+While main VU runs, the helper may consume ordinary VIF state/row/column/mask and UNPACK only. Before a complete MPG, DIRECT/DIRECTHL, FLUSHE/FLUSH/FLUSHA or next MSCAL/MSCNT it leaves that command unconsumed, marks host_vu_stalled and stops. Thus helper never accesses GIF/GS while main VU/XGKICK may do so. At VU completion main joins the feeder and three-way merges VU data memory against launch baseline/live feeder/snapshot VU results: main-only alternate-buffer writes survive, VU-only changes apply, identical dual changes are accepted, and incompatible dual changes fault explicitly as VU1 overlap memory conflict. VU register/readiness state comes from the completed snapshot. Retained synchronization/GIF/MPG/activation command is then processed synchronously on main; a newly queued MSCAL/MSCNT repeats the cycle.
+
+Overlap is enabled only inside system_diagnostic's VIF DMA drain. runtime.hpp VIF DMA callbacks skip GS interrupt polling only while host_vu_running; main polls after feeder join. Direct EE VIF FIFO writes and every other runner retain synchronous behavior. Persistent feeder avoids per-MSCAL thread creation. First phase still joins before PATH3/raster/IOP and before EE resumes: no EE/IOP overlap or PATH1/PATH2 concurrency yet. Targets: vif.hpp d6a6ff26..., vif.cpp5ab22f5b..., runtime.hppe2a56ff1..., system_diagnostic c8c2d536... plus focused gif/VIF tests. Protect configd2c998fa..., host9704ed0b..., original gs/gl_gs/vu_products and all coverage roots. Validation: full tests, build, gameplay33m replay twice for determinism, fixed frame verifier. Any conflict/state/fault/nondeterminism or meaningful slowdown restores exact source. No audio/staircase work during this mechanism.
+
+## PRIOR CONTROL REVERSAL - scheduled-clock candidate 9.622339 FPS; restored control 10.079036 FPS, 2026-09-22
+
+Overflow-safe scheduled-clock candidate completed its correctness and gameplay gates but is NOT accepted. Python365d0425... passes132; compiled readiness0d885897... passes65536 full-state/memory comparisons including near-uint64 wrap; runtime2bd84102... and translation8f0f9b38... pass. Emit85abd36c... changed only out/translated.cpp and produced3194 scheduled neutral advances versus283 residual exact advance_pipeline(1), moving ~92% of static per-pair pipeline advances off architectural state mutation. Build e1ec5f35... produced game1d08d53eb68d6dfafbfc3309545dd8c4d7d1f515cb3143e6433c01570f79165b,36666368bytes, manifest3459d709.... Replay0b2bc87a... reaches33M/no fault with exact normal48195sprite/305856triangle/842masked work.
+
+Qualified verifierf723b1dbac484c8ba14f826c65ea94d5/evidenceproject-link-verifier/abbddece8a274a3085e0fcab19610a52 passes149-input freshness,864 original1bef84/caller2d1c50 events,zero lost/unexpected/caller/stack failures and expected frame/EE RAM/GS VRAM/GS state/VU hashes. Heavy60/6.23549s=9.62233922274FPS, windows9.540528/9.705565. This is materially below recent clean controls (~10.415 to11.174), so no speed claim and no reason to retain without a reversal control. Candidate exe is ~348KB larger than recent clean control, making code-size/I-cache pressure plausible but not yet isolated.
+
+Verifier crossed the emulated RTC date boundary: masked h/m/s bytes are BCD-like27/46/00 and IOP hash excluding ONLY those three fields isb29aec44..., whereas prior same-date clean runs usedbdbf3a11.... Frame/EE/GS/VU remain exact and verifier reports no validation failures; treat the IOP hash change as a date-rollover question until a fresh control is measured under the same date, not as proof of candidate semantics.
+
+NEXT, before any new mechanism: exact restore runtime/include/hg/vif.hpp, tools/hgtool/vu_emit.py, tests/test_vu_decode.py and tests/generate_vu_readiness.py to clean hashesd6a6ff26...,5c4fcb32...,00c9c923...,9025a246... using rc3 auto-backups; regenerate translated.cpp through hg_emit to clean route, rebuild current game/fresh149-input manifest, replay/qualify same-date control. If control is materially faster and state matches, reject scheduled-clock candidate and record HG-FAIL-040; then move directly to deterministic VIF1/VU1/PATH overlap from ROOT_CAUSE_AUDIT rather than another scoreboard micro-tweak. If control unexpectedly reproduces9.62, investigate host/date drift before decision. No candidate source remains after restore; preserve configd2c998fa..., host9704ed0b..., gs/gl_gs/vu_products exact production.
+
+## PRIOR ACTIVE OPTIMIZATION - VU function-level scheduled-clock accumulator after root-cause audit, 2026-09-22
+
+Deep audit complete enough to justify one bounded source experiment; details/evidence matrix are in docs/ROOT_CAUSE_AUDIT.md4a7bb869.... Major structural finding: actual heavy-scene VIF source chain uses BASE0/OFFSET0x200, FLG=1 TOPS-relative UNPACK and repeated MSCAL/MSCNT, while current VIF parser calls the whole VU AOT executor inline. Sony manual semantics allow VIF to fill the alternate buffer while VU executes; XGKICK PATH1 also progresses independently until a real path conflict. Current runner drains VIF/GIF/GS serially. This is the major architecture restraint, but parallelism alone cannot erase VU arithmetic CPU cost.
+
+AOT host-side finding:13 programs contain~3.5k microinstruction pairs and current generated C++ has3477 per-pair advance_pipeline(1) calls plus dynamic readiness production/checking. Map text is megabyte-scale for those programs. Retained heavy diagnostics place VIF service around3.6s of~4.9s heavy loop and MSCNT inclusive work around2.56s; worker CPU accounts for~97% of wall. The next candidate attacks runtime software-pipeline overhead without yet changing device ordering/concurrency.
+
+PROPOSED BEFORE source edits: function-level scheduled-clock accumulator. Add exact scheduled readiness helpers to Vu1State operating on an explicit local uint64 cycle; add a small RAII Vu1ScheduledClock that defers state.advance_pipeline(elapsed) and commits during exception unwind. Generated Q/P-neutral pairs use local ++cycle plus scheduled require/produced timestamps, preserving current VF proof/wrap fallback and same operations/faults. Before any pair that observes/produces Q or P (DIV/WAITQ/ERLENG/WAITP/MFP or upper MULQ/ADDQ), sync elapsed cycles into the exact existing state path, emit current _pair_lines unchanged, then reload local cycle. Function exit/destructor syncs. This does NOT introduce VIF/VU concurrency, change arithmetic, XGKICK ordering, renderer, input, guest clocks, audio or fault policy. It is materially different from the rejected no-Q/no-P early-return: that still updated/checks pipeline state per pair; this hoists Q/P state progression across whole neutral spans.
+
+Static coverage suggests most pairs are eligible: generated counts DIV43, WAITQ50(including DIV prewaits), ERLENG47, WAITP20, MFP53, Q arithmetic134 versus3477 advances. Exact pre-edit hashes/plan in artifacts/vu-scheduled-clock-preedit-20260922-rc2.txt (SHA b0a6a15e...). Targets: vif.hppd6a6ff26..., vu_emit.py5c4fcb32..., emitter tests00c9c923.... Protect configd2c998fa..., host9704ed0b..., gs.cpp/gl_gs.cpp/vu_products exact restored sources. Validation: Python tests -> hg_emit and inspect generated counts -> build_tests/runtime/translation/readiness -> build_game fresh manifest -> gameplay33m replay -> fixed frames qualifier. Any state/fault mismatch restores exact source immediately. If first timing is materially promising, exact reverse emitter/header, regenerate/build/qualify a fresh control, then second candidate before retention. If flat/slower, restore and move to deterministic VIF/VU/PATH overlap rather than more micro-tweaks.
+
+Correctness gate update before further source edits: initial scheduled-clock build passed Python/runtime/translation but failed compiled readiness at program0/sample4, a deliberate near-uint64-wrap state. Reference/optimized ended issue_cycle0 with DIV Q completed; scheduled ended issue_cycle0 but left Q pending/rem5. Debugging shows the local modular timestamp can wrap, sync to0, then a readiness hazard can jump the local timestamp to a numerically large pre-wrap ready value; a later wrap makes cycle-last_sync ambiguous and loses elapsed Q/P time. One immediate wrap sync did not fix this because the ambiguity is caused by hazard jumps after sync. Revised implementation now tracks DEFERRED ELAPSED CYCLES separately from the modular issue timestamp, but the same synthetic sample still fails: the accumulated elapsed duration itself can exceed one full uint64 span under the current wrap-fallback readiness semantics and overflow back to a small value. Before more source edits, make deferred additions overflow-safe: add Vu1State::scheduled_advance(cycle,elapsed,delta) and a shared scheduled_add_elapsed helper that flushes the already-deferred span through advance_pipeline only when `elapsed+delta` would overflow; scheduled require_vf/require_vi use that helper before advancing the local timestamp. Normal gameplay-sized spans remain local; only synthetic/full-wrap spans materialize early. This preserves exact modular issue_cycle plus Q/P elapsed duration across multiple wraps without changing arithmetic or normal scheduling. No gameplay timing until the 65536 compiled differential passes. Temporary readiness failure-print detail may remain only until the fix is proven, then restore the test generator to concise output.
+
+## PRIOR ACTIVE ROOT-CAUSE AUDIT - mapped GS readback rejected; scan PS2 overlap/serialization model, 2026-09-22
+
+Mapped-span readback is closed without retention. Candidate runtime/gl_gs.cpp6cd8588c..., build971a1e7a0e47405a825d74f98ea0dcfd/gameb23dcc992dfb87123bb30a1d224a4c5b35cc843c6993e4a8d2724175f28ee7a2, replay154f095d... normal/no fault, verifier122e24082ca046e19a481f636be4d308/evidenceproject-link-verifier/d82e00b83485478b89b92085e12afc36 passes149-input/864-writer and all established state hashes at11.1584518764FPS (60/5.37709s;11.240123/11.077959). Exact pre-candidate control3aef9218072446dfb40a45aec3ce9f0a was11.1743080310FPS (60/5.36946s;11.183597/11.165034). Flat/slightly slower; no gain. Restore only gl_gs.cpp map additions to exact original e5069d2b... per artifacts/gs-readback-map-span-restore-20260922-opt5.txt, rebuild/qualify production. Record as HG-FAIL-039 after restore. No other performance mechanism active.
+
+User requested a deep architecture/spec investigation before more micro-optimization. New read-only audit scope: PS2 official/manual references already cited by the project plus publicly available EE/VU/VIF/DMAC/GIF/GS/IPU/SIF/IOP technical references, original executable/static structure, current runtime scheduling and all retained diagnostics. Primary question is whether our static runtime serializes work that real hardware overlaps (EE with VU1/DMAC/VIF/GIF/GS/IPU/IOP), or performs host-side synchronization/coherence at boundaries much more frequent than the original architecture requires. Secondary questions: whether issue-slot clock modeling invokes expensive service work synchronously, whether VIF MSCAL/MSCNT executes VU to completion instead of modeling asynchronous VU1, whether DIRECT/GIF service is nested synchronously inside VIF, whether GS readback/CPU ownership forces full producer completion too eagerly, whether IPU and SIF/IOP advance synchronously, and whether original interrupt/status polling permits more overlap than current runtime. Do NOT change behavior during audit. Build one evidence matrix mapping manual/spec semantics -> current implementation -> measured cost -> likely over-serialization -> safe experiment. PCSX2 is external oracle only; no code/algorithm copying. Prefer architectural fixes with potential multi-x impact over 1% helper tweaks.
+
+## PRIOR ACTIVE OPTIMIZATION - one mapped GS readback span per CPU-read event, 2026-09-22
+
+The full-lane validated-operand reuse trial is closed without retention. Candidate bec75d450c884b42a341d3df417607d7/evidence2d668c528c0e470195b9e66302ea3eac measured11.0486453440FPS (60/5.43053s;11.013135/11.084385) with all established state/writer hashes exact. runtime/vu_products.cpp was restored byte-exactly to1e53d7e7... and rebuilt; fresh restored control3aef9218072446dfb40a45aec3ce9f0a/evidenceac161ed2cbbd49a2b17be183843834f7 measured11.1743080310FPS (60/5.36946s;11.183597/11.165034), again all149-input/864-writer/frame/EE/GS/VU/RTC-normalized IOP checks passing. Therefore repeated read_vf validation was not the meaningful cost; record HG-FAIL-038 before handoff. Current gamebd22c996d2077c86b5cca1ccc01a2f0d20a0b9e3e13e84ec46109a4bf60e2b84,36318208bytes, manifest65ba2672....
+
+NEXT bounded mechanism recorded BEFORE source edit: replace multiple synchronous glGetBufferSubData calls within one resident GPU download event by one glMapBufferRange read mapping spanning first..last dirty page, then copy ONLY the exact dirty runs from mapped storage into guest resident_vram and uploaded_copy. Existing dirty-bit computation, flush/dependency ordering, GL_BUFFER_UPDATE_BARRIER_BIT, dirty-run boundaries, gpu_dirty clearing after success, downloaded_bytes accounting and glGetError check remain. Null map or failed unmap is explicit fault. Clean gap pages are never copied to guest memory or uploaded_copy. No persistent/unsynchronized mapping and no fence/barrier removal.
+
+Motivation is HG-DIAG-005 heavy31M..33M:420 multi-page CPU reads produced900 glGetBufferSubData ranges/79140 dirty pages/648314880 explicit bytes/335193200ns. Synchronous readback is secondary, not enough alone for30FPS. This candidate is distinct from HG-FAIL-025: that failed path issued one bounding glGetBufferSubData and staged/copied dirty runs while explicitly over-reading gap pages. Here there is no host staging transfer and only one read-only GL mapping per event; guest-visible copies remain dirty runs. Driver may still internally transfer the span, so qualified timing decides. OpenGL4.3 compute requirement already guarantees core glMapBufferRange/glUnmapBuffer.
+
+Pre-edit manifest artifacts/gs-readback-map-span-preedit-20260922-opt5.txt records hashes/evidence. Target only runtime/gl_gs.cpp e5069d2b...; protect configd2c998fa..., host9704ed0b..., runtime/gs.cppe03185c7..., restored vu_products1e53d7e7.... Validation: build_tests/runtime smoke, build_game/fresh manifest, gameplay33m replay and fixed frames verifier. If candidate materially improves, exact one-file reversal + fresh control + second candidate required before retention. Any state/GL fault or flat/slower result restores exact pre-edit. No staircase/audio work in this mechanism.
+
+## PRIOR ACTIVE OPTIMIZATION - reuse already-validated operands in full-lane VU ACC/MADD helper, 2026-09-22
+
+Selective IMAGE A/B is closed as HG-FAIL-037: candidate0d8ed3b943214a6f89fc65d1ca61bb41/evidence1cb357d1760c4081834468c6c29520c7 =11.2283853582FPS (60/5.3436s;11.239617/11.217176), exact gs.cpp reversal control9839e36d0911452f9d2ba88d9ab5732f/evidence22b5420e942249108c0541f93581d1eb =11.1738918293FPS (60/5.36966s;11.240586/11.107984). ~0.49% host-time difference with overlapping windows is not dependable; production gs.cpp is exact original e03185c7.... Compact VU MUL is likewise closed HG-FAIL-036; original multiply_vector remains production. PERFORMANCE/learned updated. Current gameade19962517bf3278ef4fa32ee2aed31cbe6c7b758d4cfd9671d8d4ec22f6caa,36318208bytes, manifestf6d93ac79f1d608ef92561d107b8b8f3fd31803c684ba33d52f0cbedbfc8fdd8; replaycd08b9daa... normal/no fault. Strengthened VU/GIF fixtures remain test-only.
+
+Proposed bounded change BEFORE code edit: runtime/vu_products.cpp::full_result already rejects source>=32,other>=32,broadcast>=4, undefined source lanes, undefined selected scalar lane and undefined ACC for add. Only after those guards succeed it calls state.read_vf(other,broadcast), and on the non-combined fallback can call that same checked read a second time. Historical native profile's largest named app symbol was full multiply_acc140/3295 samples (4.25%), with full madd_vector47/3295 (1.43%); sample attribution is only a lead, not exact inclusive cost.
+
+Candidate removes only redundant host validation on that already-accepted full-lane path: bind source_values to state.vf[source] or the existing architectural VF00 {0,0,0,1.0}; compute scalar once from state.vf[other][broadcast] or VF00[broadcast]; pass those cached values to try_fpu_madd4 and broadcast_products. Preserve existing guard order byte-for-byte, arithmetic helpers, fallback choice, flag/result commits and aliasing. Invalid/undefined cases return false BEFORE any direct access and therefore still execute the unchanged original checked multiply_acc/madd_vector path with its exact fault order. No clock/readiness/emitter/render/input/audio/fault-policy change, no new template/code-size mechanism. No PCSX2 probe needed for this host duplicate-check elimination.
+
+Correctness source: existing tests/gif_tests.cpp full-lane differential runs65536 samples x3 operations against frozen scalar reference with VF00, destination/input aliases, all broadcasts and arbitrary encodings; direct guard tests cover invalid source/destination/broadcast and undefined source without mutation. Pre-edit hashes/plan: artifacts/vu-full-validated-operands-preedit-20260922-opt4.txt. Target runtime/vu_products.cpp1e53d7e7..., protected configd2c998fa... and host9704ed0b.... Next: guarded one-file edit, build_tests/runtime tests (plus translation/readiness if needed), build_game/fresh manifest, gameplay33m replay and fixed frames qualification. If materially promising, exact one-file reversal/fresh control/repeat candidate before retention; otherwise restore.30FPS remains unmet.
+
+## PRIOR ACTIVE OPTIMIZATION - selective IMAGE first candidate 11.228385 FPS; exact reversal control next, 2026-09-22
+
+First selective single-tag EOP IMAGE/IMAGE2 candidate is state-qualified and promising but NOT accepted. Candidate gs.cppf58b9af4..., build74e990b9e3e8435abc237941d83507e9 -> game36a3efd78341e9661e2f5393f122ffc4dfd8b6d0b89428e163a9fe2a55c453cd,36318208bytes, manifestb90514b23945d11aaedd572bcb27bf36b9f8ec8d6fdf5302a483e8abb6efba61. Replay6fffe45503694dc1bce733a7de49da78/evidenceproject-link-runtime/20260922T143300Z-e98beda96fd444d88359bf3e47c081ed reaches33M/no fault and preserves48195sprite/305856triangle/842masked batches. Fixed verifier0d8ed3b943214a6f89fc65d1ca61bb41/evidenceproject-link-verifier/1cb357d1760c4081834468c6c29520c7 passes149-input freshness,864 original1bef84/caller2d1c50 events, zero lost/unexpected/caller/stack failures, expected frame/EE/GS/VU and RTC-only-normalized IOPbdbf3a11.... Heavy60/5.3436s=11.2283853582FPS; windows11.2396174/11.2171757.
+
+This is +4.79% FPS /4.57% less heavy host time than the immediately preceding fresh original-route control3924b770...=10.7152041604FPS, but only+0.74% FPS versus earlier original-route3be4caa8...=11.1457868926FPS. Host drift therefore prevents retention from this one sample. Per pre-recorded plan, NEXT edit is an exact whole-file restore of runtime/gs.cpp to pre-candidate e03185c749dd2f8eae603593e51e9f08e566e2ab113d84b109c24ca45e92057f using backup2f2e969e54f3402eaec5e9d48f28b487. Keep strengthened GIF tests d7eb4a3b... and all unrelated sources/config/host untouched. Rebuild current game, replay and fixed qualifier as a fresh materializing control. If control is materially below11.228, reapply exact candidate bytes/mechanism and require a second candidate qualification before retaining. If control overlaps/exceeds candidate, restore production original and reject. No second optimization mechanism until A/B/A closes.
+
+## PRIOR ACTIVE OPTIMIZATION - selective single-tag EOP IMAGE direct apply; VU MUL routes closed, 2026-09-22
+
+Full-static broadcast VU MUL remains rejected (HG-FAIL-035). Compact Mask/Broadcast-only specialization also has NO demonstrated gain and is removed from gameplay: candidate58c00d53e11e42bd9c50754773b9ec1e/evidence1cb368a762b343f7a25f1b731969a090 =10.6084475067FPS,60/5.65587s; fresh reversed original-route control3924b77052274163b7954aab25a3cbec/evidence129dc91fe6d247e4a73bb88a3065a620 =10.7152041604FPS,60/5.59952s. An immediately earlier original-route sample3be4caa8... was11.1457868926FPS, so the ~1% latest pair is smaller than observed host drift. Decision is simpler original multiply_vector gameplay route, not a claim that compact helper semantics are wrong. Compact/full-static helpers and strengthened fixture remain test-only. Current route regenerated to exact translated.cpp6979f9a8...; current game7f4cac3b40fbdc39865e551a139cb238f8fce2818e76991010735cf88c9bef5c,36318208bytes, manifeste7e1d32b.... Replayb5feffb68dec4797b29712413b226981 reaches33M/no fault with normal48195sprite/305856triangle/842masked work. All expected state/writer qualification remains exact. Record HG-FAIL-036/PERFORMANCE before handoff; no VU MUL route remains pending.
+
+NEXT bounded production mechanism, recorded BEFORE code edits: selective single-tag EOP IMAGE/IMAGE2 direct apply in runtime/gs.cpp. HG-DIAG-005 already measured steady31M..33M GIF cost:17,850,014 submitted qwords; perturbed attribution ~1.4821181s GS application,0.1863614s decode/materialization,0.3895350s append and0.3689151s scan/destruction. IMAGE-only application included~0.3599126s PSMT8 format19 +0.0808712s format20 +0.006778s format0, while mixed/register was~1.0352467s. Generic all-packet streaming was previously inconclusive/rejected; DO NOT repeat it. New mechanism leaves every mixed/register/multi-tag packet on exact original decode_gif_packet+apply_gif_register_transfers and bypasses the intermediate transfer vector ONLY when the complete packet is exactly one EOP tag with format>=2.
+
+Semantics plan: after existing pending append/max_pending/gif_packet_size succeeds, inspect first tag. Fast-path guard requires EOP, IMAGE/IMAGE2, and packet_size==16+NLOOP*16. Private helper revalidates exact tag/size; NLOOP=0 makes no Q/state mutation; otherwise reset gif_q once then call existing write_image_qword in qword order. PRE remains ignored in IMAGE; descriptor/NREG bits remain irrelevant there. Any write fault leaves the complete packet pending because erase remains after successful application, matching original partial-GS/fault behavior. All multi-tag/register packets remain exact original path. No GifPath layout, header decoder, guest clocks/input/audio, renderer admission/shader or unsupported-fault policy change. Add zero-loop IMAGE and multi-tag IMAGE frozen-reference cases; existing IMAGE/IMAGE2 active/inactive upload fixtures already compare every submit checkpoint against the original materializing path. Pre-edit exact hashes/evidence: artifacts/gif-single-image-fastpath-preedit-20260922-opt3.txt. Protect configd2c998fa... and host9704ed0b....
+
+Validation sequence: guarded gs.cpp/test edits; Python/build_tests/runtime/translation as relevant; build_game/fresh manifest; gameplay33m replay; fixed gameplay33m/frames qualification. If candidate shows material gain, reverse ONLY production gs.cpp fast-path routing to exact e03185c7... behavior while keeping useful tests/helper if needed, rebuild/qualify fresh control, then repeat candidate before retention. If state differs or timing is flat/slower, restore production path and document. No staircase/audio work during this mechanism.
+
+## PRIOR OPTIMIZATION - full-static VU MUL rejected; compact mask/broadcast specialization tested, 2026-09-22
+
+The current-coverage A/B is complete and decisive. Fresh full-static candidate5fddf7c20c19439e9ffde1c1bce41f77/evidence project-link-verifier/c45f3d39ed084ea2a4a1092da38193ae measured9.44969690097FPS. Switching ONLY broadcast MUL routing back to original Vu1State::multiply_vector and removing only the generated-main vu_specialized include produced control3be4caa8540541c0b6b360561cc2a476/evidence project-link-verifier/cf0b4a45fa2945988fe573d3f1086a11 =11.1457868926FPS (60/5.3832s; heavy windows11.143137/11.148438). Both sides retain current configd2c998fa..., host9704ed0b...,149-input freshness,864 original1bef84/caller2d1c50 events,zero trace/writer/caller/stack failures and all expected frame/EE/GS/VU/same-date RTC-only normalized IOP hashes. The candidate costs~17.95% more heavy host time. Reject full register+mask+broadcast template routing; current production remains original multiply_vector.
+
+Current production source: vu_emit.py5c4fcb32... always emits multiply_vector for broadcast MUL; emit.py5985e970... no longer includes vu_specialized.hpp in generated gameplay; generated main6979f9a8..., current gameeb3704710d8cadcdcb1166247f4fe931668244f2caeedb006dcbd257b062a35d,36318208bytes; manifest2eb0511e.... Helper vu_specialized.hpp355f6607... and exact104-case fixture remain test-only. Control replayc860f16aa... completes33M/no fault with normal48195sprite/305856triangle/842masked batches. Python/runtime/translation/readiness suites all pass. See HG-FAIL-035 and PERFORMANCE. This rejection does not prove constant mask/broadcast specialization itself is harmful; the failed route instantiated destination/source/other registers too and bloated the game by~306688bytes.
+
+Compact candidate first measurement complete: helper fixture passes786432 exact state comparisons /427520 matching faults in addition to the old851968/466304 full-static fixture. Emitter generation10b6c8e5... changes only out/translated.cpp; actual game uses four linked mask14/broadcast0..3 helper instantiations and no full-static helper. Builda6270dae... game53867cbce39536cc7f15b9b839c26d8f621f861a260a68f31400f10e866c826a remains36318208bytes, exactly the accepted control size. Replay4ebee749... reaches33M/no fault with normal work. Fixed verifier58c00d53e11e42bd9c50754773b9ec1e/evidence1cb368a762b343f7a25f1b731969a090 passes all state/writer/provenance checks but measures10.6084475067FPS (60/5.65587s; windows10.534855/10.683076), below immediately prior control11.1457868926. No gain claim.
+
+Per the pre-recorded A/B plan, reverse ONLY compact gameplay routing/header include to the exact accepted original multiply_vector route; leave compact helper/differential fixture test-only. Regenerate and require fresh control qualification before deciding. If fresh control again exceeds10.608 materially, reject compact routing as HG-FAIL-036. Preserve configd2c998fa... and host9704ed0b... exactly.
+
+PRIOR bounded mechanism plan: compact broadcast-MUL specialization with ONLY <Mask,Broadcast> static (masks14/15 x broadcasts0..3 = eight variants); destination/source/other stay runtime parameters. Keep identical scalar read/product/flag/write ordering and exceptions. Extend the existing differential fixture to compare compact helper against multiply_vector across register-validity/alias/MXCSR cases. Route only the same masks14/15 through this compact helper and include vu_specialized.hpp again in generated main; no other VU operation changes. Expected effect: retain compiler knowledge of the two hot constants without hundreds of register-specific template instantiations/code-size pressure. Disproof: any test/state mismatch or no repeatable qualified gain versus current11.1457869FPS control. Back up/hash source before edit, regenerate, inspect generated call count/executable size, run full relevant tests/replay/fixed qualifier; if promising, reverse to a fresh control before retention. Keep every gameplay coverage root and protected host unchanged. No staircase/audio work in this mechanism.
+
+## PRIOR ACTIVE OPTIMIZATION - finish current-coverage A/B for static-operand VU MUL, 2026-09-22
+
+User explicitly parked staircase/manual-route work and requested optimization. Visible job feb4a13c49d548fd90d62cf37eaf1145 was cancelled before edits; no live game remains. Immediate optimization target is the long-pending AOT static-operand broadcast MUL route, because it is already active in current source yet has never received a clean contemporaneous current-coverage control. Do not add another mechanism until this one is accepted/rejected.
+
+Pre-edit manifest artifacts/vu-static-current-ab-preedit-20260922-opt1.txt records exact hashes. Current candidate routing: vu_emit.py87df2850... sends only broadcast MUL destination masks14/15 to noinline hg::vu_aot_multiply; emit.py396fd486... includes vu_specialized.hpp; helper355f6607... remains exact-tested. Current configd2c998fa... and host9704ed0b... contain all staircase/menu/controls coverage and MUST remain identical across A/B. Current generated main33225731... and post-link manifest8245e6f4.... Latest source-matched qualified sample5d147ab1... is9.14211880793FPS, but recent controls have drifted materially, so do not use that historical value alone.
+
+Bounded sequence BEFORE source edits: first run one fresh fixed gameplay33m/frames qualification on the current candidate. Then disable ONLY AOT specialization routing: broadcast MUL always emits existing Vu1State::multiply_vector and generated main drops the vu_specialized.hpp include. Keep helper/fixtures test-only, every config root, host redraw/F1/Tab, runtime/parser/renderer/audio/clocks/input and explicit faults unchanged. Regenerate through hg_emit, inspect route/generated changes, run Python/runtime/translation/readiness tests, build current game/fresh manifest, replay and fixed qualifier. If control is clearly faster, retain original multiply route; if candidate is clearly faster, reapply the exact two routing edits and require a second candidate qualification; if inside drift, prefer the simpler original route and document non-retention. All state/image/RTC-only-normalized IOP hashes and writer qualification must remain exact. No staircase replay work until this optimization decision is closed.
+
+## CURRENT - eight missing staircase-object methods compiled and state-qualified; live retest next, 2026-09-22
+
+Latest fault2ac570 was repaired with a bounded family batch, not just that getter:2ac4d0/550/560/570/580/5a0/5b0 and2097e0. Six other initialized entries of original46dfc0..46e000 were already compiled. Actual original installer20a6f8..704 and distinct next20a708..714, saved receiver and original/live table/body hashes establish scope; see SOURCES and stairs-object-46dfc0-preedit-20260922-g1.txt. Extra methods are statically justified potential calls, not claimed dynamic hits. Do not infer coverage of adjacent tables, BSS selectors or all downstream functions.
+
+Current configd2c998fa19148db9acc27a023ab7b027f86bf701b97885e86879aee8636aa989,164259bytes; exact pre-edit81772f41... backup6da48db24c154d3fb49ad985d27b3b1f. Every older staircase/menu/pause root retained; F1/Tab/event-redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f unchanged. No renderer/runtime/audio/clock/input/fault mechanism or pending VU change. Emitter8594a73e76fa46389c10b2363db10e31 adds exactly50 original words, changing only shards0010/0015 as C++; backup directoryproject-link-emit/20260922T073009Z-82326dd30ebd4020b5009323b0e16117. Generated0010 SHA15a69834c4350987c4a8f2e372b0c0ad5a81ef5b28bcb0eb6c09a8be5f3817ef;0015 SHAbb25e01a85c4867275956a5728e28d9cf5c38a1433700133cfd060de842e7fda. Inspected new getters/default and checked indexed-load behavior; no host stubs.
+
+Python7c4c36235f9b44b791aef4f98ff5d0c0 passes130; runtime86f9d1b55e1a45d48a19ef1383d81974 passes inherited arithmetic/VIF/GIF/keyboard and262144Select-alias/focus comparisons. Build0c9fb87d155648cfb1cfd66294056f79 succeeds28.10s. CURRENT GAME07a17eabed38b187659677758cf5b45da34a4280fd28b110593ba2ca60cebcaa,36624896bytes; manifest8245e6f484d697311f28a902ecff3bedeb480d3156940313020aeab2774bc0e7 reflects current config and149 inputs. No source-only/stale launch.
+
+Replay198e3186e66a4f7da07ab94cafeb7904/evidenceproject-link-runtime/20260922T073232Z-4aa418a79a794877a1607d46c12d9a80 completes33M/no faults with48195sprite/305856triangle/842masked batches. Fixed verifier5d147ab1ec2147d79fd21e9d1a87d69f/evidenceproject-link-verifier/846ae4895bcf45548703b8bf170e2bfb passes freshness,864 qualified1bef84/caller2d1c50 events with zero lost/unexpected/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/6.56303s=9.14211880793FPS (9.344892/8.947959); previous8.664585 and fresh control9.209375 retained. No dependable gain or resolved throughput cause.30FPS and audio remain unmet; latest manual fault log has394 speaker underruns. No new audio code/test and no temporary probe added.
+
+All configured jobs terminal at this note. NEXT ACTION: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, unique key hg-stairs-object-manual-20260922-g1. Recover the resulting newest job rather than launch duplicates. User must retry the actual stair route: standard33M does not traverse it and exposed controlled pulses cannot provide up/right movement. No altered recordings or input shortcuts. No staircase-pass/menu-success/full-game claim. Saved fault image0be563f1... and states are preserved. No source edits/builds during the visible session; no background optimization or monitoring scheduled. SOURCES/PERFORMANCE/learned042 updated.
+
+## PRIOR PLAN - complete the independently bounded staircase object family, 2026-09-22
+
+Latest manual c277ea1723404267b5f23dd71725f966 (project-link-visible/20260922T071804Z-4497884a223e48d5bd53d7c9ce48f0ca/native.log:1204) stops at 2ac570, a0=17f355c, RA=20962c. Saved evidence is intact; frozen owned job cancelled. Original caller inspection5f0db0df... proves the current +18 call and sibling +10/+14 calls in the same bounded selector routine209390. Earlier repairs remain present. No audio repair;394 speaker underruns precede the fault.
+
+Proposed BEFORE code edits: config-only add2095dc->2ac550,209600->2ac560,209624->2ac570, plus five explicit remaining roots from this independently bounded original object table:2ac4d0,2097e0,2ac580,2ac5b0,2ac5a0. Original installer20a6f8..704 publishes46dfc0, next20a708..714 begins distinct46e000; saved selected receiver and subsequent table words agree. Original/live64-byte table identityd7ebd6d8... and original/live256-byte method region23184872... independently checked. This reuses the documented46e4c0 bounded-family technique, not an unbounded pointer sweep or proximity-only function guess. Inspectors701fc4e5...,5c3c99d8...,dd83e4f5... establish installer/bodies. Six other table entries are already compiled. Only2ac570 is the newly observed dynamic stop; other roots are static potential uses. Do not extend to neighboring tables or unproved BSS selector entries. Expected addition50 original words; no runtime, guest clock, audio, renderer, input or explicit-fault change.
+
+Pre-edit external stairs-object-46dfc0-preedit-20260922-g1.txt records dirty hashes and evidence. Guarded config/docs changes auto-back up exact original bytes; hg_emit backs up generated outputs. Preserve ALL staircase/menu roots, pending VU candidate, and F1/Tab/event-redraw host9704ed0b.... Current rules/AGENTS/learned and PROGRESS reviewed; Markdown metadata checked, unchanged evidence reused. Next: hg_emit and inspect changed output, Python/runtime regressions, build_game/fresh manifest, original33M replay and fixed gameplay33m/frames qualification, then manual speakers relaunch. Standard33M and left/cross/start-only controlled pulses do not verify staircase movement; do not modify pinned recordings or claim route success. Latest qualified baseline remains8.664585FPS; prior fresh control9.209375 also low. No claim that coverage fixes performance. No concurrent jobs or background monitoring.
+
+## PRIOR - 2ac540 compiled; state checks pass, lower8.664585FPS unresolved; manual retest next, 2026-09-22
+
+The latest freeze444f9702... was missing2ac540/ra2091a0, not the previous staircase functions. Original/live table,16-byte target identity and both original+30 callsites209198/2091c4 are proved in SOURCES. Final config81772f417dea1d0eccb17d9dae7d49a6c012738fe51fddf2f3219b803c6d9efa,162926bytes; generated shard0015 SHA05bdfcbbcae010006fc520cd0a06b469bb90d376f654fcb8d4c7cf0c788c50cd adds exactly3 original words. No runtime/clock/audio/renderer/controls change or guessed extra function. Protected F1/Tab/redraw host9704ed0b... and every older root retained. All backups/proof in stairs-2ac540-preedit-20260922-f1.txt and SOURCES.
+
+Python e29add19... passes130; runtime ec37f345... passes inherited tests including controls. Replayddeb5ed94263412e82089efe64026ce4 completes33M/no faults and original work. A real control reversal was completed: first repaired9.1950640896FPS (938e39bd.../88065449...), fresh original9.2093751439 (89cc022d.../0276bf55...), exact repair reapplied8.6645852407 (d2b957fbfc7a4593869479fbaaf54b64/project-link-verifier/4c2ca60a9ce94fc2bf44270eebe37d7e). All three match149-input provenance,864 qualified writers with zero lost/unexpected/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11.... Low speed also occurs in the control; the final repaired result is lower still. No speed-neutrality/gain or resolved-cause claim. Retain necessary correct coverage, record all results in PERFORMANCE, and investigate throughput separately.30FPS/audio remain unmet.
+
+CURRENT GAME IS REPAIRED, NOT CONTROL: final emit87a02329... restores exact05bdfcbb...; build1e88a046d502432ea6fdd6cc90a55c5c produces36621824-byte game282e3ff7f51d4d8e6b16ec6a1cbec07f55bfcb537223802f3fcc6a35173380b5. Manifest77e5c9ca316c5f9aa5e627e7f0722025416a7b3d76037a9b66e8d9eb16619185 and input digestf7a0ac94... match the first repaired source set. Original restoration used backup37ee07c5..., saving candidate as7acc8b8a...; reapply restored that candidate exactly. No stale/source-only launch. One documentation attempt during verification was rejected because a job was active; retry occurred after terminal status, without changing task restrictions.
+
+Next action is run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, request key hg-stairs-2ac540-manual-20260922-f1. Recover the resulting newest session rather than launching a duplicate. All current jobs terminal before this note; launch follows. The actual staircase pass is unverified: fixed33M does not traverse it, and exposed controlled pulses lack up/right/diagonal movement. User must retest; do not promise this is the final missing method. Frozen evidence and saved stair-landing image9a93caf7... preserved. No source edits/builds during the visible session; no background optimization or monitoring is scheduled.
+
+## PRIOR COMPARISON - 2ac540 built/state-qualified; lower9.195FPS sample requires fresh control, 2026-09-22
+
+Candidate built6980ca80564d4459b10f627ce6629766 (12.09s), game6f77e52608f1b96937dd50f040a024827ca0cd0562f36bb3ab99fdd07ede6ab2,36621824bytes, manifest030460d42ffef0f59289d9acc64d0df346735a08527316e27fc3534beb600dca. Only3 original words added in generated shard0015; unchanged host9704ed0b... rechecked. Python e29add19... passes130, runtime ec37f345... passes inherited suites. Replay ddeb5ed94263412e82089efe64026ce4 / project-link-runtime/20260922T070812Z-93d2997b046c4286a423bbaf33b0140f completes33M/no faults and original draw counts. Verifier938e39bd3b934063a27f8cb03697f371 / project-link-verifier/88065449e41d4240968c00b7eeef9ff1 passes149-input provenance,864 qualified original writers, zero lost/unexpected/caller/stack failures and expected frame/EE/GS/VU/RTC-only normalized IOP hashes. Heavy60/6.52524s=9.1950640896FPS, below prior10.7901054733. Do not dismiss or label unchanged. No launch yet.
+
+Proposed BEFORE reversal: restore ONLY current turn's two2ac540 callsite entries using config backup37ee07c5b4f14526a4f2bd2e2bb3a9d0 (81772f41... ->2a50b98b...), retaining every older staircase/menu repair and F1/Tab/redraw host. Regenerate/build original control and run fresh fixed gameplay33m/frames; then reapply EXACT81772f41... candidate from automatic restore backup, regenerate/build and qualify again. Never launch the known-faulting control for manual gameplay. This bounded comparison distinguishes current host variation from the code-coverage change; no runtime performance mechanism/audio/timing change. Existing tests need no repeat unless source differs. Retain necessary verified coverage; record both current samples and uncertainty rather than accepting a unexplained large negative effect. All jobs terminal at this plan.
+
+## PRIOR PLAN - staircase slot+30 / 2ac540 coverage repair, 2026-09-22
+
+Latest manual444f97023d454284a6eb624b8a9da788 stopped at2ac540, a017f355c, ra2091a0 (native.log646 in project-link-visible/20260922T065755Z-2697cdfbcf484f14a093708fffe18461). Saved evidence preserved; frozen session cancelled. Current source/executable retains earlier2ac530,2ac5d0,2ac600 and every menu repair. This is another original slot, not recurrence of the same address. Original caller inspection2421f0d1... proves209198 and paired2091c4 read the selected object's slot+30; saved vptr46dfc0 and original/live table agree. Inspector ee86c73d... plus16-byte original/live matchc76d2d8a... proves2ac540's three original instructions return3f92e0 with no nested calls. The paired call is statically supported, not claimed dynamically observed.
+
+Proposed BEFORE code edits: append only config209198->2ac540 and2091c4->2ac540. Preserve F1/Tab/event-redraw host9704ed0b..., all old roots, pending VU candidate, runtime/renderer/audio/clocks/input and explicit faults. No guessed table-wide roots or runtime substitute. External stairs-2ac540-preedit-20260922-f1.txt records original dirty config2a50b98b..., baseline executable1fe0fcdb..., proof and byte-backup plan. Guarded config/doc edits automatically save originals; hg_emit saves generated originals. Current rules/AGENTS/learned and PROGRESS reread; Markdown metadata checked against prior state.
+
+Next: configured hg_emit, verify bounded changed output, Python/runtime tests, build_game/fresh provenance, gameplay33m replay and fixed frames qualification; then manual speakers relaunch for actual stairs. Latest qualified baseline10.7901054733FPS remains until a new measured result. Standard33M is not a staircase-route test; exposed controlled pulses only left/cross/start cannot reproduce this route. No modified recordings or shortcut state. Audio still unfixed (353 underruns before this stop); no new audio mechanism. No edits during visible session.
+
+## PRIOR - second staircase2ac5d0/2ac600 built and qualified; live stairs retest next, 2026-09-22
+
+Completed config-only repair2a50b98bfb1af41d99f897d1abbcfb941b0324a4f008291ca502dff7a394b26e,162347bytes:2032bc->2ac5d0 and existing100b6c->2ac600. Exact predecessor b8d3101f... backup33be0e762ffe44ccb0c19f9895f484ff; all old staircase/menu/pause roots retained. Original/live code/table/selected BSS callback evidence is in SOURCES and external stairs-2ac5d0-preedit-20260922-e1.txt. Subsequent2ac624 virtual call resolves in saved state to already-compiled2c91d0; no further guessed target added. F1/Tab/redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f unchanged. No audio/runtime/clock/renderer change; pending VU candidate not accepted as a gain.
+
+Emitterbd0cd304d15f487ebe70c9c0341187b2 changed only shard0015 as C++ (36 new original words), preserving prior bytes under project-link-emit/20260922T065246Z-a4d75a31edd2445a9fe6857343e95172. New sharde6b836246e65dcb14e295c315e67102f1392e06148ff43f99a0cc3b977434a17 has verified entry cases49603/49657 with actual tail/member dispatch, budgets and faults. Build4a077e3187c549938b34901423cff715 succeeded12.40s. Current game36621312bytes SHA1fe0fcdb73b9c78ff081941fdb6663e08826e1d7129e28d241c02e427e50957d;149-input post-link manifest67a1a896a7d162c45bf9ec0fd8c245f9f3ba35c7ea7b0ff4193bbb27b96c0398 matches current config. Python d2336bbbd20b419283de74a66a51b273 passes130 tests; runtime276d8128c34e4fa0b4309ff9d3444c82 passes inherited arithmetic/VIF/GIF/keyboard and262144Select-alias/focus checks.
+
+Recorded replay7b66b76acb8d4c69a8d521a9c407bc24/evidence20260922T065401Z-e0c478ab989148e0ad031101f5c59b7b reaches33M/no faults with original48195sprite/305856triangle/842masked batches. Fixed verifiera2251c6a7d244c868b0754403f3e7273/evidenceproject-link-verifier/8ab87396dc624f089ce3fe7cfbf20612 passes provenance,864 qualified1bef84/caller2d1c50 writes,zero lost/unexpected/caller/stack failures, established frame/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.56065s=10.7901054733FPS, intervals10.791755/10.788456; previous10.297336 retained, no dependable performance-gain claim.30FPS/audio remain unmet. User's late manual log recorded450speaker underruns; no new audio-code or audio-test result here.
+
+All configured jobs are terminal before next visible launch. Next action: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, unique key hg-stairs-manual-retest-20260922-e1; recover newest session/key on continuation instead of launching duplicates. Standard33M does NOT cross this user's100M staircase route; actual progression past top of stairs needs the live retest. No claim of whole-game/route repair or menu-close success inferred from this test. Keep all controls and audio enabled for user test; no edits/builds while visible job active. Documentation refresh and SOURCES/PERFORMANCE/learned042 updates complete. No background optimization or polling is scheduled.
+
+## PRIOR PLAN - new staircase slot2ac5d0 and selected callback2ac600; bounded repair, 2026-09-22
+
+User reports a new stop at the top of the stairs. Saved manual3005b1c29cff45ad99918cf7832882db/native.log1106 (project-link-visible/20260922T064324Z-c54b636f936049019d5e5f53fc6c5fe4) reports2ac5d0,a017f355c,a1=0,ra2032c4. This is a different original vtable slot+28, not recurrence of earlier slot+0c/2ac530. Original/live vptr46dfc0/table agree. Inspector98329158... verifies caller2032bc/delay2032c0. Inspector63108a0... plus original/live152-byte match08e46fa5... verifies40-byte dispatcher and104-byte callback2ac600. With captured selector0, original dispatcher selects saved BSS01990900={0,-1,2ac600} via existing100b6c; no table-wide assumptions. Extra neighboring entries are not rooted. Frozen session cancelled after preserved capture; no game job still running.
+
+Proposed BEFORE edits: config-only add2032bc->2ac5d0 and append2ac600 at100b6c, retaining all existing roots, pending VU candidate, F1/Tab/redraw host9704ed0b..., original runner/parser/audio/clocks/arithmetic/CPU fallback and explicit faults. External stairs-2ac5d0-preedit-20260922-e1.txt records proof and hashes; guarded edits auto-back up exact dirty bytes/newlines outside repo. All14 Markdown files scanned for relevant current evidence and their metadata checked; unchanged rules/map reused, updated PROGRESS/learned entries reread. No separate shared configuration has been supplied here beyond existing verified records. Next hg_emit, inspect changed code, Python/runtime tests, build_game/fresh manifest, recorded33M and qualified frames, then live stairs retest. Standard33M does not cross this100M manual route. Latest qualified baseline remains10.2973355644FPS; no audio or performance fix is part of this change.
+
+## PRIOR - menu-close3977d0/3974a0 compiled and qualified; live close retest next, 2026-09-22
+
+The user's requested normal inspection retry succeeded; platform blocker resolved. Config-only repair adds3977d0 and its original-installed successor3974a0 at existing100b6c. The successor returns the callback to already compiled398850. Complete original/live724/812-byte bodies and descriptor/caller proof are in SOURCES and external close-menu-3977d0-family-preedit-20260922.txt. Current configb8d3101f33e40b67bbcfa5cc0f7acafe3a9899a8cf418ee6bec4d2eb004d6711,161602bytes; exact pre-edit12393103... backupd7fece70d66844c4969b7a08fb63c6ae. All staircase, pause/unpause and Select roots retained. Protected F1/Tab/event-redraw host9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f rechecked unchanged; audio/runner/parser/guest clocks/rendering/explicit faults and pending VU candidate unchanged.
+
+Generation35b8201409954c61917c784460e57772 changes ONLY translated-shard-001c.cpp as C++, exactly384 newly reachable words (the two bodies); backup directory project-link-emit/20260922T063803Z-efe99298d87a4a6d907e82b8e197d853. New shard3e38cfc44724deeda08f92b83b8257a9f4c19744a639d2b7d2e55f47ce27c88d entry cases66389/67611 preserve ordinary checked static execution. Pythonc8ef3d914ca94f3bbe9a76475b14b62f passes130; runtime25edccfedc994971b87071b4c806489b passes all inherited arithmetic/VIF/GIF/keyboard and262144 Select-alias/focus regressions. No test source changes. Build58e9b25b02d144d2aecebc14173ff143 succeeds14.93s. Current game36619264bytes SHA2094e2cd8e2bdd4f0bcef49b3d14ca90ba6db939c166b30ffe25d61e8571d3d9; post-link manifest95c9f948ed016e89d1184e414a43ab7dc88f2a8ef70cba63325f29031ea607a3 matches149inputs including current config.
+
+Replay84cb026f47b64049b5df653ca169c90d/evidenceproject-link-runtime/20260922T063956Z-7212e4332b2e488c806f6bcf67d2fb05 completes33M with no faults and original48195sprite/305856triangle/842masked batches. Fixed verifierfa260aa4865b4fcf9bfde0f36103b3fe/evidenceproject-link-verifier/c9c581a6755143e0a1721c90cb7a1711 passes freshness,864 qualified original1bef84/caller2d1c50 writers with zero lost/unexpected/caller/stack failures and all expected image/EE/GS/VU/same-date RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.82675host seconds=10.2973355644FPS (10.554127/10.052743). Previous10.112825 remains comparison evidence, not a demonstrated speed gain.30FPS and audio correctness remain unmet. No new audio test or audio-code fix in this turn.
+
+Next immediately scheduled action within this session: configured run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600, key hg-closemenu-family-manual-20260922-d1. Recover that key/newest visible job on continuation, never launch duplicates. The actual later menu open/close is NOT exercised by standard33M: user needs to repeat the same close interaction; do not claim whole-menu repair before live evidence. Keep Tab/Backspace Select, F1 controls, Enter pause and shoulders unchanged. No source edits/builds while visible job is active; no background optimization is scheduled. At this note the last test job is terminal; launch follows documentation.
+
+## PRIOR PLAN - permitted retry succeeded; menu-close3977d0/3974a0 coverage repair, 2026-09-22
+
+User requested another attempt. The IDENTICAL configured hg_inspect retry succeeded as1ec288e8f1a044019044cd67c9b6ec72; prior platform blocker is no longer present. Saved descriptor01810d7c={0,-1,3977d0} matches original caller3999d0/helper100b6c and object180f680+16fc. Full724-byte original/live body3977d0..397aa0 matches SHAa9602af3.... It installs original44b1d0 descriptor3974a0 into the same consumed field at397924/28/2c. Successor inspector7ca164d5089842f7b00064c5f0d46666 and full812-byte original/live body identity83ee781c... verify3974a0, whose next descriptor44b1e0 points to ALREADY-COMPILED398850. Original/live32-byte descriptor pair matches069f9105.... These are original-code/data-derived roots, not adjacent-address guesses or claimed dynamic successor hits.
+
+Proposed BEFORE code edits: add only3977d0 and3974a0 at existing config site100b6c; preserve all other roots, F1/Tab/redraw host9704ed0b..., pending VU candidate, parser, runner, audio, clocks, original instructions and explicit faults. Pre-edit external manifest close-menu-3977d0-family-preedit-20260922.txt records exact dirty hashes/evidence; guarded edits auto-back up exact bytes and normal hg_emit backs up generated outputs. Next Python tests, build_game, linked/generated-source and post-link freshness checks, recorded33M replay and qualified frames, then speakers-enabled manual open/close retest. Existing fixed33M does not exercise later live menu-close input. No audio or performance fix is implied. All other Markdown metadata matched the immediately preceding session; current rules/AGENTS/learned lessons and current PROGRESS reread, prior verified findings reused.
+
+## PRIOR BLOCKER - menu-close missing target3977d0; evidence saved, no code change, 2026-09-22
+
+Latest user reports closing the in-game Select menu stops execution; screenshot shows address has no static translation. Recovered visible jobb26be6103c9c4acf961ad659cf0fabf9 (game0972a30e...,36596736bytes) has native.log820: EE3977d0, a0180f680, ra3999d8, sp1ffec40. Evidence project-link-visible/20260922T062421Z-54c3dd048b424235bcc181896bdbc35e retains log and dumped states. Original caller inspector46bffe01b2614eee922d4e0f3d3c9fde completed:3999d0 calls100b40; delay3999d4 selects object+16fc, not prior menu+1708. This identifies a distinct menu-close dispatch, not a failed Tab binding. Frozen owned session was cancelled after saved fault confirmation and is terminal.
+
+Actual external blocker: configured hg_inspect pc0x003977d0/count256, key hg-closemenu-3977d0-body-20260922-c1, was blocked by OpenAI before any job was created because safety status could not be determined. No retry or alternate target-inspection route was attempted. No code/config/generated-source change, build, replay or relaunch this turn. Target-body and saved-descriptor verification for this repair remain pending; do not root a guessed function or claim the menu closes successfully. All newest listed jobs terminal. Work is not continuing in the background. Next step requires the normal permitted inspection path to be available; do not bypass the platform block. Then verify target/descriptor, record a bounded repair plan, back up, regenerate/build and test the actual open/close sequence as well as the fixed regression. Preserve every existing menu/unpause/staircase root and F1/Tab/event-redraw host9704ed0b....
+
+Title question resolved from current game_host.cpp239-249: numeric title is produced host images divided by host interval seconds, labelled video updates/s. It is neither percent speed nor independently qualified gameplay FPS nor monitor Hz, and images need not have different pixels. Fault status replaces that number after the native worker stops. User's12-19 observation is retained, not contradicted or substituted for the latest fixed heavy result10.1128254223FPS. No new performance result or audio fix. Menu log782..808 shows speaker underruns unchanged at173 while its lighter menu work advances; this is observational context, not proof of audio/mix correctness or qualified FPS. External record close-select-menu-stop-20260922.txt contains exact fault, caller, blocker, source/previous-doc hashes. Only this progress note and that record are new; prior qualified state follows.
+
+## PRIOR - Select-menu callback family built/qualified; speakers live retest next, 2026-09-22
+
+Completed config-only coverage repair: initial396900 plus three independently proved original-installed successors394e40/395630/394670 at existing member helper100b6c. Config12393103d9bf5782ece43bf2c5ac4857a1bb718f2a418ac4632e9f9f524b159e,161164bytes. Preserve staircase2ac530, unpause2f55c0, all prior roots, pending VU candidate and F1/Tab/event-redraw host9704ed0b.... No audio/runtime/clock/renderer/fault behavior changed. Original-proof details in SOURCES and plans below. Automatic backups4ababbf5ff094fdab9deb00af72c1d07 (pre-turnconfigd90c7919...) andc90e46405ea54ee58f53484b1fa00bef (396900-onlyintermediate) preserve dirty originals.
+
+Python4bf8b8f6d0934095a988e05974323806 passes130 tests. Configured emitter011587b0980c42a4bf1e9a8db52c9f48 succeeded with verified prior-byte backups at project-link-emit/20260922T061352Z-5a43a2db1eb64e34af2af7a7d9572822; normal direct callees also discovered. All four entry cases verified in generated shard001c (SHA bb9380cfce7417e3d83f051740f6d572e4c588554dffede09ae26952ba4b0240). Game build e31e3fa32c56458389fe4b641a4daf7b succeeded139.54s, compiling changed main/shards0012/0013/0018/001c. Linked page396 appears in shard001c.obj atVA142148a78. Current game36596736bytes SHA0972a30eb23046931ee3af8612b08ac43b946b6774c67202e7b8e104adb3907c; manifest8b2e7991f3e00110e6c8f65cd712d294954ccaef4d84b8c53ea3974fdfa4120b matches149inputs including current config/host. No stale executable launch.
+
+Replay0d00aca090a549a98612a91441139e49/evidence20260922T061800Z-b48139cce1724b8e99e54ac81f1535fb completes33M/no faults with original work counts. Fixed verifier53369591d83c4a2eb1b46750e3e6f0d7/evidenceproject-link-verifier/4e163caf6201471dbbad67858e69df7e passes149-input provenance,864 original1bef84/caller2d1c50 events with zero trace/caller/stack failures, all established image/EE/GS/VU/SAME-DATE RTC-only normalized IOPbdbf3a11... hashes. Latest heavy60/5.93306s=10.1128254223FPS (10.344257/9.891523), below last pre-change F1/Tab build10.3913197842; no speed gain or causal-regression conclusion from single samples.30FPS remains unmet. Existing VU candidate still not accepted; a later VU-only reversal must retain ALL newer menu/host changes.
+
+Audio diagnostic929ee941048344b6860a0667be7a53b9 used unchanged configured gameplay33m/current/speakers, completed33M without fault and saved project-link-runtime/20260922T061958Z-47460baf9a3e429cb0dd39d7a0b019d6. Raw WAV SHA c2a6162a39bd41d0438adcb9df7c92d2e599802da04a0f87bb131717f99b35e3=1579627frames at48kHz;73 speaker queue underruns, peak16966input/12724output,maxqueued7. Frame/EE/GS/VU/metadata hashes match; rawIOP not separately normalized for THIS audio run, so no fullIOPequality claim. User's manual run had414 underruns BEFORE Select fault and12-19video updates/s; neither counter is qualified gameplay FPS. Sources confirm raw input output bypasses unfinished synthesis/effects/mix; speed alone does not complete audio. No audio fix applied, no new probe remains. DIAGNOSTICS013/014, PERFORMANCE and learned042 updated with scope/evidence. Raw clip tool returned exact sample metadata, not an audible-quality assessment.
+
+Next action: run_game_visible manual,slice_budget0,audio=speakers,wall_limit_seconds3600 with unique key hg-select-family-manual-retest-20260922-b1. Recover newest visible job rather than launch duplicates. User must retest Tab/Backspace Select and pause/unpause: standard33M does NOT enter the actual Select fault route. Saved original Select-menu screenshot proves its shell rendered, not completed interaction. Maintain F1help/shoulders/Tab and original inputs. Do not edit/build during visible session. At this note all configured jobs are terminal; launching follows this note because the connector disallows project edits during active jobs. No background optimization or monitoring is scheduled. Source comment shorthand397f60 means the descriptor-setup INSTRUCTION there, not a descriptor data address; live descriptor address is01810d88.
+
+## PRIOR PLAN - Select menu target396900; preserve F1/Tab host and diagnose audio starvation, 2026-09-22
+
+Bounded plan refinement BEFORE further config edits: original396900 contains directly decoded descriptor installers at396e3c/40/48 (source44b200),396ed0/d4/d8 (44b210) and396fdc/e0/e8 (44b220), writing exactly object+1708/+170c/+1710 consumed by observed397f5c/helper100b6c. Original/live96-byte descriptor region agrees SHA8d77461e... and has {0,-1,394e40},{0,-1,395630},{0,-1,394670}. Helper100bd0 independently checks whether the12-byte descriptor is nonzero; all three pass. Thus add these THREE statically proved successor roots at the same dispatch, not adjacent functions guessed from proximity. Existing393bd0 remains; duplicate secondary descriptor copies do not add roots. Inspectors9321d630...,ac16345a...,ac7fd36f... record source/load/store/guard proof. New roots are static potential successors, not claimed dynamic hits. First emitter94c788b9... added396900 and direct callees (4CPP files); none of these three successor entries are currently compiled. Regenerate once for the bounded family before building, preserving every earlier repair.
+
+Manual93c3705fa75c447b93bde4547d095d73 saved Select input (buttons65534) then explicit PC396900/no static translation, a0180f680, ra397f64; cancelled after capture. Original397f5c calls member helper100b40 with descriptor at object+1708; saved01810d88 is {0,-1,396900}. Own inspectorsad68cf07...,a8dff78c...,59aca2fc... and complete original/live1996-byte body396900..3970c8 match SHAfb5d15b9.... Return3970c4 restores stack in delay3970c8. No guessed neighbor target. Evidence project-link-visible/20260922T060315Z-2b6cfc946afd44cfb159f18fef315246/native.log:748..762 and state.ram.ee-ram.bin.
+
+Proposed BEFORE code edit: append only396900 to existing indirect_targets site100b6c in config/haunting_ground_us.toml (d90c7919...,160481bytes), retain2f55c0/2ac530/all roots, pending VU candidate, protected F1/Tab host9704ed0b..., original runner/parser and explicit faults. Plan/hash manifest external select-396900-preedit.txt; automatic exact-byte backups protect dirty source and mixed newlines. hg_emit then inspect changed code/paths, Python/build_game/fresh manifest, original33M replay and fixed gameplay33m/frames qualification. Actual Select-menu success requires live retest; standard33M does not include this input. No source changes during visible gameplay.
+
+Recovered panel tests/build/replay/verifier were already completed: current gameca4f82b4... with149-input provenance and all expected state hashes, verifierbb2d8648113a4439907525efe65f6a6b/evidence7cc7b5d8f5dd40158a2a92011892e09f=10.391319784FPS (60/5.77405s). Protect host9704ed0b... including redraw fix AND new UI; historical1a122b9f is not the whole current host. No panel/FPS gain or successful unpause is inferred from menu evidence.
+
+Audio remains broken: current manual log733/741/751 reports354/384/414 queue underruns before the missing-target stop;48000 new source frames per about2.86..2.96host seconds. User reports12-19 video updates/s, not substituted for qualified FPS. Next diagnosis uses existing configured audio replay/raw-core0 capture and unchanged speaker queue counters, plus source inspection; no guessed clock/sample drop or buffer-size band-aid. Raw SPU2 input is not a completed gameplay mix. This is separate from the bounded config repair.
+
+## PRIOR - user-requested F1 controls panel and Tab Select alias, 2026-09-22
+
+Proposed before code edits: add portable host-only runtime/include/hg/controls_panel.hpp plus tests/controls_panel_regression.hpp and hooks in game_host.cpp/runtime_tests.cpp. F1 toggles a readable keyboard-reference overlay; Escape dismisses it before a separate press can close the game. Keep every original binding, especially L1 Q/L2 top-row1/R1 E/R2 top-row3/Select Backspace; add Tab as a Select alias. Panel releases live input while open, never changes guest clocks or forces a game pause; label that the game keeps running and to pause with Enter first. Independently authored small UI glyphs/bitmap use existing host GL presentation, no new shader/framework/game rendering path. Build/upload once on first open, draw only within retained fresh/refresh/resize boundary; closed panel does no bitmap work or extra swaps. Preserve exact newline styles and all error checks. This intentionally extends host1a122b9f..., not a rollback of its redraw fix.
+
+Pre-edit external controls-panel-preedit.txt records exact dirty-source/doc hashes; guarded edits automatically save old bytes. New synthetic tests cover hotkey edges, held Escape, alias combinations/focus and bitmap bounds, and write only a synthetic controls-panel-preview.ppm externally. Build tests/game, inspect preview, verify current-source manifest and original gameplay33m replay/qualified frames; then speakers-enabled manual F1/Tab and pause/unpause check. No audio fix or FPS gain is claimed. Update CONTROLS/README/AGENTS with new UI and protected host hash after validation.
+
+Recovered unpause repair is already in configd90c7919... retaining staircase2ac530 and all earlier roots. hg_emit6dadd150619e401799ce2dfb4464d9de, Python881c06cb74ea4aefa6311305a3310e08 and game buildd7faa74ab14248888889c2f48e1baf90 succeeded. Do not repeat generation or drop that repair. Recover any ongoing regression task before starting another. Latest completed pre-panel unpause-build verifierdf1e2499045a418f816024b12b539a81/evidencee44d4071930a4b8e889bc771f75f47c7 qualifies60/6.05005s=9.91727341096FPS with148-input provenance and all expected state hashes. This is below prior10.852932 and remains unexplained; pending VU candidate is not accepted as a gain. The intended same-build repeat was blocked by the platform before job creation; no substitute measurement or retry was attempted. No source changes during a live visible session.
+
+## COMPLETED COVERAGE BUILD - unpause target2f55c0; live retest still pending, 2026-09-22
+
+Unpause-only work completed: emitter6dadd150... changed only translated-shard-0017.cpp as C++ (248 original words; sourceSHAaf4a9b43...), Python881c06cb... passed130 tests, buildd7faa74... succeeded. Pre-panel game732a2a94f17f96ae67db3f392525e9aa28e5b910772f0995bdfcf034e030972a is36343808bytes; post-link manifest765d5c326a634e09614945ff4511428581f77f52815cbb7a0937d5ce02821018 matches148 inputs. Generated body retains saves/FPU/branches/calls, normal prologues and JRra2f5998/stack-restore delay2f599c. Original992-byte live/file-backed body identity d15a1113... is documented in SOURCES. Configd90c7919... retains2ac530 and all earlier roots.
+
+Replay7d91d2163643483682ff5d963fc50052/evidenceproject-link-runtime/20260922T055312Z-e593c0cb723844fdb40b2015a964820c reaches normal33M budget with original48195 sprite/305856 triangle/842 masked-transfer batches. Fixed verifierdf1e2499045a418f816024b12b539a81/evidenceproject-link-verifier/e44d4071930a4b8e889bc771f75f47c7 matches148 inputs,864 original1bef84/caller2d1c50 events with zero trace/caller/stack failures, expected image/EE/GS/VU and same-date RTC-only normalized IOPbdbf3a11.... Latest60/6.05005s=9.91727341096FPS, windows9.850308/9.985155; prior10.852932 is not substituted. Attempted repeat hg-unpause-qualify-repeat-20260922-a1 was platform-blocked; no new job or result. PERFORMANCE records the lower sample and unresolved cause; correctness coverage remains necessary, not a speed optimization.
+
+Concurrent F1-panel work appeared while recording these results, including new hostSHA9704ed0bbf59c9ede823a03821f224aa7aa42512978dc22d153f0439de9b6d0f and completed build_tests a4f5ec70ac544f858145fc10c9f79b05. Those edits are preserved; this unpause worker did not implement, overwrite, build or validate the new panel. No additional visible launch was made. Pre-panel qualification must not be attributed to the newer host. Continue the active panel work above, refresh game build/provenance as required, then manual speakers pause/unpause retest; existing standard33M does not exercise the later user's unpause fault. Audio still faulty (151/426 observed queue underruns); no audio changes. HG-LEARN-042 and PERFORMANCE updated with exact scope. Original unpause plan follows.
+
+User reports freeze when unpausing and asks for shoulder bindings. Current host1a122b9f... already maps L1=Q,L2=top-row1,R1=E,R2=top-row3; no remapping is needed or applied without a requested replacement. Recovered session ecd7f4c9b0754e2b9d2110c0ef697e21 (cancelled after saved fault) stops at2f55c0, a0fc6fe0, ra2f609c. Evidence project-link-visible/20260922T054317Z-ce289a174ffe4a2fb45ee1d975469fbe/native.log:1094 and saved framebuffer show the paused scene. Original/live992-byte body2f55c0..599c matches SHAd15a1113...; saved descriptorfc70f0 is {0,-1,2f55c0}. Own original inspectors5558618...,cf9a925...,3d3f3fb... confirm2f6094 calls100b40 with object+110, whose negative-descriptor path reaches JRt9 at100b6c. This is a missing static target, not proof of a deadlock or the cause of low FPS.
+
+Proposed change BEFORE code edits: append only2f55c0 to existing site100b6c in config/haunting_ground_us.toml (pre-edit77332e15...,160166bytes), retaining2ac530 and all earlier coverage. Preserve pending VU candidate, protected host1a122b9f..., original runner/parser, CPU fallback, exact arithmetic/delays/budgets and all explicit faults. No runtime/clock/audio/control change. External plan/hash manifest unpause-2f55c0-preedit.txt and automatic exact-byte backups preserve dirty files and newline/encoding. Current148-input game0dd2b06c... archived in both fault session and qualified05f3470a.... Latest current qualified10.8529319196FPS;30FPS unmet.
+
+Next measurable actions: hg_emit, inspect new body/change list; Python regression and build_game with fresh manifest; recorded33M replay and fixed gameplay33m/frames state qualification, then manual speakers pause/unpause retest. Standard33M does not reach this later manual fault: do not claim live repair from a build/checkpoint. Prior speaker session4594260a ended normally at user's close with151 queue underruns; latest unpause session has426 before fault. Audio remains faulty, not fixed by selecting speakers; no audio mechanism is changed here. One configured job at a time; no live PCSX2 probe is required to establish this already-proven callback.
+
+## PRIOR - missing target2ac530 rebuilt; regression qualified; manual speakers retest next, 2026-09-22
+
+Completed build74a226c6379e4d47b1a24bb65beacecc produces36329472-byte game0dd2b06c44841d796dee87faff8b84d57a90b980d5e3b679964182eb283c0900. Post-link manifestc43ef1b2701f8d837b98c066afb83b236aee2b0a097815f3f1bfdb6a73a77985 matches148 inputs, including repaired config77332e15.... Linker map contains page_2ac atVA141e61488 from shard0015. Original/live target16-byte slices agree SHA3d15d15d86e33ef536957c7124a633eb940ba5a2f321d61cfc814745e6e52258. No runtime, host, arithmetic or timing change for this coverage repair.130Python tests3a2d0275... and existing runtime testsff3267fd9c484ccabe1766d5779fd0f5 pass.
+
+Recovered replaya096e4574e41433482cb52941f08fd23/evidenceproject-link-runtime/20260922T053550Z-df12f6c31d8b4d169d2b9a582b776e79 completes33M at the normal budget without faults and preserves original draw counts. Fixed verifier50aa2939d58d44bd80963af41120ca32/evidenceproject-link-verifier/05f3470af08d41b6b0a63254e308bd3c succeeds:148-input freshness,864 qualified original1bef84 writers/caller2d1c50,zero trace/caller/stack failures and all expected frame/EE/GS/VU/RTC-only normalized IOP hashes match. Latest current heavy result60/5.52846s=10.8529319196FPS (windows10.680718/11.030791);30FPS remains unmet. This includes the still-pending static-operand VU candidate plus the verified target root. It is not a demonstrated gain over prior original control11.114260151FPS, nor does one comparison isolate a regression. Future VU reversal must retain this new config target and regenerate, not restore an old whole generated file that drops coverage.
+
+Next executable action: run_game_visible mode=manual,slice_budget=0,audio=speakers,wall_limit_seconds=3600; unique request key hg-freeze-2ac530-speakers-relaunch-20260922-a1. Recover newest visible job before launching duplicates. User will retry the same staircase route; standard33M regression does NOT cross the later79M fault, and previous manual inputs were not recorded. Do not claim later-route repair or audible/full-mix correctness until that live check. All listed jobs terminal before this planned relaunch. The game remains user-controlled; no automatic background optimization is scheduled. Source edits are disallowed while that visible job is active. Protected host1a122b9f... retained.
+
+## PRIOR PLAN - manual next-section fault2ac530; verified static-target repair and speaker relaunch, 2026-09-22
+
+Continuation/user observation: user reports 12-19 FPS throughout manual gameplay. The built-in title is produced-video-updates/host-second (game_host.cpp214), not the fixed qualified heavy-gameplay metric; the user's counter source is not separately confirmed. Native log2885/2886 records15/13 produced/presented updates near101.7/102.7s, then explicit fault at2ac530. Do not turn this route into a qualified FPS result: it has different live input and existing full-run probe object mismatches. Saved framebuffer state.ram.display.ppm SHAa0a8b54f1ee9875abb4752f4d605f94de2373645926b8871e113e90fd5b2cc67 visibly shows the stairway scene; it is actual saved game pixels, not an all-white PrintWindow capture. Rechecked protected host exact1a122b9f....
+
+Recovered config already adds only site209574 ->2ac530, SHA77332e1590c8003b4625521466e8d72b683612f0b3c5fbfda270b62afad2a13a. Recovered hg_emit b0129f4346b0439282aee2efe6468458 succeeded (external20260922T053246Z-dbc5de424d2a4c44bf8db98e75cf151d); only generated main and shard0015 changed, besides analysis/listing. Shard49581..49604 now contains normal page_2ac and original LUI/JR/delay ADDIU, retaining budgets and faults. Python3a2d0275f45f4a819e990bcf4f82b8c9 passed. Recovered build_game74a226c6379e4d47b1a24bb65beacecc is active; do not launch duplicate generation/build jobs. Next verify manifest, replay/qualification then speakers-enabled manual relaunch; no passing later route or speed gain yet.
+
+User reported frozen game and missing audio after manual launchc1fa9cfc84bc40bfaad9712c131e0ffc. Audio was explicitly launched off: restore the existing speakers option, not a claimed audio-engine repair. Native log2899 reports EE2ac530/no static translation, ra20957c, a017f355c. Saved EE RAM proves object vptr46dfc0 and slot+0c target2ac530; original ELF table agrees. Original caller209574 is JALR t9 with a0 setup at209578. Own hg_inspect decodes target's three instructions LUI v0,0x40; JRra; ADDIU v0,v0,-28256 (delay), returning3f91a0. Do not bypass this function or infer low-FPS causation from the explicit stop. Fault evidence includes memory/GS/VU/frame under project-link-visible/20260922T052458Z-71c5108ac15b4b9a80b5a56e4112e3fc; session cancelled after capture. PrintWindow is all-white, not reliable game pixels.
+
+Proposed change before edits: append only verified indirect_targets site209574 ->2ac530 in config/haunting_ground_us.toml (pre-edit e6a72c5f...); regenerate through hg_emit, inspect exact emitted target and changed paths, test and rebuild game with fresh manifest. Run existing33M regression/qualification, then manual visible relaunch with audio=speakers and original controls. Passing the user's later route still requires live replay: previous manual inputs were not recorded. No runtime/renderer/clock/input/arithmetic change, no new performance mechanism or suppressed faults. Automatic byte backups and external manifest manual-freeze-2ac530-preedit.txt preserve current dirty config/docs. Host1a122b9f... rechecked and protected. Only one configured job at a time.
+
+Recovered buildd0ed67c451b84a5587709eb171b44096 succeeded after the prior PROGRESS note: launched game0255d6fd1995de9748d833166bfa332bd2ef528b565e88048717abbf055d7e0c,36329472bytes already contains the pending static-operand VU candidate. Preserve that pending work, but do not claim qualified gain or full correctness. Last qualified control remains11.114260151FPS. No separate shared HG config/manual list is present in accessible project file listings; independent original ELF/live call evidence supplies this bounded root.
+
+## PRIOR PENDING - static-operand VU multiply tests pass; regenerated candidate awaits game build/qualification, 2026-09-21
+
+Implemented noinline scalar helper runtime/include/hg/vu_specialized.hpp SHA355f6607... and AOT-only mask14/15 routing (vu_emit.py87df2850...,emit.py396fd486...). No runtime state/header-layout, clock, arithmetic or CMake change. Tests130Python39cd62e89a6545f58a736add2b34ac3c, build71235f0386a84dc2b211a11731329a3b, runtimeed3ca7e60f7d4547a54ba369c2b7d959, translation08afd59e587d435a94e9bc1912719d68, readiness8c68bcf9b43b4f0ca41de1819648a447 all succeeded. New fixture:104 static operand combinations,851968 exact complete-state comparisons including466304 identical faults across16MXCSR modes. Existing DIRECT936/7873, DMA2338, UNPACK16M/24576, arithmetic/GIF/keyboard and65536 generated readiness checks pass. Python tests intentionally allow the exact old or candidate call for masks14/15, preserving fixtures across rollback; they do not independently prove activation.
+
+Configured hg_emit36edf7a774d0439e995a17992588fa0b succeeded; evidenceproject-link-emit/20260922T051644Z-a2214578b0c74d819c93364c36a69b05 includes exact prior byte backups. Only out/translated.cpp changed among25EE shards; current1479141bytes SHA9e404c2d289cef76e6d03b12a463a8e9dd6aa954c694b7644523e079907644e4. New static calls are present (bounded search already returns120 distinct source sites, not a complete/dynamic count); old mainb03c024b... also in automatic backup3b595d8ec7604c12bbce148a7df59b30. Original emitter backups1dda8e00086942a2b06c7384eaa5c47d and03f48590769a40b390658766f301d73c define exact rollback. Next build_game, verify linked separate helper bodies and fresh manifest, replay, qualified frames, then fresh route-only reversal. Last qualified control remains11.114260151FPS; no candidate FPS yet.
+
+Original hypothesis/plan and prior control follow:
+
+Original CMake2b9e0b6b... rebuild184f60eec8944ddf830866cc2d3a4a32 and verifier34348808501e43729ed7f2380f37fda0/evidencebff1d79d44d0454e870c25316cd62076 restore60/5.39847s=11.114260151FPS, all147-input/writer/state checks exact. This reverses /Ob3 candidate9.201748FPS; reject and record HG-FAIL-034. Current game2dc877908c68de315501fa3fbda271ff89e6be22868a0db98bd3d9056e233f1e. No active native probe; no new optimization retained yet. Selective LTCG and FPU bit scan were found already rejected017/011, so no repeat of either was launched.
+
+Next bounded mechanism: specialize scalar VU broadcast MUL with statically known register/mask/broadcast operands, but keep each unique helper OUTSIDE the huge generated CFG (noinline template). New runtime/include/hg/vu_specialized.hpp reproduces the existing read_vf/product/flags/write sequence, no new arithmetic, ISA, decoder, clock, pipeline or object layout. tools/hgtool/vu_emit.py routes only masks14/15; emit.py adds the header only to the generated main unit. Preserve all reads/fault order, flag-before-invalid-destination behavior, VF0/aliases/undefined lanes and unrelated architectural state. This is not global /Ob3, forced compound inlining or the rejected packed-vector extension. Native sampling's12 scalar-multiply samples are a lead, not a promised gain.
+
+Validation plan: new redistributable differential fixture against unchanged Vu1State::multiply_vector including random/edge bits, all defined masks, alias/zero/invalid registers and broadcasts, flags/Q/P/readiness/host modes. Add Python AOT selection/fallback checks; include helper in existing generated readiness tests without altering their pipeline logic. Capture exact original generated main b03c024b... via guarded no-op backup; existing write_text_if_changed avoids touching identical shards. Run python/native/translation/readiness tests, configured hg_emit and build_game, verify linked separate native specializations, replay and fixed qualification, then restore ONLY emitter route/include, regenerate/rebuild and measure fresh control. No source-only rollback is a current game. Exact input hashes and scope in external vu-static-multiply-preedit.txt; automatic byte backups preserve dirty source/CRLF/LF. If rejected, new helper/fixtures remain explicitly test-only, not an active gameplay mechanism. Host1a122b9f..., runnerc8c2d536..., parser5ab22f5b... protected.
+
+## PRIOR ACTIVE - /Ob3 candidate qualified9.201748FPS; restoring original setting for fresh control, 2026-09-21
+
+Compiler-only /Ob3 candidate built successfully in106.35s (c5635f5fbdd244a7bbc594743140016a); generated vcxproj line304 and compiler D9025 override confirm main-unit setting, with unchanged/O1 EE shards. Candidate executable292e20170593d3b71f2dcc0c857e799fa83540ffd1b1f133085a90acced37de6,36027392bytes;147-input manifest e4a88df5... reflects CMake7607ff8b.... Recorded replay669ad9881c684693999d6a3a9c97e008/evidence20260922T045150Z-7343225602104735aff2c8b4c65e1d4b preserves inputs/work/image/EE/GS/VU with no faults. Fixed verifier04f39bd225e740a7bbf4e5130a205cc3/evidence6a179db53b724cbcab73d34af82e0b94 qualifies864 original writer events, all expected hashes including same-date normalized IOPbdbf3a11...,60/6.5205s=9.201748332FPS.30FPS unmet. This is below recent original controls; do not declare code causation until a fresh reversal.
+
+Next: restore ONLY CMake via backup8fcdccc821e04892ae3ee547d400bab7 to exact2b9e0b6b..., rebuild and qualify gameplay33m/frames. Protected host1a122b9f..., runnerc8c2d536..., parser5ab22f5b... and all prior fixtures remain; no sampler active. If restored control confirms a loss, reject /Ob3 rather than repeat unchanged; if controls also fall, report the host-condition ambiguity. Linker map size3417247bytes matches earlier map size but executable grew5120bytes: size alone proves neither unchanged code nor useful inlining. Detailed native-code comparison is warranted only if it resolves an actual next decision. Learned HG-LEARN-041 now records completed native sampling and limits, not a performance gain.
+
+## PRIOR ACTIVE - native sampling closed; planned /Ob3 automatic VU-unit inlining trial, 2026-09-21
+
+HG-DIAG-037 complete: temporary offline IOP comparison passed129 Python tests (df58fe42022548ffbeedc6829ce2f61d); only bfcd1/bfcd2 changed versus same-date control, normalized bdbf3a11... exact. Runnerc8c2d536... and test_runtime_verifier.py95054f79... byte-restored; clean game d47ee0b1... built with147 inputs. DIAGNOSTICS records samples/limits/removal. No probe or temporary fixture active.
+
+Next bounded production candidate modifies ONLY CMakeLists.txt (pre-edit2b9e0b6b12a7f1835f81884f7fb299e769214f9697a09c05469127a4d74dd3ca): append Release /Ob3 to existing per-source/O2 property for HG_TRANSLATED_SOURCE, leaving/O1 large EE shards unchanged. Current generated project confirms main Release MaxSpeed override. Do not change forced-inline annotations, runtime/emitter/generated original code, arithmetic mode/architecture/trace settings, clocks/input or host. Unlike HG-FAIL-007 forced compound inlining, leave compiler heuristic discretion; first attempt bounded and stop if compilation becomes pathological. Microsoft /Ob documentation checked; more aggressive automatic inlining is a hypothesis, not guaranteed expansion or speed. This targets dispersed native VU/helper cost sampled after host recovery rather than another guessed parser microchange.
+
+Milestone: build_game and confirm effective per-source flag/linked code size; recorded33M replay and fixed gameplay33m/frames original-writer state qualification, then exact CMake rollback/rebuild and fresh control. Preserve host1a122b9f..., runnerc8c2d536..., parser5ab22f5b..., all current fixtures/freshness guard. No hg_emit needed for compiler-only change. Plan and exact hashes in external vu-auto-inline-ob3-preedit.txt. Retain only dependable gain with unchanged original-state hashes/RTC-only IOP; otherwise remove and rebuild. Latest clean qualified control remains10.861438815FPS; no /Ob3 game built yet.
+
+## PRIOR ACTIVE - native sampling captured/removed; close IOP comparison and assess compiler inlining, 2026-09-21
+
+HG-DIAG-037 replay3dc6017703934d2fb276fd5b094f02d2/evidence20260922T043923Z-777a3f5a342d4ff2b8b420755c5e06d3 completed33M without runtime faults.330 RIP samples/290 main-image,0 suspend/context errors or unexpected counts, not capped.13,465 copied-map symbols; real image base7ff6cd340000/preferred140000000. Top native samples: AVX2 MADD15,Vu1 multiply_vector12,process_pending11,convert_fixed10; generated VU1/8 bodies8/7 and multiple other arithmetic/GS helpers.40 outside-image samples have NO caller attribution. This is dispersed native work, not a dominant isolated helper or qualified FPS. Expected frame/EE/GS/VU hashes and delivered inputs match. Raw IOP differs, normalization not yet recomputed for this replay.
+
+Sampler source byte-restored from backup1eb6e68364ca410facc0918278612e50 to original runnerc8c2d536...; instrumented source saved automatically7ca4761b5bad4725b3c6e029b48306cb. Host1a122b9f... rechecked. Clean buildb94d2b4dc6bc41f4a34f3bdf73536073 succeeded; game d47ee0b105acb51d5e7913e2c881bf44f1068aac16010f64e3e417159d5e7c91,147 inputs. No runtime probe remains.
+
+Before further production edits: use a temporary explicitly labelled offline integration case in existing tests/test_runtime_verifier.py (pre-edit95054f795393d9c9fd6f7df857cf1292f0fc2b4d6c8eb29265066ed4817da78d) through configured python_tests to compare only the two pinned existing artifact IOP captures bytewise, allowing exactly bfcd1/2/3, using existing normalized_iop_digest and expected raw SHA256 identities. No game launch, network, shell or process access. Byte-restore this temporary fixture after success; do not silently claim RTC-only equality without checking. CMake source confirms intended /O2 main VU unit versus/O1 EE shards; inspect effective generated project too. Consider bounded automatic /Ob3 main-unit inlining only after reading prior HG-FAIL-007 (forced compound inlining exhausted memory); do not repeat force-inline compound arithmetic or change guest math/clocks. No compiler candidate implemented yet.
+
+## PRIOR ACTIVE - GIF trial closed; planned native heavy-window sampler HG-DIAG-037, 2026-09-21
+
+Incomplete GIF trial completed all four qualified original-state comparisons and is not retained (HG-FAIL-033). Final exact original control21cf3aba83b442e8b083b61788c5e2b8/evidence1b05c22d19ff484581c6d713951f95f5=10.861438815FPS,60/5.52413s. Game37f7d62d... is source-matched. Original parser5ab22f5b... and protected host1a122b9f... remain unchanged. Both PERFORMANCE and learned skills record the small, drift-sensitive differences without claiming a gain or semantic failure.
+
+Next measurable milestone: identify native heavy-window hot functions rather than speculate from inclusive VIF timings. HG-DIAG-037 modifies ONLY runtime/system_diagnostic.cpp (pre-editc8c2d536...). Within existing31M checkpoint of profiled unpaced33M replay, start a bounded Windows-x64 own-worker RIP sampler (4096 preallocated entries; nominal jittered1..4ms sleeps, OS granularity unchanged). Duplicate only current worker handle, suspend/get CONTEXT_CONTROL/resume immediately; no locks/allocations/IO/stack walking/guest reads between suspend/resume. Any failure is reported, invalidates attribution; fatal resume failure ends diagnostic explicitly. Stop/join on exits before post-run symbolization from exact isolated hg_game.map. No production helpers/emitter/common headers, guest writes/clocks/input/render/fault or external process/device settings change. Suspensions perturb host time; diagnostic run is NOT FPS evidence. Plan/provenance/backups in external native-rip-heavy-profile-preedit.txt; primary Microsoft context/suspend/resume/handle documentation checked. Record inventory in DIAGNOSTICS, run one configured replay, compare original work/image/state, then byte-restore runner and rebuild. Keep PCSX2 out of host bottleneck diagnosis.
+
+## PRIOR ACTIVE - incomplete GIF batching comparison nearly flat; final exact control pending, 2026-09-21
+
+Qualified sequence: candidate fa3283542166432f8058a0e932dcd847=11.021044685FPS (60/5.44413s), exact original f048f775d8754a55b7c49772e64335c2=10.904966849FPS (60/5.50208s), repeated candidate4f708348e1c243b39043e861a449f87b=10.911729564FPS (60/5.49867s). All147-input manifests,864 original writer events, expected image/EE/GS/VU and same-date normalized IOP bdbf3a11... match. First-pair~1% advantage has not established a stable gain. Candidate replay20260922T042721Z-f34ee87e87814c02ba5125c0d82802a7 preserves normal work/no faults and exact640x448 image. Native candidate process_pending in hg_vif:vif.obj at VA1421c5b40 contains original submit call followed by inlined incomplete-payload/capacity guards and range insert;416-byte slice at fileoffset35412829 SHAf96a28c947e6cf76e2c96311c1f16a002e1876c0bc42bc5733e089a18c42dfd9 confirms linked mechanism, not only source freshness.
+
+Now restore ONLY parser to original5ab22f5b... using backup8d4796564dfd4ff9beae0330591f0482; candidate retained in backups bffa0a620e0a4400be7203efcf2025c3/ab4f8269661946a0bcf6ce570345470e. Host1a122b9f... rechecked unchanged. Final control build5a3e4885cc644e5f91108a80c8492b84 started, followed by fixed qualified frames. Decide based on both pairs; do not keep a flat candidate or cite the earlier isolated10.476 control as gain proof. Regression fixtures retained. Next bottleneck investigation should use actual native heavy-window instruction-pointer samples to distinguish arithmetic, generated VU and GIF/GS execution, not another guessed word-copy variation; no diagnostic sampler has been added yet. Any new probe needs its own written plan, exact backup, activation/removal accounting and original-state verification.
+
+## PRIOR ACTIVE - existing incomplete GIF candidate built; qualify against exact fresh control, 2026-09-21
+
+Continuation verified workspace/jobs/activity and current project documentation; no inherited active job. Candidate runtime/vif.cpp remains4ad13b1dfd7bdff24a742e24e17f2e1cb5e0533ac6b5291fc9d5c1b6f6895709. Protected host1a122b9f... and original runnerc8c2d536... match handoff. Reuse current successful runtime/translation/readiness tests, not redundant setup. build_game fdcb0435cfbb469ca19bed5e3a1242b7 succeeded; game SHA680728201eed2214d8b5698037428ea44964e9391b45021fb66ab66d1b96c3a6,147-input manifest explicitly records candidate parser. Linker map process_pending is hg_vif:vif.obj at VA1421c5b40. Hidden gameplay33m replay69906038d2424176ba8a1f6c5065e86c started; no new FPS result yet.
+
+Next measurable milestone: finish candidate replay faults/work/image/state, fixed gameplay33m/frames qualification, then restore ONLY incomplete_gif_payload_qwords and its DIRECT callsite to exact original parser SHA5ab22f5b..., rebuild and qualify a fresh control. Repeat an interleaved reversal only as needed to distinguish effect from prior10.27..11.4FPS variation. Every control preserves host redraw recovery, original runner, parser source-unit isolation, test-only DMA fixture and build freshness guard. No renderer, decoder, clock, input, emitter/config, header/layout or temporary diagnostic change. Retain only a repeatable gain with original hashes/writer qualification and same-date normalized IOP state; otherwise restore and rebuild. Original/candidate files are saved by byte-preserving automatic edit/restore backups. External pre-edit manifest gif-incomplete-qualified-continuation-preedit.txt under artifacts root. The prior handoff section is historical below.
+
+## PRIOR HANDOFF - incomplete GIF batching tested; candidate game build and qualified comparison pending
+
+Checked at handoff: latest listed jobs are terminal; no build/replay was started for this handoff. Current runtime/vif.cpp SHA4ad13b1dfd7bdff24a742e24e17f2e1cb5e0533ac6b5291fc9d5c1b6f6895709 contains the incomplete-payload batching candidate. Candidate tests are current: runtime jobef82aa04ef7d408ca968eec4e156139e passed936 DIRECT serial-reference cases/7873 exact state/fault/partial-packet checkpoints; translationb497673c3a474bcfbaab8d81ff8cc8d3 and readinessa51315a84c244f0682c490aa03019cd2 succeeded. Fixture tests/vif_direct_regression.hpp SHA3dabfff8b56d81494d227ff185eeb109f3181121d638e5aa12e1a795e63ecf06. This does not establish candidate gameplay correctness or speed yet.
+
+The game executable still contains the previous original parser, not this candidate. Explicit compare_files proved build/Release/hg_game.exe is byte-identical to project-link-verifier/460d860b8d80482e8f2c8cc25779e2e1/hg_game.exe:36,022,272bytes, SHA2562afaeb1604b65bb1630d236f58d11171e60c4fa3489e4e8d37d07ebffaaa54e4. Last qualified control10.4763235089FPS=60 original heavy boundaries/5.7272host seconds,147-input provenance,864 original0x001bef84/caller002d1c50 events and established state hashes. Historical11.4FPS is not a current guarantee; do not dismiss the smaller later reduction without a comparable control. Source/binary mismatch here is a pending build; freshness must reject stale measurements.
+
+Protect the retained host redraw fix: runtime/game_host.cpp verified SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Original runner verified c8c2d5364eaa64ced38bbde901875f4e4b0b0d50368d55937000706ac029036f. Earlier inert DIRECT DMA helper is test-only. No new VU shortcut, timing probe, error suppression or clock change should be introduced while this candidate is compared.
+
+Immediate continuation: workspace/jobs/activity and required docs; build_game current candidate; check new post-link manifest and relevant actual native code/linked parser; run_game_replay gameplay33m/current, inspect faults and images/state; run_runtime_verifier gameplay33m/frames. Then reverse ONLY this candidate helper/callsite in runtime/vif.cpp to original SHA5ab22f5b286e0b192942b61da4d52173b9b4db98857509ac64fe2bbbde645924, rebuild and measure a fresh original control. Retain only repeatable qualified gain with state preserved. Reuse passed tests rather than repeating unrelated analysis. Preserve host, parser source-unit isolation, tests and provenance guard on any rollback. Candidate source backup plan: artifacts/gif-incomplete-payload-preedit.txt; handoff documentation manifest: artifacts/incomplete-gif-handoff-preedit.txt. No production code was changed for this handoff.
+
+## PRIOR ACTIVE - batch incomplete GIF payload, preserve every original commit/fault boundary, 2026-09-21
+
+Prior inert DMA helper is test-only; original runnerc8c2d536... rebuilt by79c41522908c4a9eaa0fe08b5a36754e. Current original exe2afaeb1604b65bb1630d236f58d11171e60c4fa3489e4e8d37d07ebffaaa54e4 qualifies460d860b8d80482e8f2c8cc25779e2e1 at10.4763235FPS with147-input provenance, all original image/EE/GS/VU/same-date IOP hashes and864 writer events. Earlier originals11.02/11.13 show variation; no historical sample is substituted as current baseline. Test-only helper and2338-state fixtures pass after CMake isolation.
+
+Next bounded production trial only runtime/vif.cpp: keep original serial GIF submit for the first qword of each run; afterward scan existing pending tags to find the first known incomplete tag payload. Concatenate remaining DIRECT bytes strictly before that payload's completing qword and without crossing GifPath::max_pending. The original submit still handles every tag, complete-packet decode/application, final payload qword and first overflowing/failing qword, preserving exact offending suffix/partial GS effects. This targets large IMAGE fragments and prior GIF suffixes that the rejected whole-EOP guard could not cover; it does not repeat the DMA-arrival helper or change scheduling. No new decoder, shader, header/layout, clocks/input or runner path.
+
+Tests first: extend tests/vif_direct_regression.hpp with large multi-tag/prefix fragments across all four GIF formats and capacity-edge errors, compare original production against frozen serial reference. Then implement candidate and rerun same fixtures, native translation/readiness tests, game replay and qualified alternating control. Preserve host1a122b9f and all explicit faults. Manifest artifacts/gif-incomplete-payload-preedit.txt; automatic original-byte backups. Retain only a repeatable qualified gain, not a large percentage against an isolated slow control.
+
+## PRIOR - close inert DIRECT DMA trial without retained speed change, 2026-09-21
+
+Filtered helper caller passed2338 exact state/fault cases and qualified ee470df3566642e6ac6ea86ca68a2130 at10.9568028FPS (60/5.47605s), all147-input provenance and established state/864 writers match. Prior unfiltered candidates10.943853/11.237597 and original controls10.273726/11.125079 show timing variation; the apparent first-pair benefit is not stable, and filtered refinement does not beat the latest original control. Do not keep this as a demonstrated speed optimization.
+
+Cleanup: restore runner exactly c8c2d536...; remove vif_dma.cpp from production hg_vif sources and compile it only into runtime_tests to preserve the independent regression fixture. Keep header/source explicitly experimental/test-only, no production call or diagnostic counter. Rebuild game/tests and qualified original control before the next mechanism. Protected host1a122b9f..., parser5ab22f5b... and decoder/renderer/clocks/input stay untouched. HG-DIAG-036 coverage remains useful evidence (7.15M batched words,7.31M checks); both trial forms remain unretained. Source backups are automatic; CMake original before this experiment in backupb966f8cf11e94fcb833f38d6aa97312c.
+
+## PRIOR - prefilter inert DIRECT helper calls after measured rejection overhead, 2026-09-21
+
+HG-DIAG-036 completed without faults and was removed: project-link-runtime/20260922T024554Z-c6cc6abda3b043de9a8e92cd6fb3153f counts7306154 helper attempts,25986 accepted batches and7151582 actually buffered qwords in31M..33M, with normal rendering/GPU work. This confirms large input coverage but also millions of no-op helper calls on other input. No FPS inference from probe. Original runner c8c2d536... is restored; helper remains unchanged804bc939....
+
+Bounded refinement: before the helper call inside the SAME while(pump_vif1()) loop, check pending.size()>=4 and (pending[3]&0xfe)==0x50. A positive helper result already requires exactly those byte/header conditions, so skipping all other helper calls preserves state (including interrupt-control codes). All helper DMA enable/mode/phase/source/boundary checks remain. No persistent header metadata or layout changes. Update the full-burst differential fixture with identical caller predicate and add all256 command-byte no-op guard checks. Tests, clean game build/replay and fixed-qualified original-loop reversal decide retention. Manifest artifacts/vif-inert-prefilter-preedit.txt; automatic byte backups; preserve host1a122b9f/parser5ab22f5b and all original guest work. Do not stack any independent optimization.
+
+## PRIOR - inert DIRECT DMA second pair only~1%; inspect coverage before retention, 2026-09-21
+
+Completed sequence A1=10.9438526FPS (7c07aef8...), C1=10.2737263(ccd2a496...), A2=11.2375965(e9e0f1d0f785456cbd92c70d6dbdbf78), C2=11.1250793(7eae15ea84ae4c94ada58c1e73808fef). Second candidate60/5.33922s versus second control60/5.39322s is1.0% less host time; first-pair6.1% benefit is dominated by a slower control and must not be generalized. All147-input manifests and established state/864 writer events match. Original runner c8c2d536... remains current at this point; no retained gain yet.
+
+HG-DIAG-036: restore candidate77cf0cb0... then add only runner-local counters around existing helper calls for31M..33M profiled unpaced replay. Count attempts, positive batches and buffered qwords, no per-call clocks or new common-header/layout fields; output once at budget. This checks whether saved input iterations are material and whether rejected calls dominate. Remove exact probe after one capture. Further qualified runs must use clean source/binary and explicitly distinguish the initial slow controls from warmed comparable pairs. Manifest artifacts/vif-inert-coverage-preedit.txt. Protected host/parser/guest clocks/input remain unchanged.
+
+## PRIOR - inert DIRECT DMA first pair suggests gain; repeat reversal, 2026-09-21
+
+Candidate7c07aef89334459d91f8d73c567d4d5c=10.9438526FPS (60/5.48253s), original-loop controlccd2a4965968416dbd4c9e42b453923e=10.2737263FPS (60/5.84014s). Control build06b7140518a14dc29580c3a6ad2ff400 produces2dc948f0863743e936caacbfc3b6533a941356b07002db6055501ad6ba047cda;147-input manifest and all original image/EE/GS/VU/same-date IOP hashes/864 writer qualifications match. One pair suggests~6.1% less heavy host time, but older original controls were11.02FPS and substantial host variance was observed, so no gain retained yet.
+
+Next bounded actions: restore candidate runner77cf0cb0... from backup31c67d408a1d49659e7133f13ab3fd87, rebuild/qualified repeat; then restore original c8c2d536... and repeat control. Keep new helper/library/tests unchanged and protect host1a122b9f.... Require direction consistent across comparable reversals, never use isolated changed-image or full-run timings as FPS. If flat/mixed, disable the candidate and record uncertainty. No new production mechanism while comparing.
+
+## PRIOR - inert DIRECT DMA replay correct; measure original-loop control, 2026-09-21
+
+Candidate buildb9a314fc04f9452ba2c296b2897aa5a4 produces20d478c4481a62b39c54fc4acd45bb3742079e24d8641393bbc72f5d25f728f4,147-input manifest. Replay project-link-runtime/20260922T023445Z-3bf473f0b3c640fba25fe5ddf740694c completes33M with original rendering counts and normal GPUflush0.4502317s/readback0.9639294s. Qualified7c07aef89334459d91f8d73c567d4d5c measures60/5.48253s=10.9438526FPS, all established frame/EE/GS/VU/same-date normalized-IOP hashes/864 writer events match. This single run does not improve over prior exact original11.02064FPS; no gain claimed.
+
+Next bounded step: byte-restore only runner to c8c2d536... using backup113cad5dc5ba4925b008c0ddae2ea053. Retain helper/library and its differential fixtures for comparison, but original loop does not call it. Build and qualified-verify original-loop control; if flat, count accepted batched qwords versus rejected helper calls using a brief counter-only trial before deciding whether predicate coverage or overhead explains it. No other production change and no guest-state/fault/clock/input adjustment. Protected host remains1a122b9f....
+
+## PRIOR - inert DIRECT DMA helper passed differential tests; enable bounded game trial, 2026-09-21
+
+New helper buffer_incomplete_vif_direct in runtime/vif_dma.cpp passed2082 exact state/fault cases (512 accepted predicate cases/231898 reference-equivalent qwords), plus all existing791 DIRECT/5124 checkpoints, UNPACK16777216 indices/24576 packet fixtures and other runtime checks. Buildfabc852929684baf8a5ff59608da3bbc/runtime0e82aa84afc7496db11f95bffbf25e96 succeeded; translation581d41dbb3024ff8ad9f38426c0ae228 and65536-readiness9bac028100f744a4b0e958f8282d4a0e pass. The runner has not used this helper yet.
+
+Next activation is only runtime/system_diagnostic.cpp: include the minimal vif_dma.hpp and call helper inside the existing while(ee.pump_vif1()) body. Original single-qword entry, final command/DMA/fault handling and all guest clocks/schedules remain. Helper never reaches a command/DMA completion or crosses source bounds; it only appends inert bytes and applies the equivalent channel increments/latched interrupt. Build, hidden33M replay, source/binary manifest, fixed qualified frames and original state comparison are required before any gain claim. Restore ONLY runner include/body for control, retaining test fixtures/library so measured difference is activation, not arbitrary source layout. Protected host1a122b9f... and original parser5ab22f5b... untouched. Automatic backup preserves original c8c2d536... runner.
+
+## PRIOR - batch only inert incomplete DIRECT input inside existing DMA service, 2026-09-21
+
+HG-DIAG-035 is complete and removed: project-link-runtime/20260922T022141Z-10b6ddd9ec4a48c7b6544089db0ae5bd measured564374/7306814qwords (7.724%) covered by complete-EOP packet batching; all57906 eligible packets began PACKED, none IMAGE. Original serial parser remains5ab22f5b..., runnerc8c2d536..., protected host1a122b9f.... HG-FAIL-031 closes that candidate with no retained speed change; fresh original qualification1945b31d... is11.0206398FPS.
+
+New bounded proposal: runtime/vif_dma.cpp + minimal forward-declaration header supply a helper used only INSIDE the existing while(ee.pump_vif1()) loop. When pending starts with validated aligned noninterrupt DIRECT/DIRECTHL, its full data has not arrived, and channel1 is already in a supported active normal/loaded-chain payload, gather contiguous source qwords directly into pending. Clamp to valid RAM/scratch, leave at least one qword before command completion AND one DMA qword so no decoder, transfer completion, tag operation or possible fault boundary is crossed. No clock/quantum or original instruction changes. This removes only repeated reconstruction/reparse of known incomplete input, not GS work; original pump handles every meaningful boundary. DMA MADR/QWC match N individual increments; unchanged GS interrupt pending repeatedly ORs cause0, so one sync preserves that latched state. Do not change public single-qword State::pump_vif1 semantics or any instance layout.
+
+Tests first with runner untouched: compare helper to N original pumps for thousands of accepted/rejected predicate cases, then full normal/chain bursts and faults including source-end, scratch, invalid phase/command, disabled channels, count0 and offending final GIF packet. New tests/vif_dma_regression.hpp is called by runtime tests. Add TU to existing hg_vif library. Only after tests pass enable helper in the runner's existing loop, build/replay/qualified A/B with original loop as control; keep only repeatable improvement and exact state. Manifest artifacts/vif-incomplete-dma-preedit.txt; automatic backups preserve current files. No other production optimization is active.
+
+## PRIOR - original parser protected at11.02FPS; count actual batching opportunity, 2026-09-21
+
+Exact pre-candidate parser5ab22f5b... built by e86abf453cb74988a84a7b6e2a35a70c, exe355f8ef9a1b61a32f958312c1171811d5027ca0e5e0847834f335018d060a20c. Qualified1945b31d1f4d440393e22906ae0a9d37=11.020639822FPS (60/5.44433s), all145-input provenance and established image/EE/GS/VU/same-date normalized-IOP hashes/864 writers match. This original control is better than the10.983700/10.638468 enabled candidates; no repeatable batching advantage is established. Keep the original parser and all regression fixtures. The much slower flag-off helper runs cannot be used to claim gain over the original implementation; cause of that variation/code-placement effect was not established.
+
+HG-DIAG-035 bounded next observation: keep ORIGINAL serial DIRECT loop. After each complete DIRECT length/phase validation, count commands/units and existing suffixes. Inside its unchanged qword loop, read-only look ahead only at an idle GIF packet boundary to count whole EOP packets fully contained in the current payload. Track remaining potential packet words locally so each eligible packet is counted once, but still send every qword through the ORIGINAL path. Enable only31M..33M in profiled unpaced replay with a forward-declared source-local enable hook, no VIF instance-layout/header changes and no clocks. One replay, then restore vif.cpp and runner exactly/rebuild. This determines why batching did not help before choosing another mechanism. Manifest artifacts/direct-coverage-probe-preedit.txt. Protected host1a122b9f... unchanged; no production optimization overlaps the probe.
+
+## PRIOR - DIRECT comparison needs exact original parser control, 2026-09-21
+
+Second enabled candidate7f89e3b7d40447a0aa3ab7940c142c3d measured10.638468FPS (60/5.63991s), source identical to the first10.983700 candidate; all established state and writer qualifications still match. The flag-disabled helper control gave7.564354 and8.917942FPS, with substantial run drift. It is not yet valid to claim a repeatable gain versus the original pre-helper parser, which previously measured11.038888FPS.
+
+Next bounded action: restore runtime/vif.cpp EXACT pre-candidate bytes using recorded backupc12b1fff45a84a289859a7fa953ef2cf (target5ab22f5b286e0b192942b61da4d52173b9b4db98857509ac64fe2bbbde645924), not merely the flag-disabled helper. Build and fixed-verify that original parser under unchanged host1a122b9f.... This isolates any helper/code-placement effect versus a real transport win. Candidate is preserved by restore backup and both qualified archives; native differential tests stay. No extra runtime modification until this comparison closes.
+
+## PRIOR - DIRECT A/B timing drift; repeat candidate before drawing a conclusion, 2026-09-21
+
+Enabled candidate80d93dc0... =10.983700FPS. Disabling only bulk_direct_packets and rebuilding creates f960af79...; control51b1d662... measured7.564354FPS with strongly diverging heavy windows8.50145/6.81334, then the SAME unchanged binary4629b9ad... measured8.917942FPS with8.86101/8.97561 windows. All145-input manifests and image/EE/GS/VU/same-date IOP hashes plus864 writer qualifications match. First control GL timings remain normal (flush0.4979346s/readback1.0478535s), so this is not evidence of the former15s duplicate-redraw GL pathology. Do not infer a45% optimization gain from the first slow control, nor call this a proven code regression.
+
+Next bounded action: restore enabled candidate from backup3b81d95591c74526a7de7e740e79f394, rebuild and repeat the fixed qualified verifier. Preserve all other files. Then coverage counters or an exact pre-candidate parser control can distinguish a genuinely effective fast path from a control-code-placement effect and changing host load. No other optimization is added during this comparison. Protected host1a122b9f... remains intact.
+
+## PRIOR - DIRECT candidate passes original state; compare a fresh serial control, 2026-09-21
+
+Candidate game buildc90ba92cde8a47168d49e38363a73ec9 produces executable81203c5184ecb7faac993906aaa17bca84006097de56aed9ba94dfa3d4d0c042.145-input manifest matches and the linker map includes the new helper in hg_vif:vif.obj. Replay20260922T020957Z-29040de5ebb8441da48e8d87c369f3aa completes33M with normal48195 sprites/305856 triangles/842 masked batches and flush0.4492686s/readback0.9979762s. Qualified80d93dc088d54b0486e8496abe29f38b measures60 original heavy boundaries/5.46264s=10.983700FPS, all established image/EE/GS/VU/same-date normalized-IOP hashes match and864 original-writer events qualify. This is not a demonstrated gain against historical outlined-parser11.038888FPS.
+
+Next bounded action: toggle ONLY bulk_direct_packets=false in runtime/vif.cpp; build and use the unchanged fixed qualified verifier for a contemporaneous serial-route control. Host1a122b9f..., renderer, decoder/materialization, clocks, input, faults and manifest guard stay unchanged. If flat, one counter-only packet-coverage capture will determine how often batching actually happens (rather than assuming complete EOP packets occur inside DIRECT). Remove all counters/rebuild before any further timing; reject unhelpful production changes promptly. Manifest artifacts/vif-direct-bulk-ab-20260921.txt; automatic source backups preserve enabled candidate. All prior native791-case/5124-checkpoint, translation and65536 readiness tests passed both original and candidate. No overlapping runtime optimization.
+
+## PRIOR - batch complete DIRECT packets without changing original decode/commit semantics, 2026-09-21
+
+HG-DIAG-034 captured and both source probes removed. In60 heavy VIF bursts (4.6822539s inclusive), MSCAL/MSCNT account for2.5662147s and DIRECT61146 commands/7306814 qwords/116909024bytes for1.6075108s. Completed UNPACK is only~0.176s, explaining flat word/index experiments. Normal GPU timings/work counts remain; diagnostic overhead and nested work preclude treating these as exclusive or qualified FPS. Evidence project-link-runtime/20260922T015200Z-c79db1b4e97b4a43806f598f36fc5af7. Source is clean baseline vif.cpp5ab22f5b.../runnerc8c2d536..., but built binary is still diagnostic until next build.
+
+Next bounded candidate: private helper in runtime/vif.cpp handles already-complete DIRECT/DIRECTHL bytes. If GifPath.pending is empty, find first complete EOP packet entirely inside the validated payload, check max_pending, bulk-append exactly that packet, invoke the SAME materializing decode_gif_packet/apply_gif_register_transfers, then clear only after success. Existing pending suffix, incomplete packet or oversized packet takes original per-qword helper. Preserve original payload-phase/length checks, command order, partial GS effects and retained offending packet on errors; outer VIF cursor/pending still changes only on successful command. No new decoder, early partial-packet commit, missing fault, renderer/input/clock or host change. This differs from rejected word serialization and complete-packet streaming trials by batching transport only while retaining original decoding.
+
+Tests first: add tests/vif_direct_regression.hpp and runtime hook; compare original against a frozen serial DIRECT reference across payload chunking, prior GIF suffixes, multiple EOP/non-EOP tags, formats/descriptors/PRE/Q rules, draw/transfer/error cases, phase/truncation/capacity and exact partial state. Then apply candidate and rerun all. Optional one counter-only capture establishes actual fast-path calls; remove it/rebuild before qualified A/B. Baseline outlined-parser qualified11.038888FPS, exe868018f5...; protect host1a122b9f.... Retain only for repeatable gain with state hashes intact, otherwise restore helper/callsite only. Manifest artifacts/vif-direct-bulk-preedit.txt; automatic backups preserve source. No overlapping production experiment.
+
+## PRIOR - completed VIF command attribution after verified parser isolation, 2026-09-21
+
+Parser isolation passes all native regressions,65536-readiness,128 Python tests and original gameplay. Qualified e4ce9a76aff64860a6aa698baf976aec=11.038888FPS (60/5.43533s),145-input manifest and all established frame/EE/GS/VU/same-date normalized-IOP hashes match. Build165a1fe5a819443d824c40738565d13e produced868018f56af75fe0d09ee45d870582c8d91f0cacc89fa502365f0bdf2de8bfcb, and linker map places process_pending in hg_vif:vif.obj. Unpaced replay20260922T014543Z-2b1d59393f22405b8483c6f544e426a3 preserves normal work counts/flush0.45532s/readback1.02523s. Retain source-unit isolation for practical build/diagnostic iteration, not as a claimed FPS gain. Original division-based UNPACK and original word helper are retained; all new differential fixtures stay.
+
+HG-DIAG-034: temporary runtime/vif.cpp and system_diagnostic.cpp changes only. At31M in profiled/unpaced33M, enable fixed thread-local counters. Time complete MPG/UNPACK/DIRECT/MSCAL/MSCNT operations once per command; count attempts and incomplete commands without per-qword clocks. Group UNPACK by format/mask/mode and record units/bytes. Runner separately times only active VIF DMA bursts. These overlapping inclusive times identify major work, not additive exclusive whole-frame costs. No Vif1Path layout, guest code/input/clock/render/error/partial-write or command-order changes. Restore both files exactly after one useful replay and rebuild clean before qualified FPS. Manifest artifacts/vif-command-profile-preedit.txt. Only pursue bulk already-complete DIRECT transport if this measurement shows material cost; otherwise prioritize the measured VU body or actual dominant command.
+
+## PRIOR - isolate unchanged VIF parser to remove repeated full-game rebuild cost, 2026-09-21
+
+UNPACK cursor trial is inconclusive and source-reverted. All16,777,216 index cases,24,576 complete/incomplete/fault packet fixtures, runtime/translation and65536-readiness tests passed original and candidate. Native process_pending bytes confirmed removal of per-vector division (original function file offset201632, candidate loop slice202656 SHA16601d67...). Hidden replay20260922T012323Z-6fd283b94bcb42b28a8bb227d924c243 preserves work counts and normal GPU timings. Qualified candidatesdc105eb276824bf4899d31b4a01bcc74=11.068579FPS and6d90972e6b354ae6b803dc47e9463ae0=10.926593FPS versus fresh original control4b1d9bef5834489fb798137145ba3893=10.942196FPS overlap variance. Do not retain as a demonstrated gain. Header restored exactlyc7891753... using5500e3f0...; independent regression tests remain. Game binary still candidate until next build; freshness gate protects that mismatch.
+
+Next bounded maintainability change: move ONLY the original Vif1Path::process_pending body unchanged into runtime/vif.cpp, leave a declaration in the header, and add hg_vif static library to the existing CMake runtime dependencies. It was already emitted as an out-of-line native function in system_diagnostic.obj; no decoder/guest semantics are being replaced. Aim is to let future parser-only diagnostics/changes rebuild one translation unit instead of every large EE/VU shard. Preserve body operations, exception strings/order/partial state, all input/clocks and protected host1a122b9f.... Validate all synthetic/runtime tests and original replay/qualified state/FPS against control, record compile impact separately from game FPS; rollback if significant unexplained regression. Manifest artifacts/vif-parser-unit-preedit.txt and automatic exact backups. This is not an accepted runtime optimization yet.
+
+## PRIOR - exact UNPACK cursor recurrence; original control and host fix protected, 2026-09-21
+
+Word-range trial closed without a retained speed change: fresh candidate88bac4c386484cf2b68bb33f16da4e7b=10.92770775FPS (60/5.49063s); restored control4b1d9bef5834489fb798137145ba3893=10.94219603FPS (60/5.48336s). Both143-input manifests,864 original writers and all established frame/EE/GS/VU plus same-date IOP bdbf3a11... hashes match. Header is byte-restored c7891753..., game exe14b5dce0... built by2f7c98481ccb47769647eaf7cadf2e1d. Difference is inconclusive (~0.13%), not proof of universal inferiority. New word-read regression tests are retained; the shortcut is not.
+
+Next bounded change is only VIF UNPACK per-vector indexing, not the previous word helper, contiguous memcpy, arithmetic or GIF serialization. The original loop recomputes in_cycle=n%wl and vector=destination+cl*(n/wl)+in_cycle (or destination+n for fill). An induction-equivalent cursor starts at0/destination, increments once per completed vector, and at wl wraps phase and adds max(cl-wl,0). Independent enumeration checked16,777,216 cl/wl/vector states. Preserve original per-vector bounds check, per-field order, input eligibility, mask saturation at cycle3, signed extension, mode2 row feedback, undefined lanes, partial writes before faults, pending bytes and phase. No original guest instructions, clocks, renderer/input or host changes.
+
+Files: runtime/include/hg/vif.hpp, test-only new tests/vif_unpack_regression.hpp plus its runtime_tests.cpp hook. First run the frozen independent scalar/formula reference fixture against the original implementation, then candidate. Cover all16 format codes, zero/skip/fill CL/WL, count limits, modes/signedness/masks/TOPS/edge addresses/truncation and exact fault text/state. Build/replay/native-code check and qualified comparison decide retention; no gain is assumed from fewer divisions. Manifest artifacts/vif-unpack-cursor-preedit.txt; automatic exact backups preserve current bytes. Host1a122b9f... and disabled embedded rounding/original XYZ stay unchanged. PCSX2 semantic probing is unnecessary for this algebraic host-only indexing equivalence.
+
+## PRIOR - close word-range experiment with a fresh original-route control; host fix protected, 2026-09-21
+
+Recovered completed VIF word-range candidate tests/build/replay and verifier f865eea233e64702bfca088351f5e2dc=10.33145014FPS. Fresh unchanged-candidate verifier88bac4c386484cf2b68bb33f16da4e7b=10.92770775FPS (60 boundaries/5.49063s),143-input freshness,864 original writer events, all established EE/GS/VU/frame and SAME-DATE normalized IOP bdbf3a11... hashes match. This variation does not establish a gain over the original route or stable11.4FPS.
+
+Before more edits, restore ONLY the complete-span shortcut in runtime/include/hg/vif.hpp::word to the original four .at expression, preserving differential tests and the retained event/refresh host1a122b9f.... Expected original header c7891753..., candidate d8ac219b.... Build and fixed-qualified verify the control. Do not accept a small change based on historical rates. Manifest artifacts/vif-word-resume-control-preedit.txt and automatic exact source backup. While compiling, audit the remaining measured3.585s VIF burst path and prior failed packet/arith/clock trials for a genuinely distinct opportunity. No game functions are guessed or skipped; PCSX2 stays external semantic oracle only.
+
+## PRIOR - bounds factoring trial with original fault path; host baseline protected, 2026-09-21
+
+HG-DIAG-033 is removed byte-exactly. Unpaced worker CPU-accounted4.859375/5.0162412wall seconds (~96.9%); paced diagnostic5.3125/5.8396614 (~91.0%). Both show CPU work dominates without proving a specific cause of the observed timing variation. Clean rebuild1977a3ff46cb4a97b2c3a5839ed4a974 produced6b3651457fe9691d68a22b30fa583eb0288432de96d6e6bf0f2656ca2e3666dd. Clean fixed control ef7e59342635401bb9168f6b704f62f1 passes143-input freshness,864writers, all EE/GS/VU/frame hashes and SAME-DATE normalized IOP bdbf3a11..., but measures9.7812744FPS, windows9.177090/10.470619. This variability is explicitly preserved in evidence, not relabeled stable11.4FPS or blamed on removed code.
+
+Next one small CPU-side change: runtime/include/hg/vif.hpp::word uses an overflow-safe complete4-byte range check before the same little-endian assembly on bytes[]; out-of-range cases execute the unchanged original four .at calls. The current native process_pending body contains four separate bounds checks/byte operations at many word sites. A checked span can let the compiler combine safe loads without changing allowed inputs, faults, command execution, byte order, clocks or guest state. This is not GIF byte append, V4-32 memcpy, stride/mask changes, readiness elision or arithmetic specialization. No emulator or external implementation used.
+
+Add original-expression differential tests in configured runtime_tests: everyoffset for sizes0..1024 with excesscapacity, nearSIZE_MAX offsets and randombytes; exact value/error text and unchanged storage. Build/tests/replay/native-codeinspection/qualifiedcomparison. Do not retain based on one candidate result while conditions vary; restore a contemporaneous control, require a clear repeatable gain, otherwise revert only wordhelper. Protected host1a122b9f... and original XYZ/disabledembeddedrounding unchanged. Manifest artifacts/vif-word-range-20260921-preedit.txt; all exact backups automatic.
+
+## PRIOR - original runtime restored; same-binary timing drift requires CPU/wall attribution, 2026-09-21
+
+Restored XYZ build391811f6a67540c9a21c1a3582f228e5 succeeded, exe096308e88eadea226d0d2e3bd76ee9379b298a0b3dbece63cceb79777dd9b484. Qualified original-route verifier b016fd15850d4ea497d3dffcd1f96865 measured9.24673051FPS (60/6.48878s); unchanged executable retry65a9ed9ab1db414c9612cb854453b441 measured10.61032349FPS (60/5.65487s). Both pass143-input freshness and864-writer qualification. Input digest equals original11.420718 control. GPU flush/readback remain approximately0.52s/1.08s full-run in the slower control, not the former15s stall. Thus neither the slower candidate nor a single restoration rate isolates a code-induced regression; XYZ candidate remains reverted and no new performance candidate is accepted.
+
+The second control crossed the remote RTC's UTC date boundary: old bfcd0..7=00 39 58 23 00 21 09 26, new=00 16 00 00 00 22 09 26. The existing normalized IOP SHA is different because only bfcd1/2/3 time-of-day is masked. EE RAM, GS VRAM/state, VU and final frame still match. Do not claim complete IOP equivalence across this date or silently expand masking; use subsequent same-date controls for comparisons.
+
+HG-DIAG-033 bounded plan: runner-only current-thread/current-process CPU time snapshots via GetThreadTimes/GetProcessTimes plus raw QueryThreadCycleTime and steady_clock at31M,32M,33M in configured profiled33M. Three snapshots, no per-instruction/qword hook and no unrelated process access, priority/affinity/system setting change. Preserve guest clocks/work/faults and host1a122b9f... . Compare worker CPU-accounted time against host elapsed, without converting raw cycle counts to time or asserting a particular scheduler/driver cause. First unpaced capture20260922T000338Z-20d93d6e4ad940e49e73a065dc1f4cac completed normally:31M..33M wall5.0162412s, worker user+kernel4.859375s (~96.9% CPU-accounted), normal full-run GPU flush0.4828s/readback1.0310s. Raw cycles are recorded but not converted. Refine the second capture to the existing fixed paced verifier so CPU/wall separation is observed under the actual measurement mode where drift occurred; treat its runtime instrumentation as attribution, not a retained performance candidate. Then remove exactly/rebuild and requalify. This diagnostic does not change the frame metric and is not new performance evidence. Manifest artifacts/worker-cpu-wall-profile-20260921-preedit.txt; primary API semantics verified in Microsoft GetThreadTimes/QueryThreadCycleTime documentation. VIF index-division work is deferred until a reliable baseline exists.
+
+## PRIOR - XYZ candidate rejected; restore and requalify the protected baseline, 2026-09-21
+
+The XYZ combined integer candidate passed196608 scalar-reference state/fault comparisons across16 host MXCSR modes (packed backend available), runtime/translation and65536-readiness tests. Its linked prepare<true> at RVA021d6710 contains a call to existing try_fpu_madd4 at021d7380; inspected512-byte native slice SHA fdfa4f663cbbc0ad6724cb795087b5c87b6e278a4448fdbe66f1c06985d15693 proves the changed call path is compiled. Hidden replay project-link-runtime/20260921T235220Z-333e70c1362844fcbf03f1e9646b93a8 reached33M with normal work counts and no faults.
+
+The first qualified attempt279e1b9fcdf44242a7fc4661ee095eb0 was rejected BEFORE launch for another game/compiler; it is not a performance sample and the guard was not bypassed. Retry a1d1ac4a214b4cc5bb310bfaae4e9543/evidence738f8376d47f407693b846222e94e3ef passed143-input freshness and all established frame/EE/GS/VU/normalized-IOP hashes,864 original writer events, but measured10.474293FPS (60/5.72831s; windows10.352681/10.598797), versus preceding original11.420718FPS (60/5.25361s). This offers no acceptable speed gain; candidate was immediately byte-restored via backup e6739974b2004e96aaf71250e6303b67 to runtime/vu_xyz.cpp SHA f468e046c6a02c22419ecb2986525a3e2283c009f22b3035a2c506ef428f072e. The protected host1a122b9f... and disabled embedded-rounding route remain untouched. Independent XYZ regressions in runtime_tests.cpp are retained.
+
+Next rebuild restored game and qualified-verify the control under current conditions before making any performance conclusion beyond rejection of this candidate. No slower runtime change may remain accepted. If control does not recover, investigate run conditions rather than blaming the removed code. HG-DIAG-032 probe remains removed; only its measured attribution and new test coverage are retained.
+
+## PRIOR - fresh11.420718FPS control; test combined XYZ integer product+sum, 2026-09-21
+
+HG-DIAG-032 capture project-link-runtime/20260921T234321Z-549f1512122044dbbb449017c113e666 finds recovered heavy-loop4.8610742s with3.5851216s in60 VIF bursts; GIF service0.0400684s, explicit raster0.306112s. GS timings include nested work (sprites0.6324601s, strips0.3381137s) and are not additive exclusive totals. Full-run GPU flush0.4318462s/readback0.9447543s remain normal. Runner probe byte-restored, clean build3ee4ea2f24714fb28c21e1b0ca4223a2 completed, and fixed qualified control6959edb5bf4c4a0791f214be80482c55 measured11.420718325FPS,60 boundaries/5.25361s. All143 inputs, original864-writer provenance and established state/image hashes match executable0324fba5.... Protected host1a122b9f... is untouched.
+
+Next one bounded candidate changes only runtime/vu_xyz.cpp plus focused runtime-test coverage: for already-validated XYZ MADD/MADDA, use existing CPU/OS-guarded combined integer product-and-add helper directly on the existing4-word register backing arrays. Consume only three result lanes and their flags; never read architectural W, require W definedness, write W, or let W exception bits affect status. VF00 XYZ uses literal zero inputs. Every invalid/undefined case and unavailable-CPU case retains original scalar reference/fault order. Standalone MUL remains unchanged. This differs from HG-FAIL-019's three scalar products plus padded add4: both arithmetic stages are packed together and there are no input-padding copies. It does not enable the failed embedded-rounding helper (still false), introduce FMA, or change instructions/clocks/readiness/emitter/renderer. Mathematical source is the existing lane-independent integer helper and scalar mask14 reference.
+
+Validation: explicit mask14 scalar-reference state/fault tests across edges/random inputs, aliases,VF00,undefined W/XYZ, invalid indices/broadcast, sticky/MAC flags, clocks and MXCSR modes; build, hidden original replay and qualified control/candidate alternation if worthwhile. Keep only repeatable FPS benefit, otherwise restore only vu_xyz.cpp and rebuild clean. Pre-edit manifest artifacts/xyz-combined-integer-madd-20260921-preedit.txt; exact automatic backups protect the baseline. No speed gain is yet claimed.
+
+## PRIOR - preserve11.4FPS and attribute remaining whole DMA bursts, 2026-09-21
+
+Continuation verified no active jobs and current qualified original-arithmetic executable78a0c91d... at11.401186864FPS, with protected event/refresh host SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Do not repeat disabled MADD, byte-append, VU identity or unchanged sparse-readback trials. Existing DiagnosticProfile samples only roughly1/256 outer slices; costly DMA work can occur in rare long bursts, and old whole-system timing predates the retained host fix.
+
+HG-DIAG-032 plan: modify only runtime/system_diagnostic.cpp temporarily, activate solely at31M in configured profiled unpaced33M. Time complete VIF and GIF service spans (three host clock reads per outer slice, no guest-instruction/qword hooks); record sums/maxima and active-channel counts. Enable existing per-primitive GS host counters at31M, clearing only those counters and existing raster host counters, never guest GS state. End heavy-loop timing before bulk budget logging. Keep every original pump call, raster operation, synchronization/fault, input and guest clock. No generated/emitter/header/host change. One hidden33M replay yields attribution only; remove probe byte-exactly, rebuild before qualified timing, and select one meaningful optimization from the measured dominant class rather than another instruction-count guess. Pre-edit manifest artifacts/recovered-host-burst-profile-20260921-preedit.txt; automatic byte backups preserve the runner. No speed gain is assumed.
+
+## VERIFIED - recovered11.4FPS host retained; arithmetic experiment disabled after flat comparison, 2026-09-21
+
+Final test rebuild07619d594ccc4f2e8fed7655229cb2ca succeeded. Current-route runtime tests d8c32d449bba467c81472b7f27be168c pass (8452608 scalar lanes in direct helper fixtures,4608 GIF byte cases,5788 packet state/fault checkpoints and keyboard cases); translationa4170de1f1a645fa9c054d1cb7257ef7 and65536-readiness5bb37491043f449a9224ad51752d18f2 pass. build/Release/hg_game.exe is byte-identical to final verifier47eac334b33a4a2b9f0a5b3acd8fce84/hg_game.exe, SHA78a0c91d.... All jobs started in this update are terminal. No production arithmetic shortcut or temporary timing probe was left enabled; the proved host fix and source/binary freshness guard remain.
+
+Current original-arithmetic-route build14d202aae83044fdb10560e15b3672f2 succeeded. Executable SHA25678a0c91d159da2b8472688a93594298b144a9b7c21c1c5c600b62a6aff094dcd (36,022,272bytes). Final fixed qualified verifier joba02e4fc3207e4d09b17005ba236370c7, evidence project-link-verifier/47eac334b33a4a2b9f0a5b3acd8fce84, measured11.4011868636FPS (60 original heavy boundaries/5.26261host seconds; windows11.38766/11.41474). All143 manifest inputs and isolated executable match; all established final frame/EE/GS/VU/normalized-IOP hashes match;864 original0x001bef84/caller002d1c50 events with zero lost/unexpected/caller/invalid-stack failures. No30FPS claim.
+
+The guarded arithmetic candidate measured11.3883758847FPS in the immediately preceding qualification (evidence9e7d985c63b6448c8312d3d912fa8039,60/5.26853s). Its difference from current control is about0.11% and does not establish any benefit or meaningful regression. use_embedded_rounding_madd is now false in runtime/fpu_add4.cpp SHA213498c2d38ab1b0c9fe8a97ed574493c5d40c791b9e6d916d513080783b9513. Candidate helper/direct regression tests remain for reproducibility but gameplay uses the original integer/AVX2 path. No candidate arithmetic shortcut is retained in the production route.
+
+The successful event/refresh host is unchanged SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436; the4FPS regression is recovered, current qualified baseline remains11.3-11.4FPS, above historical9-9.5FPS. Current game source and executable are synchronized. All timings use the unchanged original-writer verifier, never video/presentation counts. Next work must preserve this host fix and identify meaningful remaining CPU/VU/GS work before another small trial; do not repeat disabled arithmetic or word-append trials unchanged. Detailed experiment/backup manifest artifacts/madd-er-qualified-control-20260921-update.txt. Latest test/build job status should be checked on continuation.
+
+## PRIOR - recovered host protected; arithmetic candidate qualified but no demonstrated gain, 2026-09-21
+
+Latest fixed qualified candidate job2d0faf7fcf7d47c19d236b6ec499f7bd, evidence project-link-verifier/9e7d985c63b6448c8312d3d912fa8039, measured11.3883758847FPS (60 heavy boundaries/5.26853host seconds; windows11.37635/11.40043).143-input freshness matched executable be497bc09aa35d12aabf079cf560b603124e6f8dcb3c9fb30046605a038eac2a. All established frame/EE/GS/VU/normalized-IOP hashes and864 original0x001bef84/caller002d1c50 events match; no qualification failures. Existing direct tests passed2113152 vectors/8452608 scalar lanes with16 MXCSR modes, guard fallback, exact flags and failure atomicity. The prior protected baseline measured11.4190446827FPS. This small difference is NOT a demonstrated gain or proof of a real regression.
+
+Bounded next action before accepting any arithmetic change: change only runtime/fpu_add4.cpp use_embedded_rounding_madd from true to false, preserving the helper and direct regression tests for reproducibility. Rebuild game and fixed qualified-verify the original arithmetic route under the current retained event/refresh host. Do not restore old game_host.cpp or alter guest instructions/clocks, input, rendering, errors or verifier. Keep the arithmetic experiment disabled unless repeatable improvement is established. Source/decision manifest artifacts/madd-er-qualified-control-20260921-update.txt; automatic exact backups preserve the enabled dispatcher. Current protected host remains1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Current docs below describing a disabled initial route are historical; enabled candidate really ran in this latest qualification.
+
+## PRIOR - protected11.4FPS baseline; guarded exact full-lane arithmetic candidate, 2026-09-21
+
+GIF word-append trial is inconclusive, not retained: candidate11.434888FPS vs restored11.419045, mixed window direction and~0.14% aggregate. gs.cpp is original e03185c7... and current built controlc8be3a4d... is source-matched. The4608 bytewise transport regression fixtures are retained independently. Machine code confirmed the candidate really changed sixteen stores to two; fewer instructions alone did not give measurable FPS. No host fix was reverted.
+
+Next single bounded candidate: isolated full-lane MADD helper using AVX512 embedded round-toward-zero and suppressed host exceptions, but only for a proved normal-value range. No global floating-point mode change and NO FMA: product and sum remain separately rounded. Existing integer Fpu::product/add and AVX2 remain reference and fallback. Exponent-zero inputs are explicitly flushed to signed zero. Exponent255 always rejects. For nonzero products guard sum of encoded input exponents in128..380; this ensures product exponent1..254 regardless of significand carry. For addition, sort magnitudes, require larger exponent24..253 (or both operands zero), then clear the smaller operand's lowest delta significand bits before addition, or replace it by signed zero when delta>=24. This reproduces the original pre-add truncation without guard/round/sticky bits; nonzero difference is at least one big-exponent mantissa unit and cannot underflow within the guard. Upper exponent limit prevents IEEE overflow saturation from masquerading as a valid normal result. Every rejecting case leaves output state untouched and follows the unchanged integer path. Masked4-lane loads/stores read/write exactly16bytes.
+
+Files: new runtime/fpu_madd4_er.cpp and tests/fpu_madd4_er_regression.hpp, runtime/fpu_add4.cpp dispatcher, its small API header, CMake isolated source flags, runtime_tests integration. Gate by CPUID AVX512F/DQ/CD/BW/VL plus AVX2/OSXSAVE and XCR0 extended-state bits0xe6; no CPU feature is assumed. Initial production route is disabled while direct guarded helper tests establish bitwise equivalence, failure atomicity, signed zeros/cancellation/exponent edges and host MXCSR preservation over all4 rounding modes and4 FTZ/DAZ modes. Existing VU flags/readiness/advances/input/render faults are not edited. Only after tests, enable one route, build/replay/qualified A/B with recovered event-host baseline; retain only repeatable gain, otherwise restore/disable and rebuild. This is neither the rejected prepared matrix path nor padding partial XYZ into SIMD. Backup/hash manifest artifacts/guarded-madd-er-20260921-preedit.txt. Primary ISA/compiler documentation is recorded there; independent mathematical equivalence to the current model, not a new claim of complete console arithmetic fidelity.
+
+## PRIOR - preserve recovered11.3FPS; remove proven bytewise GIF append overhead, 2026-09-21
+
+Continuation confirms current executable8faa79a2... and qualified verifierf7e7e60d...=11.370032FPS with established hashes and142-input freshness. All previously pending native/runtime/translation/65536-readiness and128 Python tests have passed (latest jobs9f6754cf...,3cbbc4c7...,6d07edc8...,098f8e0f...). Do not roll back the retained event/refresh host when editing GS transport.
+
+Controlled-input smoke evidence project-link-visible/20260921T203204Z-0baaca1564d54a90a3572e41a034b953: delivered left26M..26.5M moves original no-card selection from NO to YES; cross50.78M..51.29M advances saved game image to CAPCOM. Logs show all press/release events. Saved images were inspected. Owned PrintWindow capture in the preceding33M smoke was all-white despite valid saved game pixels, so actual on-screen/resize/physical keyboard display is NOT certified by this tool. The first smoke hit its60s wall limit; second was explicitly cancelled after the functional input check, terminal confirmed. These are not gameplay FPS runs.
+
+Native audit found current GifPath::submit_qword at RVA021d3180 emits sixteen separate byte stores, fourteen shifts and repeated vector pointer reloads for every qword; the current native384-byte evidence slice SHA is c80276a1c962fbc938c4360c1bd98430e38dd265f4a6ca0a4afbfa080ff81c65. Prior heavy-phase count is17,850,014 GIF qwords. Next bounded candidate changes only the append serialization in runtime/gs.cpp: recognized little-endian hosts use two8-byte memcpy calls after the same vector resize; unknown/big-endian targets keep the existing scalar loop. Preserve all parser/decoder/GS application/fault/queue/clock/input behavior. Tests in tests/runtime_tests.cpp independently compare pending bytes over boundary/random values, growth/reset and deliberately unaligned host-buffer prefixes; original incomplete packets and malformed-transfer faults must remain. This is neither the rejected streaming parser nor changed packet storage/lifetime. Manifest artifacts/gif-word-append-20260921-preedit.txt; all edits byte-backed-up automatically. Build/test, inspect machine stores, hidden replay and qualified A/B. Keep only for repeatable gain over the recovered host baseline, otherwise byte-restore and rebuild.
+
+## RETAINED - event/refresh-aware host reversibly recovers11.3FPS, 2026-09-21
+
+Four interleaved qualified observations now establish the host-loop effect under current conditions: original6307f56dbf734d9390d5f16726eba31d=4.082260266FPS (60/14.69774s), candidatec6a43b6fc9584ca59d7b516029da6c53=11.326161356FPS (60/5.29747s), restored original7f64ea2afa9c4ac4a1c82c8221b27ad1=4.058046294FPS (60/14.78544s), exact restored candidatef7e7e60dcb5248f691ebf6c9276f73b3=11.370032007FPS (60/5.27703s). All four pass142-input freshness, original0x001bef84/caller002d1c50 provenance864 events and every established frame/EE/GS/VU/normalized-IOP hash. No GLSL/GS/VU/guest-input/clock/verifier change. Candidate is retained; this is reversible recovery beyond the historical9-9.5 range, not30FPS.
+
+Current source runtime/game_host.cpp SHA1a122b9f3c1ed5521f6270d2189171e0966c18db868c0c46b04b7af2bb408436. Build43dbaa78038e4e9da8972ebc53ab23b8 produced36,022,272-byte exe8faa79a2734d65dbb2e124401d1ce1a05c20f1fff02d585ce1bb03563f2bc1db; input-manifest SHAebb3025f7567c429e02e091311ed8c99f9c7e0651cbf585247cacd9981b38444. Original baseline source/executable and candidate are preserved in automatic backups and verifier evidence. No rejected GL callbacks/context changes or VU shortcuts were revived. Probe counters are removed.
+
+Mechanism established at application level: old UI performs clear/draw/swap without new CPU pixel frames; probe measured6235 duplicates out of7097 swaps. Avoiding redundant host redraws while retaining fresh frames and resize/refresh handling drops replay flush15.2648s ->0.4385s, readback3.8024s ->0.9461s and reversibly raises qualified FPS. glGetError was the place contention surfaced, not necessarily the root cause; the exact driver-internal reason for the historical shift is still unknown. The unchanged archived-binary test ruled out recent recompilation as necessary, NOT the old native host loop as a contributor.
+
+Next finish regression tests and bounded visible/controlled startup smoke test if the current tool supports the required stage without long unrelated replay. Actual physical keyboard/resize/exposure behavior is not certified by hash equality alone. Then profile remaining heavy native work against this stable11.3FPS baseline rather than modifying driver settings. Do not roll back the retained host fix when testing future candidates.
+
+## PRIOR - event-driven host recovers11.326FPS; reverse control and repeat before retention, 2026-09-21
+
+Candidate host-only source SHA1a122b9f... compiled executable3f70b15abfb3ec7fd4bc153bb2e84bd1960f82b43bd7e0d70dbbac8da66163ee. Replay project-link-runtime/20260921T202106Z-e9edd49b71924be89aa03acbefd1f511 reaches33M with unchanged48195sprites/305856triangles/842masked batches; flush0.4384992s/readback0.9460685s versus15.2648s/3.8024s in the count-only old-host probe. Final image matches baseline exactly.
+
+Fixed qualified verifier c6a43b6fc9584ca59d7b516029da6c53 passes142-input freshness and all established frame/EE/GS/VU/normalized-IOP hashes and864 original writer events. Heavy60 boundaries take5.29747host seconds =11.326161356FPS; both individual intervals11.3267/11.3256. Compare current old-host baseline6307f56d...=4.082260FPS, not only historical9FPS. This is promising recovery, still requires reversible contemporaneous control.
+
+Next bounded validation: restore only game_host.cpp using candidate backup3d6ddd5559264286a5ced680990b699a to baseline cf8db914..., build and fixed-verify old host again; then restore exact candidate bytes from the restore backup, rebuild and verify again. No new optimization or driver/OS setting change in this A/B. Retain only if old-host stalls return and candidate recovery repeats with exact guest state. After a positive A/B run focused native/Python regressions and a bounded visible-input smoke test where supported; do not claim resize/input physical testing without execution evidence. Source/binary gate remains active for all qualified runs.
+
+## PRIOR - reduce measured redundant host redraws; preserve all guest rendering, 2026-09-21
+
+HG-DIAG-031 completed: project-link-runtime/20260921T201812Z-ca7efefa54de4b79a56614944ada17ea recorded7097 actual swaps/6235 duplicate swaps/862 fresh presents in42.9934s, with ordinary game draw counts and15.2648s flush/3.8024s readback. The probe was byte-restored. This establishes excess host presentation work, not yet causation for the GPU stalls.
+
+Bounded candidate in runtime/game_host.cpp only: redraw/swap for fresh mailbox frames (including identical pixels), initial paint, framebuffer-size changes or GLFW refresh requests. Keep all existing texture uploads and optional presentation validation; never alter original GS draws, driver errors, barriers, guest clocks, recorded inputs or FPS metric. Wake UI through glfwPostEmptyEvent after frame publication, fault status and completion; callbacks stay UI-thread only. Continue input/status/close checks every iteration and use bounded4ms event wait only when no redraw, retaining existing50ms minimized handling. No OS/driver-setting change or other-process access. Primary GLFW docs plus this project's existing opengl_host.cpp guide the independent host-only implementation. Manifest artifacts/event-presentation-20260921-preedit.txt. Build/replay/qualified verifier, exact image/state comparison, then restore contemporaneous control and re-enable only for repeatable improvement. Remove all probe counters before timing.
+
+## PRIOR - investigate duplicate presentation load without changing guest work, 2026-09-21
+
+Fresh unchanged-build verifier6307f56dbf734d9390d5f16726eba31d measured4.082260266FPS with142-input provenance and every established state/image hash matching. No current code regression or recovery is established by this small variance from4.002887FPS. The previously tested unchanged archived control already shows the same driver-wait inflation; use those artifacts rather than duplicate its replay without a changed condition.
+
+Source audit found the host UI unconditionally glClear/draws/swaps even when no fresh pixel mailbox item exists. Its existing presented count hides duplicates because it increments only on fresh frames. New bounded HG-DIAG-031 in runtime/game_host.cpp will count actual swaps and no-fresh iterations only, and report once at teardown using the already existing wall clock. No GL command, guest operation, input, clock, errors or wait changes. Build/replay once, then remove the counter probe. If actual duplicate load is excessive, consider event-driven/refresh-aware host-only presentation (new frames and inputs still delivered) rather than altering GS or global driver settings. If not, use other measured host scheduling evidence. Manifest artifacts/host-swap-audit-20260921-preedit.txt; automatic exact backups apply. GLFW event/refresh contracts independently checked in official input/window guides.
+
+## VERIFIED CLEAN STATE - freshness guard retained; current GPU latency unresolved, 2026-09-21
+
+Final restored game build d607ee921baf4b7ba46948506d297acc succeeded. build/Release/hg_game.exe is36,021,248bytes, SHA256 7de5e17780c2108fa5dc585318cad33e7a76f3c9c3647c9289eff38757bb85f0. The executable is byte-identical to the isolated final verifier copy; GlErrorMonitor is absent from the linker map. The post-link manifest records142 inputs (including the empty, unreferenced rejected-helper placeholder); manifest SHA92eb92d40b291d410f7f9b2820f4a9553c688a89eade26901fa261d6ccbab192 and input SHAfa4515cdd5798979bc7f841df4980f570eb83c977486a59e3489f20460096000. Current runtime source and executable are synchronized, not a source-only revert.
+
+Final fixed qualified verifier job2646d0ea287148be9510a061631582c8, evidence project-link-verifier/9628d990fb19447a8d1ea0c3491d34f7, passed the freshness gate and original0x001bef84/caller002d1c50 qualification:864 writes, no unexpected/lost/caller/invalid-stack errors. All established final frame, EE RAM, GS VRAM/state, VU memory/state and normalized-IOP hashes match. Heavy60 boundaries took14.98918host seconds =4.002887416FPS; individual windows3.982017/4.023978FPS. This is the current performance, not historical9-9.5FPS and not30FPS. No speed gain retained.
+
+Restored test build8217a279e34342f2a66f5bc01fa93e0b succeeded; runtimec6d47e9cfb4f46458e28089ad5be990e, translatione67120c48ea24828b6f87608630d9f35 and65536-readiness5c197b11d2934b329f4828137086133f pass. Final Python suite5559f90bd6ee484ca363ce920c5fdb85 passes128 tests. The synchronous callback/context-isolation/VU early-return candidates and GL-stage timers are removed. Every original GL error check, guest instruction, clock, input and rendering path remains. Retained modifications are CMake post-link provenance, tools/hg_build_provenance.py, fixed-verifier preflight,12 synthetic tests and documentation. The empty gl_error_state.hpp placeholder contains no declarations or runtime use; rejected contents are archived externally, deletion unavailable through current connector.
+
+Important next action: isolate current host/GPU/driver scheduling and load/clock conditions with the exact pinned archived control BEFORE more VU micro-optimizations. Unchanged archived executable2608296b... has reproducible15s flush latency now versus~1s in its historical capture, with same input/frame/EE/GS bytes and reported driver string; recent code changes cannot alone explain it. The call-site attribution is glGetError wait time, not proof of its underlying cause. Project Link currently exposes no general process or GPU-clock/driver-setting inspection; do not bypass the configured task boundary or change unrelated processes/settings. No build/replay/probe job is intentionally left active; verify jobs on continuation. Do not resume rejected candidates unchanged.
+
+## PRIOR - restore production after negative trials; unchanged archived executable reproduces latency, 2026-09-21
+
+Synchronous notification candidate passed its actual NVIDIA INVALID_ENUM notification self-test and portable513-length/first-error tests. All established qualified frame/EE/GS/VU/normalized-IOP hashes and864 original writer events match, but verifier a8086a1ce14a41ebae73903e79a5fa87 measured3.595859FPS versus clean control4.040570FPS. Replay flush time18.3585s/readback2.7917s: moving error reporting did not remove the underlying synchronization cost. The complete backend, context request and runtime tests were byte-restored (gl_gs.cpp e5069d2b..., game_host.cpp cf8db914..., runtime_tests.cpp62ad00b4...). No polling/error check is suppressed in production. New gl_error_state.hpp is unused; archive its rejected implementation and leave an explicitly empty placeholder because this connector cannot delete newly created files.
+
+Decisive unchanged-binary comparison: configured recorded_control replay project-link-runtime/20260921T195021Z-5c12f01e72cc4234bae8c012c45afcdd uses exact same35,827,712-byte executable as historical recorded_control project-link-runtime/20260921T023355Z-e962461879604a5e9776d9d8db125a5b, SHA2608296bcff3c2a47887f67b2cf233fd41a30eaf9792f50df85f21c1ac3d5eae. Input-events JSON, final frame, full EE RAM and full GS VRAM are byte-identical; sprite/triangle/masked counts match. Both report RTX5070/OpenGL4.3/NVIDIA616.92. Yet full-run flush time changes0.9963266s ->15.1869414s and readback1.5088076s ->3.5050519s. This archived binary contains none of today's code changes or new freshness tooling. Therefore current runtime/driver conditions, not a recent compilation change, can reproduce the large latency shift. Exact underlying driver/GPU/host condition remains unresolved; do not call it proven instrumentation causality, a proven driver bug, or an FPS measure from this hidden replay.
+
+Next: finish cleanup, document reusable results, rebuild original renderer/runtime with the retained post-link freshness gate, rebuild restored tests and run final fixed qualified verifier. Keep the clean original runtime, no performance candidates or hot timer probes. Current useful baseline is ~4FPS under these conditions; historical9FPS is not a current claim. Next performance investigation should control host/GPU scheduling, load and clock conditions using this exact archived binary before more VU rewrites. No changes to device settings or unrelated processes are authorized by this note.
+
+## PRIOR - preserve GL faults with validated synchronous notifications instead of hot polling, 2026-09-21
+
+Independent GS context candidate did not reduce the measured issue: replay project-link-runtime/20260921T193643Z-94beeb0eb8514953b68accb9143a01cf has flush15.1996341s/readback3.6566826s and unchanged work counts. The sole game_host.cpp change was byte-restored. No qualified gain is claimed; do not retain or repeat that change unchanged.
+
+Next bounded mechanism: request a debug context for the GPU worker, retry ordinary creation if unavailable; backend uses synchronous GL debug API-error notification only with verified CONTEXT_FLAG_DEBUG_BIT, available functions, no preexisting callback, enabled API error messages, synchronous delivery and a defined startup invalid-enum self-check proving callback delivery before return. Non-debug/unavailable/preexisting-callback cases retain the original glGetError path. At exactly the existing flush/download check locations, inspect the error latch and throw on any captured API error; no checks, draw/transfer/barrier/hazard/fault points, clocks or inputs are skipped. Callback copies bounded first-error text without allocation/GL/throw; RAII unregisters before context lifetime ends. Existing allocation/compile/link checks remain. This optimizes successful error reporting, NOT correctness detection. It does not promise the driver will be faster; Khronos notes synchronous output can also cost performance.
+
+Files: runtime/game_host.cpp, runtime/gl_gs.cpp, new runtime/include/hg/gl_error_state.hpp, focused tests in tests/runtime_tests.cpp. All edits automatically backed up, manifest artifacts/gl-error-callback-20260921-preedit.txt. Primary KHR_debug sections2.5/5.5/5.5.2/5.5.7 guarantee API error messages only with debug context and synchronous mode before generating call returns; callbacks in ordinary contexts cannot replace polling. Build/runtime tests and real driver startup self-test, then replay + qualified state/image/manifest checks. Alternate normal polling controls if a gain appears, otherwise restore all candidate changes and rebuild clean. No permanent diagnostic timer remains.
+
+## PRIOR - glGetError accounts for persistent GPU delay; test independent worker context, 2026-09-21
+
+HG-DIAG-029 refinement project-link-runtime/20260921T193358Z-e1b5664fb18a4a06a4837c8e5a20c198 resolves the15s flush cost: existing glGetError calls cost6.9420725s(sprite),4.2034801s(triangle),3.9702024s(masked), total15.115755s of15.2242906s. Ownership/bind and CPU queue clear are small. These timings include any synchronization exposed by the call, not necessarily error-query computation or GPU execution in isolation. All temporary GL counters have been byte-restored to e5069d2b... before production work. Do NOT disable glGetError or suppress driver failures.
+
+Next bounded candidate changes only runtime/game_host.cpp: make the GS worker context independent (glfwCreateWindow share=nullptr) rather than sharing all object namespaces with the UI window. Source audit shows CPU pixel vectors are the ONLY bridge; each context owns/creates/deletes its own GL buffers, programs and textures, so no required shared resource is removed. Keep every existing error check, renderer/ownership/barrier operation, window visibility, input and guest clock. Hypothesis is unnecessary share-group driver synchronization, not an established root cause. Official GLFW context guide documents this parameter and driver-managed sharing: https://www.glfw.org/docs/latest/context_guide.html#context_sharing . Manifest artifacts/independent-gl-context-20260921-preedit.txt. Build restored GL plus candidate host, replay and fixed qualified verifier; compare exact state/output to control, alternate controls if a gain appears. Revert if no benefit or any correctness drift.
+
+## PRIOR - GPU flush delay localized to cleanup/error-check; split that section, 2026-09-21
+
+HG-DIAG-029 capture project-link-runtime/20260921T193154Z-4ee147f04473426fa031c6fcaf4cdf53 completed with unchanged draw counts. Of15.2826546s total flush time,15.1881098s (~99.38%) is in the final stage containing buffer bind/ownership updates, CPU queue clearing and glGetError. The VRAM, command/tile upload and dispatch/barrier groups are individually small. This is NOT evidence for replacing upload/readback storage or removing rendering work.
+
+Next bounded refinement of the same probe in runtime/gl_gs.cpp: split the final stage into ownership/bind/optional nonresident readback, CPU queue cleanup, and the existing glGetError call. Keep the error check and all GL/ownership/order operations exactly in place. Record9 stage totals/maxima; one hidden33M attribution run, then byte-restore gl_gs.cpp using original backup35f428bc2d764768891060ac5957c031 and rebuild clean before any performance candidate. If glGetError dominates, investigate a semantics-preserving way to avoid cross-context/driver synchronization, not simply disabling correctness error checks.
+
+## PRIOR - clean control confirms GPU stalls; isolate flush API stages, 2026-09-21
+
+Restored control built successfully (jobb3cfca2b163c49babf4677ecdee90dc2), executable9492514de8510cf0255b79f30ae37783429a283e47b2eca664ee63cec1a9ea7c. Runtime/translation and65536 compiled-readiness tests pass after rebuilding control tests. The mapped vu1_program_1_run entry and its first640 native bytes exactly match the earlier clean baseline (RVA0099fc90, file offset10088592, slice SHA d74b3d0b00de5c285a3910a176b2ac285a72e926cd550cde4472889b46e1594d); this is bounded code identity, not whole-binary equivalence.
+
+Control replay project-link-runtime/20260921T192807Z-ee5f415c337d452eb8a8e78f901fa623 still has flush_ns15165702000/readback_ns3616067200. Fixed verifier0321d8e9233f4e2a921d3812a72c8bb3 passes141-input manifest gate and every established state/image hash,864 qualified original writes, but60 heavy boundaries take14.84939s =4.040570FPS. Candidate4.050141 versus control4.040570 is effectively flat, not a demonstrated speed gain. The VU early-return remains removed; do not attribute the historical9FPS-to-current4FPS shift to it or to removed XGKICK probes.
+
+HG-DIAG-029 plan: one temporary change in runtime/gl_gs.cpp partitions the EXISTING full-run flush span into VRAM preparation/upload, command-buffer upload/bind, tile CPU construction, tile-buffer upload/bind, program/dispatch/shader barriers, final buffer-update barrier, and ownership/cleanup/error-check. Record sums/max by sprite/triangle/masked batch. A few host clock reads per batch, no per-qword/instruction timers, no GL call/order/barrier/hazard or guest changes. Capture one configured33M hidden replay, identify the15s component, byte-restore and rebuild before qualified timing. Manifest artifacts/gl-api-stages-20260921-preedit.txt. Do not repeat rejected buffer/storage variants without distinct measured evidence.
+
+## PRIOR - freshness repaired; restore a contemporaneous control for persistent GPU stalls, 2026-09-21
+
+Build-hygiene validation passed: 128 Python tests (12 new freshness cases). Fixed verifier job facbf8ed515f41e782b69a78c2e39e50 rejected the old HG-DIAG-027 executable before launch with status stale_build. Build job4caa743e50b84869affa826637a535ca then succeeded and generated build/Release/hg_game.exe.build.json for141 input files. Candidate executable SHA256 7f5970085d4a91148b867c786f367fdae2cc2e934539f0406c9b22ccdb488da7. Native proof: xgkick_profile_hook is absent from the new map; mapped vu1_program_1_run at RVA0x009a6a60 contains the added q/p early-out branch structure, unlike the older restored code at RVA0x0099fc90. This is not a source-only change.
+
+Fresh uninstrumented hidden replay project-link-runtime/20260921T191549Z-546e2ef988ec4fa2a769bfce321c8f0b completes33M with normal48195 sprite/305856 triangle/842 masked-batch counts, but flush_ns15238028300/readback_ns3634329700 remain abnormally high. Qualified verifier e11b510d1a094cbf8e911e887bdf7c15 passes the new manifest preflight and all established frame/EE/GS/VU/normalized-IOP hashes,864 original writes, but measures4.050141FPS (14.8143host seconds for60 heavy boundaries). Therefore the former9-9.5FPS historical range is NOT a current measurement, and the removed timing probes cannot be assumed to be the cause of these stalls.
+
+Next bounded action: remove ONLY the pending advance_pipeline early-return and its two comments from vif.hpp (candidate SHA7f6928c7... -> exact pre-candidate c7891753...). Exercise real source-drift rejection before rebuilding, then build/verify this uninstrumented control under the same freshness gate. Do not compare the current4FPS directly to a historical9FPS run to blame a tiny VU edit. If the control also stalls, prioritize one gl_gs.cpp-only API-stage timing split of the existing flush span to localize the15s cost; do not add more VU/XGKICK hooks or repeat prior transfer-layout experiments. The FPS reporting timestamp audit reconstructs9.3336 versus9.3338 for one older run from rounded cumulative boundary rates, so it is not evidence for the major slowdown; preserve the existing metric during this A/B.
+
+## PRIOR - repair source/binary freshness and validate the pending VU candidate, 2026-09-21
+
+User requested fixing the confirmed source/executable mismatch before further speculative performance edits. Current game executable remains the HG-DIAG-027 binary; current vif.hpp has the no-Q/no-P advance_pipeline candidate and the diagnostic hooks are removed. Earlier cache-on/off native machine code genuinely differed, but identical executable size did not establish identical code layout. Abnormal GPU stalls in diagnostic runs are unexplained, not proven caused by instrumentation.
+
+Bounded build-hygiene change: add tools/hg_build_provenance.py and synthetic tests; CMake hg_game POST_BUILD records current project runtime/generated/config/generator inputs, configuration/build records and the linked executable SHA256. The fixed frames verifier checks this manifest against current inputs and the isolated executable BEFORE launching, rejects missing/stale/wrong binaries, and copies the checked manifest into fresh evidence. Hashing occurs outside measured native time, no guest/runtime execution semantics or FPS formula changes. This is a freshness guard under the existing build dependency system, not proof of arbitrary compiler correctness or independent proof that generated source matches changed translator intent. Inspect actual native code and relevant compile records separately for the pending change. Manifest: artifacts/build-freshness-gate-20260921-preedit.txt; exact edit backups are automatic.
+
+Validation: synthetic missing-manifest/source-drift/preserved-timestamp/added-deleted-file/wrong-binary/configuration cases; demonstrate prebuild fixed-verifier rejection with no game launch; rebuild the existing pending candidate, confirm diagnostic symbols gone and fresh intended code/commands, then original replay and qualified verifier with pinned exact binary. Do not invent a speed gain from a clean rebuild or from historical comparisons. If the candidate has no repeatable advantage versus a contemporaneous control, revert only its three added lines, rebuild, and revalidate. No new VU or renderer optimization during this integrity repair.
+
+## PRIOR - reject VU identity cache and split dominant VU/XGKICK/GIF cost, 2026-09-21
+
+Broad audit still ranks heavy31M..33M VIF/GIF at ~4.857s, versus EE ~0.698s, explicit raster ~0.497s, IOP ~0.316s, GPU readback ~0.336s and GPU flush ~0.271s. The VU identity-cache candidate is now performance-rejected/inconclusive despite exact state: cache-on qualified steady FPS samples were9.373315732 and9.386336935; layout-matched cache-off controls were9.507315087 and9.333756464. Means ~9.380 vs~9.421 are inside run variance and slightly favor control. All four preserve established frame/EE/GS/VU/normalized-IOP hashes and864 qualified original writer events. Do not retain host metadata/cache complexity without a demonstrated benefit.
+
+VU identity-cache cleanup is complete. runtime/include/hg/vif.hpp, tools/hgtool/vu_emit.py, tests/gif_tests.cpp and tests/test_vu_decode.py exactly match their pre-cache hashes; configured hg_emit restored out/translated.cpp to known SHA b03c024bfe71528a887556d68aed272dd305a813e288ae32e03c5ee92a4f9b41, and clean build job5f0dd5f0523b43e082cc12b98c810c8b succeeded.
+
+HG-DIAG-026 completed but is timing-contaminated. Evidence project-link-runtime/20260921T174657Z-425b8f33245740069045fe041d672f82 measured126180 VU calls,91140 XGKICK calls/10539780 XGKICK qwords,2.2394372s VU total,0.2776441s nested XGKICK and1.9617931s remainder. However the same run's GPU flush_ns ballooned to15.162s and readback_ns to3.782s, so absolute timings are not trustworthy; source was immediately restored byte-exactly. Treat only the direction (VU-core may dominate nested XGKICK) as a lead.
+
+HG-DIAG-027 also failed its self-check and is removed. Evidence project-link-runtime/20260921T180839Z-1fd269d9aed0439583ee3ba6a01b11a2 counted91140 XGKICK calls and248286800ns, but full-run GPU flush/readback inflated to15.083s/3.428s. Both clock-based VU/XGKICK probes therefore perturb host/GPU overlap too strongly for absolute attribution. Do not repeat hot-path timing hooks; the stable evidence remains prior VU-entry totals/call counts plus static generated structure.
+
+Next bounded production candidate: factor only the common no-Q/no-P path in `Vu1State::advance_pipeline`. Static audit proves q_pending is set only by DIV and p_pending only by ERLENG; generated code has43 DIV and47 ERLENG sites across3482 configured VU pairs. Candidate keeps `issue_cycle+=cycles` first, then returns if both pending flags are false; when either is true, run the existing Q and P completion/decrement blocks unchanged. No emitter/readiness-clock combination, no skipped advance, no changed latency/timestamp/fault behavior. This is distinct from HG-FAIL-015, which combined dependency clocks and regressed8.53%. Validate with existing randomized VU readiness/Q/P tests, runtime/translation tests, hidden33M replay and qualified original-writer FPS. Retain only for a repeatable gain; revert if flat/slower or any state differs.
+
+First observation-only capture completed successfully: project-link-runtime/20260921T103855Z-dbe0e619b99a418ab34b14ee61f1eada. It recorded2068 dirty download events expanding to3874 glGetBufferSubData ranges. Multi-page CPU reads dominate:1731 dirty events,3537 ranges,326778 dirty8KiB pages,2676965376 bytes and1006640500ns, which is98.93% of measured readback time and99.83% of bytes. Their average dirty event is188.78 pages/1.546MB and2.043 ranges. Single-page CPU writes are336 events/2.75MB/10.08ms; only one dirty multi-page write occurred; memory-select/final-finish produced no dirty download. The temporary source probe was byte-restored to gl_gs.cpp SHA e5069d2b... immediately after capture. Diagnostic timing is not FPS evidence.
+
+Second observation-only capture completed successfully: project-link-runtime/20260921T104328Z-311b52eb2a58411eb94a3697ae3b1591. It measured1735 dirty multi-read events with327338 truly dirty pages. One first-to-last bounding transfer per event would cover351042 pages, only23704 clean gap pages extra: +7.241% transfer volume (194183168 bytes /185.19MiB extra across the full33M run), maximum single bound496 pages. Range-event distribution was1083 one-range,458 two-range,194 five-to-eight-range, zero three/four/>8 in this run. Thus only652 fragmented events need staging and the extra byte cost is modest relative to the first capture's roughly halved GL range-call opportunity. The probe was byte-restored before production work; its timing is not FPS evidence.
+
+Production candidate completed and rejected. runtime/gl_gs.cpp kept the direct path for one contiguous dirty run; fragmented dirty sets used one first-to-last glGetBufferSubData into a reusable4MiB staging buffer and copied only truly dirty runs back, leaving clean/CPU-owned gaps untouched. Build succeeded. Hidden replay project-link-runtime/20260921T104813Z-6724e7c1730a4ccda7d3d5603d87f622 reached33M without fault and kept GPU work counts stable, but download volume rose to2880323584bytes and readback_ns to1056517700, worse than the roughly1.02s restored path. Qualified verifier d043105abbb14e42a897f37a3ec532a3 preserved established frame/EE/GS/VU/normalized-IOP hashes and qualified864 original writer events; steady windows9.470325/9.288817 aggregate9.378693FPS. This is below the stronger recent9.554140FPS layout-matched control and provides no repeatable improvement. HG-FAIL-025 records the result. Candidate source was immediately byte-restored: runtime/gl_gs.cpp SHA256 e5069d2b96f77d573fd92b7038632f9c28c30b4f8742bf3405ae56f047d602ae. The built executable still reflects the rejected candidate until the next clean rebuild.
+
+Restored clean rebuild succeeded and fixed qualified verifier project-link-verifier/e89fec77a90244b7b9e5cae5e1128be5 established executable d2a0d7c36be1c8d73087d98659e9a01acf2679cb8f708ae6796828e118ff23df. Established frame/EE/GS/VU/normalized-IOP hashes match;864 original writer events qualify. This run measured9.093816FPS (9.130641/9.057287) and is treated as another variance sample, not a new regression conclusion.
+
+Heavy-only readback diagnostic completed and all temporary code was restored byte-exactly. Evidence project-link-runtime/20260921T110234Z-2c636777143542a7bb347d2f3992ecca resets host counters at31M and reports31M..33M: sprites31620/pixels494505840, flushes1866/flush_ns270618100, upload_bytes38772736, download_bytes650149888, readback_ns336099600, triangles245616/723 batches, masked35389440/600 batches. Readback cause split is overwhelmingly multi-page CPU reads:420 dirty events,900 GL ranges,79140 dirty pages,648314880bytes and335193200ns; one dirty multi-write adds1.835MB/0.906ms. This proves synchronous readback is material but secondary: roughly0.336s readback plus0.271s inclusive flush cost cannot alone explain the roughly6+ host seconds represented by the two heavy qualified frame intervals. Do not continue treating transfer bytes/call count as the sole bottleneck. Temporary runtime/gl_gs.cpp, runtime/include/hg/gs_acceleration.hpp and runtime/system_diagnostic.cpp changes are removed; restored hashes are e5069d2b...,255babdb... and c8c2d536....
+
+User now requests a whole-project audit and diagnostics on the major slowdown players, including original game functions where needed. Inventory contains2196 files:1493 generated build artifacts,489 emulator-package files,23 original-game extracted files, and the first-party project source/evidence primarily under runtime(69), tests(37), tools(26), out(41), config, docs and root build files. Treat generated build products, ISO/CVM, emulator DLL/assets and other binary payloads as artifacts; content-scan every first-party text/code/config/test/evidence file and inventory all remaining files. Run fresh configured hg_analyze/triage and cross-reference unresolved indirect targets with measured gameplay PCs. Build a measured shortlist across EE AOT execution/game functions, VU, VIF/GIF application, GS CPU fallback/raster, GPU flush/readback, memory/coherence and IOP/SIF. Add bounded31M..33M diagnostics only for major unresolved contributors, one observation family at a time, then remove probes before performance timing. If a hot original game PC/function is unclear, use hg_inspect and the pinned PCSX2-MCP live debugger/oracle to prove its behavior/call context instead of guessing. Do not broaden roots or copy external implementation. Pre-edit manifest: artifacts/broad-hotspot-audit-20260921-preedit.txt.
+
+## REJECTED - proved PSMT8H same-pixel feedback but current GPU path is slower, 2026-09-21
+
+PCSX2-guided mapping capture project-link-runtime/20260921T083235Z-0a4b130471b5400693210ae98b0b9330 narrows all18378 measured feedback rejects to one class: PSMT8H=18378, nearest=18378, TEX0.TBP0==FRAME.FBP=18378 and texture stride==frame stride=18378; CT32/PSMT8/linear/other are zero. HG-LEARN-037 records this. PSMT8H uses the CT32 word address and samples its high byte as a CLUT index, so next observation can be exact: retain original GPU rejection and CPU fallback, mark these same-base/stride PSMT8H draws, and inside the already-executed covered-pixel CPU loop compare every nearest wrapped source word to that pixel's framebuffer destination word. Count covered samples, exact source==destination, wrapped u==x/v==y, and nonself samples. No added pixel traversal, no rendering/state change. Completed exact covered-pixel capture project-link-runtime/20260921T083540Z-16227b5d09bc4cef88f6fe9c5aee1c54:18378 draws,794236 covered pixels,794236 wrapped source coordinates equal destination coordinates,794236 source words equal destination words,nonself=0. This supports a framebuffer-fetch-style specialization but must not be generalized from one capture alone. Next derive a cheap per-draw proof: count whether Q bits are identical across all three vertices and whether each vertex's exact STQ coordinate at4 fractional bits equals its XY position minus XYOFFSET for both axes. If all measured self-feedback draws satisfy those conditions, implement a guard requiring constant Q plus exact vertex 12.4 identity; under constant Q perspective interpolation reduces to affine interpolation and the vertex identity carries through the triangle. Candidate shader then uses the current destination word's high byte as the PSMT8H index, preserving per-pixel ordered triangle-list semantics. Any guard failure remains CPU. Remove diagnostics before timing. First guard probe result project-link-runtime/20260921T083903Z-0a5b726636bb4d43a315f745d823616f: all18378 draws have identical Q and Q==1.0, but exact 12.4 vertex identity is0. This is compatible with the independently measured794236/794236 integer-pixel self-map if STQ carries a consistent positive sub-texel offset. Under constant Q the source coordinate is affine; therefore a sufficient proof is that each vertex source-minus-screen coordinate lies in [0,1) texel on both axes. Measure exact4-bit fixed deltas at all vertices; if every delta is0..15, this convex bound proves every covered integer pixel floors to its own coordinate. If not, do not use this guard.
+
+Completed the 4-bit vertex-delta proof in existing replay evidence project-link-runtime/20260921T084132Z-1247e861480f4e5a9833ce0ee51da2b4: draws=18378, q_equal=18378, q_one=18378, vertex_unit_cell=18378, proof=18378, and every vertex delta was exactly dx=8, dy=8 in 12.4 units. This satisfies the [0,15] convex bound for all measured feedback draws. Next bounded production candidate: remove the temporary HG-DIAG-005 proof counters/31M activation; in runtime/gs.cpp mark a triangle only when it is nearest PSMT8H, TEX0 base equals FRAME base, texture/frame stride match, Q is identical and exactly 1.0, and all three exact 4-bit STQ-minus-screen deltas are in [0,15]. In runtime/gl_gs.cpp permit texture/output alias only for that mark while retaining every other hazard rejection and batch-order barrier. In runtime/gl_triangle_shader.hpp, for that mark derive the palette index from the current destination CT32 word high byte for the same pixel, preserving the shader's existing per-pixel triangle-list order. Any guard failure remains on CPU. Add focused guard/equivalence coverage, build/test, run the fixed realtime gameplay33m frames verifier, require unchanged qualification/state/image digests, and keep only if the 18378 fallback class moves to GPU without faults/regression. Current pre-edit hashes: runtime/gs.cpp 79cb904b04212b717971ba6beab054ee2a8187b779f01ca6f3f73695f8b319c4; runtime/gl_gs.cpp e5069d2b96f77d573fd92b7038632f9c28c30b4f8742bf3405ae56f047d602ae; runtime/gl_triangle_shader.hpp 59bf5f2c91d5df495691a1ab99b345738f89e682e98e6be54a629a19caaec4b4; tests/gs_gpu_tests.cpp 8fb45aa1aac9029df976f252e0bf4678b870c0fd7ca4def6c02a36f1d61e350b.
+
+Result: the candidate is semantically correct but rejected for throughput. Full33M replay project-link-runtime/20260921T090040Z-cbd2314d6a154dc99a49476d2d06af35 completed without fault and moved total GPU triangles305856 ->328503. Qualified candidate verifier project-link-verifier/b894c58157df40d79cfafcf2ec461843 preserved frame/EE/GS/VU/normalized-IOP digests and measured heavy windows3.15966/3.16915s =9.480455FPS. A layout-matched control kept the proof/shader/backend code compiled but forced only the admission marker off; project-link-verifier/e093bf9d0518463e8661e387e22aadad measured3.13418/3.14582s =9.554140FPS with the same state hashes. Candidate heavy time6.32881s versus control6.28000s is +0.777%, both windows slower. Reverted production specialization/backend/shader/test changes immediately. Removed the temporary feedback counters and31M activation. HG-FAIL-024 and PERFORMANCE record the result. This disproves the current compute-backend implementation as an optimization, not the exact self-feedback proof.
+
+Immediate next action: rebuild the restored renderer with only diagnostic cleanup retained, run the fixed gameplay33m verifier once to establish the clean post-revert executable/state, then use a fresh hidden profile/rejection census to choose the next measured bottleneck. Do not spend time on the remaining263 unsupported triangle-format rejects unless profiling shows their CPU cost is material; they are too few to assume a meaningful gain. Prefer a larger host synchronization/readback or CPU raster cost supported by the restored run.
+
+## VERIFIED - use PCSX2 feedback architecture to classify genuine triangle feedback, 2026-09-21
+
+Semantic-no-op output hypothesis is disproved by project-link-runtime/20260921T081347Z-cf5afc140bad4634a1c56ca8265a5f8c: all18378 measured backend alias rejects overlap framebuffer pages, zero overlap depth pages, and zero have FBMSK=0xffffffff/no-effect writes. HG-LEARN-036 records the result; remove the probe before further work. These are genuine framebuffer-as-texture draws under current evidence. Next use current PCSX2 renderer architecture as an external lead only: trace how its hardware renderer represents render targets as texture sources and how it selects framebuffer fetch / attachment-feedback-loop / texture-barrier or copy-style paths when a draw samples the active target. Independently map the relevant ordering constraints onto our existing OpenGL compute path. Do not copy implementation. Before coding, classify the measured HG feedback draws by whether each draw needs a stable pre-draw framebuffer snapshot versus ordered same-draw feedback, using original job coordinates/TBP0/FRAME and CPU row-major semantics. Candidate must preserve true feedback ordering; unsafe in-place parallel SSBO read/write remains prohibited. First bounded probe: in runtime/gs.cpp only when profile_raster is active and the current GPU backend rejects a prepared textured triangle, count texture formats, TEX0.TBP0==FRAME.FBP, texture width==frame width, linear/nearest filtering, and for direct CT32 same-base/stride cases compare the first covered pixel's exact wrapped source word(s) against its destination word using the existing PreparedTriangleStq and address functions. Activate only31M..33M hidden gameplay; no rendering/state changes. Remove after one capture. If most rejects are same-target and own-destination sampling, pursue a dedicated framebuffer-fetch-style job using already-read destination data; otherwise classify stable pre-draw snapshot/copy requirements before coding.
+
+## VERIFIED - distinguish true triangle feedback from semantic no-op output hazards, 2026-09-21
+
+Tighter whole-texture page bounds are rejected: verifier92f7927c... preserved all capture digests but measured9.060FPS and GPU triangle total stayed exactly305856, so it admitted zero extra triangle work. Sources/tests were restored. HG-FAIL-023 records the result. Next bounded diagnostic targets the output side of the18378 backend texture/output alias rejects. The backend currently includes framebuffer pages in `writes` unconditionally even when FRAME.FBMSK is0xffffffff (shader store resolves exactly to the old destination), while depth pages are included only when Z writes are enabled. Count rejected jobs by texture overlap with frame pages versus depth pages, full-frame-mask status, and combinations. If a substantial class has only fully masked framebuffer overlap and no depth overlap, candidate is to omit that semantic no-op framebuffer store in the shader and exclude its pages from the write-hazard set; true feedback or depth overlap remains CPU. If not, stop this line rather than attempt unsafe parallel intra-draw feedback. Observation only,31M..33M; remove before timing and record the outcome in learned skills.
+
+## REJECTED - tighten triangle texture-page hazard for false alias rejection, 2026-09-21
+
+Completed rejection census project-link-runtime/20260921T080133Z-cf47199dc55a474ea17fc0669cdfa971: of18641 CPU fallbacks,263 are unsupported texture format and18378 are backend texture/output alias; all other categories, including frame/depth alias, are zero. Backend currently marks texture pages as one broad physical interval from TBP0 through a max coordinate, which ignores REGION_CLAMP minima and can cover unrelated physical pages. Reuse the independently documented whole wrapped texture footprint previously validated for CPU read visibility: REPEAT/CLAMP0..dimension-1, REGION_CLAMP min..max, REGION_REPEAT max..(min|max), logical CT32/PSMT8 page geometry, and both physical pages when a64-word-aligned base makes one8KiB logical tile straddle a physical page. Implement this as a shared tested `gs_texture_read_pages` helper; unsupported/invalid state returns all pages. Use it only for triangle GPU read/hazard sets, never to permit a true read/write overlap. Existing CPU path remains reference/fallback. Remove temporary triangle census/profile activation before timing. Validate footprint coverage against the existing address functions across formats/wrap/base offsets, run GPU/runtime regressions, then fixed realtime A/B. Record success/failure in learned skills; do not repeat the previously rejected CPU readback-narrowing experiment because this candidate changes admission/hazard proof, not CPU materialization.
+
+## VERIFIED - classify current GPU triangle rejections, 2026-09-21
+
+Completed census project-link-runtime/20260921T075705Z-9767c8ed0c76495590730899ff6f8e85:264257 profiled triangle draws in31M..33M, with244 untextured,264013 textured STQ-ready,0 textured FST,0 STQ-unready and0 fogged. Current GPU path attempted all264257;245616 accepted and18641 rejected to CPU fallback. FST support is therefore not a useful target for this workload. Next: replace the coarse census with exclusive rejection-reason counters around the existing submit predicate/backend result (bounds/frame-depth state/test-alpha/texture-format/texture-state/clamp/blend/coordinate-prep/palette/backend rejection), still observation-only under the31M profile activation. Run once, remove probe, then implement only the dominant real rejection class. Learned skill HG-LEARN-034 records this profiling rule.
+
+## VERIFIED - steady-gameplay triangle fallback census, 2026-09-21
+
+With CLUT deferral rejected and production renderer restored, next target is actual CPU triangle work. Current GPU triangle path accepts untextured triangles and textured STQ only when PreparedTriangleStq is ready; textured FST triangles are excluded before the GPU predicate and therefore always use the CPU rasterizer. Add one HG-DIAG-005 observation-only counter in runtime/gs.cpp, active only when existing profile_raster is enabled, to count triangle draws and covered-pixel candidates by exclusive class: untextured, textured FST, textured STQ-ready, textured STQ-unready, fogged, and current-GPU-submit accepted/rejected. Activate profile_gs only at31M for the hidden unpaced33M replay, run once, then remove timers/counters before any benchmark. No guest/rendering behavior changes. If textured FST is material, implement bounded exact 10.4 UV barycentric support in the existing GPU triangle job derived from the already-tested CPU interpolation; otherwise follow the measured dominant fallback class. Record the outcome in learned skills before moving on.
+
+## REJECTED - palette-versioned queued-draw CLUT barrier candidate, 2026-09-21
+
+The overlap observation was real but did not translate into useful work elimination. Candidate verifier d0149b1954d14d55918726872f926e0b completed qualified60-boundary steady gameplay in14.19104s =4.22802FPS. Exact control6a47185539c04508aa20458826746a95 used the same enlarged draw/snapshot-capable layout with only `defer_clut_barriers=false` and completed60 boundaries in6.43894s =9.31830FPS. Frame, full EE RAM, GS VRAM, VU micro/data/defined/state and normalized IOP digests match; candidate/control GPU work is essentially unchanged:48195 GPU sprites,305856 GPU triangles,1014 triangle batches,842 masked-transfer batches, ~0.58s sprite flush and ~1.03s readback. Thus CLUT barriers were mostly charging already-required draw work to the CLUT call site, not duplicating that work. Deferral merely moved the same rendering later while adding conservative overlap scans/snapshot bookkeeping and changed host draw-history retention (candidate final history27402 versus control11093 completed records). No FPS benefit; reject.
+
+Production renderer/tests were byte-restored: `runtime/include/hg/gs.hpp`23f36c5685a8e103..., `runtime/gs.cpp`e03185c749dd2f8e..., `tests/gif_tests.cpp`47aab66c3397afdc..., `tests/gif_stream_regression.hpp`6cb8fd92919ae0af.... The useful overlap capture remains attribution evidence only. Rebuild the clean production binary before further timings. Next rendering work must reduce actual primitive/transfer/VIF work or an actual synchronization operation, not just move a barrier. Use current heavy gameplay only and avoid repeating CLUT snapshot/deferred-barrier or sparse-readback variants.
+
+## VERIFIED - CLUT pending-draw overlap potential probe, 2026-09-21
+
+Rendering work stays separate from the concurrent intro-root audit. Current retained realtime host-profile reduction measures about9.512FPS versus8.997 baseline with identical capture digests. PCSX2 current HW renderer/texture-cache sources were reviewed only for architectural leads: palette objects/cache and dirty-target/readback tracking reinforce avoiding unnecessary synchronization, but no implementation/code is copied. Own evidence is controlling: gameplay31M..33M CLUT source reads are only94.184ms while whole CLUT-register packets cost~748.647ms, so the remaining cost is deferred draw processing/synchronization. Before implementing palette-versioned queued draws, add one observation-only helper called immediately before the existing CLUT rasterize_pending_draws. During profile_gs only, count CLUT loads with pending draws, total/max pending count, indexed-texture pending draws, and conservatively test whether any pending draw's full-scissor FRAME/ZBUF pages can intersect the exact CLUT source pages. Also record the last overlapping draw position so potential safely-deferred tail size is known. Do not change flush/order/palette/rendering behavior. Activate only31M..33M hidden unpaced profiling, run once, then remove probe. If most CLUT loads overlap or queues are tiny, reject palette-snapshot redesign; if many queues are disjoint/large, plan a bounded palette-snapshot + overlap-gated flush candidate from GS-manual ordering semantics.
+
+## ACTIVE - add second proven intro member family, 2026-09-21
+
+The first four roots are retained. hg_emit added all four cases and expanded reachable EE words360809->362755 (+1946).116 Python tests, build_game/build_tests, runtime, translation and VU-readiness suites all pass. Fixed verifier c1718309... remains qualified and frame/full EE/GS/VU/normalized-IOP digests match the prior build exactly; its8.971FPS steady result is treated as run variance because guest state is unchanged. Expanded analysis now exposes the next same-family direct-member records as compiled=false:3affa0->129090,3affc0->128ca0,3affe0/3afff0->128970,3b0000->1286f0,3b0020->128390. Fresh c171 EE RAM contains those exact `(0,-1,target)` records; compiled original loads reference them; own hg_inspect proves valid original function entries/prologues. Authorized shared function map independently corroborates starts/bounds only. Add exactly these five roots in one batch; do not import adjacent reference ranges. Regenerate/test/verifier again, then continue only from newly exposed direct-member/table evidence.
+
+## VERIFIED - add four independently proven missing intro member roots, 2026-09-21
+
+Fresh hg_analyze still reports4743 unresolved items. Its direct_member_evidence identifies exactly four currently-uncompiled `(adjustment=0, selector=-1, target)` records reached by compiled original code: record3af290->1291c0,3af2a0->128db0,3af2b0->1287b0,3af2c0->1284c0. Fresh verifier EE RAM contains those exact records, and original initializer464860 copies them into the active descriptor block. Independent hg_inspect proves each target begins a real original function body with a normal prologue and translated direct-call/control-flow content. Authorized shared functions.manual.toml independently lists the same four starts/bounds, used only as non-rendering corroboration; no code/behavior/config is copied. Add exactly these four `[[functions]]` roots, no broad function-set import and no guessed indirect site mapping. Regenerate with hg_emit, require generated cases for all four, run focused/full configured tests, then fixed gameplay verifier. If current33M path is unchanged, retain as coverage and continue auditing intro indirect targets; if state changes unexpectedly, revert and inspect which target executed.
+
+## ACTIVE - audit missing intro indirect calls/functions; keep realtime profiler reduction, 2026-09-21
+
+Realtime detailed-profile reduction is a verified host-side gain: baseline5b150aa1... measured60 steady-gameplay boundaries in6.66894s =8.99693FPS; candidate4fc3b0b3... measures60 in6.30762s =9.51230FPS, about5.73% faster. Original boundary qualification remains clean and frame/EE/GS/VU/normalized-IOP digests match. Retain `DiagnosticProfile(profile_enabled && !realtime)` and realtime raster-service timing gate; hidden/unlimited attribution still gets full profiling, while realtime keeps the independent frame probe and all guest work.
+
+User suspects missing calls/functions across intro phases and explicitly authorizes additional PCSX2/reference inspection under existing rules. Preserve rendering independence: do not copy rendering code/config/mappings from HG/ps2recomp; PCSX2 and other recomp projects are leads/oracles only. Current out/analysis.json still contains many unresolved indirect transfers. Public PS2Recomp analyzer docs independently note complex indirect jumps may need manual TOML entries, supporting a targeted audit but not any specific target. Next: regenerate current analysis/triage, prioritize missing direct-member/table targets and unresolved indirect sites on the observed opening/startup path, cross-reference permitted non-rendering reference function lists when available, then prove each candidate against original ELF bytes and live captured pointers before adding AOT roots/targets. No broad root import.
+
+## VERIFIED - remove detailed profiler overhead from realtime gameplay, 2026-09-21
+
+CLUT source timing replay3363db4c... shows49564 CLUT reads /12,688,384 entries cost only94.184ms during31M..33M, while prior whole CLUT-register packets cost~748.647ms. The remaining cost is largely draw processing/synchronization and is not safely removable by palette-read factoring. Before redesigning draw/CLUT ordering, address a host-only cost present in every visible/verifier run: `--profile` currently enables DiagnosticProfile::Slice for every guest slice, including its 64-bit sample-selection mixing and sampled steady_clock calls, plus raster-service timers. Realtime runs need the independently qualified frame probe but do not need detailed phase sampling. Candidate: construct DiagnosticProfile with `profile_enabled && !realtime` and gate raster_host_ns timing with the same condition. Hidden/unlimited run_game_replay keeps full profiling; realtime visible/verifier keeps frame_probe, input logs/checkpoints and all guest work unchanged. Compare the same fixed realtime33M verifier against clean baseline5b150aa1... (8.99693 steady FPS,60 boundaries/6.66894s), require unchanged qualification/capture digests, and retain only a measurable gain. This changes host observation only, never guest clock/work/rendering.
+
+## ACTIVE - split CLUT flush versus palette-read cost, 2026-09-21
+
+Exact-run CLUT visibility is rejected. Fresh relocated-helper baseline verifier5b150aa1... measures60 steady-gameplay boundaries in6.66894s =8.99693FPS. Exact-run candidate6120125b... measures60 in6.68303s =8.97796FPS, about0.21% slower/flat. Final frame, full EE RAM, GS VRAM/state/draw JSON, VU micro/data/defined/state and normalized IOP digest all match exactly. Therefore reducing per-word observer calls, even without broadening visible words, does not explain the ~0.749s CLUT packet cost. Disable exact_run_clut_visibility again. Next bounded attribution: keep original per-pixel CLUT reads and time only (a) the mandatory rasterize_pending_draws call and (b) read_clut_source/palette-copy work under the same31M..33M diagnostic activation. If the flush dominates, follow the ordering/GPU-work boundary; if reads dominate, inspect address/read arithmetic. No further CLUT visibility redesign until that split is measured.
+
+## REJECTED - exact-run CLUT coherence candidate, 2026-09-21
+
+The first bulk CLUT visibility attempt is rejected: candidate31M..33M heavy intervals total5.96100s (60 boundaries, about10.065FPS) versus fresh clean baseline5.84002s (about10.274FPS), roughly2.1% slower. The final frame, full EE RAM, GS VRAM/state/draw JSON and all saved VU state/data/defined/micro files are byte-identical, so this is a host-throughput rejection rather than a correctness failure. Broad min..max visibility materialized unnecessary intervening words/pages. Preserve the stronger finding that50164 CLUT-register packets cost~0.749s in the instrumented gameplay window. Next candidate must reduce observer call count without broadening the set of visible source words: compute the same CLUT word indices, sort/unique them, coalesce only truly contiguous word runs, call read_span once per exact run, and recover each original pixel from the resulting values. To speed iteration, move only this CLUT source-read helper out of the giant header into runtime/gs.cpp; the header keeps the load/order logic and one helper declaration. Once that one-time rebuild is done, alternate original-per-pixel vs exact-run helper implementations with fast gs.cpp-only rebuilds. No caching, skipped loads, widened visibility, clock/input/rendering changes.
+
+## ACTIVE - bulk CLUT source visibility candidate, 2026-09-21
+
+The refined31M..33M profile isolates0.7486468s in50164 CLUT-register packets (466308 transfers), versus only0.000389s in the remaining ordinary-register bucket. Current load_clut_from_tex0 performs16/256 source reads through GsLocalMemory::operator[], and every const operator[] invokes the optional GPU-coherence observer. This can mean millions of host observer calls for unchanged palette reads. Candidate: preserve the existing mandatory rasterize_pending_draws ordering and exact CLUT address/pixel math, but precompute the exact source word indices for one CLUT load, establish visibility once over the bounded min..max source-word span when that span is reasonably small, then read those same words through the returned const pointer. If the source span is unexpectedly broad, retain the original per-pixel checked path. No palette caching, skipped loads, guest-clock changes or draw omission. Remove the temporary packet timers/31M activation before timing. Validate build + existing runtime/translation tests and exact replay capture digests; benchmark steady31M..33M with the corrected verifier against a fresh warmed baseline. Revert if state differs or gameplay time does not repeatably improve.
+
+## ACTIVE - split dominant mixed/register gameplay rendering bucket, 2026-09-21
+
+The completed gameplay31M..33M IMAGE attribution shows the original materializing path spends about1.0352467s in mixed/register packets, versus0.3599126s in PSMT8 IMAGE format19,0.0808712s in format20 and0.006778s in format0. The mixed/register bucket is therefore the next concrete renderer target. One diagnostic-only refinement will keep stream_gif_packets=false and the existing31M activation, but classify each mixed packet before unchanged application into exclusive FINISH, mixed-IMAGE, transfer-control, vertex/draw-kick, SIGNAL/LABEL or other buckets and time the whole unchanged packet once. FINISH takes priority because write_ad(0x61) synchronously rasterizes pending draws. This adds no guest state/clock/input/rendering changes and remains HG-DIAG-005 attribution, not FPS. Build only the game, run one hidden33M replay, read the31M..33M totals, then remove the profiler and choose the next optimization from the dominant exclusive bucket. Disprove this lead if no sub-bucket materially explains the mixed cost. First result: ordinary/other register packets dominate at0.7703625s; transfer-control0.2327496s; draw-kick only0.0902477s; no FINISH bucket appeared. Because TEX0/TEX2 writes synchronously call load_clut_from_tex0, which rasterizes pending draws and reads palette VRAM, split the dominant other bucket once more into CLUT-register versus remaining ordinary packets. If CLUT dominates, optimize that exact synchronization/read path; otherwise stop drilling packet labels and move to the remaining ordinary state path.
+
+## ACTIVE - gameplay IMAGE format attribution after inconclusive streaming trial, 2026-09-21
+
+Completed four matched realtime runs after per-build warmups. Control1/candidate1/control2/candidate2 steady gameplay seconds for60 boundaries:8.14706/6.48688/6.66851/6.78493. Paired elapsed effects -20.378% then +1.746%; the first control itself varied from9.44FPS warmup to7.36FPS measured. No reliable speed gain established. Disable stream_gif_packets; retain original materializing packet path. Captured image, EE RAM, GS VRAM/registers/draw records, VU micro/data/defined/registers and metadata agree in all four; normalized full IOP agrees with only independently verified RTC seconds/minutes/hour differences. Evidence artifacts/gif-stream-comparison-20260921.json, all saved verifier results.116 Python tests and5788 native state/fault checkpoints pass. The corrected gameplay-only reporting/digests remain. No30FPS claim and no new live window.
+
+Next bounded diagnostic: with streaming off, measure original decoded packet application by IMAGE destination pixel format. In gs.cpp classify packets containing only IMAGE transfers (otherwise explicit mixed/register bucket64), time the unchanged apply_gif_register_transfers once per completed packet, and collect packet/qword counts. Temporary thread-local destructor emits bounded65-bucket totals, only after profiling was enabled. Activate existing profile_gs at31M only for profiled non-realtime33M in system_diagnostic.cpp. Thus this capture is strictly steady gameplay31M..33M, not startup/menu. Per-packet classification and GS timers perturb cost; use attribution, not FPS. No decoder, GS arithmetic/ordering, shader, input, clock or fault changes. Automatic backups preserve dirty gs.cpp/runner. Build/run one hidden configured replay, inspect which IMAGE format really costs time, then remove timers and restore runner before the next candidate. If no IMAGE format is substantial, do not force a transfer optimization; follow the measured register/draw bucket instead. Out-of-line boundary retained temporarily for quick diagnostic builds; no runtime speed claim for that refactor.
+
+## HISTORICAL - gameplay-only rendering command throughput, 2026-09-21
+
+Clean streaming candidate build c86becf34c83427ba328b0acd4dee7e0 succeeded. Native tests:5788 GIF state/fault checkpoints, keyboard65536/256, translation suite pass;116 Python tests pass. Fresh corrected verifier warmup a94e99342cdf4e9590b27bff5e8cd03a is qualified and reaches33M: steady gameplay60 boundaries in6.14472 host seconds =9.76448FPS, NOT legacy five-rate mean18.8504. This warmup is excluded from speed comparisons. Capture58ba4999c25c4510b896a187ecdd0001 matches prior image/EE/GS/VU hashes; normalized IOP digest01dc90c6... now available. No30FPS success. Current clean exe2edf24bb0593ddf5454ffaecc92b6c929f5d9e48b089fb5baa2433067cdcd01f,35862016bytes.
+
+Next matched comparison toggles ONLY constexpr stream_gif_packets in gs.cpp, preserving the out-of-line boundary on both sides. False compiles the exact prior materializing decoder/application; true compiles the direct consumer. Warm each variant after each short rebuild, then measure control1/candidate1/control2/candidate2 with the same fixed realtime verifier. No competing game or sampler. All executions remain independently saved in fresh task evidence; compare normalized IOP and every captured image/EE/GS/VU digest. Only final two heavy intervals enter the speed verdict; transition remains separately reported. This isolates streaming from the initial header/code-placement refactor. Retain only repeatable improvement; else disable/remove candidate without losing controls or earlier fixes.
+
+GIF stage capture746ea534f317495297502676ccaa63c1 reached33M. Evidence project-link-runtime/20260921T043204Z-a41c1884534f4d96bc61a2fbd033baef. Between31M and33M,17,850,014 qwords were submitted; instrumented GS application1.4821181s, decoded-transfer creation0.1863614s, append0.3895350s and scan bucket0.3689151s. Per-qword timers perturb these values; scan bucket also includes prior packet destruction, and application includes nested rendering/waits. These are not FPS nor additive to inclusive VU/GPU timings. Timer activation/source hooks have been removed; system_diagnostic.cpp is byte-restored to bcb9f289. First direct packet consumer candidate is now in gs.cpp, with frozen materializing decoder reference and new tests/gif_stream_regression.hpp included from runtime_tests.cpp. Tests/build pending. Current executable is still the old diagnostic until rebuilt; no manual launch yet.
+
+Reporting correction plan in tools/hg_runtime_verifier.py: preserve all five original late-window records and writer/caller/fault validation, but derive gameplay_fps/min/max/30FPS verdict only from the last two steady-gameplay intervals (approximately31M..33M). Use total original boundaries / total HOST seconds, require both intervals to meet30, verify expected guest range, continuity and finite positive timing. Preserve the five-rate mean under an explicitly named legacy audit field. Add pure regressions in new tests/test_runtime_verifier.py. Do not alter native command, input schedule, guest clocks or pinned catalog. Add after-run capture digests for fixed known evidence files only, including an explicitly labelled normalized IOP digest masking solely previously independently verified RTC seconds/minutes/hour offsets0xbfcd1..3, with BCD range checks and exact2MiB length. This lets current candidate/control verifiers prove all other IOP bytes agree; it never modifies captures or measured execution. Hashing occurs after the timed process stops. No broad file execution or discovery.
+
+User clarifies that menus are fine and the fault is approximately9FPS gameplay. Primary comparisons must exclude menu/startup: use the fixed replay's31M..33M steady-gameplay boundary intervals and their total boundaries / total host seconds; report30M..31M transition separately. Keep original inputs, issue-slot clock, rendering, frame qualification and full keyboard controls. Do not use the arithmetic average of five mixed-workload rates as sustained gameplay FPS. Latest baseline generated main remains pre-VI b03c024b...; candidate VI elision stays off.
+
+Measured lead: dense30M..33M graphics phase previously costs4.857s; VU executor including nested GIF2.514s, so command consumption/GS work needs separation rather than assuming vector guards dominate. Existing GifPath materializes an intermediate vector of decoded transfers and then applies them. First isolate its actual gameplay append/packet-size/decode/apply costs. Move the existing submit_qword body unchanged into runtime/gs.cpp (declaration in gs.hpp) to isolate later renderer rebuilds; add temporary HG-DIAG-005 host-only stage timers there, enabled from system_diagnostic.cpp only at30M of the configured unpaced/profiled33M replay. Report at existing checkpoints/budget. Instrumented results are attribution, not speed. Revert the timer/activation after one capture; compare state against fresh original baseline job5bf17d79d7da4360b838c30f011daa35, evidence project-link-runtime/20260921T042208Z-4be4fbacb61f4006b05016d133023ea4 (warmup, not measured pair).
+
+If decode/materialization or command application is material, test a bounded complete-packet streaming consumer in gs.cpp without the intermediate transfer vector. Retain the original decoder as frozen reference; validate the whole packet before any GS mutation, preserve PRE/Q-reset/NOP/REGLIST-padding/IMAGE semantics, all qword boundaries, queued bytes and partial GS state on exceptions. Add differential regression cases to the configured runtime_tests target, including malformed/partial/multi-tag packets, register faults and rendered output. No shader/precision/frame omission. Automatic Project Link byte backups preserve dirty sources; repeated configured build/replay jobs isolate each executable. Compare gameplay-only time and complete image/EE/GS/VU state (only independently explained RTC differences), retain only a repeatable benefit. If this path is cheap, drop that hypothesis and follow the measured rendering cost. No connector/task/catalog changes or arbitrary execution.
+
+## CURRENT - direct edits/tasks verified; keyboard build retained; VI result inconclusive, 2026-09-21
+
+Actual apply_edits and start_task calls succeeded in this continuation. The earlier missing-tools/keyboard-not-installed message was incorrect. Complete keyboard source remains built and documented in docs/CONTROLS.md: WASD left stick, IJKL right stick, arrows D-pad, Space/X/C/V face buttons, Q/E shoulders,1/3 triggers, left/right Shift stick clicks, Enter/Backspace menu. Native runtime tests verify65536 button masks and256 stick combinations; translation tests and65536 compiled VU-readiness comparisons pass.108 Python tests pass, including the new independent VI-disable option regression. Native manual end-to-end testing of every new key remains unverified. Do not apply the obsolete F/H keyboard zip.
+
+Completed two candidate and two rebuilt-baseline fixed realtime33M verifiers. All four reach budget with864 qualified original boundary writes and no lost trace/unexpected writers/caller mismatches; all fail30FPS. Candidate final two interval rates stay around9.2..9.4, contemporaneous baseline around9.1..9.2. Both are below the older saved baseline's~11, so the initial older-run comparison does not establish a VI-caused regression. The smaller contemporaneous difference is not a reliable accepted gain because these runs were sequential groups rather than warmed alternating controls. Full results/limits are in docs/PERFORMANCE.md and new external vi-readiness-recovery-comparison-20260921.json.
+
+Production VI elision is disabled pending proper comparison, while its proof implementation/tests remain available and accepted VF elision is unchanged. Configured hg_emit and build_game succeeded; restored generated out/translated.cpp SHA b03c024bfe71528a887556d68aed272dd305a813e288ae32e03c5ee92a4f9b41 exactly matches pre-VI bytes. Current hg_game SHA5f3087dcd7c8b6e8fa4449d59c5aa203014e6077184ffc0da8b59dbe074a73c1,35864064bytes. Latest baseline verifier evidence project-link-verifier/9d710e5d87e5404790944d3471ce7d0b (job0cd3e53c61924fea92acde7d97acbbbf succeeded); prior baseline c4693baba7174bfa9930c4e6754fcea8. Candidate executables/evidence remain in50993f28fd6e4e54966ccb659c2b0b63 and2b565173d1af4664992a22aa573f6688. Backups da58531f26fa4789b1dc4f798bec4461 and638b3bbc10f54ecd8c37de1138cddf2a preserve pre-comparison source/tests. Selected image/GS JSON/VU JSON hashes match the earlier baseline; no full RAM/VRAM equivalence claim is made here.
+
+No Project Link build/replay is left active and no new manual window was launched. Next executable work: establish a warmed alternating VI-on/VI-off fixed-work comparison using only the documented emitter option and configured emit/build/replay tasks, or first isolate the remaining synchronous GIF/VIF cost not resolved by the existing VU timer. The current baseline is the safe starting point; do not reapply a broad matrix/readback/clock rewrite or infer a sole bottleneck from source inspection. Maintain full controls and prior compatibility fixes. >=30 sustained gameplay FPS remains unmet; audio/menu semantic verification remains separate.
+
+## HISTORICAL PLAN - VI candidate first result and baseline comparison, 2026-09-21
+
+Direct edits/tasks work. Refreshed native tests completed: runtime keyboard65536 button combinations/256 stick combinations, translation tests, and65536 compiled VU-readiness comparisons all exit0. Candidate executable ee05d5cacf14d8e590953f349ba24cb7f96b99e59998f0fa6654b03b313ccb20 completes the fixed realtime33M verifier, qualified864 original boundary writes with zero lost trace/unexpected writers/caller mismatches. First candidate intervals29.5843/29.4619/14.5677/9.4416/9.2817; five-rate mean18.4675. Evidence project-link-verifier/50993f28fd6e4e54966ccb659c2b0b63. This is slower than the saved pre-VI run, not an accepted optimization; different run times alone do not isolate the cause. Repeat current candidate (job50b10c9ee8bc48729dbfb6f060fc00cc), then rebuild with only VI elision disabled and repeat the same fixed verifier. Preserve full keyboard mapping and all prior VF/compatibility work.
+
+Before modifying tools/hgtool/vu_emit.py: add a build-time-only optimize_vi_readiness option to the existing proof/body generator (default true for existing explicit synthetic proof tests), and call the production generator with this option false for the baseline comparison. This restores unconditional VI require calls while leaving accepted VF proof, every original pipeline advance, guest arithmetic and faults untouched. Keep the experimental VI algorithm testable; do not label it accepted. Add a focused Python regression for the disabled option. Automatic byte backups preserve dirty source; hg_emit backs up the current generated candidate. Compare generated baseline with the saved pre-VI emit backup, rebuild, test, and repeat fixed realtime measurements. No task-schema, catalog, guest-input, clock, or verifier changes.
+
+## ACTIVE - recover completed VI candidate build and validate current executable, 2026-09-21
+
+Confirmed Project Link apply_edits and start_task are exposed; the prior chat report of missing edit/task access was incorrect. Current source already contains the complete keyboard controller (keyboard_input.hpp, game_host.cpp, docs/CONTROLS.md), including left/right Shift for L3/R3, not the older F/H proposal. Do not apply the obsolete keyboard zip over this newer work. Recovered candidate hg_emit job d8b2da4ebc3b4039a9920bf2eaea4683 and build_game job801d8c10379d4ccca452537b56d275b4 both succeeded. Python tests and synthetic VU-readiness tests succeeded before the final emit; refresh linked native tests against the newly generated candidate and run them, then run the fixed gameplay33m frames verifier. No new speed benefit is established yet. The pre-VI baseline remains isolated in project-link-verifier/c4e3c5a5d3874496848ccb192484b1a6 (executable c9d6e8fdadef2fe3339b7b269af65e257b8b57e2565fbfea8cfa6e5fff6c04a8). Its last three interval rates were16.4377/10.9296/10.9765; five-window arithmetic mean19.8220 is not sustained heavy-gameplay FPS. Keep current keyboard work and prior compatibility fixes intact; no competing interactive game is listed.
+
+## ACTIVE - bounded static VI readiness proof, 2026-09-21
+
+VU entry timer replay8ccd23a2edfd475ea46f29b6eb5426f7 reached33M. Final successful-call times total2.5139328s during30M..33M, including nested GIF; frequent entries648/96 alone cost0.663/0.424s. Evidence project-link-runtime/20260921T035159Z-2a47eca4ed484edb85f489d9e02cc93c. Timer source restored exactly with backup06f01c8a7d7c416a94bc0fe34f04d996; dense header also restored. Clean baseline rebuild ada7e2c541ec492eb69c58cc108480b2 underway.
+
+Candidate: extend the existing per-basic-block VF readiness proof with a separate VI remaining-latency map. After a checked read or a known1/4-cycle write, omit only VI require calls already proved no-ops by intervening original pair advances. Unknown values still require checks; reset at every entry/control-flow leader/discontinuity; preserve the existing whole-invocation unsigned-clock-wrap fallback. Do not alter VI values/readiness writes, advances, Q/P completions, original upper/lower ordering, instructions or fault handling. Files tools/hgtool/vu_emit.py, tests/test_vu_decode.py, tests/generate_vu_readiness.py only plus generated output through hg_emit. Add unknown/overwrite/latency/branch-entry unit tests and compiled differential programs exercising integer loads, repeated bases,1-cycle writes and wrapping clocks. Keep frozen no-readiness generated baseline and compare all architectural fields/memory/errors. Automatic backups preserve dirty sources and hg_emit preserves original generated files. Measure matched uninstrumented fixed-work replays after warmup; revert candidate if benefit does not repeat. This targets a measured costly subsystem, not proof that VI checks alone dominate it.
+
+## ACTIVE - isolate VU execution within dominant VIF/GIF phase, 2026-09-21
+
+Dense phase replay ec10c96172fd41e0a96decc4059b1e49 completed33M; evidence project-link-runtime/20260921T034512Z-27078e0ee0664d6885448a2c590e257e. The VIF/GIF phase totals4.8572446s (sparse startup plus dense tail), far above EE0.698s or explicit raster0.497s. Sparse sampling missed these rare long synchronous calls. Diagnostic header restored exactly to4efc1994...; current executable still diagnostic until rebuilt. Next one bounded timer wrapper around the existing VU AOT executor in system_diagnostic.cpp, only fixed profiled unpaced33M without VU captures: count successful calls and elapsed by original entry, print at existing checkpoints/budget. No decoding, arbitrary execution or guest writes; original executor remains sole execution path and exceptions propagate. Install at30M to avoid startup and restore source after one replay. This splits VU execution (including nested GIF) from transport work before selecting an AOT optimization. Measurements are attribution only, not FPS.
+
+## ACTIVE - dense tail phase attribution, 2026-09-21
+
+Current primitive replay fc58884dbc22474ea3a5be2773f6f948 reached33M. Evidence project-link-runtime/20260921T034202Z-d1c61ba280c946609521871303ef07b4:30M..33M elapsed6.8632s including final dump; primitive deltas sprites0.9262682s, strips0.5235604s, independent triangles0.007306s. These overlap GPU waits and are not additive to GPU destructor timing. The former untextured-triangle cost has already fallen sharply; do not repeat that optimization. Temporary system_diagnostic.cpp activation restored exactly to bcb9f289... using backup2c219f9affa64be19320a60aff327363.
+
+Next diagnostic-only edit: in runtime/include/hg/diagnostic_profile.hpp select every slice in30M..33M under existing enabled profiling, retaining ordinary sampling elsewhere. This dense tail will perturb elapsed time and map/timer overhead; use only stage attribution, never FPS or speed claims. Collect one fixed hidden replay, compare captured guest/image state, restore the exact header, then rebuild. Need this because sparse samples materially undercount infrequent long VU/raster bursts. No guest clock/input/program change or new execution entry point.
+
+## ACTIVE - current-build attribution after complete keyboard tests, 2026-09-21
+
+Keyboard build and runtime tests pass (65536 button masks,256 stick combinations, focus/release and simultaneous inputs). Uninstrumented keyboard baseline replay job36ada074cd604ea383afe35cf539ff6b is isolated. Next temporarily activate existing HG-DIAG-005 per-primitive timing in runtime/system_diagnostic.cpp only when profile_enabled && !realtime && slices==33000000; print an explicit temporary-probe banner. This uses the configured hidden run_game_replay task, keeps its frozen inputs/budget/clock, and changes no renderer behavior. Read late checkpoint deltas rather than whole-run totals; restore the source from automatic byte backup immediately after collecting the diagnostic run. Profiling changes host cost, so exclude it from speed comparisons. Rebuild after restoration before the candidate/baseline benchmarks. New probe activation is temporary and inventoried in DIAGNOSTICS; no new task, shell access or input-control bypass.
+
+## ACTIVE - complete keyboard controller and current-build FPS work, 2026-09-21
+
+User explicitly requests keyboard bindings for the complete controller, then continued FPS repair; downward movement is their suggested gameplay test route. Preserve existing arrows/WASD/Space/X/C/V/Enter/Backspace/Q/E. Add IJKL right stick, 1/3 L2/R2, left/right Shift L3/R3. New pure runtime/include/hg/keyboard_input.hpp supplies all 16 active-low buttons, original pressure-byte order and four centered axes; opposite keyboard directions cancel. runtime/game_host.cpp polls these keys only in a focused manual window; existing physical-gamepad and recorded-input paths remain. Add exhaustive button/axis/release regressions to tests/runtime_tests.cpp; document controls in README.md and docs/CONTROLS.md (new). Project Link automatic byte backups and hashes preserve inherited dirty files; existing a9a9c333 executable is already isolated in verifier evidence 0dd52a23e6044097a0bcb63363f80dab.
+
+Then profile the current slow 30M..33M path without competing live play. Prior current-build final boundary intervals were 16.741/11.298/11.349 per host second; five-window arithmetic mean19.848 is not sustained heavy-scene FPS. Obtain fresh phase/primitive evidence before a bounded optimization, preserve exact guest work/state and frozen recording catalog, compare repeated matched runs, and revert a failed performance hypothesis. Connector permits named tasks only and its pulse API still has no Down: keyboard coverage does not widen that API or authorize a shell workaround. No active build/game job on entry; last manual session had reached its configured600M budget and was closed. Post brief substantive commentary during active work.
+
+## VERIFIED - reverse-sound RPC callback retained; qualified FPS rerun clean, 2026-09-21
+
+Manual-mode current-game testing advanced beyond the repaired Start path and stopped at EE0x0021f0e0 with ra0x00270648. Independent hg_inspect proves original0x0021f210 constructs0x0021f0e0 in a2 at0x21f230/0x21f244 and passes it to reverse RPC registration0x2703c0; independent caller decode proves0x270640 jalr-dispatches request+4 and returns at0x270648. Config now retains only that original handler beside sound_reverse_rpc_worker. hg_emit succeeded and generated `case 0x0021f0e0u`; Python tests, build_game, build_tests, runtime_tests, translation_tests and VU-readiness tests all exit0. New hg_game is35863040 bytes, SHA256 a9a9c333a442fffe1eef1b111062d09ca407256fd99aa98abdd2babde513568d. No guessed stub or guest behavior change was introduced. The fresh fixed gameplay33m verifier is qualified with864/864 writes from1bef84, unexpected_writers0, lost_trace0, caller_mismatches0 and invalid_stack0. Its final windows are30.5571/29.2949/16.7410/11.2980/11.3488 FPS, mean19.8480; passes_30fps=false. This small difference from prior mean19.1309 is not attributed to the coverage-only root. Evidence project-link-verifier/0dd52a23e6044097a0bcb63363f80dab. Tail slowdown still begins after30M while raster work/retirement rises sharply; profile that measured tail and do not repeat rejected sparse-readback designs.
+
+## VERIFIED - fixed gameplay FPS verifier from qualified original boundary, 2026-09-21
+
+The original display-wait write is now qualified strongly enough to drive a bounded verifier for gameplay33m, but the runtime task still reports gameplay_fps=null because tools/hg_runtime_verifier.py does not exist. Implement that new script only behind the connector's fixed run_runtime_verifier entry point. Frames mode will validate the pinned recording catalog and original ELF identity, launch the supplied isolated executable in realtime with the existing issue-slot clock/GPU flags and exact input schedule, parse only the independently qualified 0x1bef84 boundary reports, require zero unexpected writers/lost trace/caller mismatches plus stable counter/vblank evidence, and measure the final five consecutive one-second gameplay windows. Report min/mean FPS and passes_30fps without relabeling video updates, swaps, vblank edges or modeled time. A valid measurement below30 is a completed measurement, not a tool failure. Menu/audio modes remain explicit unverified results until their independent semantic verifiers exist. New file only; then run python tests and run_runtime_verifier gameplay33m/frames. The first fixed-task invocation exposed one connector packaging gap: it copies the isolated executable and recordings.json but not the required independently captured 2064-byte TOC record. Adjust the verifier, before rerunning, to locate only a toc.bin under the bounded haunting-toc-probe temp evidence root whose byte count and SHA256 exactly match the pinned catalog, copy that verified original-input record into the fresh verifier evidence directory, and reject if no exact match exists; do not synthesize or guess TOC data. If the verified five-window mean is below30, profile that same tail before the next optimization.
+
+## VERIFIED - original 0x1bef84 write is a gameplay per-frame synchronization boundary, 2026-09-21
+
+Own hg_inspect of the configured USA ELF proves 1bef78 loads the cause-2 counter, 1bef84 stores it to s0+0x1c, then the original routine performs its post-wait calls and second display wait. Own caller inspection proves 2d1c48 calls vtable slot+0x10 and returns at2d1c50; the dynamic probe reports that same external caller for every watched boundary. This is an original game synchronization point, not a host present callback or inferred image-change count.
+
+Diagnostic-only runtime/system_diagnostic.cpp change backed up as ProjectLink c48c1d52b5d94117ba1ba33947957e3e; the planning doc backup is e66a908a22ca4f5eaac03346e7168453. Fresh build_game, runtime_tests, translation_tests and vu_readiness_tests all exit0. Pinned gameplay33m replay with current SHA76e2a2ea... reaches the full33M budget. At budget the probe records864 changed writes, all864 from original PC1bef84, lost_trace0, caller_mismatches0, invalid_stack0, stable caller2d1c50,853 counter deltas of2,853 independent vblank deltas of2, and raster work advancing across863 of863 inter-boundary comparisons. Guest-time cadence converges to about29.5 boundaries/s over the full qualified span; individual late host intervals expose the real slowdown rather than presentation telemetry: the last three one-second windows are about15.10,9.51 and8.93 boundaries/s in the unlimited diagnostic run. This is timing evidence, not yet the realtime FPS verdict.
+
+Fresh recorded_control gameplay33m replay also reaches budget. Current probe versus control is byte-identical for final frame, EE RAM, GS VRAM/state, VU1 micro/data/defined/state and metadata; raw IOP RAM differs only in the previously verified RTC byte area (for example offsets bfcd1/bfcd2). Thus the observer does not alter the compared guest/graphics state. Evidence: project-link-runtime/20260921T023229Z-6fac172f527f4760b4203756c6cbedbc and control 20260921T023355Z-e962461879604a5e9776d9d8db125a5b. Keep the original boundary qualified only for this proven gameplay path until other profiles are separately checked.
+
+## VERIFIED - Start replay clears both direct-member translation faults, 2026-09-21
+
+Recovered completed Project Link work rather than rerunning duplicate jobs. The first
+start_menu replay of SHA806b231e... advanced beyond2f5c80 and faulted at2f59a0 with
+ra2f609c/a0=fc6fe0; live descriptor fc70f0 was {0,ffffffff,2f59a0}. Own hg_inspect
+confirmed2f59a0 is a real routine returning at2f5c70/2f5c74. Config now adds only
+2f59a0 beside the already-proven2f5c80 at site100b6c. hg_emit changed only shard0017
+(plus refreshed analysis/listing), and out/analysis.json marks decimal3103136 compiled.
+
+Fresh build/tests all completed exit0 with the fixed PowerShell wrapper:105 Python
+tests, runtime_tests, translation_tests, and49152 VU-readiness comparisons pass.
+Current hg_game is35852288 bytes, SHA256
+9e663a8392c342556e53c2dc85333068ff009a38b37056c5bcfa6cbfa5df0031.
+The second start_menu replay with that exact binary reached the full430M-slice budget
+without an EE translation fault. Result: status=budget_reached, final EE PC1befe4,
+modeled time430000000us, delivered recorded input prefix exact, and
+advanced_beyond_recorded_stop=true. This proves the former Start-triggered freezes at
+2f5c80/2f59a0 are cleared on the recorded path. The runtime tool still reports
+menu_verified=false, so this is not yet proof of correct visible Start-menu behavior.
+Replay artifacts: TEMP/haunting-toc-probe/project-link-runtime/
+20260921T003047Z-f395e91c22ac45788b564a3273da8cc3.
+
+A recovered realtime gameplay33m audio capture with the same binary also reaches its
+33M budget and writes1579627 frames at48kHz (6318552-byte WAV). This demonstrates
+continuous raw SPU2 core0 input capture under realtime pacing for that segment only.
+The task explicitly labels it raw input, not final synthesized/effects/cross-core mix;
+audio_fixed remains null. Gameplay FPS remains null as well: hidden presentation/video
+updates and modeled time are not internal gameplay FPS. Audio artifacts:
+TEMP/haunting-toc-probe/project-link-runtime/
+20260921T003535Z-2fc1ccd937bd46b685877051f1600cb4.
+
+## VALIDATED - proven Start target emitted and built; replay still unavailable, 2026-09-20
+
+Project Link hg_emit successfully regenerated the EE translation after adding only
+0x002f5c80 to indirect site0x00100b6c. The SHA-checked config preserves every prior
+target and records the live descriptor proof. Emit made exactly two generated C++
+files change: out/translated-shard-0017.cpp and out/translated.cpp (analysis/listing
+also refreshed). The old external backup contains no2f5c80 case/page_2f5 dispatch;
+the new shard has `case 0x002f5c80u: step_2f5c80` and normal emitted code through
+the independently decoded return, while translated.cpp now declares/dispatches page_2f5.
+Fresh out/analysis.json marks decimal target3103872 (0x2f5c80) compiled=true.
+
+Validation:105 Python tests pass. hg_game rebuilt exit0 from translated.cpp and
+translated-shard-0017.cpp; new executable SHA256 is
+806b231e7fbc6e50b915e02659e9ab1b2e7a9a6ca103601a27b1a6722e2e903a,
+35842560 bytes, versus prior1a89f68a.../35827712. build_tests rebuilt runtime,
+translation and VU-readiness executables exit0; runtime_tests and translation_tests
+exit0; vu_readiness_tests reports49152 compiled comparisons passed. Build-game log
+still prints missing pwsh.exe after producing hg_game but task exit is0; no evidence
+that warning invalidated the binary. Emitter exact-byte backup/manifest is under
+TEMP/haunting-toc-probe/project-link-emit/20260920T204149Z-312ef9d99f9542d88c5fef2ef9b3fb81.
+
+This removes the known static-translation deficiency in the built product but does
+not yet prove the Start menu works: the handler still exposes no deterministic game
+replay or visible launch task, so the saved Start-input path cannot be rerun here.
+No speed effect is claimed from this coverage change.30 gameplay FPS and corrected
+audio remain unverified; presentation updates or modeled time are not gameplay FPS.
+
+## CURRENT - previous execution path restored and replay verified, 2026-09-20
+
+Rejected matrix183227 implementation after9.377% slower mean scene, both pairs;
+all four candidate/control state comparisons passed. Archived source/tests/exe/map
+in matrix183227-rejected. Restored emitter/CMake/generated main match exact
+matrix-postcompat-baseline bytes. The two new matrix test files were archived
+outside active tests; inherited unused helper sources remain as in that baseline.
+Restored hg_game build exit0; full105 Python tests pass. Fresh restored33M replay
+ends native-iop-budget and matches original image/EE RAM+registers/devices/GS/VU,
+with only verified RTC IOP differences. Current exe SHA256
+1a89f68ad5db75e80d7ef66adc9689f4c08600c34fb37ebbe1ed95e6ff2783ea.
+Proof matrix183227-restored-validation.json. Compatibility fixes remain intact.
+No matrix speed gain or verified30 gameplayFPS. No new visible game was launched.
+
+Immediate unresolved user issues: Start-menu fault2f5c80 (ra2f609c) at416324369
+slices in saved user-live-corrected-20260920-132309/live.*; last Start input at
+416256000, release416288768.80 host input events are recorded. Further original
+menu instruction/audio source inspection was rejected by automatic approval review,
+including explicit require_escalated attempt (could not determine safety status).
+Do not infer the target's behavior or add a guessed return/menu stub. Original
+caller/target decode and independent dispatch proof are the next required actions
+when inspection is permitted. Shared non-rendering address lookups are leads only;
+classify scope before using any reference, with rendering restrictions retained.
+
+Audio log confirms324 speaker underruns.406M..416M advances10 modeled seconds in
+33.758 host seconds (~29.6% modeled realtime), so raw48kHz input arrives too slowly
+for sustained playback. This supports starvation; it does not prove every audible
+problem has the same cause. Full SPU2 synthesis/effects/cross-core mixing remains
+unfinished under HG-DIAG-014. User reported about15FPS; no internal frame counter
+has been validated. Menu and gameplay audio are NOT fixed by this restoration.
+
+Native comparison session45273, restoration build40924 and replay56268 all
+completed and their results were collected. No continuing worker is promised.
+Next performance lead requires fresh profiling/different measured hypothesis;
+do not repeat the same rejected matrix design merely because it batches calls.
+Final documentation backup matrix183227-restored-final-docs.
+
+## REJECTED - prepared matrix arithmetic slowed both pairs; restoring, 2026-09-20
+
+Original matrix build and all four33M captures pass: image, EE RAM/registers/devices,
+GS and VU exact; IOP differs only verified RTC bfcd1/2/3. Two warmups excluded.
+Control scenes7.6884/7.9125s, candidates8.8191/8.2447s. Mean7.80045 ->8.53190s,
+9.377% slower, both pairs. Reject this implementation despite synthetic correctness.
+Archive matrix183227-rejected preserves candidate sources/tests/exe/map and hashes.
+Evidence matrix183227-summary.json and all four captures; no performance gain.
+
+Restore only matrix integration in emitter/CMake/generated main to inspected
+postcompat baseline; move the two new experiment tests out of active tests after
+verified archival. Keep inherited unused helper sources and both compatibility
+fixes. Rebuild hg_game and original105 Python tests to restore product consistency.
+Menu2f5c80 inspection remains approval-blocked. Audio starvation evidence: affected
+406M..416M interval takes33.758 host seconds for10 modeled seconds, about29.6%
+modeled realtime; speaker logs reach324 underruns. Full gameplay audio remains
+unfinished. No menu/audio correction or verified30 gameFPS is claimed.
+
+## ACTIVE - independent matrix original validation after menu inspection block, 2026-09-20
+
+Confirmed completed matrix game build exit0, current exe2df27ebe...; accepted
+postcompat baseline2608296b... preserved. No user game/compiler process observed.
+Menu instruction/audio source inspection remains approval-blocked. Independent
+existing benchmark configuration read succeeded. Run two excluded warmups and
+four alternating33M hidden replays with fresh matrix183227 outputs, unchanged
+input/clocks/options. Compare image/EE RAM+registers/devices/GS/VU, RTC-only IOP.
+Reuse original synthetic validation; no new source changes or new behavior.
+Require repeated scene improvement and state equality before retaining matrix.
+Driver hg-matrix-validation-183227.py; timings matrix183227-pair-times.json.
+Documentation backup matrix183227-validation-docs. Menu/audio fixes not claimed.
+
+## BLOCKED - recorded Start-menu fault and gameplay audio, 2026-09-20
+
+Latest user reports Enter during gameplay froze the game, about15 observed FPS,
+and badly broken gameplay audio. Read-only log inspection confirms original EE
+stop2f5c80: no static translation, ra2f609c, a0fc6fe0, at416324369 issue slices.
+Saved live capture: user-live-corrected-20260920-132309/live.ram and sidecars;
+last Start press416256000, release416288768. Recorded input events remain in
+live.log. User-observed15FPS is not a verified internal game-frame measurement.
+Speaker underruns grew to324 by the fault, with repeated starvation during gameplay.
+Existing HG-DIAG-014 is raw selected-core input presentation; full SPU2 synthesis,
+effects and cross-core mix remain unfinished. Do not claim underruns are the sole
+cause of the user's audio report or claim either problem fixed.
+
+Matrix game build completed: matrix-game-build.exit0 and hg_game output present;
+no hg_game/cl/MSBuild processes observed at this continuation's initial check.
+Original matrix comparisons/performance remain unvalidated. Keep postcompat baseline
+and current candidate distinct; do not overwrite earlier live/output evidence.
+Narrow permitted shared non-rendering lookup found2f5c80 extent lead ending2f6044
+and2f6050 ending2f60ac. These remain unverified leads, not authorized AOT roots.
+
+Automatic approval review rejected original-code/audio inspection and its explicit
+require_escalated approval attempt: could not determine safety status. No source
+change, game launch or replay was made in this continuation. First combined reader
+also had missing PYTHONPATH before reaching decoding; it changed no source.
+Next action: inspect original caller2f6060..2f60cc and target2f5c80 with own decoder,
+corroborate recorded dispatch before adding any target; replay original inputs.
+Then finish original matrix comparisons and inspect audio starvation/full-mix gaps.
+Do not retry blocked inspections through another route without the gate permitting.
+Documentation backup: TEMP/haunting-toc-probe/menu-audio-investigation-183227.
+
+## VALIDATING - matrix synthetic comparisons pass; original build next, 2026-09-20
+
+108 Python tests pass. Native matrix tests pass69632 compiled CFG comparisons,
+1048576 intermediate stage comparisons,50164 prepared chains and11224 fallbacks;
+49152 existing native readiness comparisons also pass. Four host rounding modes,
+invalid guards, definedness, entries/delays, lower faults, masks and aliasing covered.
+Normal emitter recognizes129 original chains. Exact old VU block matched once;
+only that block replaced, outside bytes preserved. Proof matrix-regeneration-applied.json.
+Current game binary remains the corrected compatibility build until build completes;
+live isolated copy is untouched. Original matrix replay/equivalence and speed pending.
+Backup matrix-postcompat-baseline; do not call matrix optimization accepted yet.
+
+## ACTIVE - corrected game visible; conservative matrix integration, 2026-09-20
+
+Corrected isolated game PID34904, interactive window1838478 returned by Computer
+Use with live video-update title. Normal input/realtime, no scripted buttons.
+Copy under TEMP/haunting-toc-probe/user-live-corrected-20260920-132309 matches
+current executable2608296b...; wrapper backup and live-command.json retained.
+Do not interrupt user play. No uncontended speed claim while this game runs.
+
+Next milestone: emitted matrix/reference CFG state and fault equality. Implement
+build-time four-pair MULA/MADDA/MADDA/MADD recognition, masks14/15, all broadcasts,
+no internal entries/targets/control/end/delay, no lower writes to future operands.
+Pure guarded prepare at first upper, commit at each original upper; fallback keeps
+original faults. Keep lower/SQ snapshots/readiness/clocks/Q/P and guest work exact.
+Function locals before entry dispatch. Files vu_emit.py, CMakeLists, new compiled
+synthetic generator tests/generate_vu_matrix.py, focused Python emitter coverage.
+Backup matrix-postcompat-baseline stores17 dirty source/doc/binary files/hashes.
+Test activation, flags/ACC, partial/undefined lanes, lower faults/writers, aliases,
+branches/entries/delays and wrap before replacing only the exact old VU block.
+No matrix integration or benefit accepted yet; target30 gameplayFPS remains unmet.
+
+## VERIFIED - live compatibility fixes and saved regressions, 2026-09-20
+
+VU0 normal-ACC product-underflow and original callback124da0 are built. The exact
+42-event replay reaches45M native-iop-budget, passing both former faults. Both
+warmups and four33M regressions ended native-iop-budget; all recorded image/EE/GS/
+VU comparisons pass, IOP differs only RTC bfcd1/2/3. Saved livecompat results reused.
+Mean matched scene 8.46275 -> 8.52585s (+0.746%); pairs disagree,
+so no repeatable speed effect is established. Retain required compatibility fixes.
+Current executable SHA256 2608296bcff3c2a47887f67b2cf233fd41a30eaf9792f50df85f21c1ac3d5eae.
+30 gameplayFPS remains unverified/unmet. No new tests/build/replay needed for launch.
+
+Next milestone: corrected visible game with realtime pacing and normal input,
+then conservative matrix integration and compiled differential tests. Preserve
+old isolated executable/logs; prepare fresh copy and outputs under C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\user-live-corrected-20260920-132309
+Backup of docs/wrapper in its backup directory. Launch not yet attempted.
+No user game/compiler observed before preparation; defer speed tests during live play.
+
+## ACTIVE - original callback124da0 after underflow progress, 2026-09-20
+
+Focused tests, captured-operand fixture and game build pass. The corrected game
+SHA4488fc9dc4bc2f152355b0596bb069eb5ff4d7b435cd7b1089cfd26a9d3d7cbb passes
+former36.445516M stop and reaches39.245766M with the same42 controller events.
+New fault: no static translation at124da0, reached by original JALR1728a8.
+Original172894..9c installs46c220 on liveobjectcb8b40;1728a0/a4 reads slot+10.
+ELF/live table46c230 and live t9 agree on124da0. Its original JRra/NOP words
+03e00008/00000000 are independently decoded. Exact shared manual-config lookup
+provided no additional lead. Add only this proven site target, translate the
+original instructions normally, retain all guest budgets/delay/trace semantics.
+Files config/haunting_ground_us.toml, expected generated shard0009, provenance.
+Normal combined backup/note request was rejected by automatic approval review;
+a narrower explicit backup through the approval mechanism succeeded. Current
+flat-file backups/hashes: TEMP/haunting-toc-probe/live-callback-124da0-baseline.
+Regenerate old/new externally, require old output match existing code and inspect
+only the expected added instructions before copying any generated file. Build,
+replay45M, and original33M comparison; corrected visible launch follows validation.
+No game/build/replay remains active. Matrix scan found129 static opportunities;
+no matrix integration or speed result.30 gameplayFPS remains unverified/unmet.
+
+## VALIDATING - VU0 underflow focused checks passed, 2026-09-20
+
+Applied bounded product-underflow handling and synthetic runtime/translation tests.
+Clean runtime_tests/translation_tests build and both executables completed exit0.
+49152 new sign/mask/broadcast/alias/status cases and 12 later-lane atomic faults
+pass, plus translated JR delay-slot success and retained exact-PC rejection.
+External captured-operand fixture compiled and passed: VF9 614a953d/6201d6fa/
+633e4ce8/013b6c49, unchanged ACC, MAC0, statusfe0. Real game rebuild is active;
+no corrected original replay result exists yet. Native build session87308.
+Next: finish game build, fresh45M42-event hidden replay past former36.445M stop,
+then original33M state regression and corrected isolated visible launch.
+Manual PDF/table provenance now saved externally as sony-vu-page42-tables.json;
+page42 rendered, but native image viewer denied image input. Table cells were
+read using PDF geometry. No physical-console arithmetic/FPS claim.
+Source baseline vu0-underflow-baseline; fresh docs backup vu0-underflow-validation-docs.
+
+## ACTIVE - bounded VU0 product-underflow implementation, 2026-09-20
+
+The 42 delivered controller events exactly reproduce live10dac8. All image,
+EE/GS/VU snapshots match; IOP differs only verified RTC seconds/minutes.
+Diagnostic build and runtime tests pass; guest arithmetic is still unchanged.
+Captured VF7.y=3e73e780 times VF8.w=013b6c49 underflows with normal nonzero
+ACC.y=6201d6fa. Sony VU6.0 p42 table (coordinate-based PDF extraction) specifies
+current U/O clear, result-based Z/S, and sticky US set for normal-ACC/product-UDF.
+Implement only nonzero normal ACC exponents1..254: exact unchanged ACC result,
+separate sticky U; preserve all other exceptional guards and atomic commits.
+No policy copied from EE COP1 or external renderer. Physical-console least-bit
+profile remains unmeasured; zero/denormal and exceptional ACC stay explicit stops.
+Files runtime.hpp and runtime_tests.cpp; synthetic all-mask/broadcast/sign/alias
+coverage and later-lane atomic faults, plus existing translation tests. Build
+then replay exact42-event path past former36.445M stop and original33M regression.
+Keep live isolated executable unchanged and use fresh hidden-replay outputs.
+Backup: %TEMP%/haunting-toc-probe/vu0-underflow-baseline, including diagnostic
+executable/map. Matrix optimization and verified30FPS goal remain unfinished.
+
+## ACTIVE - live VU0 arithmetic stop, 2026-09-20
+
+Accepted isolated game launched on interactive desktop; second launch window
+2952648 observed with live update title and normal controls. Removed inherited
+host-frames flag so execution faults remain visible instead of closing the UI.
+First recorded play stops at EE10dac8, final VMADDw VF9,VF7,VF8.w in original
+matrix routine10dabc..10dac8. Fault is the explicit exceptional accumulator guard.
+Next milestone: reproduce the recorded input path, identify exact VF8/ACC values,
+validate the applicable Sony VU exception-table row and implement only proven
+behavior. First extend existing HG-DIAG-001 fault report with all VF/ACC/MAC/status
+and a2/sp (exit-only host output), incremental build, then hidden recorded replay.
+No changed guest arithmetic/clocks in this diagnostic step. Do not interrupt live
+user play. Matrix optimization remains pending until this launch blocker is fixed.
+Backup: %TEMP%/haunting-toc-probe/vu0-live-fault-baseline. Live outputs under
+user-live-20260920-120121.30FPS remains unmet; presentation counts are not game FPS.
+
+## ACTIVE - visible accepted game launch and matrix continuation, 2026-09-20
+
+User requests a controllable visible game and continued optimization. Prepare an
+isolated byte-identical accepted executable; restore live wrapper with verified
+manual live arguments and fresh outputs. No scripted input or hidden-host flag.
+Dependencies inspected with dumpbin: Windows and installed MSVC runtime only.
+Verify interactive window and startup, then continue exact matrix implementation.
+Do not interrupt user play; defer uncontended speed measurements while it runs.
+Backup/launch evidence: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\user-live-20260920-120121
+
+## ACCESS CHECK - read command and source patch succeeded, 2026-09-20
+
+After the user reported a possible fix, the normal read command succeeded and
+apply_patch successfully added the pending explicit <array> include to
+runtime/fpu_add4_avx2.cpp. Verified that this is the only source-line change.
+The earlier blanket tool blocker is not reproducing in these two checks.
+The larger matrix integration patch, compilation and benchmarks remain untested;
+this result establishes access for the tested actions only, with no FPS claim.
+
+Source and documentation backup with hashes:
+%TEMP%/haunting-toc-probe/matrix-access-check-90f2c57cc1184bfa9bc1890c4f4e6808.
+This check launched no build, game, replay or profile. Existing matrix helper
+remains unbuilt and unused by generated code. Next implementation step remains
+conservative matrix emitter integration and compiled differential tests, then
+VU-only regeneration and matched original-game replays.30FPS remains unmet.
+All older progress bytes are preserved below.
+
+## BLOCKED - matrix integration rejected by automatic safety review, 2026-09-20
+
+Automatic safety review blocked the apply_patch request adding conservative matrix
+recognition/emission to tools/hgtool/vu_emit.py and the explicit array include in
+runtime/fpu_add4_avx2.cpp. Returned reason: "we couldn't determine the safety status
+of the request." No approval request or corrective action was given. Did not retry
+the rejected source mutation through another tool.
+
+Post-block hashes verify emitter, AVX2 source, matrix source/header and CMake are
+unchanged from vu-matrix-continuation. Accepted hg_game.exe/map and generated
+out/translated.cpp still match vu-matrix-baseline. All105 Python tests pass.
+No optimization applied; inherited matrix helpers remain unused/unbuilt.
+No build/replay/profile launched; no native command session remains active.
+30 gameplay FPS remains unverified/unmet; no fresh speed result exists.
+
+Backup: %TEMP%/haunting-toc-probe/vu-matrix-continuation (17 dirty source/doc files
+and manifest); accepted executable/map/generated main stay in vu-matrix-baseline.
+Next action when the edit gate permits: apply/review conservative matrix integration,
+add compiled differential tests, then exact VU-only regeneration, clean /m:1 build
+and alternating hidden-host original replays. Current launcher wrapper still invokes
+older readiness pairs; use fresh artifact names before launching.
+
+The documentation-only apply_patch failed on inherited invalid UTF8; this note
+was prepended as ASCII bytes, preserving every pre-existing byte unchanged.
+
+## ACTIVE - resume exact matrix candidate, 2026-09-20
+
+Next measurable milestone: compiled matrix/reference CFG state and fault equality,
+then repeatable lower original33M scene elapsed with full captured-state equality.
+Confirmed accepted executable/map/generated main/emitter match matrix-baseline.
+Read all project Markdown current sections and inherited matrix code. No game/build
+active at entry. Backup current dirty sources: %TEMP%/haunting-toc-probe/
+vu-matrix-continuation; accepted binary backup remains vu-matrix-baseline.
+
+Complete conservative static four-stage recognition and function-local scratch
+before entry dispatch. Exclude internal entries/targets and every delay/control
+pair; reject lower writes to any future source lane. Keep readiness, pipeline,
+SQ snapshots, lower operations and fallback fault order. Add explicit array include
+and compiled synthetic matrix/reference cases with activation checks, masks,
+broadcast permutations, VF0, aliasing, undefined operands, intervening lower faults,
+branch/loop/entry cases, flags and unsigned-clock wrap. Source is own existing
+exact product/add and modeled state transitions; no external rendering reference.
+Files: vu_emit.py, fpu_add4_avx2.cpp, CMakeLists, new tests/generate_vu_matrix.py
+and tests/test_vu_matrix.py; matrix helper adjustments only if tests find a defect.
+After checks, replace only exact old generated VU block and use clean /m:1 build.
+Two warmups/four alternating hidden-host original replays, fresh matrix names.
+Reject mismatches or nonrepeatable gain.30 gameplay FPS still unverified/unmet.
+
+## HANDOFF - matrix candidate partially implemented, NOT validated, 2026-09-20
+
+User requested handoff during implementation. No build/replay/profile/game active
+(process check hg_game/cl/MSBuild empty). Accepted game/map and generated main
+remain byte-identical to vu-matrix-baseline manifest, verified at handoff.
+Accepted latest result remains VF readiness proof: scene7.1256 ->6.9381s,2.631%
+lower;105 Python/49152 compiled checks and four original captures pass.30FPS unmet.
+
+Partial UNBUILT source changes: new runtime/vu_matrix.cpp and include/hg/vu_matrix.hpp
+provide guarded pure preparation and per-stage commits; fpu_add4.hpp/.cpp/_avx2.cpp
+add four-product/three-exact-add helper with existing AVX2 CPU/OS guard;
+vu_xyz.hpp includes new header; CMakeLists adds vu_matrix.cpp to library.
+No generator integration, tests, original regeneration, build or timings yet.
+vu_emit.py, test_vu_decode.py, generate_vu_readiness.py remain baseline-identical.
+Review includes (AVX2 source newly uses std::array), guards, flag/partial-lane
+semantics before integrating. Runtime helper is unused by current emitted code.
+Backups/hashes: %TEMP%/haunting-toc-probe/vu-matrix-baseline, including old-vu-block.txt.
+
+Next: implement conservative static group detection for MULA/MADDA/MADDA/MADD
+(any broadcast/order, masks14/15), excluding internal entry/control/delay and
+lower writes to future operands. Prepare once, commit at each original upper
+point with original checked fallback. Keep lower/SQ snapshot/readiness/Q/P clocks
+unchanged. Add compiled baseline-vs-optimized synthetic tests (undefined/fault,
+branches/alternate entries, masks/aliasing/flags); then regenerate ONLY exact
+old VU block and build. Two warmups/four alternating original hidden replays.
+Do not accept without exact image/EE/GS/VU equality and RTC-only IOP differences,
+plus repeatable speed gain. Current live launcher wrapper still vureadiness;
+replace with fresh matrix artifact names before invoking to avoid overwrites.
+
+## Active candidate - batched exact VU matrix arithmetic, 2026-09-20
+
+Next measurable milestone: reduce original scene time with exact state equality.
+Existing profiles implicate broadcast multiply/MADD helpers; static original
+blocks contain MULA/MADDA/MADDA/MADD chains. Prepare their exact products/adds
+in one guarded AVX2 call, then commit each stage at its original instruction.
+Only masks14/15, no internal entry/control/delay, no lower writes to future
+operands. Preserve all lower operations, readiness, clocks, faults and flags.
+Guard all inputs without throwing; undefined inputs use original per-stage path.
+No host FMA, changed rounding, guest work removal or new ISA assumption.
+Files fpu_add4.cpp/_avx2.cpp/header, new vu_matrix.cpp/header, vu_xyz.hpp include,
+vu_emit.py, CMakeLists and synthetic compiled tests. Backup vu-matrix-baseline
+contains current dirty contents/hashes and accepted game/map/generated main.
+First compare synthetic baseline/optimized CFGs including partial masks, aliasing,
+undefined operands and lower faults; then original rebuild and two warmups/four
+alternating replays. Reject on mismatch or lack of repeatable improvement.
+30FPS still unmet. Automated runs stay hidden; no live session currently active.
+
+## CURRENT - compile-time VF readiness proof retained, 2026-09-20
+
+Build,105 Python tests and49152 compiled baseline/optimized scheduler comparisons
+pass, including branches/loops/delays, arbitrary ready times, Q/P completion,
+uint64 wrap, partial lanes and fault states. All four original captures match
+images/EE/GS/VU, IOP verified RTC only. Two warmups excluded; controls7.1184/7.1328s
+vs candidates6.9515/6.9247s. Mean7.12560 ->6.93810s (2.631% lower),
+both pairs faster. Retained; all advances/timestamps remain, only proven no-op
+VF guards are skipped/narrowed. VI checks and wrap fallback remain. Evidence
+vu-readiness-proof-summary.json and vureadiness-* captures. New CMake/CTest target
+vu_readiness_tests; hg-build-add4.cmd now includes it. All native products current.
+No build/replay/profile active; launcher14640 completed exit0.30FPS still unmet.
+
+Next larger lead: static four-stage MULA/MADDA/MADDA/MADD blocks. Own opportunity
+scan finds many with no internal entry/control and no lower write to future
+operands (vu-matrix-block-opportunity.json). Consider precomputing the four exact
+products together while retaining each original add, flag commit, lower operation
+and pipeline step at its original point. Must guard all inputs and retain scalar
+fallback/fault order. No matrix batching implemented yet. Local CPU is verified
+AMD Ryzen7 9800X3D; no AVX512 capability assumed or used. Latest visible rate still
+needs refresh; hidden changed-image rate11.16/s predates recent small gains.
+
+## Active plan - compile-time VU readiness proof, 2026-09-20
+
+Original static blocks contain many already-satisfied VF checks (e.g. programs3/8:
+334/455 and334/429 calls). This is an opportunity count, not measured gain. Track
+per-lane known-ready state during emission: a successful read establishes readiness;
+a write resets selected lanes to the existing four-cycle latency, and each pair
+advances the conservative lower bound by one. Ignore extra stalls in the proof.
+Reset at every entry, branch target, control-flow join/gap and after control/end
+pairs; delay slots use only their actual predecessor's proof. Keep VI checks.
+Omit/narrow only proven-satisfied VF checks, with a function-local safety flag that
+falls back to all original masks after uint64 issue-cycle wrap (unit advances or
+WAITQ). Require stalls cannot wrap because their target is >=current. Preserve
+all pipeline advances, Q/P completion, ready timestamps, arithmetic and faults.
+A zero-cycle VF check cannot clear additional Q/P state after the pair's initial
+one-cycle advance. No new scheduling/timing model or runtime instruction decoding.
+This differs from HG-FAIL-015's runtime combined dependency-clock helper.
+Files vu_emit.py, test_vu_decode.py, CMakeLists; new synthetic test generator
+ tests/generate_vu_readiness.py. Backup vu-readiness-proof-baseline includes dirty
+sources/generated main and accepted combined-MADD game/map. First compile/run
+synthetic emitted baseline versus optimized CFGs with randomized ready times,
+Q/P states, uint64 wrap, branches/loops/delays, partial lanes and fault states.
+Only then regenerate original VU block and build. Run104+ Python tests, native
+synthetic checks and four alternating original captures after two warmups. Reject
+without exact state equality and repeatable scene improvement.30FPS still unmet.
+
+## CURRENT - combined exact MADD host call retained, 2026-09-20
+
+Build/focused FPU/GIF/runtime checks pass:4M new scalar-chain comparisons across
+four MXCSR modes, existing16M products/16M additions and frozen VU checks. Four
+original captures match images/EE/GS/VU, IOP verified RTC only. Two warmups excluded;
+control scenes7.1994/7.1980s vs candidates7.1342/7.1621s. Mean7.19870 ->7.14815s
+(0.702% lower), both pairs faster. Retained; modest gain. These remain
+two exact guest arithmetic operations, not host FMA. CPU/OS guard/fallback stays.
+Artifacts vu-combined-madd-summary.json and vucombinedmadd-*; baseline preserves
+prior accepted SQ-elision game/map. Current build products match retained source.
+No build/profile/replay active; launcher48252 completed exit0.30FPS remains unmet.
+
+Next substantial lead: own static block analysis shows many repeated VU VF readiness
+checks are provably already satisfied. Opportunity counts in vu-static-readiness-
+opportunity.json, not a speed claim. Need conservative per-block proof, branch/
+entry resets and exact uint64 wrap fallback; preserve every pipeline advance,
+Q/P completion, ready timestamp, arithmetic operation and explicit fault. This
+would differ from rejected runtime combined dependency helper (HG-FAIL-015).
+No such readiness change has been implemented. Do not omit guards on assumption.
+
+## Active candidate - combined host call for exact full-lane MADD, 2026-09-20
+
+Remaining profiles show full multiply/MADD plus separate AVX2 product/add calls.
+Keep the existing exact product then exact add, but combine their host dispatch
+and inline only inside the isolated AVX2 translation unit. This may remove stack
+round-trips and duplicate AVX call transitions; it is NOT host FMA or changed
+rounding. Product and addition UF/OF masks are ORed exactly as before. CPU/OS guard
+remains; false retains original checked SSE2/scalar path. No VU timing changes.
+Files fpu_add4.cpp/_avx2.cpp, fpu_add4.hpp, vu_products.cpp, fpu_tests.cpp.
+Backup vu-combined-madd-baseline includes dirty sources/docs and accepted game/map.
+Compare chained scalar product/add bits and flags over4M lanes/four MXCSR modes,
+including cancellation/saturation/subnormals and accumulator aliasing; retain
+existing32M arithmetic checks and frozen VU reference checks. Build then two
+warmups/four alternating original33M captures; reject without repeated scene gain.
+This does not inline compound arithmetic into generated CFGs (HG-FAIL-007).
+
+## CURRENT - nonconflicting SQ snapshot elision retained, 2026-09-20
+
+All104 Python tests, build and four original captures pass; image/EE/GS/VU exact,
+IOP verified RTC only. Two warmups/four alternating hidden33M runs: controls
+7.2876/7.2536s, candidates7.1809/7.1552s. Mean7.27060 ->7.16805s
+(1.410% less scene time), both pairs faster. Retained.20 overlapping
+SQ sites keep snapshots;111 independent sites omit them. No guest clocks changed.
+Evidence vu-sq-snapshot-summary.json/static-proof.json and vusqsnapshot-*.
+Game/map and all build products current. No build/profile/replay active; launcher
+14600 completed exit0.30FPS goal unmet. Latest hidden changed-image rate11.16/s
+predates this small gain; visible rate still needs refresh. Continue measured work.
+
+## Active candidate - omit nonconflicting VU SQ snapshots, 2026-09-20
+
+Fresh post-masked profile3265 samples/zero errors, original captures pass RTC-only.
+VCRUNTIME91 samples; earlier real stack unwinds identify memcpy callers in VU
+programs1/3/9. Emitter currently copies whole Vu1State before every SQ, even if
+upper writes another VF or disjoint lanes. Own static scan:131 reachable SQ sites,
+20 have overlapping upper writes;111 unnecessary snapshots are omitted.
+Use existing _pipeline_accesses VF write mask: snapshot only when SQ source lanes
+intersect same-pair upper writes. Upper instructions cannot change VI addressing;
+SQ reads no ACC/status/clocks. Keep original whole snapshot for every overlap.
+No new inline arithmetic, no scheduling changes, no runtime decoding or flags
+elision. Files vu_emit.py/test_vu_decode.py and ignored generated main only.
+Backup vu-sq-snapshot-baseline saves dirty sources, generated main and accepted
+exe/map. Verify old emitted VU block matches exactly once, then replace only that
+block with normal emitter output; unchanged EE shards need no regeneration.
+Keep overlap ordering test, add independent-source/disjoint-lane cases, run Python
+suite and build; two warmups/four alternating33M replays must match all captures
+and show repeatable scene gain.30FPS remains unmet. Latest hidden changed images
+11.16/s; not a visible or internal-game FPS measurement. No stale products remain.
+
+## Active diagnostic - post-masked gameplay profile, 2026-09-20
+
+Refresh bounded five-second native RIP sampling after30M on the accepted masked
+transfer binary and matching map. Hidden host; post-masked-gameplay-* artifacts.
+Excluded from speed benchmarks; compare original captures on completion. Use
+measured remaining costs to choose the next bounded optimization toward30FPS.
+
+## CURRENT - masked resident transfers retained, 2026-09-20
+
+Masked PSMT8 writes passed1042 GPU/CPU cases in both modes, including confirmed
+resident execution, repeated masks/indices, partial transfers, intervening reads,
+later GPU draws, copy and pending-write accelerator teardown. Memory1920/GIF1285/
+DMA/runtime checks pass; full game and final fixture builds exit0. All four original
+33M captures match images/EE/GS/VU, IOP verified RTC only. Two warmups excluded;
+control scenes7.5312/7.5349 vs candidates7.3364/7.3433s. Mean7.53305 ->7.33985s
+(2.565% less), both pairs faster. Retained. No timing or guest work change.
+Evidence masked-transfer-summary.json, pair-times and maskedtransfer-* captures.
+Accepted binary/map, native library, headless and tests now reflect this candidate
+plus accepted AVX2 products and untextured GPU triangles. Full-vector helper reuse
+remains reverted. No build/replay/profile active; launcher20964 completed exit0.
+
+30FPS goal remains unmet. Latest visible changed-image measurement remains about9/s;
+hidden fixed-work gains are not internal game FPS. Audio recording gaps unresolved;
+Options captured path works. Next measurable milestone: refreshed presentation/
+frame-boundary evidence and remaining CPU/GPU hotspot selection. Continue beyond
+this checkpoint; avoid repeating rejected full-vector/XYZ arithmetic or read-page
+narrowing changes unchanged. Automated replay windows remain hidden, live input
+sessions retain control. Current launcher wrapper runs hg-maskedtransfer-pairs.py;
+use fresh artifact names before another run. Sources/headers require no restoration.
+
+## Active plan - masked resident PSMT8 transfers, 2026-09-20
+
+StackWalk64 proves GPU download callers include PSMT8 fast host writes. Add optional
+masked-word observer delivery in gs_memory.hpp and use it for existing aligned
+16-byte PSMT8 columns in gs.cpp. gl_gs.cpp accepts only resident pages already GPU
+dirty or with queued writes; CPU-owned pages retain original CPU stores. Flush
+prior draws before starting transfer batch. Merge repeated writes into one unique
+word job with exact bit masks/last-writer ordering; dispatch one invocation per
+word, preserving untouched GPU bits without CPU readback. Flush transfers before
+GPU draws or overlapping CPU access. Copy/read/teardown materializes normally;
+forget discards only unobservable storage. GPU upload cache/page flags follow the
+same existing flush lifecycle. No guest work, clock or transfer progress changes.
+New shader independently implements (old & ~mask) | (value & mask), no references.
+Backup masked-transfer-baseline contains dirty files and accepted game/map.
+Tests must cover GPU draw -> partial/repeated/overlapping transfer -> CPU read,
+transfer -> GPU texture use/draw, nonresident fallback and owner teardown. Prove
+actual backend use, full VRAM equality and transfer-state equality. Build/focused
+checks/both GPU modes, then two warmups/four alternating original33M captures.
+Retain only with exact equivalence and repeatable scene-time gain. This is not the
+rejected read-page narrowing/deferred-raster-flush design. Header rebuild required.
+
+## CURRENT - stack profile isolates GS transfer waits, 2026-09-20
+
+External StackWalk64 sample:325 contexts, zero context failures, depths6..20;
+276 walks end with API false below20,49 reach the20-frame cap. Do not claim every
+stack fully unwound. Among62 top-ntdll samples,39 unwind through Accelerator::
+download and15 through flush. Many download chains directly reach PSMT8 host
+transfers or CPU raster scopes. This uses unwind metadata, not stack-word guesses.
+Original images/EE/GS/VU match; only verified IOP RTC offsets differ. Replay exit2
+native-iop-budget, sampler/launcher exit0. No replay/build/profile remains active.
+Evidence post-stackwalk-gameplay-native-sample.log, summary and equivalence JSON.
+
+Next candidate lead: resident masked host-transfer writes can preserve untouched
+GPU word bits without downloading their pages first. Scope PSMT8 fast16-byte
+columns, queued unique-word masked updates; must preserve CPU reads, queued draw
+order, partial transfers, overwritten lanes and memory lifecycle. Need written
+implementation plan/backups and GPU/CPU dependency tests before changes. Unlike
+rejected read-footprint narrowing, this removes a demonstrated readback boundary.
+No such production transfer change implemented yet. Accepted game/map remain
+AVX2 product + untextured triangle build restored from vu-full-vector-baseline.
+Library objects/headless/tests require rebuild after rejected full-vector revert.
+30FPS remains unmet; latest visible changed-image measurement still~9/s.
+
+## CURRENT - full-vector extension rejected, accepted binary restored, 2026-09-20
+
+Full-vector multiply/add passed focused checks and all four original state/image
+comparisons (IOP verified RTC only), but scene mean7.5568 ->7.5691s (0.163% slower).
+First pair slower, second effectively flat; no repeatable gain. Reverted only
+vif.hpp, vu_products.cpp, gif_tests.cpp and restored accepted hg_game.exe/map from
+vu-full-vector-baseline, byte equality verified. Candidate retained externally in
+vu-full-vector-rejected. Native library objects/tests/headless may still reflect
+the rejected candidate; next build must refresh them. Sources touched accordingly.
+Accepted AVX2 products and untextured GPU triangles remain.30goal unmet.
+Next: bounded external StackWalk64 gameplay profile to resolve DLL caller costs.
+
+## Planned diagnostic follow-up - native stack unwinding, 2026-09-20
+
+After current full-vector timings finish and the winning binary/map is selected,
+resolve the substantial ntdll/VCRUNTIME sample share using a bounded external
+StackWalk64 sampler. Microsoft DbgHelp documentation and installed SDK define
+context/stack/function-table APIs; no emulator material. New external helper only,
+under HG-DIAG-010. Suspend/resume only around context capture and stack walk, with
+RAII resume; no guest-memory edits. Exclude this replay from timing comparisons.
+Report actual unwind depth/errors, never replace failed unwinds with scanned
+candidate return addresses. Original state/image comparison remains required.
+
+## Active candidate - full-lane vector multiply/add, 2026-09-20
+
+Fresh post-product4 native profile:3254 samples, zero errors; multiply_vector63
+and add_vector62 samples. Test existing exact packed arithmetic for dest15 only.
+Files vif.hpp, vu_products.cpp and gif_tests.cpp. Reuse product/flag assembly;
+add/subtract uses add4. Guard indices/definedness before commit. Preserve VF0,
+aliases, status, scalar fault ordering, partial masks and non-AVX2 fallback.
+Backup vu-full-vector-baseline preserves dirty files and accepted exe/map.
+Frozen scalar references check flags/faults/aliases and all masks. Build/focused
+checks then two warmups/four alternating hidden33M replays and full original
+state/image checks. Reject without repeatable scene improvement.30 goal unmet.
+
+## Retained - AVX2 integer VU products, 2026-09-20
+
+All four original captures match images/EE/GS/VU; IOP differs only at verified RTC
+bytes. Two warmups and four alternating hidden33M runs: controls7.8081/7.8231s,
+candidates7.6233/7.6208s; mean7.8156 ->7.62205s (2.476% less scene time), both
+pairs faster. Build and focused FPU/GIF/runtime checks pass;16M product comparisons
+and16M additions across four rounding modes preserve bits/flags with no host FP
+exceptions. Retain integer AVX2 product helper with existing CPU/OS guard and
+SSE2/scalar fallback. Evidence vu-product4-avx2-summary.json and vuproduct4-*.
+Accepted exe/map currently include this change and untextured GPU triangles.
+
+Next measurable milestone: fresh bounded gameplay native profile of this accepted
+binary/map (post-product4-gameplay-*), hidden host, sample five seconds after30M.
+This instrumented run is excluded from benchmarks. Use its costs to select the
+next bounded optimization; no internal30FPS or new visible-rate claim. Latest
+visible changed-image rate remains8.979-9.104/s. Audio gaps remain unresolved.
+
+## Active candidate - four64-bit-lane integer VU products, 2026-09-20
+
+Measured post-add4 gameplay profile: full multiply helper140/3295 samples, a leading
+application cost; untextured GPU change preserves identical VU work. Test AVX2
+integer products in four64-bit lanes rather than two SSE2 pairs. This differs from
+rejected packed32 normalization: retain64-bit significands/exponents throughout,
+using VPMULUDQ and exact shifts/masks/saturation; no host FP arithmetic. Reuse
+existing AVX2 CPU/OS guard and isolated ISA source, retain SSE2/scalar fallback.
+Files vu_products.cpp, fpu_add4.cpp/_avx2.cpp, fpu_add4.hpp, fpu_tests.cpp.
+Backup vu-product4-avx2-baseline saves dirty files and accepted untextured exe/map.
+Compare products/underflow/overflow against scalar reference across full exponent
+pairs, extreme mantissas/signs and random vectors under all MXCSR modes. Existing
+full-helper VU checks verify flags/ACC/vector commits. Then original state/image
+check and two warmups/four alternating hidden33M replays; reject without repeatable
+gain. New call/dispatch overhead may erase packed-work savings; benchmark decides.
+
+## CURRENT - untextured GPU triangles retained, Options opens, 2026-09-20
+
+Build exit0; runtime/GIF1285/page1920 and1018 GPU cases in BOTH modes pass.
+Original initial capture and4measured runs match images/EE/GS/VU, IOP verifiedRTC
+only. Two warmups/four alternating hidden runs: controls8.2821/8.2323s vs candidates
+7.7525/7.7150s; mean8.2572 ->7.73375 (6.339% less scene time), both pairs faster.
+Retained. Whole replay2.318% lower. Do not equate hidden timing with visible FPS;
+latest accepted visible changed-image measurement still8.979-9.104/s.30goal unmet.
+Backups/evidence untextured-triangle-baseline, untextured-triangle-summary.json,
+corresponding capture/equivalence files. Temporary detailed fallback logging removed.
+
+Options captured user path now reaches70M native-iop-budget and renders Options
+screen (options-state-group-replay.png). Connected member callbacks compiled from
+verified original descriptors/load/store sites; other menu interactions not yet
+claimed. Audio recording versus modeled PCM shows inserted gaps/delay, no source
+hard clipping; no audio timing/volume change made. Live/replay processes completed.
+No build/replay/profile active. Automated correctness runs use --hidden-host to
+avoid user confusion with disabled controls; live sessions retain normal input.
+Qword append remains provisionally retained; its stable speed effect unresolved.
+Next: pursue measured CPU arithmetic cost or remaining rendering cost, preserving
+exact arithmetic/flags and fixed guest work. Refresh internal frame-boundary
+measurement; changed images and swaps still not proven game updates.
+
+## CURRENT - Options opens; bounded untextured GPU triangles next, 2026-09-20
+
+Grouped Options replay reaches70M native-iop-budget with33 recorded controller
+events and displays the Options screen (options-state-group-replay.png). No claim
+all menu actions tested. Original33M triangle-fallback-profile equivalence also
+passes all compared images/EE/GS/VU, IOP verifiedRTC only. No live process remains.
+
+Measured lead:292 independent CPU fallback triangles in scene cost0.364s. Detailed
+--profile-gs identifies untextured Gouraud/blended PRIM0x4b, CT32 frame, Z24 masked,
+ZTESTalways (TEST30000); clipped quadrants cover screen. Extend existing opt-in
+triangle GPU path to untextured flat/Gouraud triangles within its same conservative
+frame/depth/alpha/fog/alias bounds. Job flag distinguishes untextured; shader skips
+STQ/texture lookup, backend marks no texture reads. Keep exact existing edge,
+interpolation, blending/masks and Z logic. Ignore texture state only when TME is off,
+as the existing CPU path does. Unsupported cases retain CPU/fault behavior.
+Files: gs.cpp, gl_gs.cpp, gl_triangle_shader.hpp, gs_triangle_acceleration.hpp,
+gs_gpu_tests.cpp. Backup untextured-triangle-baseline contains dirty sources/docs,
+current game/map and SHA256 manifest. Remove temporary detailed triangle logging
+now that its case is identified; retain external diagnostic evidence.
+
+Verify GPU/CPU full-VRAM equality across new untextured variants, actual GPU
+acceptance, invalid unused texture state, depth/alpha/frame masks and dependency
+boundaries. Build/focused checks/both GPU modes, then original regression and two
+warmups/four alternating fixed33M runs. Use --hidden-host on BOTH binaries for
+this comparison, label fixed-work scene times; never equate hidden presentation
+with gameplay FPS or compare absolute timings to prior visible runs. Exact state
+match and repeatable scene gain required to retain. Goal30FPS remains unmet;
+latest accepted visible changed images8.979-9.104/s. Qword gain still provisional.
+
+## Current grouped Options coverage and measured raster follow-up - 2026-09-20
+
+Options replay now reaches397d60 at66.138673M, source descriptor44b1a0.
+Group only independently inspected connected state installations: original393bd0
+loads44b408/418/428/438/448/458 and stores their words into object+1708/170c/1710.
+Targets393880/393480/3930c0/392b50/392670/392360 share the verified member helper.
+Original3998c4..3998fc similarly installs44b170 ->398100 atobject+16fc.
+Add these plus live397d60 to100b6c; do not automatically root all691 descriptor
+candidates or unrelated menu states. Backup options-state-group-baseline.
+Build, replay captured Options path, test original equivalence and inspect output.
+
+Current hidden instrumented33M regression matches all EE/GS/VU/images, RTC-only.
+Scene GS profile:292 independent triangles0.3636132s;753552 strip triangles
+0.7114358s;43858 sprites0.9643388s. Profile scene8.5442s is NOT a matched speed
+claim (hidden/instrumented). Next measured lead: the sparse independent triangle
+fallbacks have disproportionately high cost. Under existing --profile-gs only,
+log their PRIM/frame/Z/test/texture flags and clipped bounds at CPU fallback.
+HG-DIAG-005, no guest effects, no behavior change, disabled one branch; diagnostic
+logging cost unknown and runs excluded from benchmarks. This tests whether a
+bounded additional GPU case can remove CPU/readback work. No rendering reference
+material is used; inspect own state/implementation only.
+
+## Options body continuation - 2026-09-20
+
+Hidden70M replay ended at65.971939M on393bd0 (33 recorded pad events), advancing
+past3984d0/397f00. Original397f5c calls100b40 with descriptor object+1708; live
+8fe5c8={0,-1,393bd0}, matching original44b060 (and repeated original descriptors).
+Add this exact direct target100b6c, rebuild/replay; shared non-rendering extent lead
+checked and own executable proof retained. Backup options-body-baseline. Prior
+transition build and coherent incremental confirmation both exit0. Hidden replay
+worked without another interactive window. No game process currently active.
+Audio alignment check now also confirms raw PCM has no >=10ms silence from20s
+until60.6827s, unlike recorded short gaps; source PCM peak14136, no saturation.
+Host/capture gap origin remains under investigation; no volume/guest timing change.
+
+## Automated replay visibility refinement - 2026-09-20
+
+User confused an input-disabled replay window with live gameplay twice. Add explicit
+--hidden-host to game_host.cpp under HG-DIAG-011: retain initially hidden GLFW window,
+skip taskbar/show calls, disable host input for this diagnostic mode. Default normal
+visible/live behavior unchanged. Retain GL contexts/presentation code and guest work.
+Use only for correctness replay, not comparison to visible-window FPS/timings. Backup
+hidden-replay-host-baseline. Check manual-input replay still reaches expected path,
+then default live command remains unchanged. Incremental rebuild after current build
+ensures coherent products if game_host.cpp was already compiled.
+
+## CURRENT - Options transition coverage and audio evidence, 2026-09-20
+
+First callback batch built exit0,44tool tests/runtime/GIF1285 pass; original33M
+images/EE/GS/VU byte-equal, IOP only RTC. Replay33 recorded pad events reached
+new3984d0 fault at guest65.705s, passing399920. Manual replay ended naturally
+before attempted stop; no process killed. User was confused by disabled replay
+controls; live-controls-restored PID44952 was launched live/realtime/no scripts,
+then independently reached same3984d0 fault. Both sessions now ended. Future
+scripted checks must not take over a window the user is actively using.
+
+Next change: config100b6c gains live-proven3984d0 (descriptor8fe5bc, original44b160)
+and397f00: original398724..39875c copies descriptor44b180 into same object+16fc.
+Also original398878 bounds index<16 for398898 table4643a0..4643e0. Compile this
+verified bounded switch to avoid repeated per-case discovery. Backup external
+options-transition-baseline (dirty config/docs/generated/game/map/hash manifest).
+Regenerate/build then deterministic manual path; unsupported behavior stays explicit.
+
+Audio: manual-intro-replay has0 host underruns through intro,1 near61M transition;
+peak14136, not saturated. User recording versus modeled PCM matches correlation
+>0.99 for many1s windows. Offset changes from-2.553s (recording21..27) to-2.250s
+(39..47) and-1.925s (57), suggesting inserted delay/gaps, not global accelerated
+audio. Low-correlation windows excluded. Artifact manual-intro-replay-recording-
+alignment.json. Need distinguish host/capture gaps from source; no audio fix yet.
+Visual reference landmarks60.55/70.55 correspond roughly local35/45, not exact FPS.
+
+Goal30FPS remains unmet. Qword optimization provisional, quiet confirmation pending.
+
+## CURRENT - recording comparison, captured callbacks and audio gaps, 2026-09-20
+
+Manual recording session completed with explicit missing target399920 after user
+selected Options; no live game/build/replay remains. User supplied D:/Videos/
+2026-09-20 03-08-20.mp4 and reference https://youtu.be/JvdAHmVA-vI?t=28.
+User reports pacing improved before recording, audio clipping remains intermittent.
+Decoded recording has two matching AAC tracks, peak0.06832, no full-scale clipping;
+short near-silent gaps exist but upstream clipping/host starvation are unproved.
+
+Next measurable milestone: deterministic replay of recorded controller events past
+both missing callbacks3838f0 and399920, then original33M state-equivalence. Config
+100b6c direct-member target list will gain only these two live-proven original
+functions. Descriptor live RAM and original ELF evidence is retained externally.
+Add strict full-pad encoding to existing --input-at for exact logged state replay,
+leaving legacy commands unchanged. Add host-audio counters to profile checkpoints
+and fault reporting (HG-DIAG-014) to distinguish starvation from guest PCM gaps;
+no gain/buffering/guest-clock changes. Capture modeled PCM via existing WAV option.
+Backup: %TEMP%/haunting-toc-probe/live-callbacks-replay-baseline (dirty contents,
+generated sources, game executable/map, SHA256 manifest). Tests: valid/invalid
+controller parser cases, focused runtime, static tool tests, deterministic33M and
+recorded manual path. New helper/header files will be recorded explicitly if needed.
+Qword append remains provisional; stable warmed timing confirmation still pending.
+Goal30 verified gameplayFPS unmet; latest accepted changed images8.979-9.104/s.
+
+## CURRENT - user recording manual intro; avoid competing load, 2026-09-20
+
+User says paced controls work but later still suspects fast playback, and offers
+intro recording/reference video. Requested restart for uninterrupted recording.
+Manual session launched PID46608 (launcher22932), stdout/fault artifacts prefix
+%TEMP%/haunting-toc-probe/manual-intro-recording. --realtime, --spu2-output-core0,
+--profile/--video-rate-log, live controls; NO --input-at, --no-host-input or --unlimited.
+Verified command saved manual-intro-recording-command.json. Keep builds/benchmarks
+stopped while user records. Await attached recording/reference and compare matching
+moments by host elapsed time; decoder conversions are not gameplay FPS. Most recent
+60 conversions in preceding audio session took2.08hostseconds, not a global proof.
+
+Secondary command table at202d34 compiled8original targets; only1generated shard
+changed.44tool tests pass, clean build exit0; fixed33M original regression remains
+byte-equal images/EE/GS/VU, IOP only verifiedRTC0xbfcd1/2/3. User live session then
+hit a different explicit missing target3838f0. Live object17f3af8 has direct-member
+{0,-1,3838f0} at+4; original pointer44af38. Caller209360 calls384ba0, which tailcalls
+100b40; helper dispatch100b6c. Own ELF/body inspection and live RAM proof archived
+live-member-3838f0-proof.json. Shared non-rendering extent lead only, independently
+verified. Next code action AFTER recording: back up dirty config/generated source,
+add3838f0 to existing100b6c target list, regenerate/build, replay captured input or
+repeat user path. Runtime input logger now records changed buttons/axes/pressures
+with guest slices under --profile (HG-DIAG-006); build/runtime checks pass.
+
+Qword append remains provisional:1285synthetic cases, focused+914GPUboth modes,
+4original captures pass; paired speed gain9.00%/0.389% is too variable for a stable
+4.84% mean claim. Confirm later without recording/play load. Goal30gameplayFPS
+unmet, latest accepted changed-image samples8.979-9.104/s; internal boundary not
+verified. No commits/subagents/tasks. Preserve inherited dirty work and backups.
+
+## Live input capture refinement - 2026-09-20
+
+To reproduce user-triggered gameplay stops, log delivered host controller changes
+under existing --profile in system_diagnostic.cpp (HG-DIAG-006). Record exact slice,
+buttons,4axes,12pressurebytes after assigning existing SIO2 state. No changed input
+semantics, no additional polling, no new CLI; disabled branch only runs on delivered
+input events. External backup live-input-log-baseline. Existing deterministic
+--no-host-input comparisons unaffected. Rebuild native runtime and check original
+regression plus live records before treating recorded sequence as replay evidence.
+
+## Active gameplay blocker - secondary command dispatch, 2026-09-20
+
+User confirms paced live controls work and speed looks normal at current low FPS.
+Audio was absent/uncertain: launch omitted --spu2-output-core0. Enable the existing
+core0 PCM sink next time; full SPU2 synthesis/mixing is still unfinished.
+Live session stopped EE202d3c at32805801slices. Original202d14 bounds index<8;
+202d20/28 builds456a40,202d24 scales4,202d30 loads target,202d34 JR dispatches.
+Original8words456a40..456a60 are202d3c,202d64,202d6c,202d7c,202de0,202df0,202e00,
+202e10. Add this exact indirect_targets range, regenerate AOT; no guest substitution.
+Shared non-rendering HG functions.manual.toml exact-address lead corroborates
+secondary table; all facts independently checked in digest-verified original ELF.
+Backup live-secondary-dispatch-baseline includes dirty config/docs, generated C++,
+and qword-provisional tested binary/map. Goal: original live path past202d3c,
+with default replay unchanged and another paced logged interactive session.
+Emit/check generated targets, clean /m:1 build, regression33M state comparison,
+then relaunch fresh live artifacts with core0 speaker output. No active game remains.
+
+## Current - qword candidate verified; user timing/input check next, 2026-09-20
+
+Build confirmed exit0;1285 new append cases,16M FPU,1920page cases,DMA/runtime,
+914GPU cases both modes pass. All4 original33M captures equal RTC-only. Two warmed
+pairs scene controls10.2509/9.5677s,candidates9.3281/9.5305s. Both faster, but effect
+9.00% versus0.389% and host drift make mean4.84% unsuitable as a stable speed claim.
+Keep candidate provisionally; confirm after interactive play, no competing runs.
+Sources/baseline qword-append-baseline; results qword-append-pair-times/summary.json.
+User reports BOTH gameplay and menus sped up, and movement control lost during
+benchmark windows. --no-host-input explains control loss; --unlimited may explain
+speed but must verify normal paced play before concluding. Prepared external
+hg-live-paced-input-check.py/.cmd and hg-launch-live-paced-input-check.ps1: original
+startup schedule, --realtime, live input enabled, GPU resident/triangles, checkpoints,
+video-rate log, fault dumps. No guest clocks changed. Launch after completed benchmarks.
+Current next task user play/timing feedback plus logs, then stable performance check
+and next measured optimization. Frame-boundary-followup.json records own-ELF leads
+(wait1beef0 through2d1c48 in2d1b20; descriptor414370), not proven gameplay frame count.
+Goal >=30 verified gameplayFPS remains active; do not stop at this checkpoint.
+
+## Active optimization - qword append, 2026-09-20
+
+User requests continued work until verified gameplayFPS >=30; authorizes a logged
+interactive play session if needed. First measurable milestone: repeatable reduced
+33M gameplay scene time with exact captured state. Internal frame-boundary proof
+remains necessary; changed images/s is not internalFPS. Implement previously written
+one-resize append proposal in vif.hpp/gs.hpp, plus frozen-reference transport tests
+in gif_tests.cpp. External backup qword-append-baseline saves dirty contents/hashes
+and accepted binary/map. Preserve parser calls, capacity fault timing and byte order.
+Build clean /m:1, focused checks + both GPU modes, then2warmups+4alternating originals.
+Reject if state differs beyond verified RTC or both timing pairs do not improve.
+No runtime probe or guest timing change. Continue after this experiment.
+
+## Current continuation - post-add4 profiling milestone complete, 2026-09-20
+
+Completed the planned accepted-build gameplay profile:3295samples/0errors, sampler
+exit0, original33M replay exit2 with native-iop-budget. Game executable2593(78.69%),
+ntdll595(18.06%), VCRUNTIME87(2.64%). Leading app symbols full multiply140,
+packed add135, VIF parser122, XYZ prepare74, triangle64, scalar add62.
+All captured images/EE/GS/VU match triangle-after2 byte-for-byte; IOP same length,
+only verified RTC offsets0xbfcd1/2/3 differ from texture-before1. No speed claim:
+instrumented run excluded. Latest accepted changed images8.979-9.104/s, target30
+unmet; no independent internalFPS measurement or whole-console fidelity claim.
+
+Accepted XYZ source/game executable/map hashes unchanged and match saved baseline.
+No runtime code changed, no rebuild performed; library/tests/headless may still be
+stale from rejected XYZ experiment. No live commands/game/build/profile remain.
+Inherited dirty tree preserved. Backups+manifest: %TEMP%/haunting-toc-probe/
+post-add4-profile-baseline. New artifacts under same parent:post-add4-gameplay-
+summary.json, native-profile.json, equivalence.json, completion.json, profile.log,
+profile.* and frame.png. Helpers:%TEMP%/hg-post-add4-gameplay-profile.py and
+hg-post-add4-gameplay-sample.py. HG-DIAG-010 updated;007/008 limitations persist.
+
+Next executable action: back up dirty runtime/include/hg/vif.hpp, gs.hpp and
+relevant tests, then implement only one-resize16-byte append in the two
+submit_qword functions. Concrete hypothesis/invariants/testing/acceptance are in
+PERFORMANCE's post-add4 section. Combined submission symbols103samples(3.13%);
+this motivates a bounded test, not proof of append dominance or predicted gain.
+Do not repeat rejected VIF UNPACK bulk-copy, XYZ packed add or transfer rewrites.
+Retain existing parser invocation/order, append-before-capacity fault effects,
+portable little-endian stores and guest clocks. Frozen-reference append/state/fault
+checks, clean /m:1 focused/GPU build, then2warmups+4alternating original comparisons;
+retain only repeatable scene improvement and exact state (RTC excepted).
+This completes the requested profiling plan; next optimization remains unimplemented.
+
+## Active milestone - post-add4 gameplay profile, 2026-09-20
+
+Run one bounded gameplay-only profile of the accepted restored native binary/map.
+Their hashes and scalar XYZ source match vu-xyz-add4-baseline. Preserve this binary;
+do not rebuild stale headless/library products merely to profile. Backup of dirty
+docs, XYZ and accepted binary/map: %TEMP%/haunting-toc-probe/post-add4-profile-baseline.
+Clone existing helpers to hg-post-add4-gameplay-profile.py/sample.py with fresh
+outputs. Sample for five seconds after slice30000001, using original33M inputs and
+GPU residency/triangles. Check errors and final native-iop-budget. Sampling pauses
+the worker briefly: exclude this run from speed evidence. No runtime change planned.
+Deliver current function/module cost shares and one source-grounded optimization
+hypothesis with invariants and falsification criteria. No speed improvement assumed.
+Update PERFORMANCE/DIAGNOSTICS with evidence; preserve inherited dirty work.
+
+## Authoritative handoff � 2026-09-20, user requested handoff
+
+Goal: continue toward30 changed presented images/s while preserving verified
+behavior. Current measured accepted samples:8.979�9.104 changed images/s; internal
+FPS is not independently measured. Target remains unmet. Do not present the small
+retained gains below as a substantial FPS breakthrough or full console fidelity.
+
+Retained this continuation:
+- Conservative CPU sprite/triangle write pages; full reads/eager GPU flush remain.
+  Scene8.9539->8.89295s (-0.68%), both pairs faster.1920 coverage cases.
+- Full-lane VU packed addition, CPU/OS-guarded AVX2 with scalar fallback.
+  Exact24-bit integer conversion supplies normalization bit length only; no guest
+  float approximation.16M reference comparisons across4MXCSR modes, no host FP
+  flags; VU reference checks and914 GPU cases both modes pass. Scene8.85615->8.7826s
+  (-0.83%), both pairs faster; whole replay only0.14% lower.
+- Four new GPU/CPU ordering fixtures retained. Every accepted original comparison
+  matched images/EE/GS/VU; IOP differs only verified RTC offsets0xbfcd1/2/3.
+
+Latest rejected XYZ packed-add extension was0.62% slower in both scene pairs.
+XYZ source plus accepted hg_game.exe/map restored byte-for-byte from
+%TEMP%/haunting-toc-probe/vu-xyz-add4-baseline, hashes verified. Source touched for
+next build. Current source has original scalar XYZ plus accepted full-lane add4.
+No game/build/profile/replay process is active. No commit made. Inherited dirty tree
+preserved. Native library/test/headless build products still reflect the last XYZ
+candidate; rebuild via hg-build-add4.cmd before using them as accepted evidence.
+Restored hg_game.exe and matching map ARE accepted and ready for the next profile.
+
+Exact next action: clone hg-gameplay-cost-profile.py and hg-gameplay-cost-sample.py
+from %TEMP% with fresh artifact names and matching sample-script reference; run one
+bounded gameplay-only sample of the accepted restored hg_game.exe/map. The promised
+post-add4 profile HAS NOT RUN. Existing sample:3248hits/0errors, Fpuadd194,
+fullmultiply182,VIF103,ntdll546; DLL/heuristic stack follow-ups point to download/
+flush waits, but are not full unwinds or proof of skipped guest functions. Reprofile
+before choosing the next major change. Sampling briefly suspends the main thread;
+exclude sampled run from speed measurements. Then written plan, backups/hashes,
+focused tests and warmed alternating original33M comparisons. Continue toward30.
+
+Do not repeat rejected candidates unchanged:
+- Fresh command storage +0.59%; combined VU dependency clock +8.53%; packed32
+  product normalization lacked repeatable gain; selective /GL+/LTCG +17.96%.
+- Bounded texture read pages saved~31% bytes but +0.40% scene time; adding deferred
+  CPU-fallback flush +0.45%. Both reverted; no read helper/deferred API remains.
+- General packed-add binary normalization +0.65%; exact-conversion refinement
+  retained. XYZ padded reuse +0.62% and reverted. See HG-FAIL-014..019,
+  HG-LEARN-026/027, PERFORMANCE and external manifests.
+
+Important files:runtime/include/hg/gs_raster_pages.hpp,gs_memory.hpp,runtime/gs.cpp;
+runtime/fpu_add4.cpp,fpu_add4_avx2.cpp,include/hg/fpu_add4.hpp,vu_products.cpp;
+tests/gs_memory_tests.cpp,fpu_tests.cpp,gs_gpu_tests.cpp. CMake isolates /arch:AVX2
+to the ISA source on MSVC x64; /O2 main,/O1 EE shards remain. No /GL retained.
+AGENTS/ARCHITECTURE/SOURCES/PERFORMANCE/DIAGNOSTICS/learned skills updated.
+
+External artifacts under %TEMP%/haunting-toc-probe: raster-write-pages-baseline,
+raster-read-pages-baseline (accepted write-only), vu-add4-baseline (same accepted
+pre-add4), vu-add4-general-rejected, vu-add4-exact-pair-times.json,
+vuadd4exact-* including movement rates, vu-xyz-add4-baseline (CURRENT accepted
+source/binary/map), vu-xyz-add4-rejected, raster-read-deferred-rejected.
+Helpers: hg-build-add4.cmd, hg-vu-add4-exact-pairs.py, hg-vu-xyz-add4-pairs.py,
+hg-vu-add4-exact-rates.py, hg-gameplay-cost-profile.py/sample.py. Latest launcher
+43760 completed all6 XYZ runs (2warmups+4measured); no live sessions remain.
+Synthetic TOC HG-DIAG-007 and issue-slot timing HG-DIAG-008 remain material limits.
+
+## Active plan � reuse exact packed addition in existing XYZ helpers
+
+Accepted full-lane add4 with exact24-bit conversion normalization:16M cases over4
+MXCSR rounding modes, no host FP exceptions; existingVU checks and914GPU both modes
+pass.4original captures equal RTC-only. Warmed scene8.85615->8.7826s(-0.83%,both
+pairs faster). Whole replay0.14% lower; modest gain. General binary-normalization
+packed variant was0.65% slower and is archived. No guest FP arithmetic substituted.
+Next runtime/vu_xyz.cpp only: retain validity guards and scalar products, collect
+three product values/flags, use add4 with a zero-padded fourth lane, and commit only
+original XYZ results/flags. Never read undefined W. Unsupported ISA keeps scalar
+add and existing guard failure path. Product/add operations cannot fault after
+these guards; original partial/invalid fallback unchanged. Backup vu-xyz-add4-baseline
+contains dirty source/docs/map/acceptedbinary+hashes. Existing295168 VU reference
+cases and original state comparisons cover flags/alias/invalid cases. Four warmed
+original pairs against this new accepted baseline decide retention. Goal30 unmet.
+
+## Active refinement � exact 24-bit normalization count
+
+General packed add passed4M arithmetic cases, existingVU checks,914GPU both modes
+and4originals RTC-only, but scene8.972->9.03045s(+0.65%). Not accepted. Candidate
+archived vu-add4-general-rejected. Change only AVX2 normalizer + tests: after carry
+shift, m is an unsigned integer <=0xffffff. Every such integer is exactly
+representable in binary32, independent of rounding mode; exponent of exact CVTDQ2PS
+therefore gives floor(log2(m)). Shift count150-exponent reaches bit23; zero yields
+count150 (AVX2 shift clears it) and existing nonzero mask suppresses flags/sign.
+This revises previous no-host-FP wording: only exact integer-to-binary32 conversion
+is used to determine bit length, not PS2 arithmetic or rounding. Add/subtract and
+alignment remain integers. Test4M cases in each of4MXCSR rounding modes, verify no
+host exception flags change, then original matched pairs against vu-add4-baseline.
+No new CPU ISA requirement. No performance claim before measured scene results.
+
+## Active plan � exact four-lane AVX2 integer addition for VU MADD
+
+Measured Fpu::add remains a gameplay CPU cost. Add own fpu_add4.hpp, fpu_add4.cpp
+(host feature dispatch) and fpu_add4_avx2.cpp (separate ISA unit); integrate only
+valid full-lane VU MADD in vu_products.cpp. Preserve scalar fallback on unsupported
+CPUs and invalid/partial VU states. CPUID AVX/OSXSAVE + XGETBV XMM/YMM state + AVX2
+must pass before ISA code executes. MSVC /arch:AVX2 only on isolated source; GCC/
+Clang target attribute. No fast-math or host floating point. Integer per-lane
+magnitude swap, chopped alignment, add/subtract, normalization and UF/OF reproduce
+existing Fpu::add. Binary normalization may compute past underflow, but output and
+flags must equal original stop-at-zero exponent loop; exact cancellation stays+0.
+Tests millions of arbitrary/edge additions against scalar values/flags, existing
+VU accumulator/MAC/status comparisons,914 GPU cases and warmed4originals. Baseline
+vu-add4-baseline saves dirty files and accepted write-only binary/map with hashes.
+Change CMake, vu_products.cpp and fpu_tests.cpp; new three arithmetic files.
+No rendering, guest clock, scheduling or fault behavior changes. No gain assumed.
+
+## Current state � write-only raster scope retained; read/defer candidates reverted
+
+Accepted scene gain this continuation is modest: write-only page ownership
+8.9539->8.89295s(-0.68%). Latest presentation samples8.97-9.11 changed images/s,
+not internal FPS; goal30 remains unmet. State/image matches RTC-only. Read narrowing
+and deferred CPU flush were correct in tested cases but0.40%/0.45% slower; reverted.
+Current accepted binary/map restored from raster-read-pages-baseline. Four new GPU
+ordering fixtures retained; next build must refresh restored headers and testbinary.
+No build or replay active. Next investigation exact four-lane integer FPU addition
+for measured VU cost; retain scalar fallback and host ISA guards. Plan/back up before
+implementation; do not assume vectorization gains without warmed original replays.
+Failed candidates and hashes saved raster-read-deferred-rejected. HG-FAIL-014..018
+and HG-LEARN-026 record this continuation. Synthetic TOC/issue-slot timing limitations
+HG-DIAG-007/008 remain. No full physical-console fidelity or playability claim.
+
+## Active refinement � let resident memory hazards order CPU fallback
+
+Bounded reads alone remain UNACCEPTED:4 originals equal RTC-only,5760read/1920write
+cases and910GPU both pass,bytes~2.765GB->1.919GB but scene8.8659->8.90155s(+0.40%).
+Keep candidate only while testing associated removal of unconditional CPU-draw
+flush. New GsSpriteAccelerator::prepare_cpu_access(memory) defaults to flush;
+resident backend defers only for its currently observed memory. Existing scope
+reads/writes then flush queued read/write hazards before accessing pixels. Other
+owners, synchronous backend and unknown accelerators keep full flush. Apply only
+sprite/triangle bounded scopes; point/line unchanged. Test disjoint, read-after-GPU,
+write-after-GPU and write-to-GPU-source cases inside a service batch, then original
+comparisons against ACCEPTED write-only binary in raster-read-pages-baseline.
+Current candidate backed up raster-deferred-flush-baseline (not accepted binary).
+No guest reorder unless physical page footprints prove operations commute. No
+clocks/arithmetic changes. Revert both read narrowing and deferred flush if no gain.
+
+## Active plan � precompute coalesced CPU raster input pages
+
+Retained write-page scope:1920 footprint cases + focused checks +910 GPU cases
+both modes pass;4 original captures equal RTC-only. Warmed gameplay8.9539->8.89295s
+(-0.68%, both pairs better), whole30.05581->29.86155s. Small gain only.
+Next extend gs_raster_pages.hpp/gs_memory.hpp/gs.cpp: before CPU sprite/triangle
+loops, synchronize union of output pages and conservative whole wrapped texture
+rectangle. REPEAT/CLAMP range0..dimension-1; REGION_CLAMP min..max;
+REGION_REPEAT max..(min|maX). All bilinear neighbors wrap into same bounds.
+Use original format page geometry; texture bases may be64-word aligned, so include
+both physical pages when an8KiB tile straddles a page after base offset and wrap.
+CLUT is retained state, not a new VRAM fetch. Invalid format/dimensions/limits
+retain full readback. No per-pixel observers or demand reads. Coalesce requested
+pages before reads, then mark output pages writable. Test formats/wrap modes,
+unaligned bases, alias, observer read/write masks, fault restoration, originals.
+Backup raster-read-pages-baseline contains dirty state and accepted exe/map hashes.
+Hypothesis reduce bulk readback footprint without earlier sparse-demand overhead.
+Goal30 still unmet; no new accepted changed-image rate measured yet.
+
+## Active plan � narrow CPU raster write ownership, preserve full readback
+
+Selective VU LTCG reverted: all state equal RTC-only, gameplay8.95825->10.5671s
+(+17.96%). Candidate archived vu-ltcg-rejected; accepted binary/map restored.
+Next gs_memory.hpp/gs.cpp: full read synchronization remains, but sprite/triangle
+CPU fallback marks only conservative framebuffer/depth pages in clipped bounds
+writable. No sparse reads or per-pixel observer calls. Existing swizzles prove
+all addresses within each64x32 (32-bit) or64x64 (16-bit) tile share an8KiBpage;
+base alignment and modulo VRAM wrapping are preserved. Unsupported formats,
+invalid width or nonstandard memory size retain full writable scope, preserving
+original faults. Mark depth even when masked to avoid changing fault/order rules.
+Point/line scopes unchanged. Test observer ordering/exception restoration and
+page coverage across formats, wrap, scissor bounds; focused regressions and four
+warmed original comparisons. Backup raster-write-pages-baseline includes dirty
+sources/docs/accepted binary/map + hashes. Hypothesis: reduce false dirty pages
+and mirror comparisons without extra small downloads. Revert without scene gain.
+New helper header gs_raster_pages.hpp is new. No guest timing/arithmetic changes.
+
+## Active plan � selective MSVC VU link-time optimization
+
+Packed32 products reverted: warmed scene9.5522->9.48645s, but second pair flat
+and whole replay slower; no repeatable benefit. Saved vu-packed-products-rejected.
+Next change CMakeLists.txt only: Release /GL for generated main and two VU helper
+sources, /LTCG propagated to consumers. Keep EE shards /O1 and all guest arithmetic,
+scheduling, clocks and faults unchanged. Microsoft compiler documentation is the
+source for build option semantics; no external runtime implementation used.
+Hypothesis: optimizing calls across these translation units removes CPU overhead
+identified by gameplay sampling. Disprove with warmed alternating original replays.
+Backup vu-ltcg-baseline contains dirty CMake/docs and accepted binary/map + hashes.
+Validate actual compile flags, focused arithmetic/runtime/GPU regressions, all four
+original state/image comparisons (IOP RTC only) and scene/startup timing. Monitor
+compiler/linker memory; do not repeat uncontrolled aggressive inlining. Goal30
+unmet; latest accepted visible rate9.23-9.74 changed images/s, not internal FPS.
+
+## Active plan — packed32 VU product normalization
+
+VU pairclockcandidate rejected:131072clockcases,15emittertests andoriginalstate
+comparisons pass butscene8.86385->9.61985s(+8.53%). Restoredoriginalemitter/tests/
+generatedmain/exe/map,archivedvu-pair-clock-rejected. Mainobjectmustrefresh.
+Next runtime/vu_products.cpp only:retain twoSSE2 unsigned24x24 multiplies producing
+four48-bit products,pack(product>>23) into four32-bit lanes,then performwide-bit
+normalization,exponents,sign,UF/OF andzero masks once acrossall4lanes. No hostFP,
+no changedFpuaddition orVUguards/flagscommit. Product>>23 fits25bits;widebit24
+selects exactone-bitshift,thenexisting23bitmantissachop. Originalexponent255finite
+andzeroexponent/sign rulesremain. Existing295168arithmetic cases plusfulloriginal
+state/images andwarmed4replays validate. Baselinevu-packed-products-baseline dirty
+source/docs/acceptedexe/map+hashes. Buildalso refreshesrestoredmain (notallshards).
+Goal30unmet;no performance claimyet. Newprofilefullmultiply182/madd63 of3248samples.
+
+## Active plan — combine VU pair dependency clock updates
+
+Commandstoragecandidate reverted:gameplay8.8928->8.9454s(+0.59%),all4original
+captures equal RTC-only. Fullcleanbuildrefreshedpriorrestoredheaders;onlygl_gs object
+now needsrefresh afterreversion. Rejectedcandidate command-storage-rejected.
+New AOT-onlychange tools/hgtool/vu_emit.py::_pair_lines:compute max(issue_cycle+1,
+allselectedVF/VI readiness timestamps) andcall advance_pipeline once,beforeoriginal
+WAITQ/WAITP,upper/lower operations andwritebackmetadata. Staticregister/laneselection
+comesfrom existing independentlydecoded dependency metadata. Arithmeticunchanged.
+Ifissue_cycle==UINT64_MAX useoriginalsequence to preserveunsignedwrap andQ/P
+completion behavior. Nochange whenpair has no dependencyrequirements. Existing
+require_vf/vi helpersremainreference. Test100k+arbitrarypendingQ/P andreadinessstates,
+includingwrap,againstoriginalsequence;15emittertests,ensuregeneratedchangesonly
+prologues,focusedchecksandwarmed4originalstate/timingpairs. No guestclockpolicychange:
+exactfinalcycle andpendingresults mustmatch. Newcode onlyfolds equivalenthostupdates.
+Backup vu-pair-clock-baseline includesdirtysource/docs/generatedmain/acceptedexe/map
+withhashes. Main-onlyregeneration shouldavoidfullshard rebuild. Goal30stillunmet.
+
+## Active plan — refresh per-batch GPU command storage
+
+Gameplay-only sample3248/0errors: Fpuadd194,fullmultiply182,VIF103,ntdll546.
+DLL export attribution nextsample seesZwQueryInformationThread244 andWait209;
+external stack scanning (candidate returnaddresses,notfullunwind) chiefly finds
+Accelerator::download313/flush217/cpu_access164. This supportsGPUdriverwait work,
+notproof ofignoredfunctions orallocations. Artifacts gameplay-cost/dll/stack-*.
+Boundedchange gl_gs.cpp::flush: replace sub_data into reused command/tilebuffers
+with buffer_data exactpayload perbatch. These two buffers contain immutable
+hostcommands only;priorissuedGLwork retains requiredstorage semantics. Preserve
+VRAMbuffer0,dispatches,barriers,joboffsets andshaderarithmetic. No gueststatechange.
+Hypothesis oldbuffer overwrite waits unnecessarily forpriorGPUbatchreaders.
+Baseline command-storage-baseline savesdirtysource/docs/acceptedexe/map+hashes.
+Existing910GPUtests bothmodes exercise consecutivepayloads;original4warmedreplays
+compareallstate/images andstartup/gameplaytime. Revert absentmeasuredbenefit.
+Restoredheadersfrompriorrejectionrequirefullsingle-workerbuildrefresh;no stale
+headless/testbinary shouldbe used untilbuilt. Goal30updatedimages/s remainsunmet.
+
+## Current verified state — 2026-09-20; sparse readback experiments reverted
+
+Kept prepared PSMT4 CPU sampler:startup5M-30M mean18.45074->17.791075s(-3.58%),
+whole replay30.185885->29.480315s(-2.34%);gameplay8.85085->8.84305s(effectivelyflat).
+128scalar sprite cases and910GPUbothmodes pass;4originalcaptured images/EE/GS/VU
+match,IOPverifiedRTC-only. Source+nativegamebinary+map restored and byte-verified
+againstreadback-origin-baseline/sparse-scope-baseline. No build/replay active.
+Prior XYZscalar retained as a small measured optimization:872generatedcalls,
+295168arithmeticcases and15emittertests;all4originalstatesmatchRTC-only,warmed
+scene8.79595->8.73705(-0.67%,pairs0.27%/1.07%). Scope modest;not a majorFPSfix.
+
+Readback-origin probe found wholeCPUrequests2.335GB/1.099s,partialwrites80.6MB/
+.460s,readonly363.6MB/.208s overWHOLE33Mreplay,NOT solely gameplay. Probe removed
+fromruntime aftermeasurement. Sparse8KiBrequest scopes preservedstatebut slowed
+scene7.36%;128KiBgroupedprefetch slowedscene1.32%,whole1.83%. Bothreverted;
+failedsource/binaries/maps saved sparse-single-page-rejected,sparse-grouped-rejected.
+Tests/nativeheadlessrunner/buildobjects stillfromlast experimentalbuild;hg_game.exe
+andmap are restoredacceptedmatches. Touch-restoredheadersensurefuturebuildrefresh.
+Do not runstaletest/headlessbinaries as acceptedbuild evidence. Nextcodebuildmust
+refresh dependencies through cleanVS/m:1 workflow. No gamefile changes/commits.
+
+Next evidence-driven action: distinguish gameplay-onlyreadbackcost fromwhole-run
+cost,or specialize measuredVUarithmetic/AOTcall sequences with fullintermediate
+stateproof. Do not repeat sparseper-pixel ownership;overheadoutweighedbytes saved.
+Read-only last retainedscenehistory has1049sprites,all>=4096area;8PSMT4-tagged
+spriteshaveTMEclear,so do NOT lower sprite threshold or addPSMT4GPUcoverage based
+onthat snapshot as a gameplayfix. PSMT4 remains measuredEARLYstartupcost.
+Currentgameplayprofile174Fpuadd/163fullmultiply/121VIF of3254samples;637outside
+main lacksstackattribution. BiggestsinglefaithfulFPSfix NOT established yet.
+Target30unmet;latestacceptedpresentationrate9.23-9.74changedimages/s,notinternalFPS.
+Physicalconsoleequivalence remains limited by HG-DIAG-007/008 and documentedgaps.
+
+## Active refinement — grouped sparse readback
+
+Single-page sparse candidate rejected forperformance:allstates equalRTC-only but
+scene8.87655->9.5299s(+7.36%),whole29.67116->31.35295(+5.67%). Transferbytesfell
+butmanysmallGPUreads increasedwait. Preserved sparse-single-page-rejected withhashes.
+Refine gl_gs.cpp only:when exact aligned8KiB access demands GPUdirty data,download
+GPUdirty pages in its aligned16-page(128KiB)neighborhood in onecoalescedread. Only
+committedGPUdirty pages eligible;CPUdirtypages untouched;queuedwritesretain normal
+laterinvalidation. Existingaccessdependencyflush unchanged. No guestdraws added,
+no marking prefetchedpages CPUwritten. Sparse accesscache andoriginalwordorder
+unchanged. Verify910GPUbothmodes thenwarmed4original comparisons against ORIGINAL
+full-scope sparse-scope-baseline. Ifstillregresses,restorefullscope/code/exe/map.
+
+## Active plan — sparse CPU raster ownership scopes
+
+Readback-origin run original state equal RTC-only;whole writable scopes caused
+2.335GB/1.099s,partial writes80.6MB/.460s,read-only363.6MB/.208s. Counters excluded
+from benchmarks. Largest measured avoidable transfer source is wholeVRAM scope.
+Implement optional sparse mode in GsCpuMemoryScope:per-scope512-page read/write
+access cache,first actual access synchronizes the bounded8KiB page;write after
+read upgrades ownership. Existing default full scope retained. Raster loops opt
+into sparse scope after existing GPU flush;no GPU submissions occur inside scope.
+DrawTexture must read through const indexed VRAM rather than whole-memory data(),
+avoiding accidental full readback. No pixel cache or reordering;CLUT stays live.
+Reset cache at outer scope entry,restore depth on exception;no resizing/observer
+changes during raster scope. Tests first-read,pagebounds,writeupgrade,nestedscope,
+exception/retry plus existing910GPU/CPU andoriginal state comparisons. Header change
+requires full clean single-worker rebuild. Baseline sparse-scope-baseline hashes
+current dirty files/exe/map. Keep readbackprobe disabled in warmed timings. Compare
+startup andgameplay;revert if per-pixel overhead outweighs avoided transfers.
+
+## Current plan — attribute remaining GS readback stalls
+
+Prepared PSMT4 sampler retained:startup18.45074->17.791075s(-3.58%);whole replay
+30.185885->29.480315(-2.34%);scene8.85085->8.84305(-0.09%,effectivelyflat).
+128scalar sprite cases,910GPUboth modes and4original images/state equal RTC-only.
+Artifacts psmt4-draw-baseline,psmt4-draw-pair-times,psmt4draw-*-equivalence.
+Next runtime/gl_gs.cpp HG-DIAG-017 optional HG_PROFILE_GS_READBACK counters:
+classify actual readback bytes/time by whole writable CPU scope,partial writable,
+read-only CPU access,other. Reuse existing readback timing;no new clocks/guest
+state/synchronization. Disabled by default. One diagnostic original replay,then
+remove probe once source of stalls established. Baseline readback-origin-baseline
+backs up dirty source/docs/exe/map with hashes. No benchmark currently active.
+
+## Active plan — prepared PSMT4 CPU draw sampling
+
+Measured early scalar PSMT4/filter cost618/3258samples. Extend existing DrawTexture
+in runtime/gs.cpp to PSMT4 with CT32 CLUT,CSM1,CSA<16;retain fallback for other
+CLUTs/invalid settings. Reuse original psmt4_word and live nibble reads initially;
+prepare format/CLUT base/wrap once. Use prepared sampler for PSMT4 CPU sprites,
+and existing triangle consumer. Keep exact row-major access,filter arithmetic,
+CLUT validity checks,texture functions and pixel pipeline. No palette/texture cache
+or draw skipping. Baseline current XYZscalar candidate binary/source retained in
+psmt4-draw-baseline with hashes;XYZ remains separately provisional. Files gs.cpp,
+gif_tests.cpp;no header/full AOT rebuild. Differential sprite fixtures compare
+whole VRAM and fault messages/partial state across filters,CSA,wrap,alias and masks;
+existing910GPU cases both modes then warmed4original state comparisons. Measure
+5M-30M startup and30M-33M scene plus whole replay;reject if no reliable benefit.
+Original CPU/specification formulas only;no external rendering implementation.
+
+## Current result — startup coverage audit and phase-specific profiles complete
+
+Both new diagnostic replays completed at native-iop-budget;no build,replay or
+sampler active. External summary startup-coverage-audit/summary.json records
+binary/map hashes. Early sample begins after5M checkpoint:3258 samples,0errors;
+shade_linear_tex0 155,psmt4_word148,point_sample_tex0 116,texel_from_tex0 114,
+pixel4 85,total618/3258(18.97%). ntdll424samples lacks stack attribution and must
+not be described as a particular wait/allocation cost. Gameplay sample3254/0errors:
+Fpu add174,full multiply163,VIF121;outside-main637unattributed. Both samples
+perturb timing and are excluded from speed comparisons.
+Concrete lead: DrawTexture and GPU triangle texture guards omit PSMT4(0x14);
+generic CPU sprite path also repeats full TEX0/CLUT/filter checks per sample.
+No rendering change made by audit. Next bounded candidate should measure and
+specialize checked PSMT4 sampling/CLUT handling,retaining original address,
+filter/fault/alias ordering;plan and back up before implementation. Compare both
+early-startup and30M-33M scene intervals,not just gameplay. A missing function
+requires an observed call/verified original table;do not root2769candidates blindly.
+Current coverage audit found4598indirect EE boundaries,7syscalls,2unsupported CACHE
+words,1ERET boundary;linked IOP residual121indirect+4outside executable. Dispatch
+faults on uncompiled targets;checked exact kernel-return gateway is not a general
+skip. Native adapters invoke bounded runtime services;this review does not prove
+full physical-console service equivalence or exclude unvisited-path failures.
+XYZ scalar experiment remains provisional pending disposition;all correctness
+checks pass,warmed mean0.67%faster(0.27%/1.07%pairs),small benefit. Original accepted
+packed-flags baseline remains externally saved in vu-xyz-scalar-baseline.
+Goal30 unmet;latest accepted changed-image sampling9.23-9.74/s,not internal FPS.
+
+## Current checkpoint — user-requested startup coverage and bottleneck audit
+
+User requested polling/profiling for the biggest block and investigation of possibly
+ignored early functions. Read-only major-scan completed in external
+startup-coverage-audit/major-scan.json:354769 EE words,4608 boundaries comprising
+4598 indirect transfers,7 syscalls,2 unsupported CACHE words at26cb74/26cbb0,
+1 exception return.435 candidate installed tables include2769 uncompiled candidate
+targets;659 direct-member records include509 uncompiled candidates. These are
+unverified candidate extents/live uses,not permission to auto-root or proof of skips.
+All29 configured IOP modules scanned;none unconfigured. Linked bundle residual125
+comprises121 indirect transfers and4 outside executable words. Explicit traps244.
+EE/IOP dispatch defaults fault on missing translations; kernel return exception only
+accepts its exact return gateway and requires a saved caller. No missing-function
+fault in recent33M replays,which all ended native-iop-budget. This does not establish
+unvisited paths or full service fidelity; HG-DIAG-007/008 remain limitations.
+Current candidate XYZ scalar remains provisional:both warmed pairs faster but small,
+8.79595->8.73705s(-0.67%);full captures equal RTC-only. No acceptance claim yet.
+Focused checks pass including295168 arithmetic and910GPU cases both modes.
+Fresh gameplay native sample startup-block:3254 samples,0 errors;Fpu add174,
+full multiply163,VIF process121,arithmetic_q75,XYZ prepare70;637 outside main.
+GS readback2.764GB/1.594s. Profile run excluded from speed measurements.
+Early-startup sample starts at5M slices;launcher10772,hg-early-startup-block-profile.py,
+early-startup-block-launch.log currently active. No build/timing benchmark active.
+Next collect early profile,check boundary/service evidence;prioritize measured
+cost or verified missing original call. No new roots or runtime behavior changed.
+Docs backup startup-audit-docs-backup includes hashes. Goal30 remains unmet.
+
+## Active experiment — scalar XYZ AOT helper specialization
+
+Different hypothesis from rejected XYZ SIMD: fixed3-lane scalar products/additions,
+checks once before direct lane reads,compiled in a small runtime unit. AOT emitter
+selects helper only for original MULAbc/MADDAbc/MADDbc dest14. New vu_xyz.hpp/cpp;
+no vif.hpp changes or dynamic instruction decoding. New header included only in
+main when VU code exists. Invalid/undefined inputs/destinations call unchanged
+original scalar method to preserve fault order/partial state. Keep pipeline timing
+and all emitter scheduling prologues unchanged. New helper writes onlyXYZ,retains
+W/defined bits;MAC inactive W cleared and STATUS sticky bits preserved.
+Files CMake,emit.py,vu_emit.py,gif_tests,test_vu_decode;new header/source recorded
+new. Backup dirty inputs/accepted exe/map/generated main:vu-xyz-scalar-baseline.
+Verify emitter output/shards and49k+direct differential cases,then build relevant
+suites and warmed4original state/timing pairs. Revert if no reliable gain. Goal30
+still unmet,current accepted scene~8.87s,changed images9.23-9.74/s sampled.
+## Current accepted state — packed SIMD flags retained
+
+Both binaries warmed,then4original33M comparisons:scene9.08285->8.87205s(-2.32%),
+both pairs faster and allcaptured images/EE/GS/VU equal;IOP RTC-only.245760+256
+arithmetic cases,runtime and910GPU both modes pass. Latest changed-image samples
+9.229/9.743per second;not internal FPS,30target unmet. Source,binary,map match.
+No build or replay active. Artifacts vu-packed-flags-baseline,vu-packed-flags-pair-times,
+vupack-after*-equivalence,vupack-movement-rates. VIF bulk remains reverted.
+Next investigate bounded XYZ scalar helper specialization or larger independently
+proved AOT VU call-site optimization. Avoid repeated full-header rebuilds: new
+runtime helper entry points may be included by generated main only if justified.
+Prior SIMD XYZ extension failed;do not repeat it unchanged. Current hypothesis
+would specialize scalar three-lane checks/products while retaining exact arithmetic.
+## Current checkpoint — warmed packed-flag replay comparisons
+
+Packed SIMD flag candidate linked;245760+256arithmetic cases,runtime and910GPU
+cases both modes pass. Launcher20876 active,hg-vu-packed-flags-pairs.py,
+vu-packed-flags-pairs.log. It warms baseline and candidate before4measured alternating
+runs;warm-ups excluded. No build active. Candidate remains unaccepted pending
+full original state/images and warmed timing. Baseline vu-packed-flags-baseline.
+Read-only latest retained draw history:10018textured STQ triangles use supported
+CT32-frame/PSMT8 or8H textures;only18PSMT4 and8untextured. No broad missing format
+coverage conclusion from this bounded sample. Current work remains throughput.
+## Current checkpoint — packed SIMD flags building
+
+runtime/vu_products.cpp candidate collects UF/OF masks,extracts packed zero/sign
+masks and reverses nibble lane order into unchanged MAC/STATUS.245760reference
+cases plus256zero/sign combinations pass GIF tests. Build cmd28864/tool session87105
+active,vu-packed-flags-build.log;also refreshing rejected VIF objects from restored
+header. No benchmark active. Next finish build/checks and run
+hg-vu-packed-flags-pairs.py (warms BOTH binaries first,then4alternating measured
+runs;warm-ups excluded). Backup vu-packed-flags-baseline. Candidate unaccepted.
+Current accepted exe restored before build includes retained main/VU /O2 and scanout
+pages;30target unmet. Prior accepted scene~9.25s,changed images8.73-9.64/s sampled.
+## Active experiment — full-lane SIMD flag packing
+
+Largest accepted profile costs include full multiply helper172samples and full
+MADD58 of3256. Plan runtime/vu_products.cpp only: retain exact product and scalar
+addition,collect UF/OF nibble masks,extract result-zero/sign masks with SSE2 then
+reverse4lane masks into existing MAC groups and STATUS bits. Fault guards and
+commit boundaries unchanged. Existing245760frozen-reference cases plus added
+zero/sign combinations check flags/state. Backup vu-packed-flags-baseline includes
+dirty source/docs/exe/map. Build refresh must also clear rejected VIF objects.
+Focused suites,910GPU both modes,then warm both binaries and4measured original
+state/timing comparisons. Revert absent reliable benefit. No external code or
+new host-float arithmetic.30target remains unmet.
+## Current accepted state — VIF experiment reverted
+
+VIFbulk correctness passed but second timing pair flat;first control slow. Reverted
+vif.hpp,gif_tests and accepted exe/map from vif-bulk-baseline;candidate preserved
+vif-bulk-rejected. Accepted main/VU /O2,PSMT8 and page scanout remain. Objects await
+refresh;restored input timestamps touched. No build/replay active.30target unmet.
+Next bounded candidate: runtime-only full-lane SIMD flag packing;keep exact scalar
+Fpuaddition and fault guards. Use new harness with both binaries warmed before
+4measured alternating original replays,exclude warm-ups from speed claims. Existing
+full-lane arithmetic differential reference will verify all flags. Latest profile
+vumain-accepted-native-profile.json remains applicable (same restored native exe).
+## Current checkpoint — VIF bulk candidate building
+
+600V4-32 differential configurations pass GIF tests (masked-zero scalar reference),
+including fragmented packets,TOPS,mode/cycle fallbacks,bounds faults and defined
+highbits. Build cmd4024/tool session76993 active,vif-bulk-build.log;VU/main /O2
+unit compiled and large EE shards now compiling. No benchmark active. Candidate
+unaccepted. Next finish build,DMA/runtime/GPU checks and hg-vif-bulk-pairs.py
+four original state/timing comparisons. Baseline vif-bulk-baseline contains accepted
+/O2 main,scanout-page and PSMT8 changes. Fresh prior profile vumain-accepted:
+Fpuadd183,fullmultiply172,scalar multiply_acc122,process_pending99 of3256samples.
+Later possible bounded lead: vector flag packing inside existing full-lane SSE2
+runtime helper (no header/AOT changes),only after deciding current experiment.
+## Active experiment — bounded contiguous VIF V4-32 upload
+
+Fresh accepted main/O2 profile complete3256samples: Fpuadd183,fullmultiply172,
+scalar multiply_acc122,process_pending99. No build or replay active.
+Plan: in vif.hpp process_pending,after existing complete-payload checks,accept only
+unmasked V4-32,mode0,CL==WL and full valid VU destination span. On known little-
+endian hosts memcpy payload words,OR low4defined bits per vector,preserve row/cursor/
+phase semantics;otherwise unchanged scalar loop. Invalid span retains original
+partial-write/fault behavior. No runtime instruction decoding introduced (existing
+VIF data protocol only),no clocks/work skipped. Reference masked-zero scalar path
+is semantically identical for valid mode0/CL==WL V4-32;test fragmentation,count0,
+bounds,defined highbits,TOPS,cycle variants and failure state. Focused and910GPU
+checks then4original state/timing pairs. Backup vif-bulk-baseline includes dirty
+source and accepted exe/map. Reject absent gain or mismatch.30target still unmet.
+## Current accepted state — VU/main speed optimization retained
+
+MSVC generated main/VU1 unit now /O2,large EE shards remain /O1. Native scene
+mean9.82445->9.24555s (-5.89%,both pairs faster). Four original33M images/EE/GS/VU
+match and IOP RTC-only;910GPU cases pass both modes. Build source/binary/map agree.
+Latest complete-interval changed images8.730/9.641per second (variable sampling,
+not internal game FPS);30target unmet. No build/benchmark active.
+Retained this session:upload suppression,bulk scanout,fused VU flags,full-lane SSE2,
+PSMT8 bulk transfers,display-page read spans,main/VU1 compiler optimization.
+Rejected XYZ SIMD,/O2 helper relocation,PSMT8 address-only tables,FPU bit scan.
+Next fresh bounded profile against current map to choose next major CPU/transfer
+bottleneck. Completed-project research/provenance recorded SOURCES;no code copied.
+Artifacts vu-main-o2-baseline,vu-main-o2-pair-times,vumain-after*-equivalence,
+vumain-movement-rates. Executable35,382,784bytes. No cross-platform speed claim.
+## Active experiment — speed-optimize the generated VU/main unit
+
+Accepted main source out/translated.cpp is1.19MB with VU programs and dispatcher;
+EE page bodies live in separate shards. All currently receive MSVC /O1. Earlier
+runtime helper relocation failed, but did not optimize VU program call sites.
+Plan:CMake source-level /O2 override for HG_TRANSLATED_SOURCE only under existing
+MSVC fast-build branch;leave huge shards /O1. No generated code,guest work,clocks
+or arithmetic edits. Backup current dirty CMake/docs/accepted exe/map:
+TEMP/haunting-toc-probe/vu-main-o2-baseline. Verify generated vcxproj actual options,
+monitor compiler memory,build and4original state/timing comparisons. Existing
+synthetic tests unaffected;run relevant originals and normal GPU checks. Revert if
+resource cost excessive or no reliable improvement.30target unmet,last8.75changes/s.
+## Current accepted state — displayed-page scanout retained
+
+Four original33M captures match (RTC only),216scanout footprint/pixel scenarios,
+memory/GIF/DMA/runtime and910GPU cases both modes pass. Scene9.75995->9.68780s
+(-0.74%,second pair flat/slightly slower),full replay31.03089->30.71498s(-1.02%,
+both pairs faster). Readback bytes~130MBless but readback time increases;small
+uncertain scene benefit,not major FPS progress. FPU bit-scan remains reverted.
+Source,binary,map match accepted PSMT8+scanout changes;no build/replay active.
+Latest reliable changed-image measurement~8.75/s;30target unmet.
+Next inspect remaining VU/AOT throughput and scanout/fallback transfer costs using
+accepted profile/new measurements only where changed behavior warrants it.
+Survey of finished PS2 native projects completed in SOURCES;no external code copied.
+## Current checkpoint — scanout page candidate building
+
+Checked const read_span plus216scanout cases pass GIF/memory tests;required page
+sets and pixel bytes match,including wrap/odd strides/4096-wide rectangle.
+Build cmd10232/tool session27642 active,scanout-pages-build.log. No benchmark
+active. Candidate binary not yet linked;next finish build,DMA/runtime/GPU modes,
+then hg-scanout-pages-pairs.py original state/timing. Baseline saved accepted
+PSMT8 build;FPU normalization experiment remains reverted (HG-FAIL-011).
+## Active experiment — synchronize only displayed VRAM pages
+
+FPU bit-scan experiment reverted:all states match,but timing pairs disagree;
+HG-FAIL-011. Accepted exe/map restored;build objects await refresh. No run active.
+Plan: add checked const read_span to gs_memory.hpp. gs.cpp::display_image derives
+physical pages touched by displayed rectangle from existing CT32/24(64x32) and
+CT16/16S(64x64) page mapping,wraps X/Y at2048 and physical pages at512. Coalesce
+selected physical runs,synchronize read-only,then use per-page const pointers
+through unchanged pixel conversion. No guest draw flush,dirty mark,clock change
+or dropped presentation. Must prove selected spans cover every CPU read including
+oversized/cross-wrap rectangles,odd strides and base wrap. New observer/range tests,
+scalar scanout differentials and GPU scanout fixtures;focused suites then4original
+state/timing pairs. Backup dirty contents and accepted exe/map scanout-pages-baseline.
+Hypothesis:fewer readback bytes and less stall than whole4MiB sync;reject if no
+benefit or any mismatch.30target unmet,last accepted changed images~8.75/s.
+## Current checkpoint — FPU normalization comparisons running
+
+Full build complete;fpu/gif/runtime/translation pass,including3M random/mixed plus
+12240normalization edges and frozen original add flags.910GPU cases pass both modes.
+Four original33M comparisons running via hg-fpu-normalize-pairs.py,launcher24088,
+fpu-normalize-pairs.log. No build active. Candidate remains unaccepted pending
+all state/image comparisons and matched timing. Baseline fpu-normalize-baseline
+includes retained PSMT8 bulk candidate (mean9.84445s,last changed images8.75/s).
+Next after decision: narrow display-image read spans using original page mappings.
+User-requested completed-project survey recorded SOURCES;no implementation copied.
+## Active investigation — exact FPU normalization bit scan
+
+Accepted PSMT8 profile completed3252samples: Fpu::add216,full multiply137,VU1
+program1130. Transfers no longer leading. No build/replay active.
+Hypothesis: replace repeated left normalization shifts in Fpu::add with one
+bounded leading-bit calculation and shift,keeping original exponent-zero,
+cancellation,overflow/underflow and sticky flags. First external full-add prototype
+with random/edge/cancellation differential and /O1 timing before header changes.
+Potential files fpu.hpp,fpu_tests;dirty copies/exe/map preserved fpu-normalize-baseline.
+If prototype supports it,integrate portable MSVC/GNU bit scan with checked fallback,
+run arithmetic/runtime/GPU checks then four original33M state/timing comparisons.
+Disprove if any result/flag mismatch or no measured scene benefit. No host float
+substitution,clock change or external arithmetic code.30target remains unmet.
+## Current accepted state — PSMT8 bulk upload retained
+
+Four original33M states/images match (RTC only),910GPU cases both modes and
+memory/GIF/DMA/runtime pass. Scene mean10.83055 ->9.84445s (-9.10%). Complete
+interval changed images8.754/8.759per second;not internal game FPS,30target unmet.
+Accepted source/binary now include checked PSMT8 span writes and same-page observer
+shortcut. Backup psmt8-bulk-baseline;reports psmt8-bulk-pair-times.json and
+psmtbulk-after*-equivalence.json. All builds and benchmarks completed.
+Broader finished-PS2 survey requested by user completed and recorded SOURCES:
+OpenGOAL trilogy feature-complete (II/3beta),3SX completed game decomp but native
+prerelease;BT3 playable with defects/skipped movies,not finished. No external
+implementation copied. Main lead remains fewer native transfers/batches with
+independent proof;not a drop-in external renderer.
+Next fresh bounded profile of accepted binary/map,then next measured bottleneck.
+## Current checkpoint — PSMT8 bulk candidate building
+
+Candidate implemented: checked mutable16-word span,8 paired-byte word stores for
+aligned16-pixel PSMT8 IMAGE qwords,existing scalar fallback and same-page GPU
+observer shortcut. Added3168 transfer scenarios with per-qword scalar comparisons,
+span bounds/fault tests,and9 GPU dependency cases (same/cross-page spans and IMAGE).
+Build cmd32852/tool session78303 active,psmt8-bulk-build.log. GPU/GIF test sources
+were strengthened after their initial compile; rerun focused build once this build
+finishes before tests. No benchmark active. Candidate unaccepted; next complete
+build,focused rebuild/checks,then hg-psmt8-bulk-pairs.py original state/timing.
+Current measured presented changes~7.7-7.9/s;30 target unmet.
+## Active experiment — bounded aligned PSMT8 IMAGE spans
+
+Fresh accepted profile completed:3252 samples,psmt8_word130,write_image_qword114,
+cpu_access91,Fpu::add207. Instrumented run excluded from timings.
+Plan: checked mutable VRAM span; aligned16-pixel PSMT8 qword writes pair opposite
+byte lanes in8words of one16-word column, using existing addressing once.
+All other cases retain scalar path. Extend same-page observer shortcut to spans.
+Proof from existing independently derived GS mapping; no external rendering used.
+Files gs_memory.hpp,gs.hpp,gs.cpp,gl_gs.cpp and memory/GIF tests. Preserve transfer
+completion,padding,wrap,faults and GPU dependency order. Differential scalar upload
+and span observer tests,focused/GPU regressions,then four original33M state/timing
+comparisons; reject absent benefit or any unexplained mismatch. Backup dirty inputs
+and accepted exe/map: TEMP/haunting-toc-probe/psmt8-bulk-baseline (manifest.json).
+Milestone: exact original state/images with lower fixed-work scene time;30 updates/s
+still unmet. No build/replay active. Next implement bounded path and tests.
+## Current accepted state — XYZ experiment reverted
+
+XYZ SIMD extension state equality passed but speed inconclusive (mean+0.19%).
+Restored full-lane-only SIMD sources/tests/maps and accepted exe from vu-xyz-baseline;
+rejected candidate preserved in vu-xyz-rejected. Restored inputs touched for next
+build. Current accepted changes: upload suppression,bulk read-only scanout,fused
+flags,full-lane SSE2. Native binary matches these sources; build libraries await
+next rebuild. Starting fresh separate vu4-accepted-profile sampling replay before
+next implementation (excluded from timings). No build active. Next inspect samples
+then consider bounded aligned PSMT8 IMAGE bulk word writes and narrow CPU span.
+No XYZ speed claim;30updates/s remains unmet. Reusable failed result HG-FAIL-010.
+
+## Current checkpoint — XYZ SIMD comparisons running
+
+XYZ build linked;442368 scalar-reference cases,fpu/gif/runtime/translation and
+901 GPU cases both modes pass. Original four-run launcher31640 active via
+hg-vu-xyz-pairs.py,vu-xyz-pairs.log. First pair10.9060 ->10.6894s with all
+captured state/images equal RTC excepted. Await last candidate before retention.
+No build active. Next fresh accepted profile; bounded aligned PSMT8 IMAGE writes
+are a lead (one qword touches8words in one16-word column), not an implemented change.
+
+XYZ SIMD candidate build active: cmd5000/tool session46604,vu-xyz-build.log.
+442368 scalar-reference comparisons now cover both XYZ/XYZW plus direct inactive-W,
+undefined-broadcast-W and unsupported-mask guards. Prepared hg-vu-xyz-pairs.py.
+No replay active. Next complete build/checks and four matched original comparisons.
+
+## Active experiment — extend exact SIMD to XYZ masks
+
+Full-lane SIMD retained: four original states equal RTC excepted; mean11.25230
+->11.09275s (-1.418%),paired0.98%/1.82%; second pair host times slower overall.
+245760 arithmetic cases and901 GPU cases both modes pass. Static original AOT
+MUL/MADDA sites mask15=259,mask14=624; MADD15=87,14=248. Not dynamic counts.
+Written extension: accept dest14/15, specialize lane result for3/4 active lanes,
+check only required VF/ACC bits and retain exact scalar rejection/fault order.
+SSE2 can compute unused W host bits, but W produces no flags and is never written
+for XYZ; preserve its defined state. Other broadcast lane remains checked even
+when it is W. Rename helper APIs to reflect selected masks. Extend full-reference
+tests to both masks and add undefined-W/untouched-W direct checks. No clocks or
+guest instructions skipped. Files vif.hpp,vu_products.cpp,gif_tests,AGENTS and
+ARCHITECTURE; backup TEMP/haunting-toc-probe/vu-xyz-baseline includes dirty sources
+and accepted exe/map. Build,test,original33M state and timing before retention.
+
+## Current checkpoint — SSE2 original comparisons running
+
+SSE2 integrated candidate linked. fpu/gif/runtime/translation pass;245760
+scalar-reference arithmetic cases and direct guard checks pass.901 GPU/CPU cases
+pass both memory modes. Four original33M comparisons active via
+hg-vu-sse2-pairs.py,launcher26104,vu-sse2-pairs.log. No build/prototype timing
+active. Next compare all captured states and scene times before retaining.
+Control includes only the three accepted changes; rejected relocation/address
+experiments are restored. Current native executable is the unaccepted SIMD build.
+
+SSE2 candidate build active: cmd3672/tool session99389,vu-sse2-build.log.
+196608 extra full-lane arithmetic comparisons plus direct fast-path/guard checks
+added alongside49152 frozen-reference cases. Prepared hg-vu-sse2-pairs.py.
+No original replay/prototype benchmark active. Next complete build and checks,
+then original equality/timing; do not treat currently restored accepted exe as
+this candidate until link completes.
+
+## Active experiment — exact full-lane SSE2 VU products
+
+External product4 prototype passes1M vectors plus edges; full accumulator prototype
+passes100000 state/fault cases. Best scalar /O1 vs SIMD /O2 full-helper times:
+puremultiply~0.0646 ->0.0306s,matrix~0.0798 ->0.0497s,zero-rich~0.0506 ->0.0390s.
+These synthetic gains are not game speed. Written integration: new runtime/
+vu_products.cpp with SSE2 integer-only four-lane broadcast products, used only
+by multiply_acc/madd_vector when dest==15 and all required inputs/ACC are defined.
+Invalid indices/undefined inputs/partial masks/other hosts retain exact scalar
+path and fault order. Preserve signed-zero,exp255 finite,truncate,UF/OF,aliasing,
+flags and readiness; no host float operations, clocks or guest work omitted.
+Small SIMD helper inlining stays inside its runtime TU; no compound AOT inlining.
+Files vif.hpp,new vu_products.cpp,CMakeLists,gif_tests,AGENTS/ARCHITECTURE maps.
+Add extended full-lane scalar differentials and direct guard checks,then normal
+focused/GPU suites and four original33M state/timing pairs. Backup
+TEMP/haunting-toc-probe/vu-sse2-baseline includes current accepted exe/map and
+dirty source/docs. New vu_products.cpp recorded as new. No runtime SIMD yet built.
+
+## Current accepted state — rejected experiments restored
+
+PSMT8 experiment reverted: state equal but mean10.7334 ->10.7707s (+0.35%),
+one pair faster/one slower. Source/tests and accepted hg_game/map restored from
+psmt8-table-baseline (binary equals vu-o2-baseline). Rejected VU relocation also
+remains reverted. Three accepted changes this session: exact upload suppression,
+bulk read-only scanout,fused accumulator flag collection. Latest accepted scene
+~10.76s;30updates/s unmet. No build or replay active. Build libraries still from
+last experiment; restored input timestamps force rebuild on next build invocation.
+Next bounded step: external full accumulator SIMD prototype, including state/flags
+and input checks, measured without competing workloads before any integration.
+Prototype product4 million-vector equality passed; best scalar /O1 comparison
+only15-25% product benefit, not a game speed result. No runtime SIMD code yet.
+
+## Current checkpoint — PSMT8 original comparisons
+
+PSMT8 linked;50,331,648 formula comparisons and fpu/gif/runtime/translation pass;
+901 GPU cases pass both modes. Prototype product4 passed1M random vectors plus
+edges. Microbenchmark: best scalar /O1~0.040-0.042s versus packed /O2~0.034s
+(normal/random); zero-rich0.036s versus0.027s. /O2 scalar was~0.091s, so do not
+claim2.6x versus actual /O1 game path. Prototype timings complete before replays.
+Starting hg-psmt8-table-pairs.py; no build/prototype timing overlaps benchmark.
+Next check original state/time. SIMD remains external only and not integrated.
+
+Independent next-cost investigation (external prototype only): test SSE2 four-lane
+integer FPU products against existing scalar product, preserving exp-zero signed
+zero,overflow saturation,underflow flags and truncation. New TEMP files only;
+no runtime integration unless synthetic correctness and throughput justify it.
+Do not run prototype timings alongside original replay timings.
+
+PSMT8 build restarted as cmd8352/tool session73652,psmt8-table-build2.log.
+CMake regeneration confirmed after touching restored build inputs; prior attempt
+used stale removed-library dependency and stopped before a new native link.
+No benchmark active. Await build, full focused checks, then prepared pairs.
+
+PSMT8 candidate build active: cmd43084,psmt8-table-build.log.50,331,648
+coordinate/stride/base comparisons plus invalid-width cases added. Prepared
+hg-psmt8-table-pairs.py; no benchmark active. Build also restores the rejected
+VU relocation to its accepted inline definitions and original CMake linkage.
+
+## Active experiment — exact PSMT8 address factorization
+
+VU /O2 relocation rejected: mean10.7673 ->10.9448s (+1.65%) with state equality.
+Preserved vu-o2-rejected; restored only experiment files from vu-o2-baseline.
+Current built exe still rejected until next rebuild; accepted binary lives in
+vu-o2-baseline and psmt8-table-baseline. Fused VU flags remain accepted.
+Next written change: move psmt8_word from gs.hpp to gs.cpp and use independent
+X/Y lookup decomposition already derived in DrawTexture. Preserve coordinate/VRAM
+wrap and floor(width/128) for odd64-pixel strides. Profile measured123/3262
+samples here. No external rendering source. Files gs.hpp,gs.cpp,gif_tests.cpp.
+Exhaustively compare old formula across coordinates/odd strides/wrap bases,
+then focused suites/GPU modes/original33M state and timing. Backup
+TEMP/haunting-toc-probe/psmt8-table-baseline contains dirty source and accepted
+pre-relocation control exe/map. Combine rollback rebuild to avoid wasted rebuild.
+
+## Current checkpoint — optimized runtime arithmetic comparisons
+
+VU runtime relocation linked; map verifies Fpu::add/multiply_acc/madd_vector
+originate in hg_vu_arithmetic:vu_arithmetic.obj, Release MaxSpeed. Six bodies
+match saved source ignoring whitespace. fpu/gif/runtime/translation and901 GPU
+cases both modes pass. Four original33M comparisons active via hg-vu-o2-pairs.py,
+launcher35488,vu-o2-pairs.log. No build active. Next inspect equality and timings
+before retaining; target30updates/s remains unmet. All previous accepted changes
+are in the saved control under vu-o2-baseline.
+
+Runtime arithmetic relocation build active: cmd43632, tool session88586,
+vu-o2-build.log. Six moved function bodies match saved source exactly after
+whitespace removal (vu-o2-body-equivalence.json). New library compiled; AOT
+relink pending. Prepared hg-vu-o2-pairs.py. No benchmark active. Next complete
+build, focused suites, map provenance and original matched replays.
+
+## Active experiment — compile hot VU arithmetic in runtime /O2 unit
+
+Flag fusion retained after four original equal-state runs (RTC only), scene mean
+10.90985 ->10.75985s (-1.375%); focused suites and901 GPU cases both modes pass.
+Next measurable milestone: larger CPU scene gain from normal runtime optimization.
+Verified map: Fpu::add,multiply_acc,madd_vector emitted from translated.obj;/O1
+comes from HG_FAST_TRANSLATION_BUILDS=ON. Fresh profile identifies these hot.
+Written change: new runtime/vu_arithmetic.cpp holds unchanged Fpu::add and measured
+compound VU arithmetic bodies; declarations remain in fpu.hpp/vif.hpp. Link new
+hg_vu_arithmetic library via hg_runtime, default Release /O2. Preserve small
+inline helpers, all arithmetic/faults/flags, clocks and execution budgets. No
+compound force-inlining. CMakeLists/AGENTS/ARCHITECTURE map updated accordingly.
+Backup TEMP/haunting-toc-probe/vu-o2-baseline includes dirty inputs and exe/map.
+New file vu_arithmetic.cpp recorded as new. Validate same focused suites and
+original33M state/timing; verify final linker-map provenance, not just flags.
+
+## Current checkpoint — VU flag-fusion comparisons running
+
+Candidate linked; fpu/gif/runtime/translation pass, including49152 frozen-reference
+flag/value/fault comparisons.901 GPU/CPU cases pass both memory modes. Four
+original33M comparisons active via hg-vu-flags-fused-pairs.py,launcher33232,
+vu-flags-fused-pairs.log. No build active. Next compare all states and pair times;
+retain only demonstrated benefit. Accepted graphics changes preserved in baseline.
+
+Build restart: test fixture needed hg::Fpu qualification (fixed). Current cmd39100,
+tool session34136, vu-flags-fused-build2.log. Earlier cmd43216 stopped on fixture
+compile errors; no runtime result from it. Await current build before comparisons.
+
+VU flag-fusion candidate build active: cmd43216, vu-flags-fused-build.log.
+49152 frozen-reference cases added for both accumulator modes/vector MADD,
+all masks/broadcasts,normal/extreme values,register aliases and fault state.
+Prepared hg-vu-flags-fused-pairs.py; run only after build and focused tests.
+
+## Active experiment — fuse VU accumulator flag collection
+
+Accepted scanout fresh profile completed:3262 samples,zero errors; multiply_acc288,
+Fpu::add215,psmt8_word123,cpu_access115,write_image_qword113,madd_vector99.
+Measured changed images7.890/7.677 per second; target30 unmet, not internal FPS.
+Written change: vif.hpp multiply_acc/madd_vector gather MAC/current STATUS flags
+while computing each lane, eliminating bool arrays and a second flag scan.
+Store values temporarily and commit only after all checked reads/adds succeed;
+retain register aliasing,defined-lane faults,sticky flags and all exact arithmetic.
+No compound force-inlining or guest-clock changes. Add frozen scalar-reference
+differentials across masks,normal/extreme operands,aliases and fault-state cases
+in gif_tests.cpp. Backup TEMP/haunting-toc-probe/vu-flags-fused-baseline includes
+dirty source/tests/progress and accepted exe/map. Validate focused arithmetic/GIF,
+GPU both modes then alternating original33M state and timing comparisons.
+
+## Current accepted state — upload suppression and bulk scanout
+
+Both candidates retained with four original replays each, complete captured
+image/EE/GS/VU equality and only verified IOP RTC changes. Upload comparison
+means11.31095 ->11.09290s (-1.93% scene); scanout means11.0465 ->10.9484s
+(-0.888% scene) and full replay33.67749 ->32.20324s (-4.38%).901 GPU/CPU
+cases pass both modes; GIF passes. No full-console fidelity or30fps claim.
+Current sampling replay (excluded from timings): hg-scanout-accepted-profile.py,
+launcher3468; scanout-accepted-profile.log and scanout-accepted-native-profile.json.
+Next: use updated measured costs to select next bounded change toward30updates/s.
+No build active. Source/binary backups upload-compare-baseline,scanout-bulk-baseline
+under TEMP/haunting-toc-probe. HG-DIAG-017 updated; lessons015/016 recorded.
+
+## Current checkpoint — scanout comparisons running
+
+Bulk scanout candidate linked.901 GPU/CPU cases pass resident and synchronous;
+GIF checks pass. Four original33M comparisons active via hg-scanout-bulk-pairs.py,
+launcher32604, scanout-bulk-pairs.log. No build active. Next: verify all captured
+state/images, pair times and transfer costs; retain only measured improvement.
+Accepted upload comparison remains in both sides.30updates/s remains unmet.
+
+Scanout bulk candidate building via hg-build-resident.cmd: cmd24288, tool session
+11261, scanout-bulk-build.log. GPU fixture edited after initial GPU target may
+have compiled: rerun gs_gpu_tests target after this build, then both GPU modes
+and GIF tests. Prepared hg-scanout-bulk-pairs.py for four comparisons only after
+all builds/tests finish. Current binary must not be treated as linked candidate.
+
+## Active experiment — bulk read-only scanout
+
+Upload comparison retained:896 cases both modes,four original states match RTC
+excepted; means11.31095 ->11.09290s (-1.93%). No replay/build active.
+Next written change: move display_image from gs.hpp to gs.cpp and synchronize
+committed VRAM once via const data(), then use identical address/format conversion
+on raw read-only words. Existing scanout currently invokes observer per pixel;
+coalescing materialization may remove overhead/readback calls. This conservatively
+reads all GPU-dirty pages, possibly increasing downloads; matched timing decides.
+No guest draw-list flush, clocks, input or pixel omission. Preserve explicit faults.
+Files gs.hpp,gs.cpp,gs_gpu_tests.cpp; tests cover read-only scanout across formats,
+coordinate/VRAM wrap and queued GPU data, followed by original33M comparisons.
+Backup TEMP/haunting-toc-probe/scanout-bulk-baseline includes dirty files/exe/map.
+
+## Active experiment — exact upload suppression
+
+Fresh accepted-build profile:3257 samples,zero errors; multiply_acc239,Fpu::add202,
+cpu_access119,write_image_qword119,psmt8_word103,outside-main558. Readback1.886s;
+upload2.950GB. Profile run excluded from timings and completed (expected budget).
+Written change: gl_gs.cpp caches known GPU page bytes after upload/readback,
+invalidates on GPU writes, and suppresses CPU-dirty uploads only on full byte
+equality. Hypothesis: whole-VRAM scopes cause avoidable uploads. No guest changes
+or approximate hashing. Additional4MiB host mirror; byte-comparison cost must
+be measured. Backup TEMP/haunting-toc-probe/upload-compare-baseline includes
+dirty source/docs and accepted exe/map. Validate both GPU suites and alternating
+original33M full-state/timing comparisons; reject if no repeatable benefit.
+
+## Active continuation — accepted-build profiling
+
+Next milestone: reduce fixed-work scene elapsed while preserving captured guest
+state/images, toward30 changed updates/s. Fresh bounded native sampling uses
+the accepted executable/current map; excluded from speed comparisons. No runtime
+change proposed until costs are measured. Backup: TEMP/haunting-toc-probe/
+lane-profile-start (progress, launcher payload and binary/map hashes).
+Artifacts: lane-accepted-profile.log, lane-accepted-native-profile.json.
+
+## Current handoff — 2026-09-19, user requested handoff
+
+Opposite-lane sprite optimization retained. Both original33M pairs completed:
+controls12.5730/12.5905s, candidates11.2842/11.0869s; means12.58175 ->11.18555s
+(11.10% less scene time). All captured images, EE/GS/VU state match; IOP differs
+only verified RTC offsets0xbfcd1/2/3.896 GPU/CPU cases pass both memory modes.
+Changed presented images7.087/7.890 per second across complete movement intervals;
+this is not independently measured internal game FPS. Target30updates/s remains
+unmet, about24-26% achieved by that presentation metric. Original alias rejections
+5888 ->0, sprites48195, triangle batches444, flushes2343; readback still1.894s.
+Evidence under %TEMP%/haunting-toc-probe: lane-copy-pair-times.json,
+lane-after1-equivalence.json, lane-after2-equivalence.json, lane-movement-rates.json.
+Baseline source/binary: lane-copy-baseline. Documentation backup: handoff-lane-docs.
+
+No active benchmark/build remains; launcher3056 completed all four runs.
+Next measurable milestone: profile this accepted binary with its current linker
+map, identify the largest remaining CPU/transfer cost, and reduce equal-work scene
+time with unchanged captured state. Clone %TEMP%/hg-sprite-format-profile.py with
+fresh artifact names; its sampler is %TEMP%/hg-native-gpu-sample.py. Sampling is
+instrumented and must not be used as a speed benchmark. Investigate bounded CPU
+fallback VRAM footprints only if supported by the profile; GsCpuMemoryScope's
+whole-VRAM writable scope is a lead, not a proven safe optimization. Continue the
+plan/backup/test/equality/performance workflow toward30; do not redo reference
+research or accept guest-clock changes. Existing HG-DIAG007/008 limitations remain.
+
+Historical checkpoints below are superseded by this current section.
+
+Opposite-lane copy candidate built;896 GPU/CPU checks pass both memory modes,
+including required rejections. Four original comparisons active via
+hg-lane-copy-pairs.py, launcher3056, lane-copy-pairs.log. Do not build during timings.
+Next: compare full state/speed and fallback/readback counts. Target30updates/s unmet.
+
+Disjoint-write guard retained:856 GPU/CPU checks pass both memory modes after
+correcting the fixture's service boundary. Four original states/images agree,
+IOP RTC only. Scene controls12.8162/12.7180 ->12.5504/12.5591s (mean1.66% less).
+Flushes3007 ->2415; triangle batches962 ->444. Latest changed-image rates6.266/
+6.252 per second, about21% of30 target. No replay/build active.
+
+Next written change: safely accelerate a specific in-place16-bit sprite case.
+Original retained draw history shows8-pixel-wide CT16S strips copying one16-bit
+lane into the other lane of the same32-bit word. Current page-only alias rejection
+forces CPU fallback. gl_gs.cpp will accept only CT16/16S source and destination,
+<=8 columns with distinct destination words, zero filtering fractions, exact
+source/destination word equality at every pixel (proved by separable row/column
+deltas), and opposite source/destination lanes. All sampled texture bits remain
+unchanged throughout the draw; frame/depth alias checks stay. No shader arithmetic
+change. tests/gs_gpu_tests.cpp will cover both lane directions, wrapping, masks,
+DATE/blending and rejection when any proof condition fails. Independently derived
+from our address functions and original draw data, not external rendering code.
+Backup lane-copy-baseline. Validate differential cases, original state and timing.
+
+Earlier disjoint-write candidate:856 resident GPU/CPU checks pass. Synchronous fixture
+initially wrote VRAM inside an unfinished explicit batch, violating its service
+boundary contract; corrected to end/begin batches around the CPU service. This
+still tests resident deferred dependencies. Must rebuild/rerun corrected tests
+after current timings. Four native pairs active via hg-disjoint-pairs.py,
+launcher33232; disjoint-pairs.log. Treat results provisional until tests pass.
+
+VU narrow candidate retained after six original replays: controls13.5466/13.2277/
+13.3136s, candidates12.8638/13.2360/12.8191s; means13.36263 ->12.97297s,
+2.92% reduction with one neutral pair. All compared state/images equal (RTC only).
+Eight focused tests pass. Aggressive compound inlining remains rejected.
+
+Disjoint CPU-write flush guard implemented in gl_gs.cpp; GPU tests add writes to
+unrelated memory, queued texture inputs and pending outputs, with subsequent draws
+consuming the writes. Backup disjoint-flush-baseline includes current native binary.
+Build active cmd1640/tool session1496, disjoint-flush-build.log. Next: GPU checks,
+then original equivalence/timing; this separate candidate is not yet accepted.
+
+Previous narrow VU build complete; native executable35,317,760 bytes versus33,736,192
+(+4.69%). Eight focused arithmetic/runtime/GIF/translation/startup checks pass.
+Four matched original comparisons active via hg-vu-inline-pairs.py, launcher16252,
+vu-inline-pairs.log / vu-inline-pair-times.json. Do not build during timings.
+Next: assess state equality/speed, then test the disjoint-page flush guard separately.
+
+Previous narrow VU build: cmd30284/tool session77216, vu-inline-narrow-build.log.
+No replay competes with compilation. Next independent bounded change after VU
+measurement: cpu_access currently flushes on every CPU write; restrict submission
+to pages intersecting queued reads/writes, retaining readback of prior GPU dirty
+pages and CPU dirty marking. Current page sets conservatively cover all accepted
+jobs. This changes only ordering of provably disjoint host memory operations.
+Plan tests for writes to unrelated pages, queued texture inputs and pending outputs,
+then original state/speed. Do not mix this with the ongoing VU candidate.
+
+Aggressive VU inline build stopped: MSVC private memory36.75GB/resident14.12GB
+while generating translated.cpp. Focused tests passed but no candidate executable
+was linked. Preserved source/log/manifest in vu-inline-aggressive; HG-FAIL-007.
+Narrowed plan: restore normal inlining for Fpu::add and the3 compound vector
+arithmetic methods; retain small checked access/readiness/flag helpers and product.
+Rebuild, verify original state, and run prepared hg-vu-inline-pairs.py. Baseline
+binary in vu-inline-baseline remains the last accepted sprite-format build.
+
+Previous VU candidate build used hg-build-vu-inline.cmd, cmd38400/tool session91221.
+Arithmetic/runtime/GIF/translation checks pass, including65536 independent MAC
+packing cases;853 GPU/CPU cases also pass synchronous. Full AOT generation still
+compiling; no benchmark competes with it. Prepared hg-vu-inline-pairs.py for four
+matched replays after build completion. Do not mistake existing hg_game.exe for
+the candidate until its link finishes. Next independent lead: GsCpuMemoryScope
+marks/synchronizes the entire VRAM as writable for CPU fallback; bounded footprints
+could reduce transfers but require explicit proof of every read/write range.
+
+Next measurable milestone: lower CPU VU service cost with identical arithmetic,
+flags, readiness/stalls and faults. Fresh3266 native samples (zero errors) show
+Fpu::product265, add126, VU flag119, require_vf96, read_vf61, multiply_acc61,
+produced_vf33, advance_pipeline30. Outside-main554 includes unclassified driver/OS.
+Written change: force-inline bounded hot FPU/VU helpers so compiled constant
+indices/masks specialize; replace only the4-group MAC bit packing loop with exact
+bit placement. Preserve all checks/operations. Files fpu.hpp,vif.hpp, GIF tests;
+validation existing arithmetic/hazard suites plus independent flag packing cases,
+original full-state replay and matched native timing. Inspect code size/performance
+before retaining; no guest clocks changed. Backup vu-inline-baseline (dirty source,
+docs and current executable/map). No replay/build currently active.
+
+Current checkpoint: broader sprite-format optimization retained. Four matched
+runs complete: controls18.4264/18.8841s, candidates14.1483/14.3099s; mean23.73%
+less scene time, identical compared images/EE/GS/VU and IOP RTC bytes only.
+Separate sampling replay active via hg-sprite-format-profile.py, launcher42860;
+gpu-sprite-format-profile.log and sprite-format-native-sample.log. Next action:
+read native samples and choose next measured bottleneck;30updates/s remains unmet.
+
+Prior checkpoint: broader sprite path built;853 GPU/CPU cases pass resident,
+793 pass synchronous before extra alias/fault fixtures, and GIF suite passes.
+First original replay36.405s total/13.5048s scene preserves images/EE/GS/VU;
+IOP RTC seconds/minutes only. Movement output around6 changed images/s, not30.
+Four matched control/candidate runs now active: hg-sprite-format-pairs.py,
+launcher39836, gpu-sprite-format-pairs.log. Do not build during timings.
+Next evidence: pair timings/equality, then fresh native scene samples to choose
+between remaining CPU work and expensive ownership transitions. Sprite profile
+drops sharply but readback grows to1.931s; do not infer all remaining cost is GS.
+
+Previous checkpoint: all four matched resident triangle runs complete.
+Controls22.5453/22.3612s versus GPU17.7089/17.5342s; mean22.45325 ->17.62155s
+(21.52% less scene time). All images/EE/GS/VU match; only verified IOP RTC bytes.
+30 changed updates/s remains unmet. At that checkpoint sprite source was UNBUILT:
+shader/header use24-word descriptors but backend packing/CPU adapter/tests still
+need completion. Do not run that candidate until wiring and regressions pass.
+Reference review requested by user completed using PCSX2 performance/release docs,
+PS2Recomp README and OpenGOAL porting docs. Findings/provenance in SOURCES.md;
+prioritize remaining sprite cost and avoid redundant synchronization. No external
+implementation copied. Documentation backup: external reference-review-record.
+
+Resident triangle replay matches original images/EE/GS/VU; IOP RTC only.
+Scene19.0666s with profile-gs enabled.302650 triangles,962 triangle batches,
+1683 totalflushes (0.959s),0.564s readback,1.110GB uploaded. Triangle-strip CPU
+phase falls to~0.595s; remaining sprite phase~8.113s.345 GPU tests pass resident,
+including batches spanning guest service calls. Four matched resident control/GPU
+runs active via hg-triangle-pairs.py, launcher41580; do not build during timings.
+
+Next written change (build after controls finish): broaden bounded sprite compute
+coverage to solid draws and CT32/24/16/16S/Z24/8H textures, CT32/24/16/16S frames,
+checked DATE and Z32/Z24 tests/writes. Preserve exact TEXA, dither, masks, blending.
+One invocation owns both16-bit lanes of each destination word; no racing writes.
+Reject source/output and frame/depth aliases conservatively; unsupported cases
+remain CPU. New wire fields in GsSpriteJob; gl_gs.cpp shader/setup, gs.cpp adapter,
+synthetic GPU/CPU format cases. This revisits HG-FAIL-006 with resident batching
+and measured remaining sprite cost. Backup gpu-sprite-formats-baseline.
+
+GPU triangle first original replay matches images/EE/GS/VU and IOP RTC only,
+but scene71.4774s (regression).375054 triangles in49093 batches; total49814flushes,
+55.6346s flush time,208.935GB uploads.337 GPU tests pass both memory modes. No
+live run/build remains. Next change: cull triangles with no covered sample before
+CPU/GPU memory synchronization; scale Q and both numerators together to handle
+negative exponent differences exactly; defer resident end_batch host submission
+until memory observers/explicit CPU render/finish require visibility. This does
+not rasterize pending guest primitives for preview: observers materialize already
+logically committed host work. Update interface contract and test resident copies,
+hazards/fault ordering. Backup gpu-triangle-sync.30updates/s remains unmet.
+
+Draw-local sampler retained:864 scalar triangle/fault comparisons, GIF tests,
+241 mixed GPU cases and four original33M comparisons pass. Images/EE/GS/VU equal;
+new UTC-day control explains earlier RTC date difference. Matched scene times
+27.4915/21.6677 and25.6973/21.5711s; mean26.5944 ->21.6194s,18.71% reduction.
+No build/replay remains. Target30 changed updates/s remains unmet.
+
+Next measurable milestone: independently derived integer compute triangle batches,
+verified against CPU output/faults and original scene. New gs_triangle_acceleration.hpp
+and gl_triangle_shader.hpp; change gs.cpp, gl_gs.cpp/.hpp, game_host.cpp, GPU tests.
+Explicit --gpu-triangles, default off. Restrict formats/tests/coefficients to proved
+bounds; unsupported candidates use existing CPU path. Tile lists preserve draw
+order at each unique framebuffer/depth pixel; reject intra-draw feedback, flush
+on inter-draw texture/write hazards or mapping changes. Use original CPU/manual
+math and Khronos ARB_gpu_shader_int64 interfaces only. Start with synchronous
+batch visibility; resident mode remains separately tested. Backup gpu-triangle-baseline.
+
+Sampler replay control crossed UTC midnight: original saved RTC bytes at bfcd0
+00 27 39 22 00 19 09 26; new control00 41 02 00 00 20 09 26. Extra bfcd5 is
+independently explained by system_diagnostic.cpp UTC initialization (tm_mday) and
+IOP ReadRTC's unmodified8-byte response. All EE/GS/VU/images match. Use this fresh
+control for subsequent IOP comparisons, retaining strict non-RTC equality rather
+than broadly allowing offsets. First control27.4915s, remaining three replays
+resume without repeating it. Launcher25888 completed/stopped at this comparator.
+
+30-updates/s investigation: inline-access candidate passes9 focused tests plus
+241 GPU cases in both modes and four original33M state/image comparisons (RTC only).
+Scene regressed-control25.6951s, inline25.6195/25.3126s, pre-wrapper24.3681s.
+Inline runs include extra video-rate instrumentation, so small differences are
+inconclusive. No meaningful speed win established. Changed-image rate~3.04/s.
+3276 fresh native samples, zero context errors: linear texture234, point sampling157,
+PSMT8 addressing140, texel decode126, pixel8 108; depth/frame helpers also prominent.
+
+Next written change: draw-local sampler in runtime/gs.cpp for checked CT32 and
+PSMT8/PSMT8H with CT32 CLUT, hoisting immutable register decoding and using scoped
+CPU memory already synchronized by GsCpuMemoryScope. Preserve live texel reads,
+CLUT validity at the accessed entry, order, wrapping, filtering, and generic fallback.
+Factor PSMT8 address bits into small constexpr tables derived from our existing
+formula, not external renderer code. Compare extended scalar triangle fixtures
+including indexed formats/wrapping/faults/feedback, then matched original runs.
+Backup external draw-texture-baseline; tests/gif_tests.cpp changes included.
+
+Target requested: 30 updated video frames per host second. Immediate change plan:
+separate the rare coherence callback from the hot memory accessor, force inline the
+small observer guard/subscript, and retain all ownership ordering. GS object assembly
+shows actual subscript calls inside read_z_pixel/write_frame_pixel; each saves
+registers and reserves a stack frame even with no observer. This confirms avoidable
+per-pixel call overhead, not yet the full19% regression cause. Files gs_memory.hpp;
+validation memory/GIF/runtime/DMA/GPU both modes plus original33M state/timings.
+Add opt-in native --video-rate-log interval counters in game_host.cpp to measure
+produced and newly presented updates separately from swaps. No guest timing/input
+change. Account under HG-DIAG-011. Backup external coherence-inline-baseline.
+
+Current resident-memory regression checkpoint (2026-09-19): full build and nine
+focused CTest checks passed; 241 GPU/CPU cases pass in synchronous and resident
+modes. All three original33M replays completed at native-iop-budget. Images and
+EE/GS/VU state match; IOP differences restricted to recorded RTC seconds/minutes/
+hour. Scene times: pre-wrapper24.7895s, wrapper/residency-off29.5581s,
+resident30.2274s. The wrapper adds19.24% even with residency disabled; resident
+adds another2.26%. This is a regression, not an accepted performance milestone.
+No build or replay is active. Next measurable milestone: remove CPU memory-access
+overhead while retaining coherent ownership, then repeat matched state/timing runs.
+Linker map shows both GsLocalMemory subscript overloads emitted out-of-line from
+system_diagnostic.obj. This is a lead, not proof of the hot-path cause. Inspect
+actual raster calls/sample before choosing forced inline or scoped access changes.
+Backups/evidence: external gpu-resident-baseline, gpu-resident-times.json,
+resident-after-equivalence.json; documentation backup resident-regression-record.
+
+Resident-memory prototype passes observer/copy/move/scope tests and240 GPU/CPU
+cases, including CPU writes and GS reset preservation. A renderer-before-memory
+teardown case has been added and rebuilt. The first broad build found a missing
+vector-compatible assign member used by an existing runtime reset test; added it.
+Full AOT rebuild now active (cmd30660, tool session50010), currently generating
+translated code. No game replay competes with the build. Next: run resident and
+nonresident regressions, then original33M CPU/control/resident equality and transfer
+cost comparison. HG-DIAG-017 added; current default remains CPU, GPU flags explicit.
+
+Wide STQ division retained after200000 independent bit-serial comparisons,
+GIF suite, and four original33M native replays with images/EE/GS/VU equal; only
+verified IOP RTC differences. Pairs26.653/23.8881 and24.5814/24.4012s;
+means25.6172 ->24.14465s,5.75% reduction with substantial variance.
+No live build/replay remains. Snapshot external gpu-resident-baseline.
+
+Next measurable major milestone: coherent GPU-resident VRAM serving actual sprite
+work, preserving original state/image while reducing transferred bytes/forced syncs;
+then use it to enable triangle batching. Plan a vector-compatible GS local-memory
+owner with optional observer, page ownership tracked by backend, scoped raw CPU
+raster access, and deterministic copy/move/reset/dump behavior. New gs_memory.hpp
+and focused tests first; integrate gs.hpp, gs_acceleration.hpp, gs.cpp, gl_gs.cpp,
+game_host and CMake only after tests. --gpu-resident remains explicit experiment.
+Raw memory bypass confined to backend/CPU scope; CPU reads download dirty pages,
+CPU writes dispatch older queued work before modifying their inputs. Observer
+lifetime must remain safe if memory or renderer dies first. No guest clocks altered.
+
+Solid extension four33M comparisons complete, all images/EE/GS/VU equal,
+only validated IOP RTC fields differ. Scene pairs24.4999/25.0902 and25.2612/23.6315;
+mean24.88055 ->24.36085s,2.09% below substantial pair variation. Do not call this
+established progress. 4360 additional GPU fills increase flushes721 ->1227 and
+flush cost~0.89 ->1.49s. Keep candidate external, revert its source-only delta
+before evaluating the independent wide-divide candidate; preserve its regression
+fixtures. Current wide-divide source edited but not built yet. No replay remains.
+
+User requested PCSX2/PS2 rendering reference comparison; AGENTS and SOURCES now
+record that scope/provenance. No external rendering code or algorithms copied.
+
+Solid candidate passes64 scalar-reference cases plus328 GPU comparisons. Four
+alternating native replays active via temp hg-solid-replays.py, launcher4544;
+progress/equality artifacts gpu-solid-times.json and solid-{before,after}{1,2}*.
+No builds overlap timing. Next prepared candidate (build only after replays):
+replace wide STQ bit-loop division with guarded native128/64 division when shift
+is0..63 and quotient fits64 bits; preserve exact remainder/floor and checked
+fallback elsewhere. Also avoid calculating the unshifted quotient on the fast path.
+Files gs_math.hpp, gs.cpp, GIF tests; backup external wide-divide-baseline (source
+includes pending solid candidate). Add deterministic bit-serial differential tests.
+Microsoft _udiv128 docs establish host intrinsic only, not guest rendering behavior.
+
+GPU profile completes51.1381s; scene24.2688s with --profile-gs. Remaining
+scene primitive costs: strips9.1135s, sprites6.7282s, triangles0.2987s. Whole-run
+GPU flush0.883s. Sample attempt raced process exit (no usable native samples).
+Next: extend existing checked CT32 sprite specialization to untextured, unfogged
+solid fills with always-pass tests/masked depth, both CPU and GPU. Preserve masks,
+PABE/FBA/blending/clamp; bypass irrelevant texture reads only. GPU uses explicit
+solid job flag and no source-page dependencies. GIF scalar pixel tests and GPU
+comparisons, then original scene equality/timing. Backup external gpu-solid-baseline.
+
+Batched GPU milestone verified: scene31.6796 ->22.9379s (27.59% reduction)
+against matched native CPU; all EE/GS/VU/images equal, only known IOP RTC differs.
+32848 dispatched sprites/442843448 pixels,721 flushes,0.878s flush host time.
+Snapshot external gpu-sprites-batched. Enhanced wrap/fault tests rebuilt.
+Next measured milestone: reduce remaining scene CPU time. GPU profile replay
+queued gpu-sprite-profile* with --profile-gs (deferred GPU flush costs reported
+separately). No live process from preceding run; no build will overlap profile.
+
+Synchronous GPU version is not a retained speed improvement: identical native
+CPU scene31.6796s versus GPU34.5168s (~8.96% slower), despite matching state/image.
+Batch candidate now builds and216 GPU/CPU tests pass, including ordered render-to-
+texture dispatches and CPU/alias boundaries. Original33M batch replay queued.
+Counters account for flush cost separately. No timing/quality changes or default
+GPU enablement; shader source remains independent of external rendering material.
+
+Next GPU change: captured final history has8.59M CT32 sprite pixels in700
+medium strips, versus0.46M in16 large sprites. Current16384 threshold misses most.
+Plan lower threshold4096 and batch only inside rasterize_pending_draws. Queued
+draws execute as ordered GL dispatches with storage barriers; one upload/readback
+per run. Flush before any CPU primitive/fallback and at pending-list return or
+fault. Standalone raster calls remain synchronous. This avoids invasive VRAM
+hooks and preserves CLUT/transfer/FINISH boundaries. Backup external gpu-sprites-sync.
+Add batched differential tests with intervening CPU draws and feedback. GPU timing
+counter includes all flush work, since per-draw --profile-gs timing defers that cost.
+
+First original33M GPU native run matches all compared images/EE/GS/VU; IOP
+only RTC bfcd1/bfcd2 differs. 584 sprites,16744448 pixels, no alias rejections.
+Scene34.5168s, total profile71.256s. Prior29.1186s CPU was headless, so this is
+not yet a valid regression attribution. Identical native CPU run now queued.
+First run clean budget exit2; no game process left. Artifacts gpu-sprite-first*.
+
+GPU sprite build and tests: 200 GPU/CPU cases passed (192 dispatched,
+9351360 pixels, eight alias rejections), plus GIF suite. GLSL reserved identifier
+was caught by shader compilation and renamed before tests. Original33M native
+replay active: gpu-sprite-first-command.json/log; launcher43796, bounded autoexit.
+No timing conclusion yet. HG-DIAG-016 is explicit opt-in, default off.
+
+## GPU sprite milestone - active 2026-09-19
+
+Triangle arithmetic retained: mean31.5837 ->29.1186s (7.81% reduction),
+all four33M compared images/EE/GS/VU identical; IOP differences only RTC.
+Eight relevant CTest checks pass. No live game/build remains.
+Backup: external haunting-toc-probe/gpu-sprites-baseline with hash manifest.
+Next: synchronous OpenGL compute acceleration of large CT32 FST sprites,
+using prepared row/column addresses from our existing independently derived CPU
+renderer. Reject texture/frame alias and destination alias before dispatch;
+CPU remains reference and handles all other cases. Upload/readback per accepted
+draw initially preserves CPU visibility and ordering without invasive VRAM hooks.
+New gs_acceleration interface and gl_gs backend; game_host opt-in --gpu-sprites
+with worker-owned GL4.3 context; CMake and differential GL tests. Measure transfer
+cost and33M equality before enabling by default. No guest timing changes.
+
+## Full-speed rendering push - 2026-09-19
+
+Triangle candidate builds and GIF tests pass, including300000 independently
+checked integer quotients and six scalar-reference triangle cases with identical
+zero-Q/exponent-spread faults and partial writes. Full33M alternating comparison
+running: temp hg-triangle-replays.py (current tool session), triangle-times/equivalence files. Sprite IOP
+comparison also matches except verified RTC fields (sprite-iop-equivalence.json).
+Bounded native-window check confirms active RTX5070, OpenGL3.3 NVIDIA616.92,
+three images and clean result0. Context version is requested3.3, not maximum GPU
+capability. No live GUI remains during timings.
+
+CT32 sprite specialization retained:72 differential cases pass, all four33M
+images and EE/GS/VU data match. Scene means43.2754 ->31.5756s (27.04% less time),
+paired26.02%/28.07%. Artifacts sprite-times.json and sprite-equivalence.json.
+Snapshot of retained source/tests/executable/map under backup/ct32-sprites.
+Fresh32M profile:31M..32M triangle strips4.706s, sprites4.067s, other triangles
+0.107s. Now target triangle arithmetic; no live game competes with measurements.
+
+Next planned changes: gs.cpp prepares exact signed S/T/Q coefficients per triangle
+under a conservative no-overflow bound, otherwise uses the existing checked path.
+Reuse Q weighted sum for U/V. New gs_math.hpp provides bounded quotient estimation
+with integer correction; every returned quotient is exact. Apply to positive
+triangle interpolants, preserving signed and wide STQ division. Add independent
+integer-division and scalar triangle differential tests, including zero-Q faults
+and exponent-spread fallback. No trace, clocks, weights or coverage rules change.
+
+Isolated33M --profile-gs replay completes72.812s. All861346 completed draws
+counted, matching the dumped raster total (no reset-quantum loss in this run).
+GS host times: sprites35.505s (74.24%), triangle strips12.048s (25.19%), other
+triangles0.272s. Image/EE/GS/VU state matches commit-after2. Original counters
+therefore identify sprite work as the first major rendering target. Artifacts
+external gs-isolated-profile.*. CT32 sprite specialization implemented; build and
+72 differential cases (filter/wrap/blend/mask with feedback) pending.
+
+Raster bodies now live in gs.cpp. Release build and GIF/runtime/DMA checks pass.
+GS timing is re-armed at each quantum after device reset; counters are since the
+last GS reset and may omit calls within the reset quantum. The33M profile will
+check totals against rasterized count before attributing scene intervals. Default
+has no clock queries. Snapshot of isolated source/binary/map under backup/isolated.
+
+Next candidate: per-draw CT32 sprite specialization for source/target32-bit,
+FST UV, no fog/SCANMSK/alpha-test/DATE, depth ALWAYS and writes masked. Precompute
+U-address components and fractions, compute V components per row, use existing
+texture function and alpha blend with original masks/FBA/PABE/clamp behavior.
+Preserve row-major pixel order and live four-neighbor reads for feedback. Fall
+through to the existing renderer outside the checked predicate. Captured retained
+history has8815556/14970930 sprite pixels in this predicate (58.9%); timing still
+pending. Modify gs.cpp and add focused scalar-reference differential tests.
+
+User authorizes all necessary renderer work until target speed is reached.
+Next measurable milestone: substantial scene throughput gain with33M output/state
+preserved. Read rules.md and learned skills.md; preserve console semantics.
+Backup of current dirty source/docs and pixel-commit executables/maps: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\gs-throughput-20260919-171050.
+No live game currently running (previous PID30536 has exited).
+
+Plan phase1: move the six rasterizer bodies from gs.hpp into gs.cpp, keeping
+identical logic. This isolates renderer rebuilds and ensures these bodies are
+compiled in the GS /O2 unit rather than potentially emitted/selected from an /O1
+translated shard. Add opt-in --profile-gs (HG-DIAG-005) cumulative per-primitive
+host duration/count, covering FINISH/CLUT/transfer-triggered raster calls as well
+as explicit runner servicing. Default has no clock queries. Validate GIF/runtime/
+DMA regressions and original33M state, then measure current distribution before
+choosing CPU span specialization or GPU offload. GPU inventory: RTX5070 plus AMD
+integrated; OpenGL currently only presents CPU-rendered pixels.
+Expected files: gs.hpp, gs.cpp, system_diagnostic.cpp, tests as needed, diagnostic/
+performance/progress documentation. No guest clocks, instructions or draws skipped.
+
+## Speed investigation and persistent workflow - 2026-09-19
+
+Candidate B retained: scene mean47.56255 ->41.97535s,11.75% reduction over two
+alternating comparisons (individual13.54%/9.80%). EE/GS/VU/images identical across
+all four; only validated IOP RTC seconds/minutes/hour differ. Artifacts commit-
+times.json, commit-equivalence.json, commit-iop-equivalence.json. Learned skill
+HG-LEARN-006. No clock/input/rendering-quality changes. Native viewer rebuild passed. Refreshed runtime/DMA/GIF and five startup
+CTest checks all pass (8/8). Old live PID11532 closed for isolated timing.
+Updated viewer launched with direct presentation and keyboard/gamepad input;
+external native-host-speed-command.json / native-host-speed.log. One-shot GL
+colored-pixel verification enabled; no profile or framebuffer file transport.
+
+Live updated hg_game PID30536, launcher cmd26580. No active timed replay or
+build process remains. Next measurable milestone: another meaningful CPU scene-
+time reduction against the retained pixel-commit binary, with the same33M image/
+state equality. First inspect per-draw invariant setup and address/pixel traffic;
+keep the software GS bottleneck distinct from OpenGL presentation. Re-read rules
+and lessons, make a fresh backup before the next experiment. Speed remains far
+below console level; no complete-playability or full-console parity claim.
+
+Candidate A completed: byte-identical compared images/EE/GS/VU, only0.21% mean
+scene-time reduction, below run variation. Reverted runtime/gs.cpp to the saved
+baseline; candidate source/executable retained in the backup directory. HG-FAIL-005.
+Candidate B plan: share final blend/frame commit after already-validated pixel
+stages in runtime/gs.cpp. Preserve destination/depth test order, alpha-fail actions,
+frame/depth masks and live reads. Remove only duplicate destination read and alpha/
+DATE checks between draw_depth_frame_pixel and draw_frame_pixel. GIF regression
+suite already covers these interactions; compare the same33M state and timings.
+
+User withdrew the missing map-entry text report; no missing-call assumption.
+New root rules.md and learned skills.md are mandatory pre-change reading via
+AGENTS.md. Baseline dirty-file copies and SHA256 manifest: C:\Users\johnn\AppData\Local\Temp\haunting-toc-probe\change-baseline-20260919-165027.
+New files recorded: rules.md, learned skills.md. Backup covers candidate GS,
+runner, tests and documentation before this work.
+
+Candidate A: share validated TEX0/TEXA decoding and axis wrapping across the
+four bilinear samples inside one fragment. No cross-fragment texture cache; every
+VRAM/CLUT read remains live. Modify runtime/gs.cpp only, then run GIF checks and
+33M equivalence/performance comparison. Existing point/extraction callers use the
+same decoder. This is exact host-work factoring, not a new rendering algorithm.
+
+Plan: quantify sustained scene CPU phases and expensive raster operations using
+existing replay evidence first. Then reduce redundant validated pixel work in
+runtime/gs.cpp or runtime/include/hg/gs.hpp, preserving every guest operation,
+image and fault. Add relevant synthetic checks in tests/gif_tests.cpp if needed.
+Compare same33M scripted scene and state with divide-after2, plus alternating
+uninstrumented timings if the candidate passes. Console speed is a target, not
+currently verified. Do not change clocks or skip draws to raise the displayed rate.
+
+## CPU performance and native OpenGL game host - 2026-09-19
+
+Current priority: CPU throughput before further major rendering changes. Native
+hg_game now runs the AOT runtime in-process on a worker with GLFW/OpenGL on the
+main thread, direct framebuffer mailbox, keyboard/gamepad input, aspect-preserving
+presentation and cooperative shutdown. No framebuffer file transport is required.
+The GS rasterizer remains CPU-based. User confirmed the new window is visible.
+
+Verification: Release builds and GIF tests passed; game_sif/fileio/cdvd/loadfile/
+reboot CTests all passed. Controlled33M native-host-controlled replay completed
+with budget exit:898 produced,897 presented, colored-pixel GL readback passed.
+Against divide-after2, EE RAM, GS VRAM/draw records, VU state/data/micro/defined,
+metadata and final display are byte-identical; IOP differs only RTC bfcd1/bfcd2.
+Evidence in TEMP/haunting-toc-probe/native-host-controlled-equivalence.json.
+The earlier live-input-enabled run diverged after31M; its input was uncontrolled,
+so it is not an equivalence test. User subsequently confirmed arrow-key movement in the new native window.
+Shutdown test --host-frames3 produced/presented3 and returned0 cleanly. Initial
+shutdown attempt omitted required TOC input and correctly faulted; corrected run
+uses the explicit synthetic record. No fault was suppressed.
+
+Exact STQ shifted-numerator native division shortcut: four alternating33M runs
+before76.923/76.016s, after75.433/74.990s overall. Scene30M..33M before47.274/
+46.871s, after44.842/44.880s:4.70% mean scene-time reduction. Compared guest
+state and images match apart from RTC. Evidence divide-times.json and
+ divide-equivalence.json. Fresh sampling before this change:3333 samples,
+0errors, STQ coordinate362 plus weighted-sum213 (~17.3%).
+
+Live native host PID11532 (launcher cmd37860), default pacing, keyboard/gamepad
+enabled; standard startup script ends27.1M. Command and log: external
+native-host-live-command.json / native-host-live.log. Old diagnostic viewer is
+no longer running; rebuilt hg_opengl_host successfully after shared-header split.
+User confirmed keyboard movement; gamepad still awaits verification.
+
+Fresh post-change sampling:3330 samples,0 errors; CT32 addressing226, weighted
+sum194, bilinear182, texture decode176, depth/frame pixel paths159/154. STQ
+coordinate body70 vs prior362 (samples are attribution, not speed comparison).
+Artifact native-profile-after-host.json; profiling perturbs timing and ran beside
+the live host. Next milestone: optimize repeated texture/frame address and
+weighted-sum work while preserving captured33M state. Do not label video publications or window swaps internal game FPS.
+HG-DIAG-007 synthetic TOC and008 issue-slot timing still apply; host validation
+flags are HG-DIAG-011. Preserve inherited broad dirty tree.
+
+## Active character-render correction - 2026-09-19
+
+First scene movement is verified: unchanged baseline executable plus Left75M /
+none79M completed80M with only budget exit (EE1bef18, IOP1f0000). External
+scene-left75m-at74000000.png is stationary; at76000000.png Fiona walks left;
+scene-left75m-final.png shows her by the left wall. Rasterized15808287.
+User confirms viewer visibility, character corruption and apparent~5FPS.
+No completed-playability claim: rendering, speed, audio/input/save gaps remain.
+
+Geometry, movement, character color, address-cost and bounded bilinear milestones
+are completed below. Next measurable milestone: reduce bilinear host cost without
+changing the verified filtered output, and report measured preview update rate.
+Captured thin triangles already contain displaced coordinates, TEX0
+2007e78621b10400. HG-DIAG-006 now optionally captures64 selected before/after
+AOT VU calls (--capture-vu1 external-prefix --capture-vu1-tex0 value), then
+detaches. Default keeps original executor without extra calls. Build passed,
+four invalid argument cases reject,32M profiled run completed in54.89s.
+Artifacts: %TEMP%/haunting-toc-probe/character-vu-* and scene-vu-capture.*.
+
+Independent matrix projection of captured scene4 entry58 vertex predicts
+1969.9667/2109.4265/87909.20. Old Q reproduces incorrect native result
+1956.3125/2094.8125/87300. Sony VU manual pp44-48/365-366 proves omitted
+per-field dependency stalls must advance pending Q/P. New AOT dependency
+metadata and readiness tracking produce31519/33750/87909 raw fixed coordinates
+in isolated compiled original-program check, matching the independent math.
+No runtime decoding or external rendering implementation. Synthetic GIF tests
+and15 VU translator tests pass. Full diagnostic rebuild completed successfully;
+logs %TEMP%/hg-build-vu-hazards.out/.err. 32M scene-vu-hazards completed55.016s. Visible spikes are gone; clothing colors remain suspect. Next:
+trace remaining color/UV/lighting. Observer-disabled32M scene-vu-control completed49.625s: EE RAM, GS VRAM/draws, VU memory/state and image identical. Only IOP RTC seconds/minutes differ atbfcd1/bfcd2 (BCD19:56:13 vs19:57:29 UTC).
+
+Separate verified PACKED XYZF2 Z/F shift fix (Sony EE manual p154) passes GIF
+regressions and was present in scene-vu-capture run. It does not explain geometry.
+48M..51M original scene took49.039 host seconds (1s observation precision),
+confirming slowdown without a verified FPS metric. Timing/synthetic TOC remain
+HG-DIAG-007/008 limitations. HG-DIAG-015 stale proxy description reconciled.
+ViewerPID14572 now displays the corrected scene via its existing watched path. Original movement PPM preserved as scene-left75m-preserved.ppm and .ram.display.ppm; stable final PNG retained.
+Preserve inherited broad dirty tree.
+
+Color follow-up: independently decoded character textures look plausible and
+body vertex colors are neutral. The green pixel exists in both native render
+buffers. Offline replay of saved draw records reproduces that pixel changing
+during original postprocessing sprites, but full VRAM differs from the capture;
+this is a lead, not validated whole-frame replay or proof of a color defect.
+Do not remove original grading based on appearance alone. External artifacts:
+character-texture-*.png, draw-replay.*, hg-draw-replay.out under TEMP.
+First scene host sample (scene-profile/native-profile-scene) used a stale Sep14
+linker map and its symbol attribution is INVALID. Rebuilt current map via
+TEMP/hg-build-scene-map.cmd and repeated:3328 samples,0 context errors,
+400 samples in PSMCT32 addressing. Candidate uses compile-time X/Y offsets
+derived from our old formula; exhaustive coordinate comparison passes for four
+widths. Full build and GIF tests pass. Four alternating32M runs measure a6.44%
+reduction in30M..32M scene time with identical EE/GS/VU/images/checkpoints;
+IOP differences only RTC minutes/seconds. Retained. Baseline executable remains
+external scene-before-address.exe. Next bounded STQ overflow-check simplification
+also passes boundary tests and four-run state equivalence; mean scene time falls
+0.68%, too small for a separate material-speedup claim. See PERFORMANCE.md.
+Corrected movement replay35M completed with only budget exit. Left30.5M/none33M
+shows Fiona walking at32M and stopped by the left wall at35M, without spikes.
+TEMP/hg-fixed-walk.py and scene-fixed-walk-at32000000.png/final.png retain
+the command and visual evidence; viewer14572 shows the final corrected pose.
+The stationary checkpoints establish no physical FPS measurement.
+
+Sony GS manual6.0 p59 section3.4.9 independently confirms texture multiplication
+must clamp to8 bits. Existing MODULATE incorrectly packed wider products,
+allowing RGB channel spill and alpha wrap. Correction plus synthetic bright
+channel/alpha tests pass, full build completed (TEMP/hg-build-saturation.out/.err).
+32M scene-saturation completed46.857s with only budget exit. It removes Fiona's
+green patches:169 changed display pixels confined to rectangle210,273..226,359.
+GS VRAM changes444 bytes; EE RAM, GS draw/register records and VU data/state are
+identical; IOP differences only RTC minutes/seconds. Evidence: external
+scene-saturation.png and scene-saturation-comparison.json. Viewer14572 now
+shows this corrected standing frame. Prior binary scene-before-saturation.exe
+and corrected movement images remain external. No live build/replay sessions.
+
+Bilinear follow-up:18132 captured textured draws (including character groups)
+use TEX1=0x60;1488 request nearest. GS6.0 pp28/50/58/62/127 derives the new
+fractional UV/STQ, half-texel offset and four-neighbor path. Native GIF tests
+pass.56 synthetic samples across all four wrapping modes match completed,
+stable external oracle memory readbacks and our exact native packet replay;
+200 untouched pixels also match. See ORACLE.md. Both oracle processes closed.
+Only equal nearest/linear min/mag filters are supported; mixed selection and
+mipmapping now fail explicitly. No physical-console parity claim.
+
+33M scene-linear-fps completes88.695s with only budget exit and renders the
+filtered scene (scene-linear.png). User asked running FPS. Measured from31M:
+61 preview publications and60 changed images over40.867s =1.49 publications/s,
+1.47 changed images/s. Reported approximately1.5 new images/s, explicitly NOT
+an internal game-frame counter or physical display FPS. Earlier~5FPS was the
+user's unverified estimate. HG-DIAG-006 external polling/hash cost is included.
+Retained candidate skips zero-weight texture reads and uses the point path at
+exact texel centers. GIF tests and56-pixel native oracle replay pass.33M replay
+completed78.200s; measured scene interval37.675s with61 publications and60
+changed images =1.62 publications/s,1.59 changed images/s. User informed that
+latest preview update rate is approximately1.6/s, not internal game FPS.
+The complete61-image scene hash sequence, final EE RAM, GS VRAM/draws and
+VU data/state match baseline exactly; IOP differs only RTC minutes/seconds.
+Evidence: scene-linear-center-equivalence.json, scene-linear-center-fps.json,
+scene-linear-center.png. Baseline binary remains external scene-linear-baseline.exe.
+No live build/replay/oracle process remains. Viewer14572 displays the final frame;
+there is no separate gameplay input window. Git diff --check passes.
+
+Next executable action: sample the current binary during31M..33M using the
+fresh matching build/Release/hg_system_diagnostic.map and existing external
+hg-native-scene.py sampler. Its current hardcoded5s start in hg-profile-scene.py
+must be moved to the actual scene checkpoint (not34s, now still scene ramp).
+Target repeated bilinear texture decode/wrap/address validation; preserve
+the proven61-image sequence and guest-state equivalence for any optimization.
+Do not report the earlier6.44% nearest-renderer gain as the final bilinear rate.
+
+## Handoff checkpoint - 2026-09-19
+
+Active milestone: first original gameplay scene visibly rendered and responding
+ to input. The full80M clean replay below is verified; gameplay is not.
+
+Immediate next action: inspect the preserved continue-stream1d4d60.ppm (or .bmp)
+under %TEMP%\haunting-toc-probe, identify its actual contents, and use the
+interactive-desktop launcher in tools/run_movie.ps1 to show that saved frame.
+Do not rerun80M merely to recover the image. The user offered to identify it.
+User has not confirmed visibility after the last desktop-specific launch.
+
+Visibility diagnosis: normal Start-Process inherited a private Codex desktop.
+A valid visible HWND and matching SessionId did NOT prove user-visible output.
+The existing tools/run_movie.ps1 already documents the correct CreateProcessW
+STARTUPINFO.lpDesktop='WinSta0\Default' mechanism. Reusing it for the saved
+frame created viewer74232; EnumDesktopWindows(Default) found the titled window
+at92,69..1052,609. Earlier HWND manipulations targeted helper windows and did
+not solve desktop isolation. Do not repeat them or claim visibility solely from
+MainWindowHandle. GUI launches must follow applicable escalation requirements.
+
+Handoff process check: no hg_opengl_host or hg_system_diagnostic process remains.
+No live command session to resume. Old PIDs65052/68816/74232 are historical.
+The saved preview is a static capture; keyboard gameplay is not wired in viewer.
+
+Viewer-only change during diagnosis: explicit GLFW_DECORATED/RESIZABLE hints
+and glfwSetWindowPos after showing the window in runtime/opengl_host.cpp.
+Clean /m:1 hg_opengl_host build passed after stopping the old locked executable.
+These changes did not establish the cause; desktop selection was the evidence-
+backed fix. No fresh full regression suite was run for the viewer-only edit.
+Existing HG-DIAG-006/011 cover capture/presentation; HG-DIAG-015 inventory still
+describes an older taskbar proxy and needs reconciliation with current source.
+No new guest-state probe was introduced. Preserve the broad dirty tree.
+
+Next after image identification: if gameplay, perform one targeted deterministic
+late-input replay and compare response with baseline. Otherwise select an input
+or extend budget according to the actual rendered state. Keep explicit faults.
+Existing fixed input schedule ends27.1M, so80M success alone proves no late input
+response. No saved-machine resume mechanism has been verified.
+
+## Gameplay-scene push checkpoint - late 2026-09-18
+
+Milestone remains: reach the first original gameplay scene and capture it rendered
+and responding to input. Gameplay is not yet verified. The deterministic schedule
+remains issue-slots,80M slices,1M checkpoints with the established
+Left/Cross/Start sequence and external synthetic-index-pattern.bin.
+
+Latest continuation completes the full80M deterministic budget with no explicit
+EE/IOP/renderer correctness fault after independently rooting stream callbacks
+1d4ef8 and1d4d60. Final connected state:
+- EE pc1bef18, IOP pc1f0000; exit reason is only cooperative startup budget reached.
+- Display640x448, rasterized15808281, retired15765367, first_pending42914.
+- Exact replay prefix is %TEMP%\\haunting-toc-probe\\continue-stream1d4d60.
+- Final preview %TEMP%\\haunting-toc-probe\\continue-stream1d4d60.ppm is preserved.
+- hg_opengl_host --watch-display was launched against that saved framebuffer
+  (viewer PID65052) so the user can visually identify the rendered state. Gameplay
+  remains unclaimed until that screen is identified and input response is verified.
+
+The late stream callback provenance is now also closed:
+- Original1d54e8..54f8 registers1d4ef8 through setter1d1770 at object+38/+3c;
+  fresh object3c2850 contains1d4ef8/3b7238 there. Rooting1d4ef8 cleared the
+  61M-slice frontier (rasterized9952687 at the old fault).
+- Original1d4ca8 tail materializes1d4d60 and tail-calls setter1ce638 at
+  object+48/+4c; fresh object3bfc18 contains1d4d60/3b7238. Rooting1d4d60
+  cleared the62M frontier and allowed the clean80M run.
+- Current generated EE state is354769 reachable words /4608 unresolved items.
+- Current generated IOP bundle remains28 modules /94548 reachable words /
+  125 residual boundaries /244 original BREAK traps.
+
+Current connected progress after the scene11 renderer frontier:
+- PACKED descriptor8 was independently identified as CLAMP_1 and implemented with
+  the documented lower-64-bit PACKED semantics. Renderer advanced22328->22624 draws.
+- Original16x16 PSMCT32 palette upload proved128 direct A+D writes to GS HWREG.
+  PACKED A+D addr54 now feeds the checked host-to-local path; the CLUT-transfer
+  fault cleared and renderer advanced to22770 draws.
+- Independently bounded EE targets added during the continuation include the
+  39c4c0 six-way internal switch, full live472700 interface, direct member19c600,
+  and direct member2c2ed0. Each was proven from original executable data/control
+  flow plus fresh connected RAM before rooting.
+- The 28-module IOP bundle remains the current generated set and intentionally
+  omits rom_romdrv. Fresh bundle after the SNDDRV callback batch has94548 reachable
+  words,125 residual boundaries and244 original BREAK traps.
+- IOP7e99c was proven SNDDRV+399c. Original SNDDRV initialization7fe34..7ff64
+  installs the four callback set7e98c/7e994/7e99c/7e9a4 into MODMIDI records;
+  all four are now explicit roots. That IOP frontier cleared.
+- Replay continue-member2c2ed0 reached rasterized850741 / retired850253 with only
+  488 pending draws before the next EE boundary, substantially beyond the prior
+  rasterized564458 checkpoint.
+
+Current blocker:
+- EE stops at1d4ca8, RA1cdb84, current thread4.
+- Caller1cdb60 loads the callback from object+48 and1cdb7c dispatches it while
+  loading context from+4c. Fresh object3bfc18 contains1d4ca8 at+48 and3b7238 at+4c.
+- Original1d5534..5544 materializes1d4ca8 and calls1ce638; independently decoded
+  setter1ce638 writes a1/a2 to exactly+48/+4c. This is the same verified mechanism
+  already used for rooted sibling callback1d4ff0.
+- Add root1d4ca8, emit, incremental clean build, replay the identical schedule and
+  continue from the next live blocker. No new HG-DIAG probe was introduced.
+
+## Gameplay-scene push checkpoint - 2026-09-18
+
+Milestone remains: reach the first original gameplay scene and capture a rendered
+scene responding to input. Gameplay is not yet verified. The current deterministic
+replay frontier is `%TEMP%\haunting-toc-probe\continue-vu1-scene11-loop`.
+
+Recent progress:
+- VU scene identities 8 through 11 are now independently reconstructed from exact
+  live MicroMem plus original MPG commands and fully looped through every live
+  continuation entry.
+- Scene8: sources3a2018/3a2820, entries0/0x80/0xec0.
+- Scene9: source3a58c8, exact115-pair replacement, entries0/0xa8/0x380.
+- Scene10: sources3a4f68/3a5770, entries0/0x58/0x920.
+- Scene11: source3abd18, exact219-pair replacement, entries0/0x10/0x6c0.
+- Renderer frontier advanced from the old scene4 stop around draw18025 to draw22328.
+- Same-pair VU SQ source hazards now snapshot pre-pair state; MAX emitter temporaries
+  use micro-PC suffixes; VU translator tests pass14/14.
+- HG-DIAG-006 also writes VU1 data/defined masks/register-state sidecars.
+- XGKICK validation is descriptor-aware so PACKED STQ requires only defined S/T/Q.
+  Focused native GIF regression passes.
+- Stable generated EE sharding keeps config/VU emit/build cycles around14-16s each;
+  shared runtime-header changes still trigger a roughly5-minute rebuild.
+
+Current blocker after scene11 full loop:
+- EE stops at1b7960 / RA1b8680 with `unsupported GIF PACKED register descriptor`.
+- Display capture640x448, draws22328, rasterized87779, retired65451,
+  first_pending22328.
+- Scene11's only XGKICK packet at VI1=768 is valid PACKED EOP NLOOP4 NREG3 with
+  descriptors STQ/RGBAQ/XYZ2 only; it does not explain the fault.
+- Fresh EE DMA metadata shows GIF channel2 is already idle at the dump point:
+  CHCR=1, QWC=0, MADR=0x7f21b0, TADR=0x47d550. The offending descriptor likely
+  passed through before the exception snapshot.
+
+Immediate next action:
+1. Capture the numeric descriptor at `GsRegisterState::write_packed` instead of
+   inferring it after the fact. Prefer moving `write_packed` and `write_reglist`
+   bodies from `runtime/include/hg/gs.hpp` into `runtime/gs.cpp` in the same change,
+   paying one shared-header rebuild so later renderer descriptor fixes are cheap.
+2. Include descriptor plus low/high payload in the explicit unsupported exception.
+3. Replay the identical fixed issue-slots schedule once and identify the exact live
+   descriptor. Independently verify its PACKED layout from Sony GS/GIF documentation
+   before implementing semantics.
+4. Continue immediately from the next observed blocker until the gameplay scene is
+   verified. Do not claim playability from a loading/diagnostic frame.
+
+Keep the existing deterministic schedule:
+left/none5630000/5700000, cross/none5760000/5870000,
+start/none19450000/19490000, start/none20860000/20930000,
+cross/none23130000/23270000, start/none27000000/27100000;
+issue-slots,80000000 slices, checkpoint every1000000, synthetic-index-pattern.bin.
+
+## Post-opening VU1 continuation + audio observation - 2026-09-18
+
+Replay continue-sharded-478b70 clears34e9e0 and reaches a different frontier:
+EE1b7960 faults because the live VU1 MicroMem does not match the configured opening
+AOT program. Extended HG-DIAG-006 now writes the exact external16KiB MicroMem image.
+Fresh capture proves pairs0..82 equal original source3a7558 after VIF4a530000
+(MPG83,destination0); remaining live tail still equals the old opening program.
+The actual MSCAL entry is0. Structural audit finds83 pairs,5 direct control pairs,
+all edges/delay slots internal and no unsupported decoded pairs; emit_vu1 dry-run
+succeeds from entry0. Added exact post_opening_mscal0 AOT identity only.
+
+User also reports the audible cutscene stream still develops peaking/scratchiness
+after a certain point. Record this as an unresolved host/audio-path observation;
+do not divert the active milestone from reaching gameplay. Interactive host input
+is still unavailable in the viewer, so deterministic scheduled input remains the
+current continuation mechanism. HG-DIAG-006/007/008 limitations remain explicit.
+
+## Latest 478b70 continuation - 2026-09-18
+
+Sharded frontier iteration remains fast. The preceding46fc30 pair changed the
+dispatcher plus shards0009/0017 and built hg_system_diagnostic in30.12s including
+CMake regeneration, still roughly7x faster than the old218.319s single-TU cycle.
+Replay continue-sharded-fc30 takes29.808s, clears2e5660 and stops at34e9e0,
+RA1bbed8, object1ffeaa0 vptr478b70. Original/live words prove null-bounded pair
+[478b78,478b80)=347640/34e9e0; original347658..664 installs478b70. Add exactly
+that pair, emit, incremental build and replay. The adjacent478b80 table remains
+deferred pending live use. HG-DIAG-006/007/008 remain limitations; no gameplay claim.
+
+## Sharded EE build speed + 46fc30 continuation - 2026-09-18
+
+The generated EE source is now split into25 stable address-based C++ shards while
+the small translated.cpp retains metadata and checked dispatch. Content-aware emit
+preserves timestamps for unchanged shards. Tool tests pass44/44. The first one-time
+sharded build cost275s, but an immediate no-change build fell to2.263s. A real
+blocker batch changed only translated-shard-0013.cpp and rebuilt hg_system_diagnostic
+in18.272s versus the prior218.319s targeted no-trace baseline, about12x faster.
+Focused runtime/translation/translation_no_trace CTests pass3/3. Replays remain
+~29.5s and preserve the fixed schedule/diagnostic limitations.
+
+Replay continue-sharded-d790 clears2685f0 and the adjacent46d7a0 family, then
+stops at original2e5660, RA1bbed8, object17f6c50 vptr46fc30. Original/live data
+prove null-bounded pair[46fc38,46fc40)=126170/2e5660 and original126188..194
+installs46fc30. Add exactly that pair to1bbed0's explicit union, emit, incremental
+build and replay. The following46fc40 table is intentionally deferred until live
+evidence reaches it. HG-DIAG-006/007/008 remain active limitations; no gameplay claim.
+
+## Latest callback-family batch - 2026-09-18
+
+No-trace targeted frontier build completed in218.319s, confirming the large single
+translated.cpp compile remains the dominant iteration cost. Identical replay takes
+29.783s, clears2bb3e0 and stops at1b8910 via100b40, RA1b8e64. Fresh47e300
+descriptors plus original constants3b2f68..3b2fd0 and constructor464920..464a60
+prove the full seven-callback family;1b8ce0/1b8c90 were already compiled and the
+remaining1b8910/1b88c0/1b8890/1b8860/1b87f0 are batched now.
+
+Turnaround mitigation retained: reuse triage instead of rerunning heavy scans, keep
+EE history OFF for frontier replays without watches, and build only target
+hg_system_diagnostic. The next required rebuild also tests MSVC /O1 under the existing
+HG_FAST_TRANSLATION_BUILDS option; measure compile time and retain only if it helps
+without changing correctness checks. The structural long-term bottleneck is still
+one generated EE translation unit invalidated by every root change; split-TU emission
+remains the next build-system improvement if /O1 is insufficient.
+
+## Latest 46eb60 continuation - 2026-09-18
+
+Connected continue-object46b1c0 replay confirms the prior46b1c0 batch:1f2b80
+clears and execution reaches missing original EE2bb3e0, RA1bbed8, object1ffeaf0
+vptr46eb60. Original/live words prove null-bounded pair[46eb68,46eb70)=
+2bb220/2bb3e0; original2bb238..244 installs46eb60 and caller1bbed0 uses slot+0c.
+The three immediate2bb3e0 virtual dependencies are already compiled. Add only
+this proven pair to the existing dispatcher union before the next emit/build.
+
+Turnaround work continues in parallel. The previous cycle measured replay~28.6s,
+triage~10.4s, major-scan~11.5s and emit~12.7s, while the stable single-worker
+generated-EE Release compile took several minutes. Current build cache has
+HG_EE_INSTRUCTION_TRACE=ON even though the frontier replay uses no EE PC watches;
+the documented OFF configuration preserves guest instructions/budgets/faults and
+has prior state-equivalence evidence. For the next frontier build, configure EE
+history OFF and build only target hg_system_diagnostic, then replay the identical
+schedule. Keep006/007/008 limitations and do not claim gameplay yet.
+
+## Latest 46b1c0 continuation - 2026-09-17
+
+Connected continue-vuconvert replay proves the VU fixed-point conversion fix: the
+old10dda4 VFTOI0 stop is gone. The same80M schedule advances to missing original
+EE1f2b80, RA1bbed8, objecta85110 vptr46b1c0, after28.6493s host time. Original
+ELF and fresh EE RAM agree on the null-bounded pair[46b1c8,46b1d0)=16f680/1f2b80;
+original16f754..75c installs46b1c0 and caller1bbed0 uses slot+0c. Both targets
+are now added to that dispatcher union. Turnaround review: this replay cost~28.6s,
+triage~10.4s and major-scan~11.5s before rebuild time; avoid repeating both heavy
+scans for every small root and batch only independently proven families per build.
+Next action: emit, single-worker Release build, replay as continue-object46b1c0,
+then continue from the next actual original stop. Diagnostics006/007/008 persist;
+no gameplay claim yet.
+
+## Latest VU conversion checkpoint - 2026-09-17
+
+Sixth Release build and replay clear1bdf80; next fault original10dda4 word
+4be5217c VFTOI0, RA1b6d54. Evidence continue-object46ada0.ram and sidecars/log.
+Implemented both VU0 macro fixed-point conversion families using existing
+independent Vu1State integer-bit primitives; manual provenance in SOURCES.md.
+43 Python tests and3 native CTests(runtime/translation/translation_no_trace)
+pass, diff check passes. Emit344672 words/4525 boundaries. Connected Release
+build session60540 completed successfully and linked hg_system_diagnostic.exe.
+Replay continue-vuconvert.ram has not yet been run; next action is that replay,
+verify10dda4 clears, then investigate the next actual original-PC stop.
+Existing006/007/008 diagnostic limitations persist; no new diagnostics.
+Still no gameplay or physical-console parity claim. Earlier sessions finished.
+
+## Latest object46ada0 checkpoint - 2026-09-17
+
+Fifth Release build passed;268090 clears. Replay next stops at1bdf80,
+RA1bbed8, objecta84f50 vptr46ada0. Evidence continue-object46d770.ram and
+sidecars/log under external probe directory. Original installers16f704/16f794
+and null bounds prove pair16f6e0/1bdf80 in[46ada8,46adb0); added only that
+pair to1bbed0 targets. Emit:344670 words/4526 boundaries. Release build
+session27898 active; next replay continue-object46ada0.ram. Earlier sessions finished.
+Milestone remains original gameplay with input response, not yet verified.
+
+## Latest object46d770 checkpoint - 2026-09-17
+
+Fourth Release build passed;25e2b0 clears. Replay now stops at268090,
+RA1bbed8, objectfcda60 vptr46d770. Evidence continue-object46c770.ram
+and sidecars/log in external probe directory. Original installers and null
+bounds prove pair267500/268090 in[46d778,46d780); expanded1bbed0 targets
+with precisely this family. Emit:341876 words/4456 boundaries. Release build
+session55060 active; next replay continue-object46d770.ram. Earlier sessions complete.
+Milestone remains original gameplay with input response, not yet verified.
+
+## Latest object46c770 checkpoint - 2026-09-17
+
+Third Release build passed; paired switches clear in connected replay.
+Next missing target25e2b0, RA1bbed8, objectfc72c0 vptr46c770, slot+0c.
+Fresh evidence: %TEMP%/haunting-toc-probe/continue-paired2cf3a0.ram sidecars/log.
+Original installers25c870/2d137c and null bounds prove the two-method family
+[46c778,46c780). Root added at1bbed0. Emit:340376 words/4424 boundaries. Release build
+active session78114; next replay continue-object46c770.ram. Earlier sessions
+finished. No gameplay yet; retain current diagnostic limitations006/007/008.
+
+## Latest paired-switch checkpoint - 2026-09-17
+
+Second Release build succeeded. Fresh replay clears1fbfc0 and stops at2cf4e4,
+RA207854, selector1. Evidence: continue-switch1fbfb0.ram and sidecars/log
+under %TEMP%/haunting-toc-probe. Original2cf3a0 bounds two switches below8:
+2cf3dc ->[45d7a0,45d7c0),2cf608 ->[45d780,45d7a0). Both independently
+verified against original code/data and fresh RAM; both roots now added.
+Emit succeeds:338284 words/4392 boundaries. Release build session33188
+is active; next replay with continue-paired2cf3a0.ram. Earlier sessions finished.
+Milestone remains original gameplay with input response; image still loading.
+Existing diagnostics006/007/008 only; no new runtime substitution or probe.
+
+## Latest continuation checkpoint - 2026-09-17
+
+46f480 family Release build succeeded; runtime/translation CTests pass2/2.
+Replay with identical80M schedule clears2d3e80 and stops later at1fbfc0,
+a1=f1, RA202bf4. Evidence: %TEMP%/haunting-toc-probe/continue-46f480.ram
+and sidecars/log. Captured image remains original NOW LOADING, not gameplay.
+Original1fbf70..b0 proves11-case table[456420,45644c), all entries agree with
+fresh RAM. Added bounded switch at1fbfb0. Emit succeeds:338113 words/4394 boundaries.
+Release build active in tool session99615; then repeat80M schedule with dump
+continue-switch1fbfb0.ram. Previous build/replay sessions have completed.
+No new diagnostics; HG-DIAG-006/007/008 limitations unchanged.
+
+## Active continuation - 2026-09-17
+
+Milestone: reach an original gameplay scene and capture its response to input.
+Fresh deterministic replay reproduced2d3e80 at caller1ffd34. Current dump:
+%TEMP%/haunting-toc-probe/continue-2d3e80.ram (with ee-ram/GS/display sidecars).
+Object18eca40 holds46f480. All24 executable table entries[46f488,46f4e8)
+agree between fresh RAM and original ELF; original installers2d3ab8 and39aa48
+publish this vptr, null prefix/trailer bound the family. Added its bounded
+indirect_targets entry at1ffd34; provenance in SOURCES.md. Exact permitted
+non-rendering shared lookup corroborated only2d3e80 extent.
+Generation succeeds:338092 reachable words /4395 unresolved items.
+Single-worker clean VS Release build is running (tool session9153); next action
+is finish build, repeat identical80M replay with a new dump name, inspect next
+actual fault. No gameplay claim. Existing HG-DIAG-006/007/008 only; no new
+runtime diagnostic or guest-state substitute. Preserve unrelated changes.
+
+# Handoff: Haunting Ground independent static recompilation
+
+## Latest chat handoff checkpoint — 2026-09-17
+
+Active milestone: reach original gameplay and capture a rendered scene responding
+to input. Gameplay is not yet verified. This checkpoint consolidates the prior
+chat's execution report; handoff preparation did not rerun generation or replay.
+The two configuration entries below were verified present on disk.
+
+- Rooted site `0x0029f25c`, table `[0x0046c0a8,0x0046c158)`:
+  live object `0x00a87f80`, vptr `0x0046c0a0`, slot `+0x0c` selected
+  `0x00210ce0`; original installer `0x00171024..0x00171030`, 44 unique
+  executable methods, null prefix and trailing nulls, ELF/live RAM agreement.
+  Prior chat reports successful Release build after 333050 reachable words /
+  4278 unresolved items.
+- Rooted site `0x001ffcec`, six-entry switch `[0x00456960,0x00456978)`:
+  selector bounded below six at `0x001ffccc`; targets `1ffcf4,1ffd14,1ffd2c,
+  1ffd54,1ffd7c,1ffd94`. Prior chat reports successful Release build after
+  333096 reachable words / 4284 unresolved items.
+- Latest reported replay stop: untranslated EE `0x002d3e80`, RA `0x001ffd3c`,
+  a0 `0x018eca40`, a1 `0x00456a60`, v0 `1`, t0 `7`. Caller `0x001ffd34`
+  dispatches through object slot `+0x0c`. The older RAM dump predates this
+  object and must not be used to infer its vptr.
+
+Immediate next action: capture current failing EE RAM, read the object vptr at
+`0x018eca40`, verify slot `+0x0c`, independently prove original installer/table
+bounds, consult permitted non-rendering configuration leads, then root only the
+proven family, emit, single-worker Release build and replay. Continue at the next
+observed blocker. Automate evidence collection, never heuristic root insertion.
+
+Replay parameters inherited from chat: synthetic-index-pattern.bin TOC,
+issue-slots clock, 80000000 slices, checkpoint every 1000000; input pairs
+left/none 5630000/5700000, cross/none 5760000/5870000,
+start/none 19450000/19490000, start/none 20860000/20930000,
+cross/none 23130000/23270000, start/none 27000000/27100000.
+Resolve exact existing CLI flags/output paths before execution.
+
+Handoff process check found no hg_system_diagnostic, hg_opengl_host, MSBuild or
+cl processes. No command sessions were started by handoff preparation. No new
+diagnostics were introduced; existing synthetic TOC/input remain experimental
+replay inputs, not evidence of natural playability. Preserve the diagnostic
+inventory in docs/DIAGNOSTICS.md and all unrelated working-tree changes.
+
+## Goal
+Continue independent AOT execution toward faithful natural 1:1 startup/movie speed
+and later original scene/asset execution. OpenGL; no interpreter/JIT/emulator
+backend. Preserve inherited changes and explicit correctness faults.
+
+## Current state
+
+**Latest handoff checkpoint (2026-09-15):** the connected replay previously
+stopped at original EE target `0x002b1100` after 29,069,012 slices / 19.2619 host
+seconds, with display `640x448` and 39,290 draws/rasterized.  The live caller at
+`0x0020956c..0x00209578` loads virtual slot `+0x0c`; original initialized data
+contains `0x002b1100` exactly once at `0x0046e4cc`, fixing table base
+`0x0046e4c0`.  Original installer `0x0020a868..0x0020a874` publishes that table,
+and the following installer at `0x0020a878` begins `0x0046e500`, independently
+bounding the family to `[0x0046e4c0,0x0046e500)`.  All 14 non-null entries are
+executable original-ELF pointers and are now rooted in
+`config/haunting_ground_us.toml` as one bounded batch.  Shared HG configuration
+was consulted only afterward for non-rendering boundary corroboration; no shared
+rendering material or implementation was used.
+
+`python tools/hg.py emit` now reports **254865 reachable EE words / 2463
+unresolved items**, only +72 reachable words from the preceding baseline.  The
+normalized-environment single-worker Release rebuild completed successfully after
+this batch; `hg_ee_translated`, `hg_iop_translated`, `hg_system_diagnostic` and
+the other listed Release targets linked without error.  No command session is
+left running.  The deterministic 80M connected replay has **not** yet been rerun
+after this build.  Immediate next action: run the fixed startup/input schedule
+with dump `startup-clock-bursts-vtable46e4c0.ram`, verify that `0x2b1100` clears,
+then independently trace the next actual original stop before consulting the
+permitted non-rendering shared configuration for corroboration.
+
+**Fast verification baseline (2026-09-15):** preserve game fidelity as a hard
+constraint while reducing test turnaround. Before another long connected replay,
+use `python tools/hg.py analyze --triage` and `python tools/hg.py major-scan` to
+batch independently provable missing targets and identify the smallest concrete
+runtime blocker. The fresh triage reports254793 reachable EE words /2463
+unresolved items,372 installed-table candidates /2516 distinct uncompiled table
+targets, and623 direct-member records /510 uncompiled member candidates. The
+fresh major scan reports94718 IOP reachable words /739 per-module boundaries and
+125 residual all-module bundle boundaries. `python tools/hg.py iop-audit` remains
+the cheap per-module check. Never auto-root candidates: verify bounds, installers,
+live use and original executable data first. Batch targets proven from the same
+bounded family, rebuild once, then replay the fixed input schedule. Repeat an
+expensive full-movie/long-slice replay only after a relevant code/config change or
+when it is the shortest way to establish a milestone. Keep explicit unsupported
+hardware/instruction faults and state-equivalence checks intact.
+
+2026-09-15 America/Chicago - ACTIVE candidate75 continuation. Major milestone:
+complete original post-movie camera matrix setup and capture later original
+scene/asset execution, with regression checks after runtime changes.
+
+**Later connected object-dispatch continuation (2026-09-15):** the fixed
+80M-slice startup/input replay has moved through two independently derived
+original object tables. The first post-root run cleared `0x2674f0` from table
+`0x46d750` and exposed `0x26b480`; the next clean generation/root batch cleared
+`0x26b480` from `0x46d7b0` and now stops later at `0x2bb390`, RA `0x266eb8`,
+after 29,068,787 slices / 24.7848 host seconds. Display evidence is unchanged at
+640x448, 39,290 draws/rasterized, with external IOP dump
+`%TEMP%/haunting-toc-probe/startup-clock-bursts-vtable46d7b0.ram`.
+
+Original code and initialized-data inspection independently establish the full
+five-method `0x46eb40` family (`2bafd0/2bb390/2bb280/2bb1a0/2bb030`) installed
+at `0x208348` and `0x267044`, bounded by zero at `+0x1c`. The following dispatcher
+branch independently establishes the analogous `0x46ec60` family
+(`2c64e0/2c6630/2c6620/2c6570/2c6540`) installed at `0x208f18`, `0x2242e0`, and
+`0x26705c`, also zero-bounded at `+0x1c`. Shared non-rendering configuration was
+consulted only afterward to corroborate function-boundary leads. Both families
+are now rooted in one batch to avoid a redundant rebuild; generation is 254232
+reachable words / 2444 unresolved items. Clean Release rebuild is active.
+
+The preceding `0x46d750` family is independently fixed by original virtual-call
+slot `+0x0c`, the unique initialized `0x2674f0` word at `0x46d75c`, installer
+`0x267334`, and the distinct base-table restore at `0x267340`. Its five executable
+entries are `267310/2674f0/2674e0/2673e0/267370`. `0x46d7b0` is independently
+installed at `0x2083b8` and `0x26702c` and contains exactly
+`26b1e0/26b480/26b350/26b2c0/26b240` in `+08..+18`. No rendering reference data
+or implementation was used for any of these roots. Next: finish the active
+build, replay the identical schedule, confirm `0x2bb390` and the following
+`0x46ec60` path clear, then trace the next actual original stop.
+
+**Streamed-audio timing verification (2026-09-15):** HG-DIAG-013 now captures
+raw SPU2 input plus the original movie-sync queue/ring writers and core-0 AutoDMA
+state. Original EE code independently establishes callback B as buffered bytes:
+slot 8 `0x1e34a0 -> 0x1e34f0` copies the caller's descriptor bytes and
+`0x1e35f4` adds its length to object `0x003d0128+0x0c`; `0x1e3464` consumes
+that count and `0x1d3c58` divides the callback result by two. Callback A is the
+sum of queued node byte lengths; the live node is `0x003ccc60` and its `+0x0c`
+length is updated by `0x1e4450`/`0x1e42f8`. The focused external replay
+`spu2-sync-dma-19p4m.csv{,.events.csv}` shows the native transport moving exactly
+1024 bytes when each 256-frame half becomes free and completing each observed
+2048-byte BCR descriptor only after two halves / 512 frames, then rearming the
+next original request. MADR/BCR/CHCR/remaining transitions agree with that
+sequence; no SPU2 underrun, active-descriptor mutation, or AutoDMA fault appears.
+
+The longer `spu2-sync-returnregs-25m.csv` capture measures core-0 consumption at
+47,999.59 and 47,999.89 frames/s across its two sustained movie segments. The
+original guest movie position advances in queue-sized steps rather than every
+sample; over those segments its lag relative to the 48kHz consumer changes by
+only 531 and 759 samples, with no accumulating rate drift. The earlier raw WAV's
+first nonzero core-0 frame is 924676. Correlating that frame with the focused
+sync capture puts it at guest time ~19.355198s; the next movie-sync sample reports
+position 1024 at 19.358531s, only 3.333ms later and within one documented
+256-frame half. These results validate the current streamed AutoDMA rate,
+half-refill cadence, full-descriptor completion boundary, and startup phase
+against the original guest synchronization path for the observed movie window.
+No evidence-supported production SPU2 timing change is required.
+
+The earlier 60M raw capture remains at `%TEMP%/haunting-toc-probe/spu2-movie-core0.*`:
+2,875,627 frames, 3,611,093 nonzero channel samples, FNV64
+`888b15d5c9687e8f`, WAV SHA256
+`cede10bda40667ad5ee12289f6349457751d21c1714785e93e44d1837858c744`.
+Its old `19.264083s` first-nonzero notation is WAV-relative duration, not absolute
+guest time. Core1 remains unused in this path. The synthetic TOC and issue-slot
+clock remain diagnostic limitations, so this is not physical-console timing
+proof. Final SPU2 voice synthesis, volume/effects, cross-core mixing and host
+speaker output are separate unfinished audio work; streamed CRI_ADXI/AutoDMA
+transport timing itself is verified for this path. Return to candidate75/post-movie
+execution after this requested streamed-audio milestone.
+
+Final streamed-audio validation (2026-09-16): `build/Release/spu2_tests.exe`
+passes; `ctest --test-dir build -C Release -R "spu2|runtime" --output-on-failure`
+passes 2/2 (`spu2`, `runtime`), and `git diff --check` reports no whitespace
+errors. The remaining CRI_ADXI/SPU2 production code was intentionally unchanged
+because the original guest accounting and focused runtime evidence demonstrate
+the current observed-path timing rather than a correctable mismatch.
+
+Movie speaker presentation continuation (2026-09-16): the verified core-0 48kHz
+stereo sound-input stream can now be sent to the Windows default audio device with
+explicit `--spu2-output-core 0` through `runtime/include/hg/host_audio.hpp`.
+The WinMM sink now queues eight 1024-frame host buffers, prebuffering four before
+playback starts, and consumes the same PCM frames
+already used by HG-DIAG-013; it does not feed host timing or audio state back into
+the guest. This is HG-DIAG-014 and bypasses unfinished SPU2 voice synthesis,
+volume/effects and cross-core mixing. The system diagnostic links `winmm` only on
+Windows. `tools/run_movie.ps1` now launches the OpenGL viewer and realtime
+connected diagnostic together with speaker output and the fixed movie-navigation
+schedule; it still depends on the external synthetic TOC record. The first build
+after CMake regeneration hit the known duplicate `PATH`/`Path` MSBuild environment
+failure; rebuilding in a clean `Start-Process -UseNewEnvironment` Visual Studio
+child with `/m:1` succeeded. Dedicated SPU2 and focused `spu2|runtime` regressions
+pass. Live launch verification kept both game and viewer processes running and the
+viewer had a responding native window handle while the framebuffer continued to
+update.
+
+Taskbar/audio-presentation follow-up (2026-09-16): user reported the first WinMM
+presentation path was clearly choppy/scratchy and the GLFW viewer did not reliably
+appear in the Windows taskbar. HG-DIAG-014 now uses eight 1024-frame buffers with
+four-buffer (~85ms) startup prebuffer and ~171ms total host queue capacity, plus
+host-only underrun/max-queue counters. The retained long raw movie capture peaks
+at 31944/32767 (~97.5% full scale) with no hard-clipped samples, so the Windows
+speaker presentation now applies 3/4 (~-2.5dB) headroom while the verified guest
+PCM remains unchanged. The GLFW Win32 HWND is forced to normal
+`WS_EX_APPWINDOW` semantics with `WS_EX_TOOLWINDOW` cleared and no owner so the
+interactive viewer has a taskbar button. Guest SPU2 timing remains unchanged.
+The focused 26M-slice realtime movie probe completed at the expected diagnostic
+budget with 1,243,627 speaker frames, **0 host underruns**, and a measured maximum
+of 7 queued buffers. A fresh interactive launch then verified the actual GLFW
+scanout HWND live as `APPWINDOW=true`, `TOOLWINDOW=false`, owner 0 while the
+viewer remained responsive and its published framebuffer continued advancing.
+
+Interactive-desktop launch fix (2026-09-16): repeated Win32 style/taskbar checks
+were misleading because Codex tool commands run on a private Windows desktop.
+The live viewer/runtime launched through ordinary `Start-Process` were assigned to
+`CodexSandboxDesktop-*`, while the user's Explorer/taskbar uses `WinSta0\\Default`.
+This explains why a valid visible `GLFW30` HWND could not be seen on any physical
+screen. `tools/run_movie.ps1` now creates the GUI viewer explicitly with
+`CreateProcessW` and `STARTUPINFO.lpDesktop = WinSta0\\Default`; the detached
+bootstrap still survives the calling task and the runtime remains hidden. The
+live-preview readback validator was also corrected so a valid uploaded framebuffer
+does not exit before its first visible swap. A fresh normal launcher run created
+viewer PID32628 and runtime PID14432. Enumerating the real `Default` desktop found
+the viewer's titled `GLFW30` HWND there with Visible=True, APPWINDOW=True,
+TOOLWINDOW=False, owner0 and rectangle `(480,246)-(1440,786)` inside the primary
+1920x1032 work area; the preview file continued advancing. Leave this fresh pair
+running for interactive verification.
+
+Viewer survival/taskbar continuation (2026-09-16): the apparent taskbar problem
+was ultimately hiding a real viewer failure. Direct Explorer launch loaded one
+complete live PPM and then exited before its first swap with `Diagnostic preview
+readback mismatch`. The live-preview readback verifier now accepts the one-texel
+nearest-filter boundary around the analytically selected source texel while the
+separate synthetic exact-color probe remains unchanged. A clean VS `/m:1` viewer
+rebuild passed. The actual detached `tools/run_movie.ps1` path now launches the
+GUI viewer executable directly through Explorer and the runtime through a separate
+hidden bootstrap. Fresh launcher evidence: `hg_opengl_host` PID37316 and
+`hg_system_diagnostic` PID42848 both remain alive/responding, the preview timestamp
+continues advancing, and the real `GLFW30` HWND is titled `Haunting Ground - latest
+diagnostic framebuffer (Esc closes preview)`, visible, unowned, `APPWINDOW=true`,
+`TOOLWINDOW=false`, and physically centered inside the primary 1920x1032 work area
+at `(480,246)-(1440,786)`. The exact GLFW HWND was restored/foregrounded after this
+check. Native desktop screenshot/taskbar inspection is unavailable from the current
+tool surface, so shell/HWND evidence is recorded without claiming visual proof.
+
+Detached-launch follow-up (2026-09-16): the earlier interactive processes were
+still coupled to the invoking Codex command lifetime and disappeared after the
+task returned. `tools/run_movie.ps1` now defaults to a 3,000,000,000-slice run
+and asks the existing Explorer shell to launch a hidden attached bootstrap through
+an external temporary shortcut. The bootstrap starts the visible viewer and hidden
+diagnostic, then exits; a later independent command verified both processes still
+running. Direct `ITaskbarList` registration was then measured and rejected by this
+shell: `CoCreateInstance` succeeds but `HrInit()` returns `0x80004001`
+(`E_NOTIMPL`), making `AddTab` unusable. The viewer therefore uses standard GLFW
+show/focus semantics plus HG-DIAG-015, a native minimized `Haunting Ground`
+taskbar proxy (`WS_EX_APPWINDOW`, no owner) whose restore/activation brings the
+real titled GLFW scanout forward. Live inspection verified the proxy visible and
+minimized with AppWindow=true, ToolWindow=false, owner0 while both game and viewer
+continued running.
+
+Candidate74 ALL_BUILD passed (settled37366); all25 CTests passed13.08s
+(settled91109).74skip replay is settled47866: EE advances beyond10dabc's
+broadcast arithmetic and stops at10dc10 unsupported71286488,RA10e170,
+a019615d0,a11ffe820,modeled28234190us.359 images;last358 retains
+hash aa51ff064036e5a49ef1278494344a67796499ebfb13b0985ebcca7e16b4ad88.
+No new pixels,completed camera setup,scene or asset completion established.
+Candidate74 generation203680words/1801issues,zero cap exhaustion.
+
+Candidate75 implements PEXTLW/PEXTUW from Sony EE instruction manual pp205/208,
+verified against original10dc10..1c. Decoder/emitter/runtime plus independent
+register/bit-lane/branch-delay tests changed.41 focused tool tests pass0.036s.
+Generation203698words/1800issues,zero cap exhaustion. ALL_BUILD session68115
+is ACTIVE,log %TEMP%/haunting-build75-all.log. CTest/75skip remain pending.
+Keep the400000 discovery cap and assert zero budget exhaustion.
+No new diagnostic family,timing override,reference implementation or roots.
+
+Latest full-movie69 evidence is unchanged:6300OPENING conversions/54366sectors;
+all6518 guest timestamps equal61full.210.241230 modeled seconds in210.7389host
+seconds=99.763845% modeled speed (about0.498s behind),99.633559% nominal30fps.
+6505shared sampled hashes retain order out of6506 each.60-interval windows
+85.0122%..104.3999%,median99.9934%;host-stall cause unproven. Do not repeat
+an expensive full movie without a relevant change or verification question.
+
+HG-DIAG-006 scripted input/capture(short probes intentionally skip OPENING),
+HG-DIAG-007 synthetic TOC andHG-DIAG-008 issue-slot clock remain limitations.
+Histories OFF locally;realtime opt-in/default-off. Conversion rate is not
+presented FPS,physical scanout,audio sync or physical-console1:1. Retain54
+history optimization/60pacing;rejected62preview cache stays removed.
+
+Viewer freshly checked63648,Responding=True,MainWindowHandle5505716.
+Native image inspection reported unsupported image inputs;do not claim visual
+inspection of74. One broad evidence read was safety-status blocked;narrower
+log/metadata reads succeeded. No persistent local-command blocker.
+All ten Markdown current sections/headings scanned;rootSKILL fully read.
+One scan hit cp1252 output encoding;remaining reads succeeded with stdout
+errors=backslashreplace. Historical bytes below are preserved unchanged.
+
+Branch codex/console-speed-checks tracks its origin. No commit/push;preserve
+inherited dirty/untracked files. External evidence is under
+%TEMP%/haunting-toc-probe. Next:settle68115,fullCTest,create-only75skip,then trace the next actual stop.
+git diff --check passed exit0 after source edits;repeat after final doc edits.
+
+### Latest verified checkpoint
+
+**2026-09-13 natural-speed optimization continuation.** User resumed work and
+requested faithful1:1 speeds, quickly fixing inefficiencies. The major milestone
+remains sustained natural host playback/presentation cadence. It is NOT reached.
+On explicit resumption, continue through checkpoints when session resources permit.
+AOT only; preserve guest waits and time budgets during performance changes.
+
+- Retained performance reference: replay42 (EE instruction history OFF),1066 OPENING CSC conversions spanning
+  35.611639modeled seconds in50.2381host seconds (median46.3ms). Earlier22 takes
+  77.9186host seconds: about55.1% more throughput, currently70.9% modeled rate.
+  These are conversion events, not displayed FPS or physical-console parity.
+- Retained changes: checked RGB24 sprite reduction; aligned CSC byte-lane reads;
+  X-inner separable IDCT with original per-output sum order; indexed existing DCT
+  codebooks; static intra-page EE branch labels; fixed-width inline user-RAM
+  access with full checked fallback; bounded scheduler cursor/wakeup scans.
+  Split host device profiles distinguish IPU/scratchpad, VIF/GIF and raster.
+- Sparse-IDCT zero-tail experiment26 showed no speed benefit and was reverted.
+  Word-based/out-of-line bit reader34 also showed none (53.42s versus53.1226s);
+  it is reverted in source. Do not reintroduce either without new evidence.
+- Replays31->32 and32->33 have identical final EE RAM, GS VRAM, GS metadata and
+  machine JSON; all shared sampled images retain order.32->33 shares1311images.
+  All1066 opening timestamps agree with22. Compared to22, EE byte47e373 differs
+  (12 ->11), already stable from25 onward in an original input-related object;
+  exact field semantics remain unproven. Host input pulse lengths differ.
+  IOP RTC bytes vary by launch time. Do not claim full22->33 byte equivalence.
+- All21CTest passed after refreshing affected targets and relinking hg_diagnostic,
+  including87Python tests. Added full codebook prefix equivalence,1280 IDCT cases,
+  all128 CSC offsets with starvation/backpressure, scalar alias/sign/fault/watch
+  cases, branch budget cuts, and scheduler priority/cyclic/wakeup combinations.
+- Reader restore build, hg_diagnostic relink and21CTest completed. Dense host
+  sampling now1/256 with11 phases (separate IPU input/output); replay35 completed
+  32M slices normally. EE remains largest sampled opening phase. Baseline33
+  is historical;42 below is the latest retained60M measurement.
+- Byte-copy batching36 is REJECTED and removed: exact1066 guest timestamps,
+  EE/GS/machine state and1311images, but54.2326s vs53.1226s showed no gain.
+- Retained new wider-RAM access37: full-span store validation once and checked
+  fixed-width load/store halves preserve device/watch fallbacks. All21 refreshed
+  checks pass, including startup checks rerun after successful diagnostic relink.
+  Replay37:1066 events,35.611639guest seconds in51.8379host seconds (~68.7%),
+  median48ms. Exact guest timestamps, EE/GS/machine state and1311images match33.
+  Evidence speed-opening-replay37.json. No1:1 claim.
+- Native host profile39 completed:3254samples,0context errors over five seconds
+  during opening. EE trace_pc161samples (~5%), r174 and w77; raster196,
+  psmct32_word160, IPU rgba126, IDCT53. Profile-only, no wall-time comparison.
+  Earlier38 completed before manual sampling;39 automates sampling at350images.
+  External native-profile39.json/log and %TEMP%/haunting-native-sample.py.
+- Combined EE trace-guard/forced-accessor candidate40 is REJECTED and reverted:
+  all1066guest times, EE/GS/machine state and1311shared images agree with37,
+  but53.2729host seconds vs51.8379s. All21checks had passed. Do not claim
+  profile attribution proves this change saves time. Existing traces accounted
+  for in DIAGNOSTICS; no debug probe silently removed.
+- Framebuffer-address41 is REJECTED and reverted: exact1066guest timestamps,
+  EE/GS/machine state and1311shared images, but57.5964host seconds. Raster total
+  slightly improved (12.4892s vs12.6544s37) while whole playback worsened. Keep
+  whole-sequence comparison authoritative over local counters.
+- Retained42 makes HG-DIAG-001 a build-time EE history option. Default
+  HG_EE_INSTRUCTION_TRACE=ON retains tracing; local throughput build OFF removes
+  only history calls and explicitly rejects PC watches. Full60M42 completes
+  native-iop-budget:1066events across35.611639guest seconds in50.2381host seconds,
+  median46.3ms. Exact guest timestamps, EE/GS/machine state and1311images match37.
+  This is a bounded opening segment, not proof the entire movie/game completes.
+- Fresh source-only Release build passes all16CTest entries (including87Python
+  cases and explicit trace-disabled branch/watch/fault checks), using Python3.11
+  under %TEMP%/haunting-source-release-20260913. Auto-selected Python3.14 hit
+  sandbox temporary-directory permissions;3.11 passes unchanged tests. Source
+  build log validation-python311.log; connected evidence speed-opening-replay42.json.
+- SOURCE repository published as requested to https://github.com/KunoDemetries/hg2.git,
+  branch codex/console-speed-checks. Initial verified commit e50192b57b0649e5c56b7f133178d5af5818a365;
+  remote SHA confirmed,108text source/config/doc files, no game/emu/generated
+  outputs. HTTPS uses existing GCM account; SSH publickey access is unavailable.
+  .gitattributes normalizes source text. No executable release was requested.
+- No active diagnostic/build session remained at the stop. Viewer state may change
+  independently. The following next steps apply ONLY after explicit resume. Next major
+  milestone remains sustained1:1 natural playback. Native profile39 shows texture
+  sampling/pixel addressing/raster overhead alongside EE execution. Next inspect
+  the active movie draw's original TEX0/TFX/CLAMP state and independently prove a
+  narrow live-VRAM texture/shading reduction before implementation; retain full
+  masks/feedback/fault equivalence. Do not repeat rejected framebuffer-address41.
+  IOP default-on history is separately accounted for, not yet gated. Any further
+  native sampling needs a freshly matched linker map: CMake regeneration for42
+  removed the ignored map override; the earlier map must not be reused with42.
+- Separate native IDCT AVX2 benchmark has matching sampled checksums and about10%
+  speed gain, external %TEMP%/haunting-ipu-arch-bench/results.json. No project
+  architecture flags changed and no whole-game gain established from this.
+- User additionally requested debug-code accounting and further EE checks.
+  AGENTS now requires stable HG-DIAG identifiers; docs/DIAGNOSTICS.md inventories
+  ten diagnostic/experimental families, activation, guest effects, cost and cleanup.
+  EE disabled-trace candidate40 was rejected; IOP per-instruction history remains active
+  (50/3254samples), with downstream host-history consumers audited in runner.
+  Synthetic TOC input and issue-slot clock are explicitly guest-affecting probes,
+  not silent production defaults. Current replay has no EE watches. Do not remove
+  correctness checks or add unproven EE roots to make boundary counts look better.
+- User explicitly requested major missing-code/timing scan and PCSX2/web checks.
+  Fresh %TEMP%/haunting-major-speed-audit/major-scan.json: EE162833words,
+  1071boundaries; all29IOP94718words,125residuals,244BREAKtraps. ROMDRV accounts
+  for178-word difference from built28modules; no evidence it causes opening
+  slowdown. Four unsupported EE boundaries are vector/cache bodies, still
+  explicit faults and not reached by completed60M opening. No guessed roots.
+- Local PCSX2 retains EECycleRate=0/EECycleSkip=0/NominalScalar=1/NTSC59.94;
+  no PCSX2 process running. Official performance docs distinguish FPS/VPS/speed.
+  Host Ryzen7 9800X3D, Balanced power plan; no power setting changed. Continue
+  measuring host execution costs while preserving independently derived timing.
+- EE coverage unchanged:162833words/1071boundaries;28IOP modules/94540words.
+  Windows verified; no new Linux or other-platform verification this session.
+
+Evidence under %TEMP%/haunting-toc-probe:
+- speed-replays23-26.json, speed-replays27-28.json, speed-replays28-29.json.
+- speed-opening-replay31..34,36,37,40,41,42.json; native-profile39.json/log.
+- startup-clock-bursts-22..42 logs/dumps and clock-bursts-N-frames/manifest.json
+  (24 interrupted; no complete dump). Retained42 is60M;35/38/39 are shorter probes.
+- Local helpers %TEMP%/haunting-clock-bursts-N-replay.py; input and preview use
+  %TEMP%/haunting-input.txt and %TEMP%/haunting-live.ppm. Helpers may exit0 when
+  diagnostic exits2: inspect native JSON kind and log. Recent runs are ordinary
+  native-iop-budget completions, not unsupported-hardware faults.
+- %TEMP%/haunting-ipu-loop-bench/results.json is a synthetic loop-order benchmark,
+  not connected playback. No game-derived content was added to version control.
+
+### Earlier checkpoints (historical; superseded by the state above)
+
+- **Handoff requested with optimization checks:** retain paused state. On
+  explicit resume, use fresh replay25 from24, with no rebuild needed for the
+  current RGB24 optimization. Compare full32M run to replay23, separating
+  OPENING using its disc-read start (not a fixed CSC sequence). Compare median
+  and span host/guest CSC times, runner raster totals over matching26M..31M
+  checkpoints, and corresponding image hashes/order. Capture polling can omit
+  frames, so distinguish sampling gaps from real image mismatches. Confirm
+  native diagnostic result from log/JSON rather than helper exit. Full-VRAM
+  synthetic comparison already passes masks0/0055aa33/ffffffff and live texture
+  feedback; all refreshed regressions pass. Only broaden tests after new changes.
+  No established speedup yet; remaining goal is natural host playback cadence.
+
+- **PAUSED at user's request,2026-09-13:** no further autonomous continuation
+  until the user resumes. RGB24 sprite diagnostic build67560 completed.
+  All14 native regression targets were refreshed against current headers;
+  all21CTest pass (including87Python tests via tools). Replay24 was stopped
+  on request by terminating confirmed hg_system_diagnostic PID52316; helper
+  session88537 finished with child exit4294967295. Partial replay24 is NOT a
+  completed timing comparison; no connected RGB24 speedup claim yet.
+  No diagnostic/build processes remain. A process inventory also found no
+  hg_opengl_host; viewer38888 was not stopped by this pause operation.
+  On resume: run a fresh replay25 from32M no-watch24 helper, compare against
+  replay23 timing/images, and continue natural-speed work. Latest sustained
+  opening evidence remains replay22 below. Do not restart work while paused.
+
+- **Major milestone replay22: sustained OPENING visibly advances.** Shared
+  original-AOT SYSMEM allocation plus CRI switch/rate callbacks clears the stall.
+  Opening reads11202sectors2113282..2124483;1066CSC conversions from24,367,072
+  to59,978,711us,35.611639modeled seconds spanning77.9186host seconds. Distinct
+  brick wall/cellar/dog scenes captured;1314unique images across full startup.
+  Replay ends native-iop-budget60M /111.424host seconds, no hardware fault.
+  Evidence external opening-replay22-evidence.json, clock-bursts-22-frames.
+  Median opening interval34.463modeled ms/71.4host ms: NOT natural console speed.
+  Next major milestone: natural host cadence without changing guest waits.
+  Replay23 measured runner rasterization: during26M..31M it consumes3.15host
+  seconds out of10.7elapsed. Instrumentation times only nonempty runner batches,
+  excluding any inline FINISH/CLUT-triggered drawing. Replay23 ends32M budget.
+  A checked RGB24 sprite reduction now bypasses redundant pixel stages only
+  with no blend/alpha/DATE, Z ALWAYS+masked, valid formats/storage and no scanmask.
+  Live texture reads, row order, FBMSK and padding preserved; synthetic complete
+  VRAM comparison against generic pipeline passes, including texture feedback.
+  Active diagnostic build67560, haunting-build-rgb24-sprite.log. Next replay24
+  from no-watch23 after build; compare corresponding captured frames and raster/
+  CSC timing. All other natural-speed/performance work remains active.
+
+- **Replay21 CRI rate callback:** previous14-entry switch clears; now stops
+  at19,333,856us/23.8347host seconds on18ab4 ->18e38. Original181e0 installs
+  seven rate-dependent callbacks in object+40; original relocated code matches
+  RAM, and live24408+40=18e38 for48000/48000. Added all seven verified roots;
+  evidence external cri-audio-callbacks-181e0.json. Generated94540IOP words.
+  Active diagnostic build58194, haunting-build-cri-rate-callbacks.log.
+  Replay22 helper prepared from18; next run after build. No movie advancement
+  claim yet. All21CTest passed after previous switch, before these seven roots.
+
+- **Shared-SYSMEM connected replay20:** build completed;21CTest including
+  original reboot and87Python tests pass. Replay20 stops at12,383,634us /
+  11.7071host seconds on CRI indirect transfer10f0c ->10f30, before movie input.
+  Original10ef4 bounds selector below14; original relocated1aaa0 table agrees
+  with live RAM in all14 slots. Added the complete bounded switch; evidence
+  external cri-command-switch-10f0c.json. Generated28IOP modules93928words.
+  Building diagnostic session68535, haunting-build-cri-transfer-switch.log.
+  Next replay21 helper is ready from no-watch18; verify continued startup and
+  OPENING/audio synchronization after this switch. Viewer38888 retained.
+
+- **Active shared-SYSMEM fix build27390:** haunting-build-shared-sysmem.log.
+  Replay19 confirms audio clock0 because8192produced minus16384queued clamps0.
+  Root cause: native MODLOAD scratch overlaps original SYSMEM SIF allocations.
+  Audio buffer121b00..1223d0 contains2254/2256bytes of original DS2O_S1.IRX
+  atfile1d60; its0x880payload at121b40 matchesEE3cf1c0 exactly. Evidence:
+  external opening-audio-buffer-overlap.json. Native ordinary scratch, worker
+  and HEAPLIB allocations now delegate to original AOT SYSMEM exports4/5;
+  static image/call stacks reserved in original pool. No fabricated audio time.
+  New synthetic shared-allocation/plan-isolation regression passes iop_tests.
+  Next: complete build, game-reboot/full checks, replay20 from no-watch18;
+  verify preserved synchronization buffers and continuing OPENING conversions.
+  Replay19 finished; no diagnostic/oracle active; viewer38888 retained.
+
+- **Replay18 OPENING start verified:** clears menu selection and reads1322
+  sectors2113282..2114603 from OPENING,24380208..24481837us. Four CSC frames
+ 186..189 start24433535..24604741us; first dark brick image capture233 appears,
+  then no more conversions through60M budget/57.7958host seconds. Not sustained
+  cinematic advancement or natural playback. All87Python/21CTest pass after
+  menu roots. Generated162833EE words1071boundaries. No build active.
+  Investigating actual original audio-clock path2429c8->242a88->1d3210->1d30c8;
+  MPEG1081440, movie3e893c, audio3b72fc. MPEG decoded queue4, audio-position
+  record1084960+24 remains0, rate+28=48000. Global display count3b7230 advances.
+  Replay19 is a30M targeted trace of1d310c/3118/3134/31c0 and242a2c, external
+  helper haunting-clock-bursts-19-replay.py. Next: inspect traces and identify
+  actual audio producer/consumer blockage; never fabricate playback time.
+
+- **Replay17 current:** automated title then active highlighted New Game now
+  succeeds; missing EE12e578 is a bounded menu switch at12e4e8, selector<7.
+  Original/live44e8a0..bc agree; added table and six verified movie/demo start,
+  wait and end member descriptors. Evidence: external menu-selection-switch.json.
+  Generated162833EE words1071boundaries; active build menu-selection log.
+  Replay16 cleared130a40, showed active New Game, then timed out to demo case
+  12e534 at54,059,827us/77.2441s (NOT a60M budget exit); early Cross during fade
+  was ignored. Replay17 uses bright highlighted row recognition and stops at
+  12e578 at24,263,393us/30.1982s. Both cases belong to the added switch.
+  Both retain explicit faults; no OPENING consumption yet. All87Python/21CTest
+  passed before the new switch/descriptor roots. Viewer38888 remains alive.
+  Sprite change has no measured gain: CAPCOM median host55.35ms in16 versus
+  53.05ms in15, modeled33.3655ms. Next: complete build, checks, replay18 from17.
+
+- **Active continuation:** next major milestone is visibly advancing OPENING
+  frames in connected OpenGL, corroborated by ISO reads in2113282..2167647,
+  followed by host cadence measurement against the30fps movie target.
+  Regenerated pending menu roots:162042EE words,1063unresolved boundaries.
+  Building menu/sprite changes with haunting-build-menu-sprite.log; viewer38888
+  remains alive. Next: full checks and automated replay16 title/New Game input.
+
+- **Handoff 2026-09-13, latest state supersedes older active-build notes:**
+  Replay15 reached the title and New Game/Load Game/Options menu in connected
+  OpenGL. Captures: external clock-bursts-15-frames/198.png,200.png,258.png.
+  It stopped at missing EE130a40 after41,780,650 modeled us /52.6577 host seconds.
+  Original12c31c installs table46a110; live9c90e4 points there; its two methods
+  are130a40 and1309d0. Both roots are now in config but NOT regenerated/built.
+  Evidence menu-table-46a120.json is misnamed: actual table is46a110.
+  GS fixed-UV sprite coordinates now calculate U once per visible column and
+  V once per row, preserving exact integer formulas and row-major shading.
+  Latest gif_tests build/run passes; connected performance is NOT measured.
+  No build/diagnostic/oracle active at handoff; keep viewer38888 alive.
+  Next executable action: python tools/hg.py emit, then clean diagnostic build
+  using haunting-clean-build.ps1 -Project hg_system_diagnostic with a fresh log.
+  Run full CTest, prepare replay16 from15 with automatic second Start at title
+  and Cross on New Game, then capture next fault/OPENING consumption.
+  Replay15 second Start was MANUAL at39.620M and released39.680M; helper15
+  only automates the earlier red-corridor Start. Do not repeat that idle wait.
+
+  Natural console speed is NOT matched: CAPCOM median CSC intervals remain
+  33.365ms modeled versus55-56ms host (~18 conversions/sec, not presented FPS).
+  No OPENING asset consumption or advancing long cinematic verified yet.
+  Latest complete suite before pending sprite/root edits:87 Python,21 CTest pass.
+  Last generated coverage162005EE words/1063boundaries;28IOP modules/93389words.
+  Completed build5291 and replay15 supersede their historical pending status.
+
+- **Latest active build5291:** haunting-build-gs-surplus.log;162005EEwords,
+ 1063boundaries. Replay14 Start press at19.480M transitions the scene then stops
+ at20,859,685us/23.6322s: GS IMAGE surplus at EE1b7960. Original packet4f23b0
+ sends17920qwords for PSMT4 640x448 (8960needed). Independent synthetic GS
+ memory-oracle probe verifies exact/double upload equality for CT32/CT16/T8/T4;
+ evidence in external gs-surplus-oracle and docs/ORACLE.md. Probe44816 closed.
+ Native completed-transfer state accepts surplus only after valid completion
+ in measured formats, preserves strict idle/cancel faults and resets on TRXDIR.
+ New GIF regressions pass. Added already-verified downstream stream callback
+ 1d4ff0 from original1d5590..1d55a0 and replay10 live+48, avoiding another build.
+ No diagnostic/oracle active; viewer38888 retained. Next: finish5291, full21
+ checks, fresh replay15 derived from Start-capable14. Verify next screen and
+ OPENING consumption, continue profiling; natural30fps still not verified.
+
+- **Visible post-CAPCOM milestone:** replay13 now shows the red corridor in
+  connected OpenGL (clock-bursts-13-frames/149.png).35Mquanta/34.6264s, no fault.
+  Previous replay12 was100Mbudget/41.6691s, but4830draws remained unexecuted;
+  the runner now services ordered GS draws after VIF/GIF independently of preview.
+  GS manual pp38-43 provides kick/order provenance; all21 CTests pass. No shared
+  rendering material used. Natural movie host timing still slow (median~55ms);
+  byte extraction has no measured gain.185CAPCOM conversions, no OPENING reads.
+
+  Live scene descriptor888444 targets130460. Its original bit3 input test gates
+  transition to130170 while44e958 points at a LOOP_DEMO resource. Added host
+  Start command (active-low bit3, no pressure channel). Replay14 helper presses
+  Start on verified red-corridor pixels after CAPCOM; session/next result pending.
+  Viewer38888 retained. Next: inspect Start transition, trace next fault or
+  verify OPENING sectors2113282..2167647 and advancing cinematic captures.
+
+- **Timing continuation current:** replay11 clears1cda10, stops at related
+  default callback1c4ce8 (RA1c5ddc),19,274,818us/21.6912host seconds. Original
+  registration1c4dc8..1c4e08 proves defaults1c4cb8/1c4ce8; both now rooted.
+  Generated161788words1051boundaries. Build46027 active, external log
+  haunting-build-byte-prefix.log. No diagnostic/oracle running; viewer38888.
+  IPU peek now consumes byte portions instead of individual bits; exhaustive
+  independent bit-reference tests cover8patterns,128offsets, widths0..32 and
+  existing MPEG tests pass. Full native suite after build remains pending.
+  Prefix lookup already passed full21 tests before the byte extraction change.
+  Prepared replay12 helper outside repo; launch after build and final relink.
+
+  Replay11 profile explicitly consumed all1704 CAPCOM ISO sectors2111088..2112791;
+  no OPENING sector consumption yet.182 CSC conversions span6.733modeled seconds
+  and10.696host seconds; these are conversions, not presentation events. Thus
+  host execution is the larger observed shortfall. Movie header raw count187
+  gives6.233nominal seconds but packet/presentation completeness is unverified.
+  Prior replay10 all149 image hashes exactly matched replay9. Long opening and
+  natural30fps remain unverified. Continue through next original stop, no bypass.
+
+- **Active timing continuation:** prior build completed; final diagnostic relink
+  succeeded and all87 Python tests pass. Next measurable milestone: advancing
+  OPENING frames in connected OpenGL plus original asset-consumption evidence;
+  then measure presentation cadence against the verified30fps movie target.
+  Full native checks and experimental reboot are running before replay10.
+  Viewer38888 retained. Issue-slot scheduling remains experimental, not PS2
+  cycle parity; natural playback must be measured independently of throughput.
+
+- **USER-REQUESTED HANDOFF,2026-09-13 15:58 America/Chicago:** build session43368
+  still RUNNING, cl PID42784 observed (verify identity anew); log
+  `%TEMP%/haunting-build-budget-scene-closure.log` appears only on completion.
+  No diagnostic/oracle active. Viewer38888 alive, watches `%TEMP%/haunting-live.ppm`.
+  Generated161695 EE words1050 boundaries,28 IOP modules93389 words. Current
+  build includes ordinary-return budget preservation (only reserved EE/IOP return
+  sentinels yield; native services/syscalls still yield), DMA busy-loop parking,
+  seven more verified scene-state descriptor roots (external
+  scene-descriptor-closure.json). Runtime IPU constant-DC transform optimization
+  added during build; runtime_tests built/passed against new IPU library. After
+  43368 completes, rerun clean diagnostic build to guarantee final relink with new
+  IPU source/library, then full CTest and experimental --verify-reboot.
+  Native EE/IOP return-budget tests and DC constant transform edge tests pass;
+ 87 Python passed before final ordinary-return edits. Run Python again in batch.
+  The latest changes are NOT connected-replay verified. Fresh helper prepared:
+  `%TEMP%/haunting-clock-bursts-10-replay.py` (100M quanta,no obsolete watches,
+  short60ms inputs,10ms capture polling). Launch only after build/checks complete.
+
+  Last connected replay9 ended20,580,407us in21.5898s at130460; scene transitions
+ 130460/12f290/12f500 plus descriptor closure are now generated. Replay8 ended
+ 20,447,349us in22.4743s at1306e0. Replay9 has149 unique images; still only CAPCOM
+  verified. DMA busy-loop optimization improved modestly; no30fps claim. Ultimate
+  goal remains advancing long OPENING cinematic in connected OpenGL, with original
+  asset consumption evidence. User priority: profile/fix natural rate now. Original
+  CAPCOM/OPENING header target30 progressive fps verified independently; NTSC
+ 59.94 fields is separate. PCSX2 inspection now allowed as timing lead, never copy
+  implementation/algorithms or use emulator backend; installed normal timing
+  settings inspected, no PCSX2 source or shared rendering material used.
+
+
+- **Active build1960:** `haunting-build-dma-wait-members.log`,158568 words1004
+  boundaries. New narrow generated IPU CHCR busy-loop parking tested (87 Python,
+  native translation pass), restricted to read-only CHCR3/4, fixed register result,
+  real STR bit and no in-loop trace watch; no completion is fabricated. Adds four
+  scene member transitions1306e0/130520/12fb50/12f720, independently verified
+  original/live descriptors3b0070..a0 and actual stores in1306e0. Replay8 ended
+ 20,447,349us in22.4743s at1306e0, after passing all prior scene virtual stops.
+  No replay active; viewer38888. Replay8 removed obsolete EE instruction watches
+  and samples captures every10ms;149 unique images. Replay7 (with watches) ended
+ 20,413,938us in25.8812s at2d4020; its7-method table and next virtual slots verified
+  and included in current binary. Direct straight-line dispatch preserved complete
+  benchmark state (EE/GS exact, IOP only RTC seconds/minutes); legacy30M4.56995s
+  before vs4.66269s after, no legacy gain; burst runs improve modestly, not isolated.
+  Next: finish1960, launch fresh clock-bursts-9 from no-watch replay8 helper,
+  inspect next scene/movie and measure busy-loop gain. Long opening and30fps remain
+  unverified. Original CAPCOM/OPENING sequence+extension headers independently
+  verified progressive30fps (H.262 Table6-4), distinct from59.94 display fields.
+
+
+- **Current build52429:** native EE straight-line goto optimization, tests86Python
+  and translation native pass; full diagnostic build in progress
+  `haunting-build-direct-step.log`. Exact30M legacy baseline retained as
+  `profile-before-fallthrough.*`. After build run identical profile-after-fallthrough
+  and compare EE RAM/GS/IOP/metadata (RTC time exceptions only), then replay7.
+  No diagnostic active; viewer38888. Replay6 ended20,447,297us in27.7091s at
+  missing3913b0. Eight-qword IPU DMA service per experimental quantum (EE manual
+  pp41-43) removes artificial16MB/s cap. All148 unique captured frame hashes
+  match replay5 in order; prior run58.8558s. Four focused tests pass. New scene
+  table47a79014 methods verified against original/live and rooted;157508 words976
+  issues. Replay7 must use fresh prefix, same short-input helper,100M budget.
+  Long opening/natural FPS still unverified. Latest PCSX2 permission allows timing
+  inspection without copying, recorded in AGENTS; no implementation copied.
+
+
+- **Live replay5:** session8046/PID33300 `startup-clock-bursts-5`,100M quanta,
+  field-sampled OpenGL preview; at31M quanta CAPCOM still advancing, no fault.
+  Viewer38888. Replay4 ended30M budget,52.1107s host,129 images. Natural FPS
+  and long opening still unverified. Burst JR RA return boundaries fixed/tests
+  pass. Nested bootstrap calls corrupted suspended stack; allocated separate
+  checked0x2000 stack fixes observed IOP return-to-c failure. Full21 tests pass.
+  EE scene table46a040 methods12c220/130810/12e1b0 now rooted;156359 words956
+  boundaries, build9331 and field-preview build passed. Input pulse shortened;
+  preview now field-driven (16ms host cap), one bulk RGB write. No diagnostics
+  other than33300, no oracle active. User permits PCSX2 timing inspection, no
+  copying; installed normal timing settings match existing59.94 field target.
+  Next: inspect replay5 natural CAPCOM end and next fault/movie; optimize measured
+  CPU cost while keeping experimental clock opt-in. See PERFORMANCE.md.
+
+
+- **Current performance continuation:** full21 CTests passed after burst/clock
+  changes;86 Python tests pass. First burst replay `startup-clock-bursts`
+  exposed bootstrap return overrun at IOP1f0000 after28752us; no game fault
+  bypassed. Generators now yield cooperative bursts after original JR RA (delay
+  slot still executes); native sentinel regression tests added. Build session25265
+  (`haunting-build-burst-returns.log`) active; test build78914 active. No replay
+  active, viewer38888 retained. First instruction-granular clock probe ended3B
+  slices at budget with display-flag polling dominant; not natural playback.
+  Experimental clock now uses1us device quanta with294/295 EE and36/37 IOP
+  boundary budgets; this is approximate functional scheduling, NOT cycle parity.
+  Narrow read-only RAM polling loops may yield until real flag change, excluding
+  watched loops and overlays. Legacy timing stays default. Next: finish builds,
+  sentinel regressions, fresh clock-bursts-2 replay and measure progress/host cost.
+  Long opening still unverified; verified missing scene table46a040 methods
+  12c220/130810/12e1b0 remain to root as a batch after current build.
+
+
+- **Active priority changed by user:** fix natural playback rate now. Long-intro-3
+  passed both cleanup roots and stopped130810 via11fb04 at1326167984us,
+ 285.26s host (4.649M slices/s). No long cinematic. Captures preserved.
+  Investigating the legacy1us-per-AOT-step mismatch; manuals EE bus147.456MHz
+  (EE p36), processor/bus ratio2 and single/double issue (Core pp14,18,78).
+  Added opt-in experimental --clock-profile issue-slots (legacy remains default),
+  exact294.912MHz slots/8:1 IOP ratio, fractional microseconds; NOT pipeline/cache
+  cycle accuracy, branch bundles/bootstrap special budgets still approximation.
+  Clock arithmetic/native timer test passes. Clock-probe replay17523/PID36460
+  active, currently400M slices, no fault, no GS draws yet. Next inspect whether
+  proper work/time ratio reduces movie wait overhead; do not promote without
+  evidence or present experimental pacing as hardware parity. Viewer38888 alive.
+
+- **Profiling/optimization requested by user:** added optional host sampled phase
+  profiler, then split EE/IOP native dispatch into4KiB functions, preserving
+  instruction budgets/delay slots/native wait returns. Same30M workload measured
+  35.9562s baseline ->14.6356s EE-only ->4.56141s both (7.88x). EE RAM/GS VRAM
+  and all metadata match; IOP only RTC seconds/minutes differ. Full evidence and
+  limitations in docs/PERFORMANCE.md and external profile-*. Build92817/88052
+  passed; native EE/IOP partition regressions pass, Python85 pass. Full21 suite
+  passed. Profiled long-intro-3 replay37703/PID37660 active, at200M slices
+  in46.13s, viewer38888 alive. Member380480 root included, long movie unverified.
+
+- **Long-intro-2 completed with a new explicit stop:** destructor fix clears old
+  2c8c10 stop; at1325849980us member helper100b6c reaches380480 via11fafc,
+  RA11fb04. Object888444 descriptor matches original44aee0 and static RAM
+  exactly (0,-1,380480);380740/4c loads and38076c..78 installs it. Added
+  root380480; generation155541 words941 boundaries. Build30192 active,
+  haunting-build-long-intro-member.log. No diagnostic/oracle running; viewer38888
+  retained. Replay3 helper prepared, not launched. Latest capture145 still CAPCOM
+  fade; long cinematic unverified. Next: finish build, reboot regression and
+  long-intro-3 replay, then capture next stage.
+- Scanner now additionally detects loaded direct-member descriptors through integer
+  and floating-point copies. Pre-fix scan finds421 records/393 missing targets,
+  including44aee0->380480 which table-only scan missed. Candidates retain load
+  PCs and require live-use verification; no graph auto-expansion. All85 Python
+  tests pass, including stale-base/profile rejection and no target auto-rooting.
+
+- **Scanner refinement requested during live replay:** audit found924/936 boundaries
+  are indirect transfers but old fixed-address pointer scan returned0 candidates.
+  Added read-only literal object-table installation scan, including call delay-slot
+  stores, source PCs, slots, compiled status, deduplicated missing targets and256-byte
+  scan limit. Current scan finds56 tables/547 unique uncompiled candidate targets;
+  independently catches46ecc0 installed at2c8c3c and37f8cc. These are unverified
+  pointer-run leads, never automatic AOT roots or runtime substitutions. Synthetic
+  tests cover delay slots/no auto-discovery, stale constants, stack stores, data
+  exclusions and cap. All83 Python tests pass; full major-scan succeeds (EE155463/936, IOP29 modules93567 words, linked126 residual). Removing only the new destructor root in an in-memory pre-fix config proves scanner flags2c8c10 as the sole missing46ecc0 method via37f8cc, before any replay. Live replay83496/PID37628 remains
+  uninterrupted beyond600M slices, no fault. Next: inspect full scan and continue
+  CAPCOM-to-opening transition; use table families to avoid one-target replays.
+
+- Destructor AOT root added after original/live verification;155463 reachable words936 unresolved. Release diagnostic build19009 passed (haunting-build-long-intro-destructor.log); unchanged DMA/runtime/translation3/3 pass. Fresh long-intro-2 replay83496/PID37628 active,3B slices; external helper/captures/log use long-intro-2 prefix. Viewer38888 retained. Downstream destructor callbacks239160 and1bb9c0 already translated. game_reboot check46898 passed; focused checks4/4. Next: monitor natural CAPCOM end, trace next stop or capture advancing OPENING.
+
+- **ACTIVE continuation:** long-intro-1 finished CAPCOM fade-out and faulted after1.3B slices at missing static target2c8c10, call2d1b78, RA2d1b80. Object94fb40 points to46ecc0; original ELF/live table match, slot8 is2c8c10.146 captures, latest145 inspected (CAPCOM nearly faded). Diagnostic36672 exited; viewer38888 remains. Next milestone remains successive long-opening frames with asset provenance; root verified destructor and rebuild/replay. No long cinematic verified.
+
+- **HANDOFF requested by user (2026-09-13):** long-intro-1 replay remains RUNNING, tool session16811, diagnostic PID36672; OpenGL viewer38888 alive. Latest checkpoint1.2B slices, EE1e5398,15424 GS draws/rasterized, no fault.133 unique post-input captures through132.png. Inspected025/035/060/076/093/113/126: complete CAPCOM character motion, both leave screen, latest inspected126 holds logo. Long OPENING cinematic NOT yet verified. Do not restart this expensive replay: inspect current log/process/frame first and let it finish/trace next fault. Bound3B slices, final external startup-long-intro-1.ram sidecars appear on completion. Helper can return0 despite diagnostic2. This session changed only diagnostic CLI cap500M->3B and docs; diagnostic build passed, no new runtime implementation/test changes. Exact next action: poll log and frame manifest, inspect latest PNG, continue through natural CAPCOM end to long intro.
+
+- Long-intro-1 live update: replay16811/PID36672 passed1B slices without fault; over100 unique captured frames show Hewie then Fiona moving across CAPCOM. Still awaiting the long OPENING cinematic. OpenGL38888 remains available. No new runtime changes or tests during this uninterrupted run.
+
+- **ACTIVE new goal:** user requested continuation until the next, long intro cinematic plays. Next measurable milestone is successive visible frames from that cinematic beyond CAPCOM, with original asset/runtime provenance. Long-intro-1 replay16811/PID36672 is active with3B-slice bound and external frame capture. Runner had a hard500M argument cap; raised only that diagnostic cap to3B and rebuilt successfully (haunting-build-long-intro-budget.log). Prior500M run stopped only on its budget. Keep OpenGL visible and trace any new original stop without bypassing checks. Original CVM index confirms OPENING.SFD extent652685,size111341568,512x448 sequence header; selected-movies.json under external long-intro-assets records it and CAPCOM metadata.
+
+- **Requested visible-movie milestone complete.** startup-movie-services reached its500,000,000-slice bound with no runtime fault (diagnostic exit2 is the existing budget-stop result; JSON kind native-iop-budget). Final EE1e40f0, virtualtime500000000us. Thirty unique post-input captures include the advancing CAPCOM movie fade; frames006/007/008/013/028 inspected. External final RAM/EE/IPU/GS sidecars and frame manifest preserved under %TEMP%/haunting-toc-probe. Connected OpenGL38888 remains alive holding the latest movie image. No diagnostic, build or oracle process remains active. Release build33723 and game-reboot pass; latest relevant DMA/runtime/translation/game-reboot4/4 passed after motion changes. Current generation155372 words934 unresolved. Visible output achieved; full gameplay/audio/real-time performance and exact physical rounding are not verified. Non-intra mathematical IDCT still differs by one in24/12288 synthetic oracle samples; this limitation remains documented. Next broader work, if requested: measure movie presentation pace and continue beyond the CAPCOM intro with a fresh evidence prefix; there is no new captured hard fault to bypass.
+
+- **Visible movie milestone achieved (2026-09-13):** movie-services build33723 passed and startup-movie-services clears all prior stops. Original CAPCOM.SFD intro is visibly rendering through connected OpenGL PID38888. Sequential external movie-services-frames/006.png,007.png,008.png and013.png show CAPCOM logo/Fiona/Hewie fading in; manifest contains frame hashes and host timestamps. At240M slices15134 draws/rasterized, no fault. Replay42474/PID34944 still running toward its500M bound to retain final RAM evidence. Game-reboot check passes; latest focused4/4 passed on motion-spr runtime. This verifies advancing movie imagery only, not full playability, real-time speed, audio or physical1:1 rounding. No runtime interpreter/JIT/emulator backend.
+
+- Movie-worker build4650 passes; startup-movie-worker advances to registry dispatch25646c ->243428,time171500228us. Verified seven14-slot service tables against live RAM/ELF; added98 static callback destinations as one batch (external movie-service-tables.json). Generation155372 words934 unresolved. Movie-services build active; next fresh replay. Captured worker frames remain warning/startup transitions; no movie playback visible.
+
+- Motion-spr build67897 and focused4/4 pass. startup-motion-spr clears prediction path, reaches movie worker callback254bd8 via254b58,time171404733us. Verified original254134..419c registration and live slots; added four default workers plus previously verified2429c8. Emission151672 words911 unresolved; movie-worker build4650 active. Fresh haunting-movie-worker-replay.py records unique post-input frames in external movie-worker-frames directory. OpenGL still shows warning; no visible playback yet.
+
+- Non-intra build13680 passed. startup-nonintra clears residual decode and stops2a2b90 starting toSPR source-chain105. Original tags1990500..530 are three REF and finalREFE,48qwords each. Implemented bounded toSPR chain with real packet copies/SADR wrap/completion/IRQ and explicit unsupported tags; DMA tests pass. Verified16 original motion callbacks from3ed6d0..710, registered atcontext+5c8/+5d8 and consumed2a0f20/34. Added all associated packed operations from EE manual; synthetic translation tests pass. Generation151561 words911 unresolved. Combined motion-spr diagnostic build active; next fresh replay. No visible movie; viewer38888 retained.
+
+- CSC build86554 and focused4/4 pass. startup-csc completes896macroblock conversion and advances to non-intra BDEC20010000 at2a1fe4,time152880599us; warning frame still displayed. Non-intra implementation now handles CBP/first coefficient/signed quantization/residuals; all63CBP native tests pass. Probe32cases shows24/12288 one-value IDCT discrepancies explicitly documented in ORACLE.md. Added manual-derived PADDH from adjacent prediction-copy routine. Native translation tests pass; emission/rebuild next. No oracle active; viewer38888 retained. User requested faster progress: batch residual and pixel-add changes in one connected build.
+
+- Movie-callbacks build80716 passed; startup-movie-callbacks reaches CSC70000380 at2a7110 with real RAW8 input. Synthetic CSC memory probe completed1024pixels/five agreeing views; measured rounding discrepancy documented in ORACLE.md. Added bounded RGB32 conversion and pipeline tests; native runtime tests pass. CSC diagnostic build active. Next fresh CSC replay; no movie frames verified yet. Oracle40060 closed.
+
+- Movie-pack build79437 passed; focused4/4 and32 Python tests pass. startup-movie-pack clears pixel copy and reaches original callback24fc70 through2a5c90. Verified original24f9a0..fa00 registration of24fac0/24fbc8/24fc70/24fc98 plus all four live12-byte records atbd6bcc; bytes match ELF. Added static targets;150701 words914 unresolved. Movie-callbacks diagnostic build80716 active, next fresh replay. No movie frame verified.
+
+- startup-bdec clears intra decoding and48-qword scratchpad output, then stops at original2a299c ADDI. Added checked ADDI, PMAXH/PMINH and PPACB; synthetic native translation tests pass. Verified executed mask-word00ff00ff via independent memory probe (docs/ORACLE.md), added exact DSRA32 decoding with neighboring reserved cases rejected. Generation150613 words915 unresolved. Connected movie-pack build active; next fresh replay. No movie frame visible yet. Oracle9176 closed.
+
+- BDEC diagnostic build passed (haunting-build-bdec-diagnostic.log). ALL_BUILD96409 failed only relinking the live/locked hg_opengl_host; retained viewer remains available. Runtime/translation/reboot checks pass. DMA test stack-overflowC00000FD fixed by heap-allocating its existing large State instances; rebuilt DMA test passes unchanged assertions. Fresh haunting-bdec-replay.py running, startup-bdec evidence prefix. No movie frame verified yet.
+
+- Resumed after accidental interruption. Synthetic BDEC v2/v3 completed;32 cases/12288 pixels agree with independent mathematical IDCT using observed intra no-mismatch/0..255 clipping profile. Provenance/limitations in docs/ORACLE.md. Oracle35604 closed; no oracle active. Native block tests pass; full BDEC build/replay next. No visible movie yet.
+
+- User reaffirmed: solely a recompilation, not an emulator (2026-09-13). Recorded in AGENTS.md. Own ELF scan/decoder verifies dispatches; current static generation150562 words916 unresolved. No runtime interpreter/JIT or emulator execution backend. PCSX2 stays optional memory oracle only.
+
+- Output DMA build74980 and focused4/4 passed; replay96534 reaches BDEC2c010000 at2a1fe4 with DMA3 armed80001800/QWC48. Added independently derived MPEG2 intra/frame block decoder in runtime/ipu.cpp, separate hg_ipu library; synthetic runtime tests pass both111-entry coefficient tables, DC precision0..2, escapes, start codes and output. Native connected build/replay NOT run for BDEC yet. IDCT mathematical rounding not oracle-verified. Synthetic BDEC oracle CPU-FIFO v1 stalled at stage10; PID16968 closed. External generator haunting-ipu-bdec-probe.py now emits DMA-based v2 (hash857e6ad676a57ab019a545535ad3b745778fa1716a517c740caa5abe5ff766b7), ready to launch in ipu-bdec-oracle directory. Next: launch hidden v2, read memory, compare synthetic outputs; then build/replay. No movie frame verified.
+
+- VDEC build19296 and focused4/4 checks passed; replay15283 clears address/type VDEC and reaches2a392c arming output DMA3 (MADR80001800/QWC48/CHCR100). Implemented bounded normal output DMA, eight-qword output FIFO, RAM/scratchpad destination validation, real completion and empty-pressure behavior. DMA tests pass. Full ipu-output build74980 active; next focused checks and haunting-ipu-output-replay.py. Image decode remains explicitly unsupported.
+
+- Picture-switch build90438 and focused checks passed. Replay17045 reaches original2a2174 issuing VDEC30000000 (macroblock address increment), beyond movie headers. Implemented all manual-defined VDEC tables (EE manual pp202-204), error result/ECD and pending input/TOP, with focused runtime tests passing all prefixes and128 bit offsets. Full VDEC build active; next focused checks and haunting-vdec-replay.py. Still no movie frame; original warning remains.
+
+- Movie-extensions build34036 and focused translation/reboot checks passed. Replay45656 clears2a42a8 and reaches bounded picture switch2a5288 ->2a52a4. Original index<5 and table45bb60..74 independently verified against live RAM; configured all targets. Emission150562 words916 unresolved; no remaining reachable unresolved JR in2a0000..2b0000. Picture-switch build active, then fresh replay. Still warning frame, no movie playback.
+
+- startup-fdec clears FDEC, consumes more movie data and reaches2a42a8 via2a47f8 (time145422997us). Original11-entry extension table45b9f8..ba24 matches live RAM and copied stack; bounded index>10 clamped to0. Added all verified destinations, emission146347 words911 unresolved. Build movie-extensions active; next fresh automated replay. Warning frame remains; no movie decoding/playback verified.
+
+- FDEC Release build10777 passed (haunting-build-fdec.log); all21 CTests passed. Fresh automated replay67239/PID8172 active, startup-fdec evidence prefix. Shared stream, pending input and table-consumption tests pass; no movie frame verified yet. OpenGL PID38888 alive.
+
+- **ACTIVE continuation (2026-09-13).** User resumed until movie playback is visible. Next major milestone: advancing original movie frames in the connected OpenGL preview, verified by fresh captures and regression checks. Immediate blocker is FDEC at2a26b8; implementing manual-derived shared bit stream and pending input. Previous pause superseded.
+
+- **PAUSED at user request, 2026-09-13.** No build, connected diagnostic or
+  PCSX2 process remains running (checked after closing oracle31460). OpenGL
+  preview38888 remains available, holding the warning frame. No movie playback
+  or playability verified. Wait for a continuation instruction before tests.
+  Latest full Release build60127 (haunting-build-ipu-input.log) passed, followed
+  by focused DMA/runtime/translation/game_reboot checks4/4. Automated replay89056
+  (startup-ipu-input) clears channel4 DMA and stops at original2a26b8 writing
+  IPU FDEC(0), command40000000: decode command unsupported. Capture time
+  145407939us; IPU has8 FIFO qwords, dma4 CHCR30000105/MADR13456512/QWC120/
+  TADR13980688. Evidence startup-ipu-input.log and .ram sidecars under
+  %TEMP%/haunting-toc-probe. Current generation145943 words912 unresolved.
+  Synthetic FDEC probes v1/v2 completed; exact observations and limitations
+  recorded in docs/ORACLE.md. FDEC implementation has NOT been started.
+  Next: implement manual-derived FDEC bit reading and internal-buffer/FIFO
+  accounting in ipu.hpp, with pending empty/cross-qword input, tests and capture
+  fields. Resolve or explicitly reject the observed forward-with-empty-input
+  discrepancy rather than copying oracle behavior. SETIQ/SETVQ must consume the
+  same stream correctly after bit reads. Then build, focused checks and fresh
+  automated replay toward advancing original movie frames in OpenGL.
+  Reuse %TEMP%/haunting-ipu-input-replay.py with a fresh evidence prefix.
+  The TOC input remains a quarantined synthetic probe.
+
+- Movie-timing build37144 passed; replay24513 (startup-movie-timing) clears
+  255208 and stops24ed44 starting IPU input DMA CHCR30000105, time145407653us.
+  Original24f230/26c constructs REF/REFE tags through24ed68. Implemented
+  independent channel4 normal/source-chain transport with eight-qword input
+  FIFO pressure, saved MADR/QWC continuation and real completion status.
+  New DMA tests passed; full build haunting-build-ipu-input.log active.
+  Diagnostic JSON now captures EE DMA channels and retained IPU input.
+  Next focused DMA/runtime/translation/reboot tests, then
+  haunting-ipu-input-replay.py (startup-ipu-input). IPU decode/output remain
+  unsupported; no movie playback verified.
+
+- Video-header build69679 passed; replay85131 (startup-video-header) clears
+  22cff0 and stops255208 via2551ec, RA2551f4, a0=7530. Original
+  459cb8..9d00 conversion table matches RAM; seven nonzero destinations
+  verified and rooted together. Generation145943 words912 unresolved;
+  no new JR/unsupported instruction in inspected22a000..260000 range.
+  Build active, haunting-build-movie-timing.log. Next
+  haunting-movie-timing-replay.py, startup-movie-timing evidence prefix.
+  No movie playback verified.
+
+- Getter build12992 passed; replay53755 (startup-stream-getters) advances
+  to144840077us, then stops22cff0 through JR22cfe4, RA22bddc. Original
+  22cfc8 bounds selector-1<10; table457490..4b8 matches original/live RAM.
+  Added all10 destinations; generation145747 words913 unresolved. No other
+  currently reachable unresolved JR or unsupported instruction in22a000..260000.
+  Build active, haunting-build-video-header.log; next
+  haunting-video-header-replay.py (startup-video-header). Live snapshot
+  getters-live.png still shows warning screen, no decoded movie verified.
+
+- Stream-switches build4622 passed; replay72892 clears23a5a0 and stops
+  metadata getter258080 via24698c, RA246994. Original246590..6954
+  constructs25 literal getter addresses to adapters246980/2469b8; verified
+  and added as a family. New getter switch258ec8 is bounded input-1<8;
+  original459fc0..fe0 matches live RAM and all8 targets are rooted.
+  Generation142820 words914 unresolved. Build12992 active,
+  haunting-build-stream-getters.log. Next haunting-stream-getters-replay.py,
+  startup-stream-getters prefix. Movie playback remains unverified.
+
+- Stream-property build60394 passed; replay54598 clears23a6e0 and stops
+  23a5a0 through bounded switch23a57c. Original index<9 and table457e70..94
+  verified against live RAM. Audited currently reachable unresolved JR sites
+  in230000..260000: second bounded switch2387f4 (index<6,457840..58) also
+  verified; added both. Generation142224 words916 unresolved. Build4622
+  active (haunting-build-stream-switches.log). Next automated
+  haunting-stream-switches-replay.py, startup-stream-switches evidence.
+  No movie frame verified; viewer remains available.
+
+- Payload provenance verified while build60394 runs: captured packet9b2380,
+  size800, exactly matches DATA.CVM /CAPCOM.SFD;1 offset800 (extent650491).
+  SHA256 abf5d17a1562fed9c492ce148c7bc879bbc64bc4f8daad950a8926994f75716b.
+  External stream-packet-origin.json records this comparison. This proves
+  original movie data delivery to callback23a6e0, not decoded frame playback.
+
+- Parser-dispatch build16149 passed; replay62259 (startup-parser-dispatch)
+  clears248138 and stops23a6e0 via246194, RA24619c, object3e893c and
+  data9b2380. Original23a694..b8 registers target as property4b, and
+  24616c/253d38 retrieves it; added independently verified root.
+  Generation142215 words918 unresolved. Build60394 active, log
+  haunting-build-stream-property.log. Next haunting-stream-property-replay.py
+  writes startup-stream-property evidence. No movie playback verified.
+
+- DIV1 full build2672 and focused tools/runtime/translation passed3/3.
+  Replay23468 (startup-div1) clears1e3774 and stops248138 via247a14,
+  RA247a1c. Original4599fc and live RAM agree. Adjacent original pointers
+  4599f0/f4/f8->247ad8/247c48/247ea8 also match and have verified executable
+  bodies; added four additive roots as a callback family. Generation141995
+  words917 unresolved. Build16149 active, haunting-build-parser-dispatch.log.
+  Next haunting-parser-dispatch-replay.py, startup-parser-dispatch prefix.
+  Preview PID38888 remains; no movie playback verified.
+
+- Stream-copy build91627 passed; replay9754 (startup-stream-copy) clears2419d0
+  and stops1e3774 on DIV1 word7066001a, RA1e3694. Manual pp138/140 proves
+  second-bank signed/unsigned division. Added DIV1/DIVU1 decoding/emission,
+  bank selection in checked divide_word, and synthetic decode/AOT regressions.
+  Generation139844 words911 unresolved. Full build2672 active, log
+  haunting-build-div1.log. Next focused tools/runtime/translation tests and
+  automated haunting-div1-replay.py (startup-div1 evidence). No movie verified.
+
+- Unaligned-store fix verified in connected replay27984 (startup-unaligned-fixed).
+  All21 Windows Release CTests passed after full build49559. Stream1 now has
+  capacity5b800 and callback3cffa8, with pointer94fd40/chunk800 unchanged.
+  Next stop2419d0 via2418d4, RA2418dc, service100b360+3c. Original
+  241b1c..28/241ca4..ac install that callback; added verified root.
+  Generation139799 words912 unresolved. Build haunting-build-stream-copy.log
+  active; next automated startup-stream-copy replay. Movie still unverified.
+
+- **ACTIVE continuation (2026-09-13).** User resumed work. Major milestone: original movie playback visibly advancing in the connected OpenGL preview, supported by fresh frame captures/runtime evidence and focused regression checks. Immediate investigation: trace stream1 capacity from original construction descriptors; do not change max_bps or bypass the error.
+  Found reversed memory-lane masks in EE SDL/SDR and SWL/SWR helpers. Manual
+  pp99/101/117/119 confirms store lane directions; new byte-wise tests covering
+  all offsets fail before the fix. Corrected both store masks; full Release
+  build session49559 is active (haunting-build-unaligned-fixed.log). Next run
+  CTest, then external haunting-unaligned-replay.py; preview PID38888 verified.
+  Replay watches243640/243660/2443a0/24a220, fresh startup-unaligned-fixed prefix.
+  Stream1 descriptor at10091cc is four-byte-misaligned; neighbors are aligned.
+  This explains zeroed high words, but connected causal verification is pending.
+
+- **PAUSED at user request (2026-09-13).** No build, game diagnostic or PCSX2
+  oracle is running. Visible OpenGL viewer PID38888 may remain open, holding
+  the last frame. Latest completed build40020; latest completed replay24649
+  (startup-parser.log/.ram) cleared231840 and stopped uncompiled error callback
+  23b058 via246d4c, RA246d54, error codeff000f1c. No movie playback verified.
+  Original error string4580e8 says read buffer is small / increase max_bps.
+  Do NOT patch that parameter or suppress the error. Trace its cause first.
+  Original24a220..a280 raises this when capacity minus occupied bytes is less
+  than object+28 (800). Live main object1007e40 has selected stream index1 at
+  +1fc0. Ring records at object+1308, stride0x74: record0 capacity224800,
+  record1 at10091bc capacity0 (10091d8), pointer94fd40, chunk800; record2
+  capacity5dcc, pointer9abd40. This is the next measurable blocker.
+  Original233bc8..bd8 callback231840 registration verified; it is translated.
+  Original23b008..b014 registers error callback23b058 (not added yet).
+  Original capacity getter244388 reads object+1324+index*0x74; occupied getter
+  244ba0 calls243e90/243ea8. Next action: trace ring1 construction/capacity
+  and original creation parameters using targeted PC watches or memory oracle;
+  inspect2438e4/243cb4 ring setup and original callers. Full original ISO exists
+  at Haunting Ground (USA)/Haunting Ground (USA).iso if oracle launch helps.
+  No .p2s savestate found under emu. Preserve independence and explicit faults.
+  Current generation139709 words908 unresolved; SPR DMA/FPU changes and
+  verified callback families are built. Tests: DMA passes after heap allocation
+  of extra synthetic State; FPU/translation/reboot passed. Host16MB stack
+  reserve is verified. Next replay should keep preview and automatic input.
+  Handoff requested and prepared; remain paused until the user resumes work.
+
+- Stack-corrected replay74427 advanced selector2 and stopped231840 via231818,
+  RA231820. Original233bc8..bd8 installs this callback at object+d4; live
+  1983f44 agrees, adjacent fields are zero. Added root; emission139709 words908
+  unresolved. No unresolved JR switch in231840..233c40. Build40020 active,
+  haunting-build-parser.log. Next automated startup-parser replay. Evidence
+  startup-registry-slot2-stack.log/.ram. Viewer PID38888; no movie verified.
+
+- Registry-slot2 build78554 passed but fresh executable exited C00000FD just
+  after checkpoint0. PE reserve was1MB; unwind metadata reports frames928616,
+  378152 and319640 bytes among largest, exhausting native stack as AOT grows.
+  Added MSVC16MB host-stack reserve for both diagnostics. CMake regeneration
+  required a second MSBuild invocation to actually relink new flags; PE header
+  now verifies0x1000000. One-slice run no longer stack-overflows (its final
+  diagnostic printing hits existing early kernel-map fault; not a runtime pass).
+  Visible viewer had exited; reopened with explicit desktop launch PID38888.
+  Active fresh replay uses %TEMP%/haunting-registry-slot2-stack.py and
+  startup-registry-slot2-stack.log/.ram. Next inspect first actual selector2
+  outcome; no movie playback verified. Earlier registry-slot2 log is stack-failed.
+
+- Object-family build66880 passed; replay62899 cleared2b69b0 and reached
+  registry selector2 callback246fa8 at2563fc, RA256404. Correct record stride
+  is0x44 bytes (68 decimal), nine records at1009d68. Seven populated table+8
+  words match original ELF/native RAM:246fa8,247208,249828,2417c8,257518,
+  243240,257210. Added all seven roots, emission137960 words906 unresolved.
+  Build78554 active, haunting-build-registry-slot2.log. Next automated
+  startup-registry-slot2 replay. Evidence startup-object-family.log/.ram;
+  movie playback still unverified. Earlier shorthand stride44 means hex0x44.
+
+- Stream-record build39482 passed; replay30362 cleared241580 and stopped
+  object callback2b69b0. Original2b6c98..cd4 copies descriptor4126b8 into
+  object94fb40+4, matching live dump. Traced subsequent original descriptor
+  assignments:4126d8->2b68b0,4126e8->2b6710,4126f8 virtual slot1c. Live
+  vtable46ecc0 slots0c..24 all match ELF, including slot1c->2b6510. Added
+  verified callback transitions and vtable family before next replay. Initial
+  transition build40187 passed; final family build now active with log
+  haunting-build-object-family.log. Evidence startup-stream-record.log/.ram.
+  Next automated startup-object-family replay. Still no visible movie evidence.
+
+- Preview-retry replay49146 reached241580 via243148, RA243150; callback240a58
+  is cleared. Live record100b414 is {3ceb60,241540,241560,241580,2415a0,2415c0}.
+  Independently decoded242690..2714 constructs/stores all five methods; shared
+  non-rendering lead corroborates addresses only. Added five roots as a group.
+  Evidence startup-service-callbacks-retry.log/.ram. Emission124464 words823
+  unresolved; build39482 active, haunting-build-stream-record.log. Next automated
+  startup-stream-record replay; movie playback remains unverified.
+
+- Service-callback build59545 passed. Replay42272 ended before menu input on
+  Windows preview-file sharing violation during remove(haunting-live.ppm);
+  callback outcome untested. Added bounded100x1ms publication retries preserving
+  completed pending frame; persistent I/O errors still throw. Diagnostic-only
+  build passed, haunting-build-preview-retry.log. Active fresh replay uses
+  %TEMP%/haunting-service-callbacks-retry.py and startup-service-callbacks-retry
+  .log/.ram evidence prefix. User reiterated HG leads allowed but renderer must
+  be independent; existing AGENTS constraints remain unchanged.
+
+- SPR callback build73582 passed; replay87357 cleared1cb140 and stopped
+  service-list callback240a58 at1e5c10, RA1e5c18. Original23ac74..90 registers
+  2409d8/240a58 through240198/240148; live480f18/480f40 agrees. Other four
+  populated list callbacks and2409d8 already translated. Added explicit roots
+  for this verified pair; emission124296 words823 unresolved. Build59545 active,
+  haunting-build-service-callbacks.log. Next automated startup-service-callbacks
+  replay. Evidence startup-spr-callback.log/.ram. No movie verified yet.
+
+- SPR build91690 passed. First DMA test hit Windows stack exhaustion from an
+  extra State local; moving that synthetic State to heap fixed the test, which
+  now passes unchanged assertions. FPU/translation/reboot also passed. Replay
+  59189 cleared normal SPR start and stopped callback1cb140, RA1e5b28. Original
+  1cbe44..54 registers callback index6/arg0; live480fd0 agrees. Added root;
+  emission124270 words823 unresolved. Build73582 active, haunting-build-spr-
+  callback.log. Next automated startup-spr-callback replay. Current evidence
+  startup-spr.log/.ram. No movie verified; visible viewer preserved.
+
+- Vtable build61085 passed; replay81524 cleared23b618 and stopped at normal
+  fromSPR DMA STR write10d8f4, s16=1000d000, RA23c178. Original23c144 selects
+  channel8, destination197aa80, QWC400. Evidence startup-movie-vtable.log/.ram.
+  Implemented documented normal SPR burst channels8/9 in connected runner with
+  full-span validation,14-bit SADR wrap, address/count updates and D_STAT.
+  Added tests for both directions, wrap, hold, completion and invalid spans/modes.
+  Build91690 active, haunting-build-spr.log. Next focused DMA tests and original
+  startup-spr replay; no movie verified yet. Source derivation in SOURCES.md.
+
+- Member build80047 passed; replay68107 cleared2b6bb0 and reached vtable
+  method23b618 via2b6bf4, RA2b6bfc. Live object3e893c vptr3e8758; all fourteen
+  method slots3e8764..3e8798 match original ELF/native RAM. Added fourteen roots
+  as one verified family; emission124204 words823 unresolved. No unresolved
+  JR switch in newly covered239000..241000 range. Evidence startup-member.log/
+  .ram sidecars. Next build haunting-build-movie-vtable.log then automated
+  startup-movie-vtable replay. No visible movie verified yet.
+
+- Service-switch build22962 passed; replay14355 cleared2509e8 and stopped
+  2b6bb0 via member thunk100b6c, RA11fb04. Live object94fb40 descriptor+4 is
+  {0,-1,2b6bb0}, matching original file-backed descriptors including4126a8..b0.
+  Shared non-rendering lead confirms function boundary; body/dispatch verified
+  from original ELF/native RAM. Added root, emission123280 words813 unresolved.
+  Build80047 active, haunting-build-member.log. Next automated startup-member
+  replay. Visually checked startup-service-switches.png: original warning screen,
+  not movie. No diagnostic/oracle running during this build; viewer stays open.
+
+- Retry5104 cleared registered worker2429c8, next stop2509e8 via bounded
+  switch2509e0. Original index<7 and table459c70..459c8c match live RAM/ELF.
+  Audited other reachable unresolved JR sites in240000..258000: only2408dc,
+  bounded index<5 and table459660..459674, also fully matching. Added both.
+  After emission122722 words810 unresolved, no unresolved JR remains in this
+  bounded range. Evidence startup-worker-retry.log/.ram. Build22962 active,
+  haunting-build-service-switches.log; next automated startup-service-switches
+  replay. Last screen still warning, movie playback remains unverified.
+
+- Worker build98152 passed. Replay20950 stopped before menu confirmation with
+  host input-file parse error, so it did not test2429c8. Suspected Windows open
+  race during atomic replacement: reader previously conflated open failure with
+  malformed contents. Added bounded4x1ms open retries and size check on the opened
+  handle; persistent open failure and malformed contents still fail explicitly.
+  Diagnostic-only build passed; invalid-command one-slice check still rejects.
+  Active retry5104/PID43780 uses startup-worker-retry.log/.ram and
+  %TEMP%/haunting-worker-retry.py. Next inspect callback outcome; no movie yet.
+
+- Switch build58961 passed; replay30316 cleared1d5f98 and stopped2429c8,
+  RA254b60. Original242988..29a4 constructs2429c8 and registers index2 via
+  original255158 (store object+d28+index*4). Live object1007e40 slot1008b70
+  matches. Added the independently verified worker root; shared non-rendering
+  lead corroborated address but no shared patches/behavior were used. Evidence
+  startup-cri-switch.log/.ram. Emission120516 words800 unresolved. Build98152
+  active, haunting-build-worker.log. Next automated startup-worker replay.
+
+- CRI buffer build78435 and IOP bundle/reboot tests passed2/2. Replay88210
+  cleared158e4 and stopped EE1d5f98 via switch1d5f5c. Original1d5f40 bounds
+  index<5; table451d10..451d24 matches live EE RAM and original ELF (targets
+  1d5f68,1d5f90,1d5f98). Added bounded indirect_targets entry. Evidence
+  startup-cri-buffer.log/.ram sidecars; shared analysis confirms containing
+  function1d5f10, but switch derived independently. Emission119939 words800
+  unresolved; build58961 active, haunting-build-cri-switch.log. Next reuse
+  automated replay with startup-cri-switch prefix. Viewer remains visible.
+
+- Rounded-SQRT build18698 and focused3 tests passed. Replay28714 cleared both
+  SQRT sites and stopped at IOP158e4, RA12424, object21500. The original1240c/
+  12414/1241c loads object vtable1c460 slot24. Nine non-null methods at slots
+  0c..2c match independently relocated original CRI_ADXI .data exactly; added
+  all nine as roots in config/iop_modules.toml. Shared non-rendering lists had
+  no applicable IOP-address lead. Native evidence startup-sqrt-rounded.log/.ram.
+  No movie yet; last scanout warning screen. IOP bundle regenerated28 modules/
+  93389 reachable words. Build78435 active, haunting-build-cri-buffer.log.
+  Next: IOP regression checks and automated replay with fresh cri-buffer prefix.
+
+- Automated replay83420 completed with input Left99010000/Cross100060000/
+  none101060000, clearing SQRT1c6c64 and stopping at SQRT1c6d20. No movie yet.
+  startup-sqrt-supported.log/.ram sidecars retain evidence. Focused timer/FPU/
+  translation tests passed3/3 before this run. An independent2048-input synthetic
+  oracle batch now validates positive-normal nearest rounding against the current
+  PCSX2 reference profile; physical-console parity remains unverified (ORACLE.md).
+  Integer rounding implementation and boundary tests added. Build session18698
+  is active, %TEMP%/haunting-build-sqrt-batch.log at completion. Next: focused
+  tests then reuse %TEMP%/haunting-sqrt-replay.py with a fresh evidence prefix.
+
+- 2026-09-13: live input successfully selected YES and advanced to the original
+  warning screen, then stopped at EE1c6c64 SQRT(2) at343583286us. Evidence:
+  %TEMP%/haunting-toc-probe/startup-live-input.log and .ram sidecars.
+  Independent synthetic SQRT ELF oracle (fpu-sqrt-oracle/verified.json; provenance
+  in ORACLE.md) measured 2->3fb504f3 and 0.5->3f3504f3. Implemented only the
+  supported normal power-of-two case and measured flag clearing; other inexact
+  significands still stop explicitly. Release build44639 and fpu_tests passed.
+  Next measurable milestone remains connected movie playback. Active replay
+  uses %TEMP%/haunting-sqrt-replay.py, startup-sqrt-supported.log/.ram, automatic
+  preview-driven YES/Cross, and the existing visible haunting-live.ppm viewer.
+  Capture the next explicit blocker if movie playback is not reached.
+
+- Clock-enabled replay26866 reached500M without an explicit hardware/AOT fault,
+  but final scanout still shows the no-card prompt with NO selected. T0/T1 mode82
+  are counting and T2 mode382 runs; T1 count43177 in final metadata. Do not infer
+  completed movie startup from the larger slice count. Input-repeat/missed-input
+  remains a hypothesis. DECI2 output has only known heap/cache messages.
+- Added --input-file (none/left/cross, poll10000 slices, reject malformed input
+  and combination with scripted pulses) so input can be sent to an active run.
+  Build passed. Active session43666 is fresh500M startup-live-input.log/.ram with
+  watches25c04c and2c8c70, input %TEMP%/haunting-input.txt currently none, and the
+  existing visible preview. Next: wait for prompt, atomically pulse Left briefly,
+  inspect YES selection, then Cross; retain observed input slice numbers.
+
+- Timer-handler build27301 passed. Focused rerun47234 passed all6 entries in
+  54.91s, including the three previously failing fileio/cdvd/reboot tests plus
+  timer/translation/prefix. The earlier other18 tests passed with clock attached.
+  Fresh visible replay26866 is active: startup-ee-timer-handler.log/.ram sidecars,
+  500M budget,30M checkpoints, Left180M/Cross181M, haunting-live.ppm viewer4016.
+  30M checkpoint EE1ee728 proves original timer IRQ no longer stops early startup.
+  Next measurable gate: pass original T1_COUNT read25c04c and capture later
+  connected startup/movie state. Rendering/viewer stays observational only.
+
+- Complete global registry build42207 and focused tests passed. Replay90578
+  cleared230fd8 and reached EE25c04c at197454482us, reading T1_COUNT10000800
+  after original mode82 setup. Timer model was not connected to runner clock.
+  Final five initializer callbacks were independently verified from2309a0..b44
+  and live globals3e82b0..c0; library68586 passed,119722 words798 unresolved.
+- Added EeTimerClock using manualp36 BUSCLK147.456MHz, fractional microsecond
+  conversion and INTC9..12 flag-edge delivery. Timer unit tests pass. Clock
+  attachment exposes original registered INTC11 handler277110 at227303us;
+  alarm list3ec068 is null in this capture. Full suite58913:18 pass,3 fail only
+  at this untranslated handler (fileio/cdvd/reboot). Do not disable interrupts
+  to restore tests. Added verified277110 root; emission119891 words799 residuals.
+  Build27301 is active. Next run full regression gate and visible startup replay.
+  Latest captures: startup-global-callbacks.ram and startup-ee-clock.ram/log.
+  Visible viewer PID4016 remains active at haunting-live.ppm.
+
+- Preview-enabled replay66544 is terminal, next untranslated230fd8 via22b2fc,
+  RA22b304, live callback global3e828c. Full CTest84858 passed21/21 in65.46s.
+  Added13 missing targets from the same live registered global block3e8274..ac,
+  each independently decoded with matching original indirect-call wrappers.
+  Emission117464 words,788 unresolved items. Build42207 in progress; next
+  run must retain --preview-file %TEMP%/haunting-live.ppm for visible viewer4016.
+  Viewer holds the last captured warning screen between runs; no movie yet.
+
+- User confirmed the live OpenGL window is visible, with their screenshot of the
+  no-memory-card prompt. Tool-isolated launches were invisible even with Normal;
+  explicit approved desktop launch succeeded, viewer PID4016. Prior viewers40340
+  and13668 were stopped. Preserve4016 across diagnostic replays using the same
+  external haunting-live.ppm path. Original game execution is still diagnostic66544.
+
+- User requested visibility during tests. Added diagnostic --preview-file (external
+  P6, every1M slices and final dump, committed VRAM only) and OpenGL host
+  --watch-display (250ms polling, bounded complete-frame reads, retained last
+  frame, aspect-preserving viewport). Viewer checks a presented pixel against
+  the source framebuffer. Synthetic and original warning-frame3-frame checks
+  passed on NVIDIA OpenGL3.3. Build passed after NOMINMAX/clean-environment fixes.
+  Live viewer session33382 watches %TEMP%/haunting-live.ppm. Keep it open for
+  the user while tracing; Escape closes only the viewer.
+- Registry replay32540 is terminal, next callback230e38 via22b280/RA22b288;
+  live global3e8284 contains230e38 (ELF initial value0, dynamically registered).
+  Own decoder verifies callback body; shared non-rendering analysis range agrees.
+  Added that observed root:116947 reachable words,779 unresolved items.
+  Runtime replay66544 uses startup-visible-230e38.log/.ram sidecars and live
+  preview. Full CTest84858 is active. Movie playback remains unverified.
+
+- Callback-only build37426 and full21-test suite49018 passed (78.01s).
+  Replay45697 confirmed0x246fd0 executes, stopping next at0x248c08 with the
+  same caller0x256404. Captures: startup-callback-246fd0.ram sidecars/log.
+- Batched the remaining six selected registry callbacks, independently verified
+  from the nine-record loop0x256398, selector3, live records0x1009d68+i*0x44,
+  and original ELF slots4599c4/459a0c/459754/459eec/4597ac/459eb4.
+  Targets248c08/24d708/2425f8/2576c8/243390/257370; two records are null.
+  Emission116793 words,779 unresolved items. Library99702 and ALL_BUILD passed.
+  Fresh startup-registry-slot3 replay and focused tools/translation/prefix tests
+  are active. No movie playback is verified yet; warning-screen milestone stands.
+
+- Fresh replay session50494 is terminal: Left180M/Cross181M clears the five
+  vtable methods and reaches untranslated EE0x246fd0, RA0x256404. Captured
+  display was visually inspected: the original violence-and-gore warning is
+  readable over the castle background. This is a later startup screen, not movie
+  playback. GS evidence: 67810 rasterized,65517 retired,640x448 capture.
+- External startup-vtable-continue.ram sidecars preserve EE/IOP RAM, GS VRAM,
+  registers, draw records and display.ppm/.png; adjacent log records the fault.
+  Original0x2563ec/0x2563fc loads/calls slot0x45998c, which contains0x246fd0
+  in both the original ELF and live RAM (r3). Own decoder verifies jr ra with
+  daddu v0,zero,zero delay slot. Non-rendering manual-list lead agrees on the
+  eight-byte range. Added only this observed callback; emission113828 words,
+  774 unresolved items. Release ALL_BUILD session37426 is in progress.
+  Next: complete build/regression gate and replay toward connected movie playback.
+
+- 2026-09-13 continuation: active major milestone is a later original startup
+  screen leading to connected movie decoding/presentation, verified by runtime
+  captures and relevant regressions. Fresh 500M Left180M/Cross181M replay uses
+  external startup-vtable-continue.log and startup-vtable-continue.ram sidecars.
+  The synthetic TOC remains a diagnostic dependency, not physical-drive evidence.
+  Prior 90M checkpoint does not prove the later vtable frontier cleared.
+
+
+- 2026-09-13: Added live `0x46c740`-vtable continuation roots to
+  `config/haunting_ground_us.toml`:
+  `0x002265d0`, `0x00226620`, `0x00226640`, `0x00226680`, `0x002266d0`
+  (names `observed_vtable_*`). Re-ran `python tools/hg.py emit` from this branch,
+  which now reports `113826 reachable words, 774 unresolved items`.
+- Rebuilt via `Start-Process` + Visual Studio MSBuild clean environment (`/t:Build`,
+  Release/x64, `/m:1`,`/nr:false`,`/v:m`) using `build/ALL_BUILD.vcxproj`; build
+  log at `%TEMP%/haunting-build.log` and success `0` with refreshed
+  `build/Release/hg_system_diagnostic.exe`.
+- Restarted the long Left/Cross replay with `--slices 500000000 --checkpoint-every 30000000`
+  and synthetic TOC/I/O capture prefix in `%TEMP%/haunting-toc-probe/startup-vtable-2266.ram`,
+  including `--press-left-at 180000000 --press-cross-at 181000000 --toc-record synthetic-index-pattern.bin`.
+  Checkpoints reached 30M, 60M, 90M slices (`GS_draws` rising to 3241 / `EE=0x1cafb4`),
+  then the run was user-interrupted before the next checkpoint/stop.
+- Last known frontier before this interruption:
+  progress past the prior `0x00226620` vtable-blocker is implied, while earlier
+  stop was `EE 0x226620` with setter-like side effects. Next action is to replay or
+  resume from this frontier and capture the next explicit stop.
+
+- This continuation scanned all eight project Markdown files (including an
+  ignored/hidden-folder inventory) and confirmed the supplied PCSX2 installation
+  at emu/PS2 emu/pcsx2-qt.exe. AGENTS.md now preserves the user's authorization
+  to access these local files for memory-oracle checks and to scan all project
+  Markdown at continuation. No emulator implementation was read or copied.
+- Release ALL_BUILD session58140 completed with exit0. Full Release CTest
+  session94315 completed with exit0: all21 entries passed in59.23s, including
+  the new indexed sampling/extraction/sprite regressions. The nonfatal
+  missing-pwsh build warning persists.
+- Original Left180m/Cross181m replay is running in session41936 with a240m-slice
+  budget and30m checkpoints. External output is haunting-toc-probe/
+  startup-sampling-supported.log and startup-sampling-supported.ram with its
+  sidecars. Inspect its settled result and continue through the next observed
+  blocker toward actual connected movie playback. It still uses the quarantined
+  synthetic TOC dependency probe, not a verified physical-drive record.
+
+- 2026-09-12T17:18:40Z: the independent sampling probe now passes all56
+  expected colors and all200 undrawn sentinel pixels in three stable stage4
+  readbacks. It uses one-pixel constant-UV sprites at the original56 sample
+  coordinates. The previous extra-FINISH point probe and a final-two-points
+  permutation still missed spatial pixel55; the cause of that point-specific
+  observation remains unresolved. Expectations were not weakened.
+- External sampling-verified.json records ELF SHA256
+  a56cdc58624680f6d6e52df37c9caca5744a4299b7df20c23506cf26868df699,
+  owned PID27892 and three agreeing views. The exact owned probe was stopped
+  through explicit escalation after observation. No oracle process remains
+  active from this segment. Earlier point variants and observations are preserved.
+- Removed the provisional odd indexed TEX0 width rejection in gs.hpp, using
+  the already independently implemented whole-page address stride. Added
+  fixed physical-marker sampling/extraction/sprite regressions for both indexed
+  formats at TBW1,2,3,10,11,30,31, including both contexts, aliases, sentinels,
+  and continued zero-width rejection. The build and tests are now verified as
+  recorded above; the original startup replay is the next runtime gate.
+  Movie playback is still the goal.
+
+- Active user goal: continue until the independent recompilation produces a
+  screen showing a movie playing from the game. Verify actual connected-runtime
+  playback; an extracted movie, emulator game screen, build, or startup prompt
+  does not satisfy this goal.
+- The former approval-capacity blocker is superseded: the normal explicit
+  escalation successfully launched the isolated synthetic sampling ELF at
+  2026-09-12T07:06:46Z, owned PID33332. The read-only observer ran at07:06:54Z
+  and found three stable stage4 framebuffer views. All agree on55/56 samples;
+  pixel55 is still sentinel44556677 instead of8054f10e. All24 even-width
+  control samples and all200 undrawn sentinels are correct. Result is FAIL,
+  not accepted sampling evidence. The exact owned process was stopped through
+  explicit escalation; no process/session remained active at that checkpoint.
+- Preserve sampling-first-incomplete-final-pixel.json and
+  indexed-sampling-before-draw-fence.elf in the external indexed-stride-oracle
+  directory. Investigate draw/readback ordering with a separate drawing FINISH
+  fence and ordered DMA submissions; do not weaken the56-pixel acceptance test.
+  Runtime odd-TEX0 guard and original EE0x10d744 stop remain unchanged.
+- Next measurable verification: complete56-sample observation, sampling
+  regressions, then original Left180m/Cross181m startup replay toward movie
+  decoding/presentation. Further runtime blockers must be traced as observed.
+
+### Earlier checkpoint history (superseded where noted above)
+
+- Continuation checked at **2026-09-12T06:59:49Z**: no launch was retried,
+  no runtime code changed, and no new startup milestone was verified. Read the
+  prepared sampling generator and observer without executing their live paths.
+  The prior segment reports another approval-capacity rejection and a final
+  06:57:23Z zero-owned-process/no-new-log check; that rejection is still the
+  unresolved external prerequisite, not a new runtime failure.
+- Fresh `Get-Process` inspection at06:59:49Z returned no `pcsx2-qt`,
+  `hg_system_diagnostic`, or `MSBuild` processes. The expected external
+  `pcsx2-sampling-validated.log` was absent at06:59:31Z. An earlier CIM process
+  query returned Access denied; its empty result is not process-count evidence.
+  No tool command session remains active from this continuation. Do not retry
+  the rejected launch until its approval prerequisite changes, and do not rerun
+  unchanged builds/tests solely to report activity. The immediate executable
+  action after an approved launch remains the prepared read-only observer;
+  require stage4 and verified pixels before changing odd TEX0 sampling.
+  The active major milestone remains a later original startup screen reached
+  by Left180m/Cross181m after the absent-memory-card prompt.
+
+- Latest continuation: the isolated sampling launch was explicitly reviewed
+  again after checking the ELF/executable hashes and temporary data folders.
+  Automatic approval review still rejects it because its usage limit is reached;
+  the returned message says try again September15,2026 at8:02PM (timezone not
+  stated in the error). No alternate launch was attempted after this rejection.
+  No emulator or game diagnostic ran in this continuation; TEX0 support and the
+  last actual runtime fault are unchanged. No new startup screen is verified.
+- Completed unaffected probe validation: external sampling_control_replay.cpp
+  replays the exact generated packets through our independent GS implementation,
+  executing only six supported even-width controls. Its native build/run pass:
+  all24 sampled colors match independent expected indices; all232 undrawn pixels
+  retain their sentinel. The32 odd-width draws are deliberately not executed.
+  This validates probe preparation against our model, not odd-width behavior or
+  an emulator/physical-console observation. Result: sampling-control-replay.json.
+- Hardened external observe_indexed_sampling.py: include allocation bases when
+  guest RAM is split into regions; check the saved PID's executable path and
+  recorded executable/ELF hashes before memory reads; check protection at each
+  fixed synthetic read. Thirteen offline self-checks pass, rejecting absent,
+  incomplete, short, wrong, unstable and inconsistent completed readbacks.
+  The live Windows observation path remains unexecuted. Result:
+  indexed-stride-oracle/sampling-observer-selftest.json. The generated ELF and
+  sampling-packets.bin are unchanged. The last full21-entry suite pass below
+  belongs to the previous continuation; no runtime code changed in this one.
+
+- Current continuation is blocked on the independent sampling probe launch.
+  Explicit launch escalation was rejected because Codex automatic approval
+  review reported its usage limit. Do not bypass that rejection through another
+  launch route. No build, diagnostic or owned oracle process remains active.
+  The initial sampling launch22588 stopped at a settings-path error without
+  running its ELF and was stopped; prior oracle23948 is also no longer running.
+- Full Release ALL_BUILD session82640 is terminal, exit0. Full CTest session77902
+  is terminal, exit0: all21 entries passed in59.10s. GIF regressions now cover
+  DBW1,3,11,31 for both indexed formats, checking all64 words per256-byte tile
+  immediately and after aliasing writes, adjacent sentinels, cross-page reads,
+  and invalid-width rejection. The nonfatal missing-pwsh build warning persists.
+- The external1616-qword `indexed-sampling.elf` and its generator, manifest and
+  read-only observer are prepared under indexed-stride-oracle/. They test odd
+  TBW1,3,11,31 against even2,10,30 controls, using physical CT32 block uploads,
+  a known palette and56 sampled pixels downloaded into EE RAM. No successful
+  observation exists. Observer syntax is checked and incomplete stages,
+  mismatches or changed undrawn pixels return failure. Runtime sampling remains
+  unchanged; see ORACLE.md and SOURCES.md for evidence versus pending work.
+- Next action once the launch can be approved: use the isolated portable copy
+  with `-portable -batch -nogui` and the external indexed-sampling.elf, then run
+  observe_indexed_sampling.py after saving the returned process ID to
+  sampling-pid.txt. Require stage4, repeated stable readback, correct controls
+  and expected odd-width pixels. Only then extend TEX0 support, replace the
+  provisional rejection tests, rebuild and replay Left180m/Cross181m. Preserve
+  the active milestone: a verified later original startup screen after accepting
+  the absent-memory-card prompt. Do not count transfer tests as that milestone.
+
+- Previous connected session34382 is terminal, exit2. The original720x540 PSMT8
+  upload now passes; the next queued textured draw62385 stops at EE0x10d744
+  with `invalid TEX0 indexed texture buffer width`. TEX0=0x2007e006a932e200,
+  TBP0x2200,TBW11,PSMT8,TW10,TH10,CBP0x3f00,CLD1. External capture:
+  startup-indexed-stride.ram and adjacent state/VRAM/display files. No command
+  is active. Its saved640x448 scanout was checked without flushing pending draws:
+  all286720 pixels are black. No later original startup screen is verified.
+- psmt8_word/psmt4_word and transfer validation now accept64-pixel width units;
+  independent synthetic memory observations confirm whole-page row strides for
+  DBW11 and DBW1/3/31. GIF tests and diagnostic rebuilt successfully in25351.
+  The full native/Python suite has now passed as recorded above.
+  Odd TEX0 sampling deliberately retains its guard pending a separate measured
+  sampling probe. Immediate action: render synthetic indexed page markers into
+  a known framebuffer, observe that data, then add supported sampling/regressions
+  and replay Left180m/Cross181m toward a later original startup screen.
+- DBW1/3/31 evidence in indexed-stride-oracle/extremes-verified.json is now
+  documented in ORACLE.md/SOURCES.md and covered by passing regressions.
+  Older active-session and awaiting-first-oracle statements below are superseded.
+
+- Current continuation: session55935 is terminal (exit2), reproducing the same
+  PSMT8 transfer at EE0x10d744 after Left180m/Cross181m. No command is active.
+  External startup-transfer-provenance.ram.ee-ram.bin contains32MiB EE RAM;
+  its JSON includes all EE GPRs. Original submitted packet at0x4f20d0 contains
+  BITBLTBUF0x130b220000000000 at0x4f20f0, TRXREG720x540 at0x4f2110,
+  and IMAGE REF payload0x8f0080/QWC0x5eec at0x4f2140. This confirms the odd
+  DBW11 is present in the original packet, not a live-register decoding error.
+- Immediate work: establish odd indexed transfer page stride with an independently
+  assembled synthetic upload and a read-only memory-oracle observation. The GS
+  manual specifies64-pixel BITBLTBUF width units and128-pixel indexed pages, but
+  does not explicitly settle odd-width page-row behavior. Do not weaken guards
+  until that missing observation is obtained. The milestone remains a verified
+  later original startup screen after accepting the absent-memory-card prompt.
+- Everything below is historical where it mentions active sessions96254/1821.
+  Those sessions and55935 are terminal. No new visible milestone is claimed.
+
+- Continuation after handoff: the original sound RPC completion is compiled and
+  verified by terminal run 18016. Left at 180m and Cross at 181m pass that callback;
+  the next stop is EE0x10d744, invalid GS transfer buffer width, at slice183495727.
+  Capture: startup-prompt-callback.ram, 640x448,62384 draws/62376 rasterized.
+  This does not yet establish a newly visible startup stage.
+- Added non-mutating live GS registers and CLUT-load counter to external GS JSON,
+  and live BITBLTBUF/TRXPOS/TRXREG/TRXDIR to the diagnostic log. Prior draw
+  environments were stale relative to the failing transfer and cannot identify it.
+- CMake configuration recovered with clean-environment Start-Process and working
+  Python3.11.9. GLFW source was unavailable and its Git fetch failed with Windows
+  Schannel SEC_E_NO_CREDENTIALS, so the existing HG_OPENGL_HOST option is OFF
+  in the ignored diagnostic build cache. No project CMake source was changed.
+  Diagnostic rebuild passed; CTest tools now passes (79 Python tests,0.48s).
+  Earlier full native run passed all20 native entries; its Python launcher failure
+  is now resolved. Current active diagnostic session96254 replays Left/Cross,
+  240m budget,30m checkpoints, external startup-transfer-width.ram and log.
+- Immediate next action: poll96254, decode captured live transfer registers,
+  derive a bounded correction from original GS documentation, add regression
+  coverage, and continue until the original prompt advances to a verified stage.
+  Everything below this new continuation block is earlier checkpoint history;
+  no old build/test session listed below remains active.
+
+- Active milestone: advance the original missing-memory-card prompt by selecting
+  YES with Left and confirming with Cross, then trace the next original startup
+  stage. A build or an exhausted slice budget is not completion.
+- The earlier startup-csm1-csa run ended at its 180,000,000-slice budget, without
+  the old explicit CSA stop. Exit 1 was the diagnostic budget result. Its capture
+  contains 61,181 draws/61,018 rasterized, 640x448. The external display image was
+  converted to PNG; a monochrome copy was visually inspected and shows the
+  no-memory-card prompt with NO selected. Cross alone selects NO.
+- AGENTS.md now has operational continuation/milestone rules. Current code work
+  replaces the incorrect source-index CSA shortcut with the GS manual's shared
+  CLUT temporary buffer and TEX0/TEX2 load control. A Left diagnostic pulse is
+  added alongside Cross. Focused synthetic tests and the diagnostic build have
+  passed; connected runtime verification is active below.
+- Focused `gif_tests.exe` passes after the CLUT implementation and new synthetic
+  regressions. Test fixtures now request CLD=1 when loading palettes instead of
+  relying on the former incorrect live-VRAM lookup. Direct MSBuild Release/x64,
+  clean environment, one worker and node reuse disabled succeeded. The existing
+  nonfatal missing-pwsh post-build warning remains.
+- Diagnostic rebuild **69359** completed, exit 0. Connected native run **21268**
+  is terminal, exit 1: the new CLUT cache passes the earlier palette boundary and
+  reaches the Left pulse at 180m slices, then original SIFRPC completion reaches
+  untranslated EE0x21f280 (return0x26fad4). It stops before Cross. The 640x448
+  capture retains 61,347 draws/61,209 rasterized; a monochrome prompt crop was
+  viewed and still shows NO selected. This is not yet a prompt-advance milestone.
+  Artifacts: `%TEMP%/haunting-toc-probe/startup-clut-left-cross.ram` and adjacent
+  log/state/GS/display files. Full-color fidelity has not been visually verified.
+- Original-ELF inspection verifies the three instructions at 0x21f280 and its
+  original callback construction at 0x21fd80/0x21fda0, passed at 0x21fda4.
+  The supplied non-rendering manual list agrees. Added this exact AOT root and
+  regenerated 108,100 reachable EE words/750 unresolved items. Build **1821**
+  is active; next poll it and rerun the same Left/Cross sequence into a new
+  `startup-prompt-callback` external capture. Synthetic TOC and scripted input
+  remain diagnostic profiles, not faithful-disc/playability evidence.
+- Focused GIF tests and all 79 Python tests pass in this continuation. Other
+  native test binaries have not yet been rebuilt/retested for the CLUT header.
+- Previous sessions 43642, 69359 and 21268 are terminal. Older active-session
+  references below are historical. Only build 1821 is active.
+
+### Historical checkpoints (superseded where noted above)
+
+- Visible milestone: startup-card-info82677 renders the original memory-
+  card Checking/do-not-turn-off screen,640x448,8061draws/7898rasterized;
+  external PNG viewed. No playability/save support claim. Runs beyond90m
+  slices, then EE383550 via384bdc/100b40, object94f898. Original44af10
+  descriptor loaded3842e0/e4, installed38430c..18. Added230-word state
+  callback. EE108097words/750issues, IOP92651/28. Build7494 active; next
+  180m startup-card-prompt capture. Prior64930/82677 terminal.
+
+
+- startup-card-alarm26158 passes IOP alarm callback, reaches EE111450
+  RPC completion via26fad4. Original1115a8/1115bc passes it in a7 to
+  SIFRPC1115cc. Added22-word root; EE107867words/747issues,IOP92651/28.
+  Build64930 active; next180m startup-card-info capture. Prior44986/
+  26158 terminal. Full20native/Python79 unchanged since last pass.
+
+
+- Full native20PASS52.95s and Python79PASS after SIO2 extraction/PIO.
+  startup-card-pio48108 passes absent-card PIO and reaches MCMAN alarm
+  callback3ef84 viaTHREADMANa3b84. OriginalMCMANa13c/a140 constructs
+  offset9f84, a144 registers via thbase35. Added only10wordroot;
+  IOP92651/28modules, EE107845/747issues. Build44986 active; next180m
+  startup-card-alarm capture. Prior67911/5325/48108 terminal.
+
+
+- startup-card-probes33049 passes DMA probes and reaches PIO81/52,
+  SEND3=c0342, three bytes on absent card port2. Added missing-card PIO
+  transport. SIO2 extraction completed into runtime/iop_sio2.cpp and new
+  hg_iop_peripherals library. Full build67911 active; next full20 CTests
+  then180m startup-card-pio capture. Prior40567/33049 terminal.
+  Padding fidelity limitation remains in SOURCES; no playable claim.
+
+
+- startup-card-dma97784 completed first absent-card81/11 probe, then
+  hit bounded-profile stop on five-byte81/F3 (SEND3=140572). Generalized
+  absent-card selection81 to single36-word blocks on card ports2/3;
+  no command interpretation for absent devices. Tail FF stillunverified.
+  Build40567 done; iop_tests PASS.180m startup-card-probes session33049
+  active. Prepared SIO2 method extraction into runtime/iop_sio2.cpp and
+  hg_iop_peripherals library to avoid recompiling92k IOP words for each
+  peripheral fix. Do NOT rebuild/relink until33049 finishes.
+  Prior80882/97784 terminal. Connected displaystillblack198draws/22rasterized.
+
+
+- Module-spacing run43043 passes PC8/callback corruption; new stop is
+  SIO2 DMA setup7adf8 for absent-card probe81/11, port2, four serialbytes,
+  one36-word block each direction. Full native20PASS52.29s/Python79PASS
+  before next DMA changes. Verified original BIOS DMACMAN SetSliceDMA
+  writes request mode without start; fixed premature-start bug. Added
+  bounded missing-card DMA endpoint and buffer/ordering tests. Unused
+  140-byte RX padding uses FF profile, NOT hardware/oracle verified.
+  Build80882 done; iop_tests+dmac_tests PASS. Connected180m
+  startup-card-dma running session97784.
+  Prior6517/30114/87735 terminal. No other connected run active.
+
+
+- startup-sio-callback session27656 finished at IOP PC8. RAM watch proves
+  LOADCORE0x96840 wrote module ID8 to0x7afdc (SNDDRV header+12), overwriting
+  SIO2MAN BSS. Setter0x7ab18 never ran. Fixed placement SIO2MAN79fd0;
+  planner validates full rounded allocations with0x30 headers, runtime
+  rejects overlapping static plans. Python79PASS; regenerated IOP92641
+  words/28modules. Build6517 active for system diagnostic+iop_tests.
+  Next: focused iop_tests, then180m startup-module-spacing capture.
+  Previous PollSema run27751 also terminal. EE107845words/747issues.
+
+
+- startup-service-member reaches PollSema empty-count gap at26c1f4,
+  semaphore11, caller1113cc. Original1113d8 tests negative before
+  optional WaitSema. PS2tek documents -1 on failure; implemented empty
+  return-1 without count/scheduler change. kernel_tests PASS; build done.
+  Connected startup-poll-sema180m running session27751. Prior84138/
+ 10641 terminal. EE107845words/747issues,IOP92641/28modules unchanged.
+
+
+- startup-byte-switch reaches226220 via22653c/100b40, object4f1850
+  descriptor+14. Original1bf350/35c loads3b3028;1bf378..80 installs it.
+  Added root226220. EE107845words/747issues. Build10641 active; next
+  180m startup-service-member capture. Prior76180/88769 terminal.
+  Captured committed display640x448 is BLACK (PNG viewed);198draws,
+  22rasterized. This is not a new visible screen/playability milestone.
+
+
+- startup-object-ae90 reaches interior switch case38228c from original
+ 3821f0. Verified byte selector<30 at3821f8 and table463bd0, jr382218.
+ Added bounded indirect table463bd0..463c48. EE107477words/747issues.
+ Build88769 active; next180m startup-byte-switch capture. Prior10667/
+ 13858 terminal. Runtime and tests unchanged since prior full20pass.
+
+
+- Native full suite20/20 PASS (50.54sec), Python78PASS after cross/VF0.
+  startup-vu-cross reaches1bf340 via2bf414 slot0c, object4f1850.
+  Original1bf568..84 installs primary46ae90 + secondary46aeb4 tables;
+  added verified8 methods including secondary thunk1bf870. EE107424words/
+  748issues. Build13858 active; next180m startup-object-ae90 capture.
+  Prior23272/5052/66828 terminal. No active connected run currently.
+
+
+- Added four startup-selected methods from original vtable469a60:
+  slots24/a4/a0/20 ->1225c0,121970,121960,1225d0. Verified lifecycle
+  installs table1218b8..c4, original2cf8f0/904/918/97c selections.
+  startup-object-9a60 passes methods and reaches VOPMULA10db28.
+  Added bounded VOPMULA/VOPMSUB accumulator cross product plus VADD,
+  own VU manual116-117/241/305-306. Exceptional OPMSUB accumulator
+  product under/overflow or exponent255 remains explicit fault. Unit-axis
+  cross/alias/w-preservation test added. Python78pass. Fullbuild66828
+  active; next native suite and180m startup-vu-cross capture.
+  EE107304words/748issues. Prior17965/67981 terminal.
+
+
+- startup-default-member reaches virtual method2cf8c0 through1bbed0
+  slot0c, object94fa10. Original table46f350 has16cc40/2cf8c0; original
+  2d1050..5c installs that table. Added both verified method roots.
+  EE107278words/750issues. Build62203 active; next180m
+  startup-object-f350 capture. Prior36521/63922 terminal.
+
+
+- startup-member-states reaches default member callback383440 through
+  original384ba0/100b40, object888570+4 descriptor. Verified constructor
+  384538/384544 reads44aef0;38456c..78 stores descriptor at object+4.
+  Added exact original two-instruction callback as AOT root. No bypass.
+  EE106996words/739issues. Build63922 active; next180m
+  startup-default-member capture. Prior39732/29878 terminal.
+
+
+- startup-vu-broadcast passes scalar-vector multiply, reaches member callback
+  37fef0 from3806bc helper100b40, object888440. Original380510 copies
+  seven descriptors44ae70..44aed8:37fef0,380050,37fe50,37fc60,37fac0,
+  37f980,37f7d0. Added verified roots together. EE106994words/739issues.
+  Build29878 active; next180m startup-member-states capture.
+  Prior52359/70399 terminal. Latest VU/VF0 focused tests pass; last full
+  native suite20pass predates broadcast/VF0 changes (not yet rebuilt all).
+
+
+- startup-vu-normalize completes normalization, reaches scalar-vector
+  VMULx at10e64c (not a matrix operation despite earlier commentary).
+  Added VMULbc from VU manual299, synthetic alias/scalar test. Corrected
+  VF0 in older QMFC2/QMTC2/LQC2/SQC2/VMOVE/VABS/VMR32 helpers:
+  constant(0,0,0,1), ignored writes. Tool78pass; runtime target built.
+  Build70399 active. Next runtime test + startup-vu-broadcast180m.
+  EE102074words/682issues. Prior32137/99092 terminal.
+
+
+- Full native CTest20/20 PASS (51.05sec) after FBRST/fixture fixes.
+  startup-vu-reset reaches VPU-STAT29 read at10ca84. Added checked Ready
+  status0; pendingQ status polling explicitly faults until timed completion.
+  Added remainder of original normalization sequence: exact VNOP,VDIV,
+  VSUB,VMULq. Integrated synthetic vector(4,0,0,1)->(1,0,0,0), zero-divide
+  and0/0 flags tests added. Python78pass; runtime target built; build99092
+  active. EE102072words/683issues. Next runtime test then180m
+  startup-vu-normalize capture. Prior5055/27582/17388 terminal.
+
+
+- startup-cache-tags passes cache scan then CFC2 control28 at10bfd8,
+  original OR0200/CTC2 triggers VU1 reset. Added proper CFC2/CTC2 decode,
+  checked FBRST reset/enable state from VU manual21/203. Other control
+  registers still explicit unsupported. EE102065words/684issues.
+  All78Python tests PASS. Full native suite earlier19/20: translation
+  fixture still encoded old wrong QMFC2/QMTC2/SQC2. Fixed generator.
+  Fullbuild17388 active; next full native CTest + startup-vu-reset180m.
+  Prior93039/77599/11285 terminal. No playable build claim.
+
+
+- Corrected decoder exposes CACHE DXLTG at original26ca04 in startup-vu-q
+  before former graphics boundary. Added exact CACHE0x10 tag lookup
+  (coherent RAM => clean invalid TagLO0), CACHE0x14 indexwriteback ordering,
+  verified EE instruction manual303/306, original tag/PFN range loop.
+  Tool31pass. Build17877 active (runtime_tests built); next runtime test,
+  connected startup-cache-tags180m then continue VU boundaries. No active
+  run; prior74266 terminal. EE102012words/687issues,IOP92641/28modules.
+
+
+- VMUL/VADDbc native test passes; startup-vu-multiply reaches VSQRT10db78
+  with VF4=(0,0,0,1),VF5=0. Added bounded VSQRT pendingQ/WAITQ/VADDq;
+  synthetic zero/negative/nonsquare/synchronization tests pass. Tool31pass.
+  Manual audit corrected existing QMFC2/QMTC2 rs1/5 (not2/6), interlockbit,
+  SQC2 op62 (not47 CACHE). New negatives tested. EE101944words/687issues.
+  Build7451 active. Next180m startup-vu-q; earlier53686 terminal.
+  No full native suite after these newest VU changes yet. VF0 handling in
+  older transfer helpers remains an audit item (arithmetic reads correct
+  constant0,0,0,1). Q profile explicitly requires WAITQ before consuming.
+
+
+- startup-ds2-driver reaches EE10db6c unsupported VMUL, vector-length
+  sequence: VMUL.xyz then VADDy.x,VADDz.x then VSQRT/WAITQ etc.
+  Independently read local original VU manual pp26-29,39-42,244,296.
+  Added bounded VMUL/VADDbc static decode/emission, lane masks, MAC/status
+  flags using shared integer24-bit truncation arithmetic (same documented
+  format). VF0 reads constant0,0,0,1 for these operations. Synthetic
+  vector-length/mask/alias/overflow/flags tests added. Build18205 active,
+  EE102063words/682unresolved. Next runtime/tools tests and native run;
+  VSQRT remains explicit next boundary, no Q pipeline implemented yet.
+
+
+- All20 native CTests PASS (50.25sec) after controller/idle changes.
+  startup-dbc-switch reaches DS2O2dbb0 via DBCMAN27818 selector3.
+  Verified original2da58..2daa4 constructs six callbacks at2e1a0,
+  registers descriptor2dab8. Added all6 roots; IOP92641words/28modules.
+  Build89317 active; next180m startup-ds2-driver capture. Prior7328 and
+  tests53171/build98820 terminal. Display640x448 enabled with2 queued
+  draws,0 rasterized at stop; no new visible-screen/playability claim.
+
+
+- startup-idle-id passes idle GetThreadId and stops at DBCMAN27cf8.
+  This is an interior switch case, NOT a standalone callback. Original
+  RPC function27c88 bounds normalized selector<99 at27ca0, then jr27cc0
+  through table28560. Added complete independently verified table99,
+  generated28modules/92344words. Build50987 active. Next180m capture.
+  Prior92485 terminal; kernel test passed. No display enabled at last stop.
+
+
+- Controller/DBCMAN fixes advance beyond former controller prompt into
+  new EE interrupt path: GetThreadId26d078 with current0, INTC active,
+  all7 threads waiting/suspended. Diagnostic startup-ee-idle proves state.
+  Kernel now supports idle ID0 during initialized interrupt context, per
+  SDK declaration; preserves fault for accidental ordinary no-thread call.
+  kernel_tests PASS. Connected startup-idle-id180m running session92485.
+  All earlier runs/builds terminal. Next inspect final display/new boundary,
+  then exercise --press-cross-at if a user-input prompt remains.
+
+
+- startup-pad-sensors passes pressure negotiation and reaches original DBCMAN
+  callback262f4 (IOP static translation gap). Verified callback formed at
+  original263c8/263cc and registered by263d0. Added root+2f4; regenerated
+  all28 IOP modules,91684 reachable words. Build98860 active.
+  Added --press-cross-at slice for a250000us port0 Cross pulse through
+  digital bit14 and pressure index6, preserving original controller path.
+  Next connected180m run (first without input) after build completes.
+  controller_tests passes all12 sensor replies/invalid-index rejection.
+
+
+- Controller command4F reply now ends5A per independent hardware wire notes.
+  Focused controller test passes. startup-pad-reply reaches a NEW explicit
+  command40 pressure-sensor initialization gap, input014000000200000000.
+  Added bounded twelve-sensor initialization profile and exact reply tests.
+  Build83614 currently active (controller target built; IOP recompiling).
+  Next run controller_tests then connected startup-pad-sensors180m capture.
+  Prior run63531 terminal. Controller recognition still unverified.
+
+
+- MAJOR VERIFIED checkpoint: startup-gs-addressing180m produces clean
+  readable game screen640x448: No DUALSHOCK2 analog controller inserted
+  into port1; insert controller and press X. PNG viewed externally at
+  startup-gs-addressing.ram.display.ppm.png. All20 native CTests pass
+  after full rebuild. Run61020/build58743/tests19453 complete.
+  Next controller detection: native sio2_connected defaults{true,false},
+  so investigate PADMAN protocol/state; do not merely force connection.
+  Rendering supports this screen; gameplay/audio/hostinput remain unproven.
+
+- Corrected all GS *_word strides to2048/64/16 words, CT32/T8 block
+  x-bit2 shift tobit4, CT16/T4 blocky-bit2 shift tobit4, indexed column
+  row-bit1 XOR rather than addition. Verified original GS manual rendered
+  pp164/165/167/169; no external rendering material. gif_tests PASS,
+  including all8 formats fullpage uniqueness/coverage/nextpage separation.
+  Stale byte-stride expected constants corrected. Build52802 live for
+  systemdiagnostic. Next run startup-gs-addressing180m with external GS
+  capture; broaden native tests after rebuild as address changes are shared.
+
+- Native temp inspect_texture.exe extracted captured TEX0 source textures:
+  upper indexed texture mostlyblack; lower text visibly fragmented;
+  intermediate512x512 also corrupted. Temp sources/regs/PNG outside repo.
+  FOUND concrete addressing bug: all *_word helpers use page8192/block256/
+  column64 as WORD strides. Original GS manual p162 specifies BYTE units:
+  correct word strides2048/64/16. Also CT16/T4 block_y&4 times16 exceeds
+  block31; needs independently verify figure (likely times4). T8/T4 pixel
+  formula adds overlapping bit3 terms; audit against original columnfigure.
+  No mapping edits yet. Next correct audited mappings and replace stale
+  self-consistent tests with page coverage/boundary tests from specification.
+
+- startup-gs-state run33016 complete; external full GS JSON+VRAM valid.
+  Draws11653:6989 textured sprites(PRIM116hex),4664 clear sprites.
+  Last cycle draws512x256 indexed textures to intermediate FRAME80110,
+  then samples TEX0=664022200 into display FRAME10a0000,640x448.
+  Source TEX0s2007e08625423d00 and2007e10625423c00. Next inspect
+  source texture/CLUT captures through own native decoder to isolate
+  upload/layout versus sprite sampling. No active build/run.
+
+- Added external GS VRAM little-endian words plus full draw environment/
+  vertex JSON beside --dump-iop. Builds successfully. startup-gs-state180m
+  now running to diagnose corrupt display; same defaultbudget1/syntheticTOC.
+
+- VERIFIED first committed display capture from startup-display180m:
+  external startup-display.ram.display.ppm (+PNG viewed),640x448,574colors,
+  draws11653/rasterized11652. Output is CORRUPTED: broad white band with
+  fragmented/repeated black glyphs and colored noise nearbottom; not a
+  usable game frame/playability. Run16163 complete, no live processes.
+  Next export GS VRAM/registers and recent draw environments/vertices to
+  diagnose texture/layout independently. Draw environment snapshots exist
+  and are restored in rasterize_draw; do not assume missing state snapshot.
+
+- Added external .display.ppm beside --dump-iop capture, using existing
+  display_image on committed VRAM (no guest state mutation or forcedflush).
+  Logs dimensions and draw/rasterized counts, or explicit captureerror.
+  Build passed; startup-display180m/checkpoints30m now running to verify
+  rendered output. Prior78428 complete; no playability claim.
+
+- VERIFIED startup-texel-sampling completed180m slices WITHOUT unsupported
+  fault; exit1 is cooperative budget reached, EE1e53fc/currentthread5,
+  IOP1f0000/reboot1. Display configured NTSC/interlace,PMODE66/SMODE2=1.
+  Run78428 complete; no active build/run. Next inspect actual GS output
+  (add external dump through existing display_image) and continuing startup
+  state; no game frame/playability claim yet. Logs/capture external.
+  Shared texel conversion regression and existing gif_tests pass.
+
+- Texel refactor gif_tests PASS after fixing new fixture to ensure_vram.
+  Build97460 complete. Instrumented startup-texel-sampling run78428 live,
+  already100m slices;90m EE1e5f48,100m EE276290,VIFCHCR70000045.
+  Former slow run69081 terminal (deliberately stopped after profiling).
+  Test invocation39871 terminal; new gif_tests invocation passed in0.064s.
+
+- Identified actual long-run bottleneck: sampled own PID14356/thread39448
+  Windows context RIP7ff609130d28 (modulebase7ff609120000,RVA10d28);
+  disassembled our executable to texture/CLUT sampling. Source showed
+  point_sample_tex0 decoded ENTIRE texture per fragment (quadratic work).
+  Stopped PID14356 deliberately after this finding, not on polling timeout.
+  Refactored shared texel_from_tex0 conversion, extraction loops over it;
+  point sampling now converts one texel and reads live VRAM (no stalecache).
+  Added1024x1024 repeated-sample/live-write regression. Building97460;
+  next startup-texel-sampling180m with --checkpoint-every10000000 separated.
+  Diagnostic checkpoint source already compiled, now included in rebuild.
+
+- Checkpoint option compiles successfully using MSBuild /t:ClCompile only;
+  executable deliberately not relinked while run69081 remains active.
+  Still no output/fault; PID14356 CPU exceeded831s. Next poll samehandle,
+  then link/test checkpoints and inspect bounded diagnostic output.
+
+- Run69081/PID14356 still live, CPU722s with stable61MB working set.
+  No fault/output yet. Added optional --checkpoint-every slices to source
+  for future runs (EE/IOP PC and VIF/GIF control), defaultoff. Not yet
+  rebuilt/tested: preserve active executable until run terminal. Next use
+  --checkpoint-every10000000 (separate argument) to locate long-running phase.
+
+- Build79406 completed. startup-object-draw180m/defaultbudget1/syntheticTOC
+  is live (session69081, PID14356), repeatedly confirmed running; no output yet.
+  CPU time advanced275->427 seconds during continued polling; slice limit
+  remains180m. No restart or duplicate run has been launched.
+  Do not restart on poll timeout. Current EE102,060/682; IOP91,674.
+
+- startup-eight-state reached EE1bfdb0 via1bb53c slot6c,object7fe400.
+  Original1bf8a4 publishes46b050; retained26 entries46b058..46b0bc.
+  EE102,060/682; IOP91,674. Build50262/run94148 complete. Rebuilding
+  for startup-object-draw180m/defaultbudget1/syntheticTOC.
+
+- startup-resource-table reached EE16c0b8. This is a switch label, not
+  a function: original16c03c checks index<8 and16c05c dispatches table
+  44f7d0..44f7f0. Added bounded indirect table. EE100,462/665.
+  Build38397/run13434 complete; rebuilding for startup-eight-state180m.
+
+- startup-service-table reached EE1f4420 via26bbe4 slot10,object1970690.
+  Retained five original table46b1d0 methods46b1d8..46b1e8. Discovery
+  hit100k cap; raised configured limit200k, regenerated100,144/660.
+  Build77073/run68190 complete. Rebuilding; next startup-resource-table180m.
+
+- startup-member-sequence reached EE26bb00 via3807e8 slot8. Original
+  table46d7d0 contains nine contiguous methods46d7d8..46d7f8; retained
+  missing roots. EE99,932/660 (near100k discovery limit). Build53826
+  and run25589 complete; rebuilding for startup-service-table180m.
+
+- startup-derived-state reached EE380790 through member helper100b40.
+  Original380920 loads descriptor44ae40 into object+4; adjacent direct
+  descriptors44ae50/60 name380510/380410. Retained three targets.
+  EE99,481/652; analysis budget100k near limit (raise if genuinely hit).
+  Build18451/run7983 complete; rebuilding for startup-member-sequence180m.
+
+- startup-state-dispatch reached EE380920 via member helper100b40,
+  ra11fb04, same object888440. Original37f174 publishes table47a770;
+  retained remaining methods37f140/380920/11f990. EE99,025/636.
+  Build65865/run8268 complete; rebuilding for startup-derived-state180m.
+
+- startup-object-flags completed at EE11f9c0 via2d1bc0 slot0c,object888440.
+  Original shared state dispatcher appears in multiple ELF vtables; retained
+  observed target without guessing the live derived table. EE98,807/636.
+  Build54218/run99331 complete. Rebuilding; next startup-state-dispatch180m.
+
+- startup-service-five completed at EE1be1f0 via2d440c slot0c,object4f1500.
+  Original1be178 publishes46adb0; retained three methods46adb8..46adc0.
+  EE98,720/636; IOP91,674. Build6189/run82881 complete. Rebuilding
+  for next startup-object-flags180m/defaultbudget1/syntheticTOC.
+
+- VERIFIED VIF1 TTE startup continues: startup-vif-tte reached EE1ca610
+  via service dispatcher1e5c10. Original1ca7cc selects callback before
+  registrar1ca7d8; CFG join loses path-specific constant. Added explicit
+  original root; EE98,557/636, IOP91,674. dmac_tests passed, build48334
+  and run36538 complete. Rebuilding; next startup-service-five180m.
+
+- startup-vif-control confirms CHCR145 (TTE source-chain) at10d740.
+  Added upper64 tag delivery with physical phase8, from EE manual45/74/86.
+  Added integrated TTE DIRECT regression; build underway. Next run
+  startup-vif-tte180m/defaultbudget1/syntheticTOC after tests. Mid-packet
+  tag crossings explicitly unsupported pending phase tracking. Runs13536
+  and88824/build40712 completed; fault diagnostic now includes v0.
+
+- VERIFIED GIF status polling passes in startup-gif-status. Added completed
+  synchronous status, VIF mask bit1 and GS BUSDIR bit12 from EE manual
+  pp149/164; incomplete packet status explicitly faults. runtime_tests pass.
+  Build9586/run19771 complete. Next EE10d740 VIF1 source-chain start rejects
+  CHCR mode (original ORs105 into prior CHCR); watch run startup-vif-chain
+  now live to establish exact CHCR before implementing applicable transport.
+
+- VERIFIED VIF1 idle polling now passes in connected startup-vif-status.
+  Run91673 completed at EE10cabc reading GIF_STAT10003020, masking0c00
+  (next: derive GIF status from original/manual, never shared rendering data).
+  VIF regression passes; build51797 complete; no live build/run processes.
+  EE98,171/635; IOP91,674. No game frame or playability established.
+
+- startup-object-init completed at EE10ca44 reading VIF1_STAT10003c00
+  (mask1f000003 checks VPS/FQC). Added synchronous completed/empty status
+  and MARK detection/clear from Sony EE manual pp143-144. Incomplete
+  packets explicitly reject status reads until FIFO/pipeline is modeled.
+  gif_tests pass; build51797 complete. startup-vif-status now running
+  180m/defaultbudget1/syntheticTOC. Prior build67317 and run58176 complete.
+
+- startup-allocator completed at EE1beef0 via2d1c48 slot10, object4f14c0.
+  Original1be7d4 publishes vptr46adf0; retained five additional methods
+  from46adf8..46ae0c (1bed00 already retained). EE98,171/635; IOP91,674.
+  Rebuild underway; next startup-object-init180m/defaultbudget1/syntheticTOC.
+  Build41010 and run77903 completed. No game frame or playability established.
+
+- startup-main-object completed: EE168fc0 via2cfc3c slot10, object1961440.
+  Independently verified original table46a1c0 and vptr publication168c44;
+  retained four methods46a1c8..46a1d4. Non-rendering reference lead matched;
+  no implementation copied. EE94,165/622; IOP91,674. Rebuilding for next
+  default-budget startup allocator diagnostic. Build33549 and run73507 complete.
+
+- startup-member-state completed at EE2cfbd0 via2d1c2c slot24,object487a00.
+  Original20dbd8 publishes vptr46f360; eight non-null methods46f368..46f384
+  retained together. EE93,808/622; IOP91,674. Rebuild33549 now live; next default
+  startup-main-object180m/syntheticTOC. Run53633 complete.
+
+- startup-object-state completed at EE2d1b20 through member-pointer helper
+  100b40/100b6c,ra2d1f64,a0=487a00. Original static descriptors414370/414380
+  contain{0,-1,2d1b20}/{0,-1,2d1aa0}; retained both helper targets alongside
+  existing2d1e40. EE89,472/598; IOP91,674. Build41376 complete; current
+  startup-member-state53633 live,180m/defaultbudget1/syntheticTOC. Run37184 complete.
+
+- startup-snd-completion completed at EE1bb9d0, object4f1920 via2a7ae0
+  slot28. Original table46ac50 stores it at46ac78; original1aae34 publishes
+  the vptr. Retained36 non-null methods46ac58..46ace4 together, exclusively
+  from original executable. EE89,219/590; IOP91,674. Build11240 completed;
+  startup-object-state37184 live,180m defaultbudget1/syntheticTOC. Run35731 done.
+
+- startup-snd-bank completed at EE21f290 viaSIFRPC26facc,ra26fad4,
+  a0=21971640. Original21fac8/21faf4 selects paired callbacks21f2b0/21f290;
+  they clear bits0/1 of the caller's flag. Retained both original roots.
+  EE74,710 words/514 unresolved; IOP91,674. Build65987 live; next run
+  startup-snd-completion180m defaultbudget1 and syntheticTOC. Run87350 done.
+
+- VERIFIED CDVD continuation fixed at defaultbudget1: startup-cdvd-command-completion
+  clears timeout and reaches SNDDRV RPC86018 (ra998bc,a0=120000,a1=8fc80,a2=20).
+  Metadata drive read_pending0,sectors0,LBA2113120,error0; original streaming
+  advanced beyond the failed64-sector read. All20 native CTest targets pass.
+  Original85540 registers server77777778 with callback86018; retained SNDDRV
+  offsetb018. IOP91,674 words; EE74,696/514. Rebuild9130 now live; next default
+  budget1 startup-snd-bank180m. Prior44849 and96704 complete.
+
+- Found concrete intermediate-CDVD IRQ bug. Each partial DMA descriptor
+  published I_STAT1; original IRQ2 path b6404..b6458 calls b5b18, which
+  signals request completion and disables IRQ35 atb5b54. This stranded the
+  nextbuffer regardless ofworkerbudget (budget4 and32 both reachedBREAK).
+  complete_cdvd_dma_record now signals DMA only whilecommand stillpending;
+  finaldescriptor retains existing drivecompletion3. Added split-command
+  regression with two independently armed descriptors; focusedIOP tests pass.
+  Rebuild32149 live. Next defaultbudget1 startup-cdvd-command-completion180m.
+- EE SignalSema overflow now returns documented-1 without changingcount;
+  normal/interrupt regressions pass. No live diagnostic processes; previous
+  budget32-sema50694 andbudget4 91303 complete. Defaultworkerbudget remains1.
+
+- Budget32 experiment completed quickly at EE26c1d4 SignalSema overflow
+  (semaphore4,ra10eeec), before proving the laterCDVD continuation. Preserve
+  defaultbudget1 until timing/profile validated; don't claimCDVD fix.
+  No matching non-rendering configuration lead for SignalSema overflow.
+  Next establish its original error ABI or compare a smaller budget, keeping
+  the independent event-grant fix. No live processes. External startup-iop-budget32
+  log/RAM metadata retained. New option is diagnostic, not cycle-accurate timing.
+
+- startup-event-grant completed at same BREAK. Event fix valid but does not
+  resolve mode0 worker starvation. Added diagnostic --iop-worker-budget1..128
+  (default1 preserved), using existing per-instruction scheduler burst. Metadata
+  records budget. Connected runtime previously allows1IOP instruction/us while
+  audio consumes48k samples/sec: investigate insufficient CPU throughput.
+  Current experiment startup-iop-budget32 at180m slices, budget32, syntheticTOC.
+  Build complete, focusedIOP tests pass. Previous37364 terminal.
+
+- Corrected IOP event grants: original iSetEventFlag a11d8 copies result,
+  a11f0 clears WEF_CLEAR before making waiter ready. Native set now captures
+  output/clear atomically and records granted_event; resumed wait consumes
+  the grant without retesting or clearing later signals. Regression verifies
+  captured result, preserved second signal, and immediate waiter removal;
+  focused IOP tests pass. Build23933 completed. startup-event-grant180m live.
+- Diagnostic evidence before fix: CDVDFSVced5c validates sectors203d20..2f
+  correctly. Event4 bits0x29; worker8 ready priority81 waitingbit0x20, worker19
+  also ready priority39. So current CDVD wait is likely starvation, not bad
+  headers; WEF_CLEAR bug is independently proven but this wait usesmode0.
+  Worker19 original143f8 waits via1a734 then loops14128 work; inspect its
+  semaphore credits/audio pacing if event-grant run reaches same wait.
+  External metadata now includes threads/events. Runs77021/74065 complete.
+
+- startup-cdvd-break-state (session86297) completed; metadata JSON parses.
+  Important evidence: BREAK occurs with read command8 pending, LBA2112832
+  (0x203d40),32 sectors remaining from64, DMA [835208,12,1073742336]
+  (MADR0xcbe88,BCR0xc,CHCR0x40000200 inactive). No pendingCDVD IRQ/error;
+  status2. Virtualtime97,332,756us. Two intermediate descriptor completions
+  published I_STAT1 and originalb630c acknowledged them, but nextDMA was
+  not armed. Investigate multi-descriptor read continuation before guessing
+  BREAK readback or IRQ. Originalb6314 checksI_STATbit0,b632c checksNstatus
+  bit0 then records1/-1; b6350 acknowledgesbit0. No live processes.
+
+- startup-iop-context-return completed at original CDVDMANb81b0 writing1
+  to BREAK1f402007; nextb81b4 reads it and discards result via nextload.
+  PS2tek documents BREAK stopping current N-command but not readback/IRQ
+  timing. Do not fabricate those semantics. Added CDVD command/DMA/status
+  and64-entry MMIO trace to external fault metadata to diagnose the timeout.
+  Build complete; startup-cdvd-break-state180m now running with synthetic
+  TOC. Previous31102 terminal. Next inspect metadata cdvd object, derive
+  needed cancellation/completion behavior from original code/specs/oracle.
+
+- Build77829 completed successfully. Current diagnostic31102 confirmed live:
+  startup-iop-context-return,180m slices, synthetic TOC, external matching
+  log/RAM. Poll this handle; do not restart based on empty output. This run
+  tests original timeout callback beyond corrected GetThreadId interrupt ABI.
+
+- startup-cdvd-timeout completed at GetThreadId9fe94 in alarm IRQ.
+  Original THREADMAN9fea8 calls QueryIntrContext,9feb0 branches to9fed4
+  returning-100. Native adapter now returns that error in interrupt context;
+  focused IOP tests pass. Rebuild session77829 live (IOP translation header
+  dependency); poll before next180m startup-iop-context-return run.
+  Previous58309 completed; no live diagnostic. EE74,696/514, IOP91,645.
+
+- Build76749 completed. Current diagnostic session58309 is live:
+  startup-cdvd-timeout,180m slices, synthetic TOC, matching external RAM/log.
+  Poll it before any restart. CDVDFSVce920 is the original alarm callback:
+  calls cdvdman50(-18) then cdvdman39 and returns whether result is zero.
+  No timeout result fabricated. Native tests20/20 passed; latest changes
+  after those tests only retain original callback root.
+
+- startup-large-sif clears the larger DMA and reaches original CDVDFSV
+  callbackce920,ra a3b84,a0 d3748. Originalcf150/cfba4 register it in a1.
+  Retained module offset920; IOP91,645 words. All20 native CTest targets
+  passed after larger-SIF change. Next rebuild/run180m startup-cdvd-timeout.
+  Run63260 and test69299 are complete. EE74,696/514 unchanged.
+
+- startup-secondary-object advances to a raw SIF descriptor size2800 at
+  21f8e0/26c564, exceeding old4096-byte diagnostic cap. Replaced that cap
+  with checked native staging60000..80000; aggregate bounds are checked
+  before mutation. Kernel regression verifies complete larger transfer,
+  snapshot integrity and single/combined overflow rejection; passes.
+  Rebuild completed; startup-large-sif now running180m slices with synthetic
+  TOC. Previous10376 completed. EE74,696/514, IOP91,624 unchanged.
+
+- Longer120m run60039 completed at new EE target2107d0 via2cfa98,
+  object887204. Original constructor20e038 publishes secondary vptr46bf2c;
+  its slot4c at46bf78 matches target. Retained91 original non-null methods
+  46bf34..46c09c, derived entirely from original table and constructor.
+  EE74,696 words/514 unresolved; build52166 completed. Current live run
+  session10376: startup-secondary-object,180m slices with synthetic TOC.
+  Poll handle and external log/RAM metadata; no other active processes.
+
+- startup-service-registrars completed60m without an unsupported stop;
+  transport173,003 (formerly43,064), main priority correctly1, EE at original
+  bounded delay1ee71c (loop exits after7552 iterations), IOP worker19 active.
+  Original services are issuing repeated transfers. Longer120m run now live
+  session60039, startup-service-registrars-120m.log/.ram in external probe dir.
+  Poll it before starting another run; compare transport and wait context.
+  No frame/playability evidence. Session63363 is complete.
+
+- startup-service-callback reaches1ca680 at the same dispatcher. Added
+  original registrar callback ABIs for1e5898(a1),1e59e0(a2),2400e8(a1),
+  240198(a0). Evidence recovers1ca660/1ca680 and240990/2409d8 in pairs.
+  EE72,690 words/496 unresolved, IOP91,624. Build14238 completed.
+  startup-service-registrars is live as session63363,60m slices, synthetic TOC.
+  Poll it and inspect external matching log/RAM metadata; keep advancing.
+
+- startup-command-callbacks clears both IOP callbacks and reaches EE240990
+  via1e5c10. Original23ac58..23ac70 registers that pointer with2400e8.
+  Added the verified callback: EE71,806 words/491 unresolved; IOP91,624.
+  Rebuild is in progress; next run startup-service-callback at60m slices.
+  20 native CTest targets passed; tools test hit sandbox temporary-file denial,
+  then all78 Python tests passed when rerun with approved temporary access.
+  No live diagnostic runs; previous build93327 initially hit executable locked
+  by CTest, then linked successfully after tests finished.
+
+- Corrected ChangeThreadPriority to return previous priority. Original1cafa8
+  saves it and1cb030 restores it; returning universal zero starved EE workers.
+  Kernel regression covers0->1->5->1 and implicit current-thread ID. It passes.
+  startup-priority-restore clears the former60m/120m identical wait and reaches
+  IOP17af0 via10b94. Original17dfc/17e14 register17af0/17b9c through10b0c/10b18;
+  retained both callbacks. IOP28 modules/91,624 words; rebuild session93327 live.
+  Next run same60m synthetic TOC profile after polling build completion.
+  Earlier120m run86361 completed with identical43,064 transport steps; no longer live.
+  ORACLE.md interpretation corrected without changing recorded observation.
+
+- startup-next-object reaches60m slices without unsupported stop. EE1693a0
+  polls request state via1ca1f0 (byte at object+1), waiting for3/4. IOP worker19
+  is runnable at16ecc with interrupts masked; transport steps43,064 show
+  continued activity since earlier checkpoints. A120m-slice run is currently
+  live as session86361 (startup-next-object-120m). Poll that handle; do not
+  restart it based on empty output. This run distinguishes progress from wait.
+
+- Original ctor1e30d0 confirmed publication of table3cff70. Added its nine
+  non-null methods together; EE71,536 words/490 unresolved. Current build
+  session30503. Next startup-next-object run with60m slices and synthetic TOC.
+
+- VERIFIED CK01 entry: startup-object-table.ram.json watch0xe0030 records
+  original MODLOAD call with a0=1,a1=0x17ef80,gp=0xe80b0,sp=0x17ef70,
+  ra=0xaa324. The original buffered loader now reaches the compiled module;
+  this is execution evidence, not merely preloaded code. No success fabricated.
+  Current stop is EE1e3268 via jalr1d1f98,ra1d1fa0,a0=3cffa8,a1=0.
+  Original method pointer at3cff94 belongs to table3cff70 slot24. Nine
+  non-null methods span3cff7c..3cff9c, followed by zero/object3cffa8.
+  NEXT: verify ctor publication, then retain that original table's methods
+  together and run startup-next-object at60m slices. No active processes.
+  Current EE71,100/483; IOP28 modules/91,509. All21 regressions passed
+  after buffered lifecycle implementation; later additions are original roots.
+  Not playable. Source-region/module lifecycle work is complete for this
+  verified buffer profile; arbitrary dynamic modules/placement remain explicit gaps.
+
+- startup-cri-paired advances to EE method169420 via jalr2cfa3c, object80adc0.
+  Original table46a1e0 contains that slot30 at46a210; retained all14 non-null
+  methods46a1e8..46a21c together (skip existing roots). Original1692a4 writes
+  this vptr during object destruction. EE71,100 words/483 unresolved.
+  System rebuild just launched; next run startup-object-table with60m slices
+  and --watch-iop-pc0xe0030 to prove CK01 entry execution, not just preloading.
+  IOP28 modules/91,509 words. All21 regressions passed before last root additions.
+
+- All21 regression targets pass after buffered lifecycle changes, including the
+  new compiled embedded-source fixture. startup-cri-transfer next hits paired
+  CRI callback110e8 at jalr10c24. Original registrations11454/1146c prove
+  both10e90/110e8. Added the second root; build session33506 running.
+  Next startup-cri-paired run,60m slices/synthetic TOC. CDVDMAN:50 selector-9
+  independently decodes to b6f80, loading original halfwordbfa44; existing
+  29-entry table already covers it, so no invented module result is needed.
+
+- startup-buffered-ck01 builds and starts, but newly reaches untranslated
+  CRI_ADXI callback10e90 at jalr10b94 (ra10b9c), before display initialization.
+  Own relocated original shows pointer construction at11448. Added+0xe90 root;
+  system rebuild session50801. Next run startup-cri-transfer with60m slices.
+  Added a third embedded synthetic bundle input to exercise native region loader
+  registration and allocation; build/test that fixture after active system build.
+
+- Buffered lifecycle implemented: source-region loader retains verified original
+  bytes in a static plan, CK01 configured at0xe0030 (prefix0x30). Original
+  MODLOAD entry0xa9440 now has a generated observation hook that compares
+  the complete image, rejects unknown/duplicate loads or explicit placement,
+  selects the plan, then executes the original entry instruction/body.
+  Original allocation and relocation remain active; free resets the plan for
+  reload. AOT hook/native lifecycle regression passes (tests/iop_tests).
+  IOP bundle28 modules/91,442 words. Current system build session31569;
+  next connected run startup-buffered-ck01 with60m slices/synthetic TOC.
+
+- Embedded-region source support is implemented in iop_source.py using
+  offset,size,container_sha256 plus the module hash. Source extents and whole
+  container identity are checked; iop_build.emit_load uses the existing checked
+  load_iop_region_file path. Bundle root remains the common directory of
+  non-embedded inputs (MODULES), so embedded ELF paths may resolve through
+  ../SLUS_210.75. All78 synthetic Python tests pass, including embedded source,
+  changed-container and bounds rejection. No ck01 config added yet: runtime
+  buffer lifecycle still needs explicit binding before loading it.
+  Original MODLOAD exports:9=0xa9440 LoadModuleBufferAddress;
+  10=0xa948c LoadModuleBuffer (confirmed API declarations, not SDK code).
+  10 calls9 with a1=a2=0. At9, original stores source a0 at new stack+32
+  and builds a load-job record (type2 atstack+16) for0xa9e64.
+  Suggested next step: an AOT entry observation hook at9 that verifies the
+  buffer against immutable source bytes and selects its static allocation plan,
+  while still executing the original body. Do not match solely on memory size.
+  Use a free static low-memory range below scratch1m, and let the existing
+  high-water reservation protect it. Current native high-water affects SYSMEM
+  reservation (system_diagnostic.cpp221), not scratch_low (fixed1m).
+
+- CURRENT boundary: startup-service-table passes service methods and reaches
+  embedded IOP ck01 loading. Native LOADCORE0x96cac rejects link range
+  a0=0x100030,size0x70,ra0xab530 because the module is not in static plan.
+  Captured relocated image header at0x100000, code0x100030, name0x1000a0.
+  Original source is embedded in SLUS_210.75 file offset0x34aa20. Its full
+  ELF file extent is0x359 (include relocation/symbol/string sections after
+  section headers); sha2564ca27d8c457807cd6bcf5a8b4fb79f51b4a1ba00b8c10a0dc94936be9339ec51.
+  Captured source buffer0x13dc00 matches all0x359 original bytes exactly.
+  One import cdvdman:50 at module+0x54; text size0x70, memory0x90, entry0.
+  Code calls that import with a0=-9,a1=stack+16; returns1 on success else5.
+  NEXT: add identity-checked embedded-region source support to iop_source.py
+  and emit_load (currently ROMDIR or standalone only), then static buffered
+  module allocation/link lifecycle. Do not merely bypass LOADCORE check.
+  pending_iop_module_path still names a prior file, so buffer loading needs
+  explicit identity/lifecycle handling; avoid matching only allocation size.
+  Tests: all21 passed before constants change; all77 Python tests pass after.
+  All builds complete; no running process. EE69,101/474; IOP91,429 words.
+
+- startup-paired-callbacks reaches method1e4010 via object slot18 at1e4f94,
+  ra1e4f9c, a0=3d3fe0. Original ctor1e3c28 publishes table3d3fa8;
+  all nine non-null methods3d3fb4..3d3fd4 retained as roots (eight new).
+  EE69,101 words/474 unresolved. System build session41029 is running.
+  Next run startup-service-table,60m slices with external synthetic TOC.
+
+- startup-service-callback reaches next indirect callback0x1e4ee0 via
+  jalr0x1da8b4, ra0x1da8bc. Original setters1da7d0/1da7e0 store callback
+  a1 and arg a2 in object slots20/24 and28/2c. Added both callback bindings
+  at dispatch sites1da860/1da8b4. Discovery initially lost pointers on an
+  unrelated LW; fixed integer loads to invalidate only their destination.
+  Synthetic tests verify all12 load forms preserve unrelated pointers and
+  kill overwritten ones (31 tool tests pass). Four callbacks now recovered:
+  1e09c8,1e0a28,1e4e40,1e4ee0. EE68,663 words/470 unresolved.
+  Current system rebuild session78322. Next run startup-paired-callbacks,
+ 60m slices. All21 native/tool/integration targets passed immediately before
+  the discovery fix; focused31 tool tests pass afterward.
+
+- The60m followup progresses beyond resource lookup and faults at callback
+  0x1ca660 via original jalr0x1e5c10, ra0x1e5c18. Added that original root;
+  it calls0x1d3e58 and expands EE discovery to68,314 words/470 unresolved.
+  Build running session20123. Next: startup-service-callback with60m slices.
+  The30m resource-lookup snapshot was ongoing work, not a stuck loop.
+
+- Latest startup-pressure-probe reaches30m slices without an unsupported stop.
+  EE0x118388 is a string compare called by resource-name table lookup0x16b344;
+  DATA.CVM native reads continue (latest LBA0x1649b8). Controller thread24
+  completed ExitThread and is dormant at0x1f0020. A60m-slice followup is
+  running (startup-pressure-60m, session63418) to distinguish progress from
+  a repeat wait. Negative EE syscall-49 now maps interrupt-only to31,
+  sharing ReferThreadStatus; full48-byte comparison regression passes.
+  Added -49 returning discovery; EE58,372/353 unresolved. ExitThread synthetic
+  test now executes the generated AOT adapter and passes. Pressure42 accepts
+  short5/9-byte mode-probe prefixes, verified against original5-byte capture.
+  All builds complete. Full21 suite passed before ExitThread/status additions;
+  focused IOP/kernel/controller tests pass after respective changes.
+
+- Pressure negotiation now passes: startup-controller-pressure reaches original
+  THREADMAN panic at0x9f2fc after DS2O0x2c72c calls thbase:8. Original export
+  thbase:8 is module+0x1288 (0x9f288), which marks current thread dormant
+  then requests context transfer. Added explicit native ExitThread adapter:
+  retains ID/stack, stops dispatch at dormant sentinel, permits restart/delete.
+  Focused IOP tests pass; system build is running (session37229).
+  Next connected run: startup-thread-exit, same30m-slice/synthetic-TOC recipe.
+  Current IOP bundle27 modules/91,429 words. Controller pressure full mask
+  ff ff03 is supported with retained12 pressure bytes and21-byte polls.
+  Controller implementation moved to runtime/controller.cpp for faster builds.
+  All21 regression targets passed before ExitThread addition. Game not playable.
+
+- Controller config now advances to command41 (`startup-controller-config`).
+  Added the mode-dependent masked-capability response documented by ps2tek;
+  source disagreement is recorded in SOURCES for future verification.
+  Full preceding run passed20 targets; IOP test hit stack overflow after
+  IopState grew. Moved all its local IopState fixtures to heap allocations,
+  preserving lifetimes; focused IOP/controller tests both pass. Latest
+  controller41 system build running. Next run `startup-controller-query`.
+
+- Controller configuration boundary: DS2O table build passed. Connected
+  `startup-controller-states.log/.ram.json` faults on SIO2 command43,
+  packet1,67,0,1,0 (digital -> config), descriptor0x140540. Added independent
+  stateful Controller class and5/9-byte SIO2 framing. Config/analog/lock,
+  query commands45/46/47/4c and rumble map4d are supported, with retained
+  axes and motor values. Pressure/watchdog/host controls remain incomplete.
+  New controller tests pass. Full build running after fixing a missing<string>
+  include in the new standalone header. Next: full regression and connected
+  `startup-controller-config` run. No new IOP roots beyond state table yet.
+
+- Added configured interlaced NTSC display timing (27MHz rational phase,
+  525 half-lines/field,480 active,60 fields/1001ms) and cooperative EE INTC
+  chains preserving full CPU context. next0/front,-1/back,existing-ID/before
+  order follows ps2tek API spec. Pending edges during callbacks remain latched.
+  Nonzero callback returns still fault. Original INTC2/3 roots0x1beda0,
+  0x1bed80 and0x1aac30 added. Display start also wakes native IOP
+  WaitVblankStart threads and publishes GS VSINT. Host rendering unchanged.
+  Full build passed;20 test targets pass across full run plus focused kernel
+  rerun. Old kernel test omitted AddIntcHandler next argument; set it to0
+  to satisfy its real ABI, no runtime relaxation. New ee_interrupt tests
+  verify rational timing, chain ordering/removal, masked retention, reassertion,
+  context restoration, and invalid insertion/return rejection.
+  `startup-display-edges.log` now reaches DS2O IOP0x2c2c0 from0x2c2b8.
+  Original state byte+66 is bounded<14 and indexes table module+0x1f10.
+  Added that full14-entry table. IOP91,464 words; EE58,370/354 unresolved.
+  Latest IOP rebuild running, then run `startup-controller-states`.
+  Display timing presently supports the observed interlaced NTSC mode only;
+  other modes/custom timings remain explicit gaps. No shared rendering used.
+
+- CURRENT BOUNDARY (2026-09-09): original two-flag wait0x1bed00 is now
+  compiled. `startup-two-flag-wait.log` and latest `startup-intc-state.log`
+  reach30m-slice budget at EE0x1bed1c, ra0x1696d0. Original caller0x169680
+  formats `ST_%03X` from0x44f268 before calling object slot+0x1c. Wait
+  clears/polls gp-30444 then gp-30440. Original0x1beda0/0x1bed80 set them.
+  Original registration0x1bf198..0x1bf1d4 installs those for INTC2/3.
+  Latest budget diagnostics establish INTC status0, mask0x80c, CP0 status
+  0x70010001, and these handlers: cause11 ->0x277110 arg0;
+  cause3 ->0x1aac30 arg1; cause2 ->0x1beda0 arg0x200;
+  cause3 ->0x1bed80 arg0x200. Cause3 therefore needs an ordered chain,
+  not a single-handler shortcut. Native AddIntc currently retains next/arg
+  but dispatcher only handles SIF0 DMA; inspect original handler insertion
+  ABI and preserve callback state/return rules. Do not skip either handler.
+  DISPLAY IS NOW CONFIGURED: interlace1, mode2, frame0; PMODE/SMODE2 zero.
+  Earlier pre-read fault snapshots showing unconfigured display are stale.
+  Next: independently implement configured NTSC display edge timing and
+  EE INTC delivery, with synthetic timing/chain/context tests; connect IOP
+  display-edge wakeups if appropriate. No shared rendering material may be
+  consulted. Current handler targets must be verified/rooted from original
+  ELF as needed; do not set the wait flags directly or synthesize completion.
+  New read-only budget report in system_diagnostic prints INTC/display state.
+  Latest system build passed. EE58,238 words/352 unresolved; IOP90,642 words.
+  Multi-record runtime is verified by full18 passes plus corrected focused
+  IOP pass. Later changes only add EE static coverage/diagnostic reporting.
+  All processes finished; no live tool sessions. Capture logs external under
+  TEMP/haunting-toc-probe. Synthetic TOC remains required. Header transfer
+  and subsequent two-sector read demonstrated; playability not established.
+
+- Multi-record DMA full build passed; all19 CTest checks now pass across
+  full run plus focused IOP rerun. The new extra local IopState caused
+  Windows stack overflow0xc00000fd in the already-large test main; moved
+  its regression into a non-inlined helper with heap state, then reran IOP
+  successfully. No runtime fix needed for that test-harness issue.
+  `startup-multi-record.log` advances to EE formatter switch0x26e054.
+  Verified original89-entry table0x45ae00..0x45af64 at jr0x26e03c;
+  configured table, emitted58,208 EE words/352 unresolved and rebuilt.
+  IOP remains27 modules/90,642 words. Connected `startup-formatter-switch`
+  currently running with30m slices and external synthetic TOC.
+
+- Original read-completion callbacks now execute: IOP+0xb58 and EE0x10f0a8
+  compiled successfully. `startup-ee-read-complete.log` next reaches a
+  two-record DVD descriptor (MADR0xc3d88,BCR0x0056000c,CHCR0x41000200).
+  Own original CDVDMAN decode proves blocksize12 and43 blocks per record.
+  Implemented checked multi-record DMA with per-record MADR/BA advancement,
+  STR retained until final record, completion only at descriptor end, and
+  full descriptor bounds against remaining command/RAM. Added two-payload,
+  no-premature-IRQ, final-status and oversized-descriptor regression cases.
+  Full build in progress; this newest runtime change is NOT yet verified.
+  EE58,086 words/353 unresolved; IOP27 modules/90,642 words.
+  Next: inspect build/test results, then run connected startup and save
+  `startup-multi-record` captures externally. Earlier retry0 runtime passed
+  all19 tests; that pass predates this multi-record change.
+
+- VERIFIED first DATA.CVM sector transfer: `startup-archive-retry0.ram`
+  contains the exact2048-byte local header at IOP0xc3d94. Retry0 runtime
+  change and full Release build pass all19 CTest targets (42.83s).
+  Startup next stops at IOP0xceb58, ra0xb82b0: original CDVDFSV DMA
+  completion callback. Original callsites0xcf0f0/0xcf118 construct its
+  address; callback sets event bit0x20 through thevent:7. Added root+0xb58.
+  IOP now27 modules /90,642 words; system diagnostic build in progress.
+  Next: run with same synthetic TOC and inspect completion/next boundary.
+  Archive mounting and complete asset delivery to EE are not yet verified.
+
+- Startup now reaches the first real DATA.CVM sector request (LBA0x164972).
+  Extended backend build passed. `startup-backend-extended.log` reached
+  IOP0xd1c1c; verified CDVDFSV N-command registration ID0x80000595 and
+  its19-entry bounded switch; added root+0x3c1c/table+0x53d0.
+  IOP bundle now27 modules /90,632 words; EE58,000 /353 unresolved.
+  This build passed. `startup-cdvd-n-command.log` next rejects ReadDvd
+  retry0 (ISO discovery used retry16): packet114,73,22,0,1,0,0,0,0,2,0.
+  Independently verified original byte construction and added the observed
+  successful local-image profile; unsupported retry/error handling still faults.
+  Added DMA payload/completion regression; full build currently running.
+  Next: full CTest and connected startup to verify actual archive-sector DMA.
+  Synthetic TOC remains required; mounting/playability are not proven.
+
+- Further original archive startup coverage: worker table0x3cacc0, bounded
+  ten-entry stream switch0x453090 (jr0x1dad74), service table0x3d5b18,
+  archive dispatch table0x4558a0, and extended backend slot+0x68.
+  Own run sequence: `startup-worker-table` ->0x1dadcc;
+  `startup-stream-status` ->0x1ed1e0; `startup-service-backend` ->0x1e9260;
+  `startup-archive-dispatch` ->0x1e6198. All are now statically covered.
+  Latest emit58,000 EE words /353 unresolved; latest extended-slot build
+  in progress, not yet run. Previous builds pass. Only static config and
+  provenance docs changed; no runtime semantics changed. Existing19-test
+  checks passed earlier this session (tools rerun outside sandbox).
+  Complete mounting and real archive asset reads remain to be demonstrated.
+
+- Continued startup past stream table and backend table. Own logs
+  `startup-stream-table` and `startup-backend-table` stop respectively at
+  0x1e6168 and0x1df1c8. Verified original tables0x4555c8 and0x3cacc0;
+  batched remaining related callbacks. EE now56,149 words /345 unresolved.
+  Backend build passed; worker-table build in progress, not yet run.
+  All19 existing CTest targets pass across the main run and focused tools
+  rerun with external fixture access (initial tools failure was sandbox
+  PermissionError). No runtime semantic changes this session. Captures
+  remain external TEMP/haunting-toc-probe. Synthetic TOC still required.
+
+- Handoff checkpoint: independently decoded seek-like callback0x1db268
+  observed at0x1d7360 (object slot+0x18). Original pointer appears at0x3c50b0
+  in stream table0x3c5098. Added its related non-null callbacks through+0x40
+  together, skipping existing roots, using original ELF pointers. User's
+  non-rendering list matched the observed function range on the prior run.
+  EE generation now55,441 reachable words /337 unresolved items; IOP remains
+  27 modules /87,287 words. Latest hg_system_diagnostic Release build PASSED.
+  This latest batch has NOT yet been run. Immediate next action: connected
+  startup with --slices30000000 and the external synthetic TOC record; save
+  fresh external captures. Last executed stop remains0x1db268 in
+  `startup-archive-backend.log`, now included in the built translation.
+  No active build/diagnostic sessions. All project sources currently untracked
+  in git; do not assume commits or stage game/generated files.
+
+- Added original archive callback0x1e8580 reached at object dispatch0x1e6d48.
+  Its tail path brings reachable EE coverage to53,553 words. Connected run
+  then reached0x1eae68 via0x1e7dc4. Independently read original15-entry
+  wrapper table0x455c38 and included its related wrappers together, avoiding
+  separate builds per wrapper. Next observed backend0x1e6078 via0x1eae88
+  is also original table0x4555c8+0x18; added that entry and direct reachable
+  code. Latest EE54,048 words /333 unresolved items; IOP unchanged87,287.
+  System diagnostic builds pass after these static coverage additions.
+  Latest connected `startup-archive-backend.log/.ram/.ram.json` now stops
+  at EE0x1db268, ra0x1d7368, a0=0x3c5bf8, a1=0, t0=-202. Next: verify
+  this archive-stream object callback and its original dispatch table.
+  Companion captures `startup-archive-method` and `startup-archive-wrappers`
+  record intermediate stops. Supplied non-rendering ranges checked where
+  applicable; all code generation derives from the original ELF. No runtime
+  behavior changed this checkpoint; no full regression rerun. Successful
+  archive lookup remains verified, complete mount/playability does not.
+  Synthetic TOC still required. Captures external TEMP/haunting-toc-probe;
+  no live tool sessions.
+
+- Fixed stale CDVD DMA completion: a disabled channel must not latch an IRQ
+  for later enable. Prior TOC completion was delivered at DVD enable before
+  the DVD copy, so original0xb98cc interpreted synthetic header0x29 and
+  original0xba268 reported error0x20. Native CDVD channel enable now gates
+  completion publication; global interrupt masking still retains enabled
+  completions. Focused IOP tests pass, including the stale-TOC regression;
+  system diagnostic and IOP tests rebuilt successfully. No full suite rerun
+  for this change; previous full-suite result predates this correction.
+  `startup-dvd-gated-irq.ram` now contains a successful DATA.CVM result at
+  0xd4698: LBA0x164972, size0x5e018000. Size matches local file1577156608;
+  ISO bytes at the returned LBA match the local archive header. CDVD error0.
+  Startup reached original getter0x1ed1d0 via0x1d6a70. Independently verified
+  three instructions return0x3d5b80; reference manual range agrees. Added
+  root, emitted EE51,760 words/318 unresolved, diagnostic build passes.
+  Next connected `startup-archive-found.log/.ram/.ram.json` faults at
+  EE0x1e8580, ra0x1e6d50, a0=0x44fe18,a1=0x47e538. Next: verify this
+  original object callback and add its static coverage. Archive discovery
+  now works, but mount/playability are not proven; synthetic TOC remains.
+  All captures external TEMP/haunting-toc-probe; no active tool sessions.
+
+- EE delay is executing normally: `startup-delay-progress.log` reaches its
+  return at0x1ee734 with v1=0x1d80, and an offset budget30001000 advances
+  the sampled counter from0x1a62 to0x1b08. Scheduler instrumentation confirms
+  current thread1, ready1, no interrupt or active DMA dispatcher. Do not keep
+  investigating an EE scheduler stall on this evidence.
+  `startup-ee-wait.log` traces the caller through0x1e97a4 after failed dot
+  lookup, original0x1e8c98 loading zero from current directory0x7f712c, and
+  error -100 through0x1ea058 to0x1e73dc. Added v1 and scheduler fields to the
+  budget report; system diagnostic rebuild passes. No runtime semantics changed.
+  Batched watch runs `startup-directory-init[-30m].log` at0x1e68b4,
+  0x1e8c38,0x1e7d88,0x1e82fc have no recorded hits through30m slices.
+  These are candidate directory initialization/update paths from our ELF
+  scan; next trace upstream archive setup and DATA.CVM search response,
+  rather than pursuing the delay loop. Existing synthetic TOC limitation
+  remains. User again requested speed: batch related watches, use focused
+  verification for small changes, reserve full suites for meaningful fixes.
+  All logs external TEMP/haunting-toc-probe; no live sessions.
+
+- CDVD DMA completion now publishes channel3 and dispatches original IRQ35.
+  Original registration0xb70b0..0xb70c4 points to0xb8270; the handler sets
+  event bit0x20 after its transfer callback. Tests verify payload visibility,
+  masked retention and one-time delivery. Full Windows build and all19 tests
+  pass (39.92s). Connected `startup-dvd-irq.ram.json` advances to missing
+  indirect DVD callback0xb98cc; added verified original root +0x78cc.
+  Regenerated bundle27 modules /87,287 words and rebuilt system diagnostic.
+  Runs `startup-dvd-callback` (30m slices) and `startup-dvd-callback-60m`
+  now end on budget, with no read-timeout or translation fault. Both sample
+  EE0x1ee71c, ra0x1e6c08, a0=0x455918, a1=0x6ce and1837 transport steps.
+  Own ELF decoding shows a7552-iteration delay at0x1ee710, called twice by
+  0x1e6bf0. Next: watch entry0x1e6bf0 to identify its caller/polled condition;
+  equal transport counts across longer runs suggest a remaining wait, not
+  demonstrated startup completion. Supplied lists agree only on function
+  ranges; no applicable fix found. Synthetic TOC remains required; game
+  rendering/playability remains unverified. All captures are external under
+  TEMP/haunting-toc-probe. No active tool sessions.
+
+- DVD startup now transfers the actual ISO primary volume descriptor. Original
+  CDVDMAN builds11 command bytes: LBA/count, retry16, converted spindle2,
+  final0. Native successful-read validation now accepts this checked profile
+  and rejects incomplete/other profiles. Diagnostic parameter values now use
+  decimal consistently. DMA validation accepts equivalent block factorizations
+  totaling516 words, including original43x12 (0x002b000c). Full Windows build
+  succeeds. Regression run passed18 tests; the new IOP test initially attempted
+  an unsupported active-DMA rewrite. Corrected synthetic descriptor setup,
+  rebuilt iop_tests, and its focused rerun passes (0.12s). No runtime change
+  followed the other18 passes.
+  Own external `startup-dvd-blocks.ram` contains ISO LBA16 exactly at0xc3470
+  (2048-byte comparison passes, CD001 signature). Startup next stops at an
+  untranslated alarm callback0xb59c0, ra0xa3b84, a0=0xbfff8. Original callback
+  prints `Read Time Out %d(msec)` then invokes0xb6d18 with a0=-18 and0xb7fbc. Next: verify
+  its registration, translate the root, and trace remaining completion wait;
+  do not equate successful sector DMA with successful directory initialization.
+  Reference-list exact-address search found no match. Synthetic TOC is still
+  used and display mode remains unconfigured. Builder provenance in SOURCES;
+  external captures `startup-dvd-builder`, `startup-dvd-profile`, and
+  `startup-dvd-blocks` under TEMP/haunting-toc-probe. No live tool sessions.
+
+- Native event-status ABI fix verified: original THREADMAN wrappers +0x36dc
+  and +0x3774 now dispatch to native status handlers for native event IDs.
+  Status layout comes from the identity-checked original copier +0x36a0.
+  Tests cover layout, initial/current bits, waiter lifecycle, context checks,
+  invalid IDs and destination validation before writes. Full Windows Release
+  build and all19 tests pass (40.34 s). Bundle27 modules /86,787 IOP words.
+  Own external `startup-native-event-status.ram.json` confirms return0 at
+  0xb6414 and current bits0x28 at0xb641c, replacing the former -409 rejection.
+  Startup advances beyond the timeout to0xb8890: ReadDvd N-command8 has11
+  parameters, while the runtime accepts8. The diagnostic misleadingly prefixes
+  decimal values with `0x`: actual bytes are decimal
+  [16,0,0,0,1,0,0,0,16,2,0], requesting LBA16/count1 plus three mode bytes.
+  Next: independently decode original command construction and establish the
+  three mode-byte meanings before extending the accepted DVD profile. Fix
+  diagnostic number formatting too. The supplied lists label sceCdRead at
+  EE0x110380 but offer no matching IOP parameter fix; continue diagnostics.
+  Hardware documentation describes the first8 bytes and2064-byte framing but
+  does not establish the trailing bytes. Synthetic TOC remains diagnostic-only;
+  display mode is still unconfigured. Captures are under external TEMP folder
+  `haunting-toc-probe`, with matching `.log` and `.ram` files.
+
+- User workflow adopted in AGENTS: check supplied non-rendering reference
+  lists while continuing diagnostics; independently verify applicable leads.
+  Current reference matches label EE0x10f438 sceCdLayerSearchFile and0x10f948
+  sceCdSync, but provide no applicable IOP timeout fix. No rendering reference
+  material was used. Connected `startup-toc-completion-state.log/.ram/.ram.json`
+  reveals original event-status query called by IRQ0xb640c returns -409
+  (0xfffffe67) at0xb6414. It receives native event ID4, whereas original
+  THREADMAN routine0xa17b0+ validates original encoded handles. Runtime creates
+  native event handles via IopState::create_event_flag. Next: audit missing
+  native iReferEventFlagStatus mapping and derive status layout from original
+  helper0xa16a0, preserving waiter semantics. This is a likely mixed native/
+  original event ABI issue, not yet a verified fix. The earlier empty b6440
+  watch is inconclusive because it is a branch delay slot (not separately
+  recorded by PC tracing).
+
+- Original GetToc timeout callback now included as CDVDMAN root +0x6ebc.
+  Identity-checked relocated module setup at +0x7040 independently proves
+  a1=module+0x6ebc. Bundle now27 modules /86,870 IOP words; diagnostic build
+  passes. Connected `startup-toc-alarm.log/.ram/.ram.json/.ram.console.txt`
+  executes original callback and prints `Cmd Time Out 10000(msec)`, then faults
+  at0xb8efc on unsupported byte write1 to CDVD BREAK0x1f402007. Display mode
+  remains unconfigured. Next: trace command-completion/event wait in0xbb4b8
+  reached from0xb9048, including original IRQ acknowledgements and pending
+  descriptor/DMA state. Do not treat translating the alarm as fixing the wait.
+  Synthetic TOC remains diagnostic-only. No hardware implementation changed.
+
+- Successful CDVD completion now publishes error0 before the completion IRQ
+  for validated TOC/DVD DMA, instead of retaining a pre-command byte. This
+  is the native success-result contract; exact hardware reset timing and
+  write-side0x1f402006 semantics remain unresolved (SOURCES documents scope).
+  Focused IOP tests cover stale errors on both successful transfer kinds;
+  full Windows build and all19 Release tests pass (45.16 s).
+  Connected `startup-toc-success.log/.ram/.ram.json`
+  confirms retained error0 at0xccfd1 and advances to untranslated IOP callback
+  `0xb8ebc`, ra=`0xa3b84`, a0=`0x179510`. Original code is an alarm callback:
+  logs timeout and writes BREAK to0x1f402007, so this is not proof of successful
+  directory initialization. Next: verify its original registration at0xb9040
+  (a1 formed as0xb8ebc), add the CDVDMAN root, and trace why the alarm fires.
+  Synthetic TOC remains in use; no playability established.
+
+- Configurable IOP write trace implemented: `--watch-iop-word` accepts an
+  aligned 2MiB RAM word, preserves the default0x9a920, survives reboot, and
+  reports the selected address. Tracing guards RAM bounds. Diagnostic build
+  passes. Connected `startup-toc-write-trace.log` captures the actual error
+  producer: original IRQ `0xb62d4` stores0x84 into0xccfd1 after reading
+  MMIO `0x1f402006`. MMIO history shows earlier original write at `0xb84a4`
+  put0x84 into that address, then command9 submitted at `0xb8890`, followed
+  by successful native DMA completion and IRQ reading the unchanged0x84.
+  Runtime currently treats writes to the error register as assigning
+  `cdvd_error` and never clears it on command/completion. Next: resolve this
+  incorrect retained-error behavior using independent register semantics.
+  ps2tek CDVD I/O table marks0x1f402006 read-only; it does not specify write
+  side effects or reset timing, so do not guess those without evidence.
+  Existing boundary is now a concrete native MMIO issue, not layer mismatch.
+
+- Error0x84 producer investigation: original accessor `0xb8b04` reads retained
+  byte `0xccfd1`. `startup-toc-error-source.log` has no hit at conversion
+  branch `0xb92e0`; GetToc does hit `0xb8fd0`, which puts0x84 into the
+  command descriptor halfword at stack+38 (not itself an error-byte write).
+  A follow-up watch `startup-toc-error-write.log` has no hit at explicit
+  setter `0xb6fd8`. These observations do not establish whether hardware
+  status, timeout or descriptor validation produced the retained error.
+  Next: make the existing IOP RAM-write trace address configurable and trace
+  aligned word `0xccfd0` to capture the actual producer, rather than guessing
+  more write sites. Existing hardcoded trace word is `0x9a920` in IopState
+  store; preserve its default and carry selected address across reboot.
+  No runtime behavior changed; error remains explicit in original game path.
+
+- Directory/GetToc investigation: corrected the prior layer inference. IOP
+  watch histories are before load-delay completion: a2=0x10 at `0xce810`
+  becomes0 at `0xd2d88` and `0xbb93c`; request buffer +296 is also0.
+  `startup-disc-directory.log` proves search calls initialization `0xbc89c`,
+  which fails because DVD-type0x14 path `0xbc94c` -> `0xb64a0` returns0.
+  That helper calls original GetToc wrapper `0xb90b0` -> `0xb8f1c` and
+  takes failure branch `0xb650c`. `startup-toc-result.log` proves command
+  submit returns0 at `0xb901c` (accepted/nonnegative), then error accessor
+  returns0x84 at `0xb9070`, causing false return. Next: trace the producer of
+  CDVD error0x84 and repeated GetToc completion/event handling. Do not yet
+  attribute this to TOC content. New evidence narrows the fault before filename
+  matching; no success result or bypass has been introduced.
+
+- Disc-search trace: `startup-search-result.log` proves EE PollSema returns
+  expected id4 at `0x10f488`, busy check returns0 at `0x10f4a4`, then the
+  normal RPC-result path returns0 at `0x10f700`. Original service id80000597
+  registration at `0xd24d4` selects CDVDFSV callback `0xce7ac`; its 300-byte
+  request calls original CDVDMAN import84 via `0xd2d88` -> `0xbb93c`.
+  Connected `startup-search-iop.log/.ram/.ram.json` proves callback call
+  `0xce810` receives request buffer `0xd4698`, filename `\DATA.CVM;1`
+  at +36. The pre-load a2=0x10 observation was corrected above: actual layer0.
+  It returns0 at `0xce818`.
+  Next: inspect original CDVDMAN `0xbb93c` search path and layer handling;
+  validate its disc-directory initialization. RPC dispatch
+  and filename transport are working at this boundary. No bypass or native
+  success was added; the failure remains reproducible and unresolved.
+
+- Cache failure investigation: connected `startup-cache-watch.log` proves
+  `0x1e8c90` reads the global state pointer `0x3d5a08` -> `0x7f7100`, whose
+  +0x2c current-directory field is zero. It returns zero through `0x1e79b0`
+  and `0x1e97a4`. Original ELF string at `0x44f7f0` is `.`; the immediate
+  divideFname failure therefore concerns resolving the current directory.
+  Original setter `0x1e8ba8` writes +0x2c at `0x1e8c80`; no hit on that
+  watch in `startup-cache-population.log`. The earlier DVCI cache-miss message
+  is emitted at `0x1db144`; lookup `0x1dc0c8` returns zero at `0x1db11c`,
+  then fallback `0x1dac80` also returns zero at `0x1db170`. Next: trace this
+  fallback's request/result and underlying original disc search. Do not assume
+  the synthetic TOC is causal yet. Original setter pointer is `0x4558c0`.
+  No code behavior changed this investigation; external watch captures provide
+  the next debugging boundary. The run still reaches its budget, not playability.
+
+- Callback/file-cache continuation: verified original ELF `0x4558dc` ->
+  `0x1e9760`, bound callsite `0x1e73c8` (table +0x3c). EE coverage now
+  51,757 words / 318 unresolved items; diagnostic build passes. Connected
+  `startup-callback3c.log/.ram/.ram.json` reaches the 30M slice budget at
+  EE `0x1ee71c` rather than an untranslated target. Retained error context
+  a0=`0x455918`, a1=`0x6ce`, ra=`0x1e6c08` corresponds to failure of helper
+  `0x1e78a0` called from `0x1e979c`. Added existing retained EE DECI2 text
+  to budget diagnostics (previously only its byte count was printed).
+  Rebuilt and reran as `startup-callback-error.log`: reports DVCI file cache
+  miss for `\DATA.CVM;1`. Next: trace original cache population/search and
+  disc metadata; determine whether synthetic TOC causes this miss. Do not
+  bypass the error or substitute a success. Synthetic TOC remains diagnostic
+  only. This run also logs three successful RNA IOP allocations. No title
+  screen, game frame or playability is established.
+
+- Startup object continuation: original ELF `0x46b05c` -> `0x1c2970`
+  verified for JALR `0x1bf174`. Connected `startup-object-init` passes it,
+  then stops at `0x1c2930`, ra=`0x1b82d8`. Original pointer `0x46b064`
+  supports callsite `0x1b82d0`; its same-object tail at `0x1c2954` uses
+  `0x46b068` -> `0x1c1e00`. Both built together and connected
+  `startup-object-methods` passes them, reaching `0x1c1460`, ra=`0x1b8300`.
+  Verified original slot `0x46b074` and caller `0x1b82f8`; also bound later
+  same-object calls `0x1b8340`, `0x1b836c`, `0x1b839c` to these original
+  +0x18/+0x24 slots. EE generation now 49,583 words / 314 unresolved items.
+  Final diagnostic build passes. Connected `startup-object-batch` passes the
+  prior stop and reaches untranslated `0x1e9760`, a0=`0x44f7f0`, a1=`0x82a940`,
+  ra=`0x1e73d0`. Next: inspect original caller near `0x1e73c8` and verify its
+  pointer provenance. No runtime implementation changed; original game input
+  only, no reference rendering material. Synthetic TOC remains diagnostic-only.
+
+- EE division continuation: independently implemented integer-significand
+  truncation and signed-zero/exponent255/range handling in `Fpu::divide`, with
+  cause/sticky flags based on Sony core pp156,158–165 and DIV.S p357. Focused
+  FPU tests pass, including inexact thirds, both signs and normalization paths,
+  zero division, range limits and flag persistence. Full Windows build passes;
+  all 19 Release regression targets pass (40.69 s).
+  Hardware-specific last-bit deviations remain unmeasured (see SOURCES); this
+  is not a claim of bit-exact divider fidelity. Connected
+  `startup-divide.log/.ram/.ram.json` passes the former division boundary and
+  reaches untranslated EE `0x1c2970`, a0=`0x7fe400`, ra=`0x1bf17c`.
+  Own decoding shows JALR `0x1bf174` loads the object's vtable slot +0x0c.
+  Next: verify its original ELF pointer and extend static coverage. Synthetic
+  TOC remains diagnostic-only; no game frame/playability established.
+
+- Startup nested-method continuation: independently checked original ELF
+  `0x46ab68` -> `0x1a4510` for callsite `0x1b8478`, and the same object's
+  slot +0x10 (`0x46ab60` -> `0x1a45a0`) for nested callsite `0x1a4520`.
+  Both bindings were built together: 47,793 EE words, 320 unresolved items;
+  diagnostic build passes. Connected `startup-rng.log/.ram/.ram.json` passes
+  both and stops at `0x1b857c`: `EE FPU divide rounding requires validation`.
+  Original DIV.S divides f1 by f0; preceding code loads 180.0 into f0 and
+  multiplies f1 by the original single-precision pi constant. Next: establish
+  EE division rounding from hardware specifications before extending
+  `Fpu::divide_exact` (currently rejects nonzero integer division remainder).
+  Existing exact-division tests intentionally reject 1/3 and will need meaningful
+  rounding coverage alongside the implementation. Synthetic TOC remains in use.
+
+- Startup slot +0x14 continuation: checked original ELF pointer `0x46ac64`
+  -> `0x1bbbb0` and JALR `0x1bbcd8`, then added the static binding. EE
+  coverage is 47,622 words with 321 unresolved items. Diagnostic build passes;
+  connected `startup-slot14.log/.ram/.ram.json` passes this method and stops
+  at untranslated `0x1a4510`, ra=`0x1b8480`, a0=`0x887a00`, a1=-1.
+  Next: inspect original caller near `0x1b8478` and its target provenance.
+  No runtime behavior changed; validation was the targeted build and connected
+  startup run, using the explicitly synthetic diagnostic TOC.
+
+- Startup virtual-method continuation: independently verified original ELF slot
+  `0x46ac60` -> `0x1bbc20` and bound callsite `0x1b71fc`. Generated EE coverage
+  is now 47,596 words, with 322 unresolved sites. Diagnostic build passes.
+  Connected `startup-method.log/.ram/.ram.json` now reaches untranslated EE
+  `0x1bbbb0`, a0=`0x4f1920`, a1=13, ra=`0x1bbce0`. Next: inspect this original
+  caller and pointer before adding its static binding. Synthetic TOC remains
+  diagnostic-only; this is not evidence of playability.
+- Speed review: shared inline runtime/MMIO implementation causes large generated
+  translation rebuilds after small hardware edits. Proposed improvement (not yet
+  implemented or measured): isolate MMIO implementation in compiled source while
+  retaining inline RAM access. Batch related startup fixes and focused validation;
+  run the full regression suite at meaningful checkpoints. No rendering reference
+  material is needed or permitted for this work.
+
+- GS system reset continuation (2026-09-08): consulted original Sony GS v6
+  manual pp145-146/154. CSR bit9 reset now cancels native vertex/draw/transfer
+  state and restores the runtime initial profile, including all five interrupt
+  masks; VRAM contents are retained. Unspecified-by-manual register defaults
+  and VRAM retention are explicitly native policy, not hardware-observed reset
+  values. Separate FLUSH remains unsupported. Runtime tests pass for these
+  effects. Full Windows build passes; all 19 Release regression targets pass (40.38 s).
+- Connected `gs-reset.log/.ram/.ram.json` passes reset and reaches EE virtual
+  method `0x1bbc20`, a0=`0x4f1920`, a1=13, ra=`0x1b7204`. Own ELF decoding
+  proves caller `0x1b71fc` loads object vtable +0x10 before JALR. Next: verify
+  its original pointer/target and add the required static binding. No reference
+  rendering material was used for reset or caller discovery.
+
+- GIF reset continuation (2026-09-08): independently mapped the observed
+  word write1 to GIF_CTRL `0x10003000`. It clears retained incomplete GIF
+  packets while preserving separate GS state. Unsupported stop/restart writes
+  and widths fault without clearing the buffer. Full Windows build passes;
+  focused runtime reset tests pass. Connected `gif-reset.log/.ram/.ram.json`
+  passes GIF reset and stops at EE `0x10be94` on the existing explicit GS CSR
+  FLUSH/RESET boundary, a0=`0x200`. Next: inspect original CSR write and
+  hardware GS reset semantics, preserving the separation between GIF transport,
+  GS registers and VRAM. Full Windows Release regression: 19/19 passed
+  (44.47 s). The ps2tek register list confirms the CSR address but does not
+  supply the reset-state details needed here; consult the GS hardware manual.
+
+- CPU VIF1 FIFO continuation (2026-09-08): SQ to `0x10005000` now submits
+  both GPR halves through the existing independent VIF parser and synchronizes
+  GS interrupt state afterward. Runtime tests pass for both halves, uncached
+  aliases, zero-register NOPs and scalar-width rejection. Diagnostic and runtime
+  test builds pass. Connected `vif-cpu-fifo.log/.ram/.ram.json` passes both
+  original FIFO writes and stops at `0x10c014`, the word write of1 to
+  `0x10003000`. Next: implement that register's reset semantics from hardware
+  documentation, with parser/transport reset tests. Latest full 19-test pass
+  predates this CPU FIFO change; its focused runtime tests and native startup
+  continuation are verified. No rendering material copied from the reference.
+
+- VIF1 reset/MMIO continuation (2026-09-08): independently implemented the
+  observed FBRST reset and ERR ME0 writes through checked 32-bit MMIO routing.
+  Reset discards pending VIF stream/phase and interface state while retaining
+  separate VU data/micro memories. Unsupported controls and widths fault.
+  Runtime tests cover alias routing, reset effects and rejection preservation.
+  Full Windows build passes. Connected `vif-reset.log/.ram/.ram.json` passes
+  these writes and stops at EE `0x10c004`: original SQ to VIF1 FIFO
+  `0x10005000`. The next instruction sequence writes another quadword, then
+  writes1 to `0x10003000`. Next: route checked CPU quadword FIFO submission
+  through the existing VIF parser, then implement the following register from
+  hardware specifications. No reference-project rendering material used.
+  Final rebuilt Windows Release regression: 19/19 passed (43.58 s).
+
+- MCSERV continuation (2026-09-08): selected the identity-checked module in
+  the bundle and shared initial/reboot runtime plan. Independently decoded
+  original entry proves worker +0x280; original worker registration proves RPC
+  handler +0x324 for service `0x80000400`. Both roots added before rebuilding.
+  Bundle now has 27 modules and 86,846 reachable words. Windows diagnostic
+  build passes; LOADFILE and reboot regression tests both pass (13.95 s).
+  Connected run `mcserv-load.log/.ram/.ram.json/.ram.console.txt` records
+  MCSERV id11, ret2, then EE stops at `0x10bfc0` on an unsupported MMIO store.
+  Own identity-checked ELF inspection `hg.py inspect --pc 0x10bfb0 --count 18`
+  proves the sequence constructs address `0x10003c10` and stores value1;
+  the following store targets `0x10003c20` with value2, then accesses VU control
+  register28. Next: implement the required register semantics from hardware
+  documentation and existing runtime state, respecting the user's prohibition
+  on copying rendering-related material from the reference project.
+  The full 19-test pass at 37.94 s predates these root/module-plan extensions;
+  targeted native load/reboot tests and connected execution are verified.
+
+- MCMAN init continuation (2026-09-08): original driver descriptor `0x4700c`
+  points at operations table `0x46fa0`; its init entry `0x44c10` is now rooted
+  at module +0xfc10. Original code returns zero. Generated bundle: 26 modules,
+  85,865 reachable words. Windows diagnostic build passes; connected run
+  `mcman-init.log/.ram/.ram.json/.ram.console.txt` records MCMAN id10, ret2,
+  then reaches a real LOADFILE request for `MODULES/MCSERV.IRX`. That module
+  is already identity/placement configured but absent from selected bundle and
+  shared runtime module plan. Next: add MCSERV to both, regenerate and build.
+  Latest full 19-test pass (37.94 s) predates this root-only extension; the new
+  build and connected startup continuation are verified.
+- User explicitly prohibits copying ANY rendering-related material from the
+  shared HG/ps2recomp reference project. This restriction is recorded in AGENTS
+  and SOURCES; independently derive and implement rendering.
+
+- MCMAN continuation (2026-09-08): the identity-checked module at configured
+  base `0x35000` is now selected in the IOP bundle and shared initial/reboot
+  module plan. Bundle: 26 modules, 85,863 reachable words. Full Windows build passes.
+  Connected run `mcman-load.log/.ram/.ram.json/.ram.console.txt` passes the
+  module-plan boundary and stops at MCMAN `0x44c10`, ra=`0xa79b0`, invoked
+  by IOMAN with a0=`0x4700c`. Original relocated pointer `0x46fa0` contains
+  this driver callback. Next: inspect its operations table and add proven
+  driver callback roots, beginning with module +0xfc10. Not rooted yet.
+- Console retention no longer aborts guest printf after 64 KiB. It retains
+  the latest 64 KiB, counts discarded bytes and preserves the full printf
+  return length. External IOP dumps also write `.console.txt` so later load
+  failures can be inspected directly. A regression covers trimming and return
+  values; the rebuilt IOP test passes. Full rebuilt Windows Release regression: 19/19 passed (37.94 s).
+- User clarified reference use of shared HG configuration is allowed for
+  context/ideas, with independent verification and implementation. No copying;
+  emulator implementation restrictions remain. AGENTS/SOURCES reflect this.
+
+- Two-port digital poll continuation (2026-09-08): per-port connection state
+  and active-low button words now model one connected controller and an empty
+  second port. Connected/disconnected/reconnected and port-isolation tests
+  pass. Unsupported commands and multitap port indices remain explicit faults.
+  Full Windows build passes. All 19 regression targets pass across runs:
+  the initial IOP test exceeded stack capacity after adding another large
+  state fixture; moving that fixture to the heap fixes it and its rerun passes.
+- Connected run `sio2-two-ports.log/.ram/.ram.json` passes port1 and later
+  reaches the diagnostic console capacity limit. Own RAM inspection shows
+  repeated LOADFILE logging for `cdrom0:\MODULES\MCMAN.IRX`; MCMAN is in
+  config but absent from the selected bundle/native module plan. Next: inspect
+  that load failure and add the checked module/dependencies to the startup plan.
+  A `--stop-on-loadfile-error` probe named `mcman-request` actually stops at an
+  earlier SNDDRV result -2, so it is NOT evidence of MCMAN's result. Preserve
+  that distinction. The console retention cap also needs decoupling from guest
+  printf execution; it must not become a game stopping condition.
+- User-shared `../HG/config/` files were inspected for provenance only. They
+  include explicitly PS2Recomp-derived configuration/identification. No such
+  data was imported or used for implementation; see SOURCES.
+
+- Vblank wait continuation (2026-09-08): diagnostic capture proves no SetGsCrt
+  mode exists when DS2O first calls WaitVblankStart. Implemented a native
+  per-thread event wait instead of aborting all startup. Only a subsequently
+  published display edge grants a return; elapsed time and old edges cannot
+  satisfy it. Multiple current waiters wake once. Focused IOP tests pass.
+  The display event producer is still unfinished; no artificial edge is sent.
+- Connected run `vblank-wait.log/.ram/.ram.json` proves independent startup
+  continues with DS2O parked: it reaches DBCMAN RPC callback `0x27cd8`,
+  a0=`0x80001301`, ra=`0x998bc`. Original identity-checked relocated pointer
+  `0x28560` contains this callback, now added as an AOT root at +0x1cd8.
+  New IOP bundle: 25 modules, 71,063 reachable words. Full Windows build passes.
+  Connected evidence `dbcman-rpc.log/.ram/.ram.json` passes this command and
+  reaches a second SIO2 poll: SEND3[0]=`0x00140541`, FIFO `01 42 00 00 00`.
+  This selects controller port1; existing endpoint accepts only port0. Next:
+  implement explicit native port connection state and the supported disconnected
+  port response before advancing controller configuration. Display mode remains
+  unconfigured here; DS2O stays blocked until a genuine display event producer
+  exists. Full rebuilt Windows Release regression: 19/19 passed (31.84 s).
+
+- SIO2 digital endpoint continuation (2026-09-08): implemented the observed
+  single port-zero CPU-FIFO digital poll, returning active-low native button
+  state and connected status. Completion publishes the reply before IRQ17;
+  its original SIO2MAN callback +0x584 is independently proven by registration
+  and added as an AOT root. Focused tests pass for button payload, IRQ masking,
+  delivery, context restoration and FIFO exhaustion. Host input wiring,
+  configuration/analog commands, DMA and other peripherals remain unfinished.
+- Connected evidence `%TEMP%/haunting-toc-probe/sio2-digital.log/.ram/.ram.json`
+  passes the first transfer and reaches DS2O callback `0x2d944` via SIO2D
+  `0x7729c`. Identity-checked original relocated data at DS2O `0x2df9c`
+  contains this callback, now rooted at +0x1944. IOP bundle: 25 modules,
+  70,746 reachable words. Full Windows Release build passes. Connected run
+  `sio2-callback.log/.ram/.ram.json` passes that callback and reaches the next
+  DS2O callback `0x2d9d8` through SIO2D return `0x77318`. Next: inspect the
+  original callback table and root its proven startup callbacks as a batch.
+  Final Windows Release regression: 19/19 passed (26.96 s). Original relocated
+  DS2O table entries `0x2df9c=0x2d944` and `0x2dfa0=0x2d9d8` independently
+  confirm the two successive callbacks. The second is now rooted at +0x19d8 using original table +0x1fa0.
+  Regenerated bundle: 70,787 reachable words across 25 modules. Windows
+  connected diagnostic build passes; `sio2-attach.log/.ram/.ram.json` now
+  reaches `WaitVblankStart` at IOP `0x2de3c`, ra=`0x2c1a0`. This is the
+  next actual startup blocker: the DS2O worker needs a connected display
+  timing source. Do not replace the wait with unconditional success or an
+  unrelated instruction-count delay. The latest full 19-test pass predates
+  this root-only extension; the new build and connected run are verified.
+
+- SIO2 request preservation (2026-09-08): unsupported start writes now fault
+  before reset bits erase the pending FIFO. External diagnostic JSON records
+  the requested control, register bank and input bytes. A synthetic regression
+  verifies that rejection preserves the FIFO/registers without completing work.
+  The connected 30-million-slice synthetic-TOC run stops at the same original
+  IOP `0x7a008`, requested control `0x3bd`, with FIFO `01 42 00 00 00`,
+  SEND3[0] `0x00140540`, SEND1[0] `0xffc00505`, SEND2[0] `0x00020014`.
+  Evidence: `%TEMP%/haunting-toc-probe/sio2-packet.log/.ram/.ram.json`.
+  Next: establish the response and interrupt contract for this exact packet
+  from hardware/protocol evidence and the original SIO2MAN consumer before
+  implementing a bounded peripheral endpoint. No transfer completion is faked.
+  Validation: all 18 non-tools Windows CTest targets passed; the tools target
+  initially failed on sandbox temporary-file permissions, then passed when
+  rerun with approved external-temp access (0.87 s). All 19 targets therefore
+  pass across these runs. The synthetic TOC remains diagnostic-only.
+
+- EE startup volume continuation (2026-09-08): virtual call `0x2105a0`,
+  original ELF pointer `0x46c090` -> `0x20e9a0`, now statically translated.
+  It exposed C.LE.S (`0x46006036`) at `0x20e9c4`. Implemented its documented
+  exact comparison and condition-bit update, preserving other FCR31 bits.
+  Decode tests reject nonzero reserved fd; FPU tests cover clamp boundaries,
+  negative ordering and both signed zeros. Sources cite Sony v6 p351.
+- Connected execution passes C.LE.S and reaches the same object's tail call
+  `0x20e9e0`, virtual slot +0x178. Original ELF `0x46c098` -> `0x20e8d0`
+  independently verifies the new binding. Emit: 46,266 reachable EE words,
+  318 unresolved items. Build and connected run pass this target and reach
+  an actual LOADFILE request for `MODULES/DS2O_S1.IRX` at IOP `0x96cac`.
+  Full Windows CTest: 19/19 pass (29.61 s); Ubuntu FPU tests pass.
+- DS2O_S1 already has verified identity and reserved base `0x2c000` in the
+  IOP config (memory size 8,688 bytes). Added it to the connected native
+  module-load plan and regenerated a 25-module bundle with 70,119 reachable
+  IOP words initially. Initial/reboot module plans are now shared so reboot
+  does not silently omit a newly planned module. Original worker +0x164 is
+  rooted; vblank ordinal4 is identified and linkable but faults on invocation
+  until display timing is connected. Current IOP emit: 70,694 words.
+- DS2O linking exposed an overly strict minor-version check: it imports
+  SIO2MAN 2.6, while the supplied table is 2.4. Original LOADCORE link path
+  `0x96d14 -> 0x97138 -> 0x97038` compares only the high version byte;
+  the minor comparison belongs to export replacement. Corrected planner and
+  synthetic regression expectations. Build succeeds; DS2O now links and
+  starts. Connected execution reaches SIO2 transfer-control store at IOP
+  `0x7a008`, a0=`0x3bd`, ra=`0x7a314`, worker11, native time 14,038,821 us.
+  It correctly faults because no controller/card endpoint exists. External
+  evidence: `%TEMP%/haunting-toc-probe/ds2o-major-link.log/.ram/.ram.json`.
+  Next: inspect original SIO2 packet setup and implement the required bounded
+  controller protocol using hardware/ABI evidence. The current SIO2 stub
+  clears FIFOs for control bits 2/3 before rejecting bit0; preserve pending
+  command evidence before that rejection when expanding diagnostics.
+  WaitVblankStart remains an explicit separate timing boundary.
+  Final Windows Release regression suite: 19/19 pass (24.41 s).
+  Its original imports include vblank ordinal4,
+  SIO2MAN 51/61/62, SIO2D 6/9/10 and DBCMAN 4/6/7/8; unsupported provider
+  behavior must remain explicit. Latest boundary evidence is external
+  `%TEMP%/haunting-toc-probe/ee-volume-update.log/.ram/.ram.json`.
+  External evidence: `%TEMP%/haunting-toc-probe/ee-volume-method.log/.ram/.ram.json`
+  and `ee-less-equal.log/.ram/.ram.json`. Synthetic TOC remains diagnostic-only.
+
+- EE thread-start root cause (2026-09-08): original `0x26cc70` returns
+  `(CP0.Status ^ 1) & 1`; StartThread wrapper `0x26d300` rejects nonzero.
+  Native launch status `0x70010000` had IE cleared. Launch now uses
+  `0x70010001`; DMA callbacks gate on IE/EIE and clear both in callback context.
+  A fresh run then reached the explicit ready-thread scheduling boundary at
+  `0x26c034`, proving earlier dormant workers were caused by the status bug.
+- EE scheduler now switches by priority at cooperative host boundaries and
+  preserves per-thread CPU context, guest kernel-return frames and transfer
+  provenance. WaitSema blocks; SignalSema reserves a token for its sole waiter;
+  SleepThread uses existing WakeupThread state. Multiple semaphore waiters remain
+  an explicit ordering fault. Started threads enter with IE/EIE enabled and
+  no exception level. Kernel tests pass, including blocked-root/worker context
+  isolation and token reservation. Full-suite validation is pending this build.
+- Connected run now starts an EE worker at `0x1cb298`, stopping at its absent
+  translation. Added original observed CreateThread entries `0x1cb1a8`,
+  `0x1cb298`, `0x1cb3a0`, `0x1cb480`, and sound RPC entry `0x21f210` as AOT roots;
+  SleepThread `0x32` is a returning syscall. Emit: 46,219 reachable EE words,
+  319 unresolved items. Full Windows build and all 19 tests pass (30.65 s).
+  Connected continuation executes TIMEMANI timer callback `0xd7878`, then
+  SNDDRV callback `0x84b80`, proving its initialization has passed the previously
+  stalled bind. Both are now explicit AOT roots (TIMEMANI +0x878, SNDDRV +0x9b80;
+  the latter address is installed by original setup at `0x84c54`). Current
+  regenerated IOP bundle: 70,017 reachable words across 24 modules. Build
+  and connected continuation pass those timer boundaries and reach original
+  EE virtual method `0x20e9a0`, a0 `0x887200`, a1=2, ra `0x2105a8`.
+  Latest evidence: `%TEMP%/haunting-toc-probe/snddrv-timer.ram/.ram.json/.log`
+  and repeat `ee-scheduler-final.log`. Next: inspect call at `0x2105a0` and
+  its original ELF pointer before adding the next indirect-target binding.
+- Equal-priority RotateThreadReadyQueue now feeds the scheduler's circular
+  selection (including root thread), with a synthetic rotation test. Final
+  Ubuntu kernel tests pass. Final Windows Release CTest: 19/19 pass (35.19 s). The old IOP SIF0 quantum64 workaround remains for separate
+  re-evaluation; do not mix it into the new EE thread-context fix.
+- Ubuntu/g++ builds and passes the kernel scheduling/interrupt tests. It exposed
+  a pre-existing tokenization problem in `gs.hpp`: `0x4e+context` was parsed as
+  an invalid numeric suffix; whitespace at both depth-buffer accesses fixes it.
+  No full Linux game build verification claimed.
+  External logs: `%TEMP%/haunting-toc-probe/ee-ie-enabled.log`, `ee-scheduled.log`.
+
+- Voice-transfer completion continuation (2026-09-08): the checked one-shot
+  SPU2 copy now exposes a per-core completion condition at register +0x344
+  bit 7, retired on ATTR transfer-mode changes. This is explicitly an
+  inference from original LIBSD's completion consumer, not general verified
+  STATX/DREQ hardware semantics (see SOURCES). AutoDMA does not assert it.
+  Both-core tests cover committed bytes, status isolation, mode retirement,
+  and rejected status writes. Full Windows build and 19/19 tests pass (9.80 s).
+- Connected synthetic-TOC execution now exits the LIBSD wait and reaches EE
+  `0x20f070` through the original virtual call at `0x2104cc`, return `0x2104d4`.
+  External evidence: `%TEMP%/haunting-toc-probe/voice-complete.log/.ram/.ram.json`.
+  Original ELF pointer `0x46c050` contains that target; the corresponding
+  indirect-site binding has been added. EE emit reports 45,584 reachable words
+  and 315 unresolved items. Rebuilding the connected host with this new target
+  completed successfully. The connected 30-million-slice run now reaches a
+  MODHSYN list traversal at `0x62b20..0x62b50`, called by SNDDRV request
+  `0x70000`, with null sentinel at `0x6d520` (should be initialized by the
+  original routine `0x64b20`). External `startup-vcall.log/.ram/.ram.json`.
+- Focused 16-million-slice `hsyn-init-trace.ram.json` records SNDDRV request
+  handler `0x857b4` receiving `a0=0x70000`, but no execution at `0x611b4`
+  (call to list initializer) or `0x64b20` itself. Thus initialization has not
+  reached these points; do not repair list pointers by hand.
+  SNDDRV worker20 is still binding EE server `0x77777779` at `0x84f78`, before
+  its original initialization calls at `0x84ff0..0x85010`.
+- Added EE thread summaries on budget stops. External `ee-workers.log` shows
+  thread7 entry `0x21f210`, priority10, dormant/uninitialized. Own ELF decoding
+  confirms this entry sets up the reverse RPC server (constant `0x7777` at
+  `0x21f22c`). Other EE workers are dormant too. The next investigation is why
+  this server worker has not been started before the `0x70000` sound request.
+  Existing EE scheduler also does not preempt active main or block WaitSema
+  into scheduler state; address that when original execution proves needed.
+  The older SIF0-specific IOP quantum64 workaround is still present and should
+  be re-evaluated now that EE callbacks interleave. No speculative scheduling
+  or list initialization changes were made at this checkpoint.
+  Latest SPU2 tests also pass on Ubuntu/g++; no full Linux verification claimed.
+
+- EE/IOP scheduling continuation (2026-09-08): the 69,918-word IOP bundle
+  builds and CRI's RPC worker completes with paced AutoDMA. The synchronous EE
+  callback host then stalls in SNDDRV's bind loop for EE server `0x77777779`,
+  starving LOADFILE. External evidence: `paced-cri-callback.log/.ram/.ram.json`
+  under `%TEMP%/haunting-toc-probe/` (30-million-slice synthetic-TOC probe).
+- `EeDmaInterruptDispatcher` now preserves CPU context across host slices;
+  the connected diagnostic gives each callback one AOT step while IOP and
+  devices continue. Synthetic tests verify suspension, restoration and a
+  second pending completion. All 19 Windows CTest targets pass (8.54 seconds).
+  The new SPU2 synthetic executable also passed under Ubuntu/g++.
+- The interleaved connected probe advances into SNDDRV's watched handler
+  `0x857b4` (nonempty watch history), then explicitly faults in LIBSD's IRQ at
+  `0x31aac`, native time 14,470,984 us. Original decoded instructions poll
+  core-1 register `0xbf900744` bit `0x80`; the retained register reads zero.
+  Core 1 just completed a one-shot DMA (MADR `0x34490`, CHCR `0x201`).
+  Artifacts: `interleaved-ee.log/.ram/.ram.json` in the same external directory.
+  Next: establish SPU2 transfer-status register semantics from primary hardware
+  documentation before implementing this status. Do not simply increase the
+  IRQ budget or fabricate the polled bit. The earlier supposition that this
+  necessarily requires a resumable IOP dispatcher is not yet established.
+  Synthetic TOC remains diagnostic-only; no playable-build claim.
+
+- Paced SPU2 input continuation (2026-09-08): `spu2_input.hpp` now implements
+  the documented 48 kHz stereo input areas and 256-sample double-buffer halves.
+  AutoDMA accepts the observed 16-word blocks with whole 1024-byte stereo pairs,
+  retains L/R data separately, and advances a pending DMA only when consumption
+  frees a half. Counters/registers/IRQ complete after actual copying; an occupied
+  buffer prevents the former immediate rearm loop. Unknown modes, underruns,
+  malformed ranges and mutated active descriptors remain faults. Both initial
+  halves are primed before playback as an explicit native startup-phase policy;
+  channel-index ordering is independently inferred from CRI's alternating
+  512-byte queue setup and still needs nonzero hardware observation. Raw input
+  history is explicitly truncated and is not mixed/synthesized host audio.
+- Full Windows Release build and 19/19 CTest targets pass with the new `spu2`
+  suite. The connected synthetic-TOC run now advances through 515 input frames
+  to CRI's original stream-completion callback `0x00011d5c`, at native time
+  13,100,804 us. External artifacts: `%TEMP%/haunting-toc-probe/paced-input.log`
+  and `paced-input.ram` plus `.json`; metadata now includes each input core and
+  its pending DMA. This callback is a proven new AOT root at CRI_ADXI `+0x1d5c`.
+  The regenerated 24-module bundle contains 69,918 reachable IOP words; its
+  connected build/run is the next validation, not yet claimed successful.
+
+- Resume verification (2026-09-08): the current source tree and existing
+  local build do not yet reproduce the final September 6 SNDDRV checkpoint.
+  A fresh 30-million-slice synthetic-TOC diagnostic reaches an earlier CRI_ADXI
+  RPC wait: EE `0x0026c1e4`, semaphore 9, worker 18 at `0x00012ef8`, and worker 19
+  at `0x00014128`. SNDDRV server records remain zero. The external log is
+  `%TEMP%/haunting-toc-probe/resume-snddrv.log`. The later-discovered external
+  `%TEMP%/hg-snddrv-sema420-30m.log` already recorded the same state on September 6;
+  the final SNDDRV section below had omitted that later work.
+  All 18 existing Windows CTest targets pass across the baseline run and a
+  separate tools-test retry with temporary-directory access; the initial Python
+  failure was a sandbox PermissionError. No new Linux verification was done.
+- The current `iop_dmac.hpp` retains partial-qword lanes, consistent with
+  `ORACLE.md`; the September 6 zero-fill entry below does not describe the
+  current source. Do not reintroduce zero filling from that historical note.
+- `--dump-iop` now also writes a RAM/metadata pair on a budget or diagnostic
+  LOADFILE stop, with kind `native-iop-budget` or `native-iop-loadfile-stop`.
+  Previously only faults produced a dump, losing evidence for RPC stalls.
+  A fresh 30-million-slice run verified a 2 MiB `native-iop-budget` dump and
+  parseable JSON at `%TEMP%/haunting-toc-probe/resume-worker.ram` plus `.json`.
+- That trace identifies a repeated LIBSD SPU2 DMA interrupt/rearm cycle: the
+  callback returns through `0x00031eb0`, CRI worker 19 consumes semaphore 7,
+  and lower-priority RPC worker 18 cannot finish its request. The synchronous
+  TSA-copy endpoint incorrectly accepted enabled AutoDMA sound input.
+  `iop.hpp` now rejects nonzero per-core AutoDMA control before changing DMA
+  registers, SPU RAM, counters, or completion flags. Both-core synthetic tests
+  cover rejection without mutation and independence from the other core's mode.
+  One-shot DMA remains supported; no new scheduling workaround or fabricated
+  wake is used. The full Windows Release build and all 18/18 CTest targets pass
+  after the changes (13.60 seconds for the final suite).
+- The fixed connected diagnostic stops explicitly at IOP `0x00032140`, native
+  time 13,090,065 us, worker 18: core 0, AutoDMA control 1, source `0x0001df80`,
+  requested size `0x800`. Artifacts: `%TEMP%/haunting-toc-probe/autodma-boundary.log`
+  and `autodma-boundary.ram` plus `.json`. This uses the quarantined synthetic
+  TOC and is not a correctness or playability claim. The current selected
+  generated bundle contains 24 modules / 68,828 reachable IOP words.
+- Build-environment note: this session's MSBuild environment contained both
+  `PATH` and `Path`, which caused CL task startup to fail. Launching CMake from
+  the explicit Python 3.14 executable with `env={k.upper(): v for k,v in
+  os.environ.items()}` removes duplicate case variants for that child process.
+  `/m:1` succeeded; `/m:4` exited early in this environment. The Windows Store
+  Python 3.11 also resolves TEMP differently; use the explicit Python 3.14
+  executable for reading the external native captures. No machine settings
+  were changed.
+
+- Static decoding now separates synchronous SIFRPC completion from callback
+  completion. `0x002700e8` takes the synchronous path when `mode & 1 == 0`,
+  creates a semaphore, stores its ID at client `+0x08`, submits command
+  `0x8000000a`, and waits on that ID. EE completion handler `0x0026fa60` obtains
+  the returned client pointer from completion packet `+0x1c`; when client
+  `+0x08` is nonnegative it signals that semaphore before releasing the request.
+  Therefore IOP server `+0x30 == 0` is not itself evidence of corruption and
+  must not be forced. The `--stop-on-loadfile-error` diagnostic now watches the
+  constructor/completion/wait path and prints the completion packet plus its
+  returned client record so the next run can identify the first bookkeeping
+  divergence without changing guest-visible transport state. No build or test
+  was run for this diagnostic-only checkpoint.
+
+- Current LOADFILE/SIFRPC continuation narrowed the remaining completion defect
+  further without reintroducing the rejected transport-level semaphore shortcut.
+  Independent decoding of ROM SIFCMD confirms `rpc_call_request` at relocated
+  `0x00099264` obtains the server record from packet `+0x34`, queues it through
+  the server data queue at `server+0x40`, and copies the EE call metadata from
+  packet offsets `+0x10`, `+0x14`, and `+0x1c..+0x30` into server offsets
+  `+0x34`, `+0x20`, `+0x1c`, `+0x24`, `+0x0c`, and `+0x28..+0x30` before waking
+  the worker.  The routine previously labelled `rpc_request_complete` at
+  `0x00098bf0` is a distinct IOP-side request completion path, so the next exact
+  target is the SIFCMD routine that constructs/emits EE completion command
+  `0x80000008`.  Isolated `iop-emit` also exposed and fixed a tooling defect in
+  `tools/hgtool/iop_build.py`: single-module `build()` referenced `placement`
+  without retaining the plan; it now computes the plan once and passes it to
+  `prepare()`.  No build/tests were run for this checkpoint.
+
+- The connected startup no longer stops at the SNDDRV worker-stack boundary.
+  Independent decoding of the supplied THREADMAN `CreateThread` export at
+  relocated `0x0009ec90` shows its exact stack allocation call: SYSMEM ordinal
+  4, mode 1, with the requested size rounded up to 256 bytes. Native workers now
+  reserve that same bounded high-side SYSMEM arena instead of an artificial
+  60 KiB pool. THREADMAN ordinal 5 is independently identified as
+  `DeleteThread`; the native dormant-only adapter releases its stack and reuses
+  the stable thread-table slot, with focused allocation/deletion/reuse tests.
+  SNDDRV's four live worker entries (`+0x9fcc`, `+0xa400`, `+0xa4f4`, and
+  `+0xa5e8`) are now explicit AOT roots. A headless 30-million-slice run using
+  the quarantined synthetic TOC reaches the complete budget instead of a fault:
+  all four workers execute, three settle into original wait paths, and the
+  remaining worker services SIF traffic. This is diagnostic continuation only;
+  the synthetic TOC is not correctness evidence. The selected **24-module**
+  bundle contains **66,191 reachable IOP words**; EE reachability is **45,303
+  words** with **316 unresolved** static boundaries. The full Windows Release
+  build and all **18/18** CTest targets pass.
+
+- Startup also gained independently implemented hardware subsets needed before
+  that checkpoint: EE FPU add/multiply/MADD/MSUB use integer mantissa arithmetic
+  with documented chop-toward-zero, signed-zero, saturation, and FCR31 flag
+  behavior; EE DMAC global hold/read/edit/restart is retained at `D_ENABLER` and
+  `D_ENABLEW`; and IPU reset plus BCLR/SETIQ/SETVQ/SETTH retain their documented
+  FIFO/table/threshold state. No IPU decode/output or rendering behavior is
+  claimed. `MODHSYN`, `MODMIDI`, `MODMSIN`, and `SNDDRV` are now statically
+  planned and linked. The next connected investigation is the long-running EE
+  wait at `0x0026c1e4` / original SIF traffic after SNDDRV startup, using a real
+  TOC observation when available rather than promoting the synthetic record.
+
+- The former **250,000,000-slice** checkpoint was not a stable service loop:
+  independent ELF inspection identifies EE `0x001e50b0` as the deliberate
+  fatal loop following `E0100301: SJX_Init can't allocate IOP Heap`. The FILEIO
+  heap RPC reached original ROM SYSMEM ordinal 4 correctly, but ROM SYSMEM's
+  allocator global at `0x000950c4` was never initialized. Connected bootstrap
+  now invokes the original SYSMEM entry with the 2 MiB IOP RAM size before
+  LOADCORE, then uses the original allocator to reserve the entire static AOT
+  image through a generated, tested high-water-mark API (`0x000dd7a0`, rounded
+  to `0x000dd800`). The returned reservation must begin at the initialized
+  heap floor or startup faults. This runs on initial boot and after IOP reboot,
+  preventing later allocations from overwriting compiled module data.
+
+- With SYSMEM live, the headless 30-million-slice diagnostic advances beyond
+  the SJX failure through CRI_ADXI command registration, a newly observed
+  stream worker and its complete non-null method table. The selected 21-module
+  bundle now contains **43,179 reachable IOP words**. LIBSD reaches the original
+  SPU DMA channel: both core register banks are retained, and the exact observed
+  `0x01000201` IOP-to-SPU profile copies a fully bounded BCR descriptor into a
+  retained 2 MiB SPU2 local-memory image using the original TSA registers,
+  advances MADR, clears START, and records completion. Other modes and
+  out-of-range transfers fault explicitly; audio synthesis/output is not yet
+  implemented. This exposed and translated the EE formatter's checked 89-entry
+  jump table plus live EE object callbacks at `0x001e41b0`, `0x001eae58`,
+  `0x001ed1a0`, and `0x001ed1f8`. After those translated successfully, the
+  subsequent native runs passed checked service-command and constructor
+  callbacks through `0x001e96d8`; the newest stop is the clean object
+  constructor entry at `0x002266f0`, now added as the unverified continuation.
+  EE reachability is now **42,749 words** with that final root regenerated;
+  executing it is the next connected check.
+
+- The same path also covers three compatibility defects: FILEIO's original
+  LOADCORE link includes its SYSMEM import; suspending an existing dormant EE
+  thread returns `-1` without mutation while invalid/nonexistent targets still
+  fault; and EE DECI2 operation `0x10` has a checked, bounded `kputs` diagnostic
+  sink. Other DECI2 operations remain explicit faults. The DECI2 return value
+  is a native compatibility policy pending original-hardware observation.
+  Diagnostic output reports only call/byte counts, SIF0 history marks truncated
+  captures, and EE SifSetDma descriptors are retained in a bounded trace.
+  Original CDVDFSV then returned a nine-word SIF0 payload; arbitrary nonzero
+  partial-qword word counts now use the same bounded retained-lane policy as
+  the already-tested one-, two-, and six-word replies instead of rejecting the
+  valid transfer shape.
+  The full Windows Release build and all 18 CTest targets pass at this
+  checkpoint.
+
+- Connected startup now loads and executes `SIO2MAN`, `SIO2D`, `DBCMAN`,
+  `LIBSD`, and `CRI_ADXI` in order. DBCMAN's large 2,048-word SIF0 transfer no
+  longer aborts at the 16-word diagnostic history limit: transport completes
+  while history records its total size and explicit truncation. DMAC2 now
+  retains the otherwise-unused `0x1f801560..568` bank and implements DICR2
+  channel-7..12 completion flags plus write-one acknowledgement; this lets the
+  original SIFMAN DMA-status path complete. LIBSD initializes checked SPU2 bus
+  mappings/delays and a retained two-core halfword control-register bank;
+  sample DMA and audio synthesis remain explicit future boundaries. CRI_ADXI
+  exposed and now tests the R3000 rule that a direct write or newer load in a
+  load-delay slot cancels the older delayed write. Its observed worker roots are
+  relocated `+0x88` and `+0x7d4`. The selected bundle is 21 modules and 40,420
+  reachable words. Full Windows Release build and all 18 CTest targets pass.
+  Both CRI_ADXI workers now execute and the connected system has returned to
+  EE startup. Independently decoded dispatch targets `0x001df068`, `0x001df220`,
+  `0x001dac20`, and `0x001dae68` are now explicit EE AOT roots; the first three
+  have executed live in order. The next boundary is the stream-state callback
+  at `0x001dae68`. The synthetic TOC remains diagnostic-only and is not
+  correctness evidence.
+
+- The second LOADFILE deadlock is fixed. Native `StartThread` now restarts a
+  completed/dormant IOP worker with a fresh CPU context and new argument while
+  reusing its already reserved stack; it rejects blocked/non-dormant targets.
+  A focused regression test covers return-to-sentinel, restart, argument reset,
+  and stable stack reservation. Consequently `SIO2D.IRX` links, returns result
+  0, and runs its original worker at relocated `+0xae4`. Startup then requests,
+  statically allocates, and links `DBCMAN.IRX`; its observed workers at `+0x1d94`,
+  `+0x1e2c`, and `+0x1ec4` and SIF callbacks at `+0x1c88`, `+0x1cc8`, and
+  `+0x1d68` are explicit AOT roots.
+  The selected bundle is now 19 modules and 33,507 reachable words. The full
+  Windows Release build and all 18 CTest
+  targets pass. The next boundary is execution through DBCMAN's original SIF
+  callback; the synthetic TOC remains diagnostic-only and is not correctness
+  evidence.
+
+- The connected startup now completes the first real post-reboot module load:
+  `SIO2MAN.IRX` returns LOADFILE result **0**, executes its translated module
+  entry at static `0x0007a000`, starts its original worker at `0x0007a39c`, and
+  the EE submits the next request for `SIO2D.IRX`. This advances the prior
+  `-203 -> -400 -> -200` sequence through checked ISO open/read, bounded SYSMEM
+  allocation, relocation-range validation, and generated static import linking.
+  MODLOAD's observed 0x30-byte allocation prefix is represented explicitly;
+  unknown link ranges and modules with unresolved imports still fault. The
+  runtime now models the documented SIO2 register window and keeps controller,
+  memory-card, FIFO-transfer, and SECRMAN authentication operations as explicit
+  boundaries. The 18-module bundle (including SIO2D) contains 32,238 reachable
+  words. The next active defect is scheduler/transport lifecycle after the first
+  successful LOADFILE reply: MODLOAD waits on event 3 for the SIO2D request, but
+  no second wake is delivered despite the consumed SIF1 packet. The synthetic
+  TOC remains diagnostic-only and is not correctness evidence.
+
+- A targeted native trace now resolves the post-GetToc LOADFILE failure through
+  the original IOMAN dispatch. MODLOAD calls IOMAN ordinal 4 with the correct
+  path and flags; IOMAN strips the `cdrom0:` prefix, selects the registered
+  `cdrom` descriptor, allocates descriptor slot `0x000a8080`, and calls the
+  CDVDMAN open operation at static `0x000b39e0`. That operation returns `-2` at
+  `0x000b3ed0`, which MODLOAD maps to `-203`. The deliberately synthetic TOC
+  probe contains no valid filesystem catalogue, so this result is expected and
+  is not evidence of a path-parser or scheduler defect. The next implementation
+  boundary is a checked ISO-backed CDVDMAN open/read compatibility path derived
+  from the original request ABI; the synthetic TOC must not be promoted into a
+  correctness input.
+
+- The post-GetToc CDVD interrupt path is now statically reachable. The supplied
+  CDVDMAN setup at `+0x505c` passes module `+0x4288` while registering hardware
+  interrupt cause 2, so that exact callback is now an explicit AOT root. Its
+  first live execution exposed the original read of byte register `0x1f402013`;
+  the synchronous native endpoint now reports a checked zero idle/decoder state
+  and records the access in the MMIO provenance ring. A deliberately synthetic,
+  non-promotable TOC probe kept outside the repository then completed the IRQ,
+  advanced through the original CDVD request machinery, and reached the real
+  `cdrom0:\\MODULES\\SIO2MAN.IRX` LOADFILE request and existing `-203` result.
+  This proves the missing IRQ root/register were earlier startup boundaries and
+  that the next failure is in MODLOAD's original device-open path; it does not
+  validate or replace a real TOC record. The expanded 16-module bundle has
+  32,606 reachable words, 41 explicit indirect-transfer boundaries, 95 native
+  adapter sites, and 11 BREAK traps. Full Windows Release CTest passes 18/18.
+
+- The configured 16-module IOP startup bundle now has **zero residual
+  syscalls**. Independent decoding of the user's external BIOS-derived IOP RAM
+  established that selector 32 enters the kernel context-transfer handler at
+  `0x5830`, which saves a complete thread frame, calls the registered callback
+  at `0x59d0` (live value `0x0000c368`), and restores the frame it returns. The
+  supplied game THREADMAN wrapper at static `0x000a4640` selects its ordinary
+  (`global+0x5c`) or interrupt/preemption (`global+0x60`) scheduling slot from
+  `a3`, stores it at `global+0x54`, and invokes selector 32 at `0x000a465c`.
+  That exact site is now a checked native reschedule boundary for the existing
+  cooperative thread contexts, including explicit cursor advance, lock release,
+  and host-only provenance; it is not a returning no-op. Regeneration yields
+  31,448 reachable words, 36 residual indirect transfers, 95 native adapter
+  sites, and no residual syscall evidence. The full Windows Release build and
+  all 18 CTest targets pass. A fresh connected 20-million-slice run reaches the
+  unchanged honest GetToc gate (`MADR=0x000c3464`, `BCR=0x00810004`,
+  `CHCR=0x41000200`), with no earlier startup regression.
+
+- The external memory-oracle helper now recognizes the original CDVDMAN
+  GetToc call frame from two independently decoded facts: the exact
+  `4 x 0x81` channel-3 descriptor and saved return to module `+0x70c4`.
+  It verifies the supplied module on every full IOP-RAM sample, follows its
+  observed reboot relocation (`0x120370` to `0x22830`), records generic CDVD
+  frames separately, and writes candidate bytes only outside the repository.
+  Synthetic exact/mismatched-frame tests pass. A fresh same-operation launch
+  sampled complete IOP RAM 10,111 times over 25 seconds and observed both
+  module placements but no CDVD request frame, so it produced no candidate and
+  did not weaken the runtime's explicit GetToc gate. The next oracle attempt
+  must use PCSX2's documented `-debugger` entry break and R3000 breakpoint, or
+  another timing-controlled guest-register observation; blind host scans remain
+  disproven. The full Windows Release build and all 18 CTest targets pass after
+  this tooling change. Regenerating the configured 16-module startup bundle
+  yields 31,449 reachable IOP words, 37 residual boundaries, 94 native adapter
+  sites, and 10 explicit BREAK traps. A fresh 20-million-slice connected run
+  reaches the unchanged honest GetToc gate (`MADR=0x000c3464`,
+  `BCR=0x00810004`, `CHCR=0x41000200`).
+
+- The OpenGL 3.3 host no longer ends at a disconnected colored-triangle probe.
+  Its verified path now creates swizzled CT32 GS local memory, selects it through
+  PMODE/DISPFB1/DISPLAY1, extracts the PCRTC source rectangle to portable RGBA,
+  uploads that image as an OpenGL texture, and presents a full-window quad. An
+  exact center-pixel readback verifies `RGBA=(0x80,0xc0,0x40,0xff)` after the
+  complete GS-to-host path. On this Windows/NVIDIA host, a three-frame run reports
+  `OpenGL: 3.3.0 NVIDIA 610.88`, presents three frames, and succeeds. The full
+  Windows Release build is also **18/18 CTest passing**. The source is still synthetic rather than game-run
+  state, so this is a scanout integration checkpoint, not playability evidence.
+
+- A single enabled PCRTC read circuit can now produce a bounded host RGBA image
+  directly from game-written GS local memory. The path decodes DISPFB FBP/FBW/
+  PSM/DBX/DBY and DISPLAY DX/DY/MAGH/MAGV/DW/DH, validates integral source
+  dimensions, reads the correct swizzled PSMCT32/24/16/16S layout, and applies
+  the documented display alpha expansion. Tests cover magnified offset CT32,
+  CT24 fixed alpha, CT16S RGB5/A1 expansion, and explicit dual-circuit rejection.
+  PCRTC circuit blending and PS-GPU24 remain checked presentation boundaries.
+
+- EE `LD`/`SD` now reaches the GS privileged range at `0x12000000` through
+  `0x13ffffff` with the documented 64-bit-only width, KSEG aliases, and address
+  mirrors. Writes cover PMODE, SMODE2, both DISPFB/DISPLAY circuits, BGCOLOR,
+  IMR, BUSDIR, and CSR event clearing; reads cover CSR and SIGLBLID. SIGNAL and
+  LABEL apply their 32-bit ID masks, FINISH drains earlier deferred draws, and
+  newly unmasked GS events latch EE INTC cause 0 through PATH2/PATH3 or IMR
+  writes. IMR resets to all five events masked. Tests cover mirrors, invalid
+  widths/BUSDIR, event IDs and clearing, FIFO-empty status, and interrupt latching.
+  CSR FLUSH/RESET, second-SIGNAL stall/resume, and local-to-host FIFO data remain
+  explicit faults rather than guessed behavior.
+  The full Windows Release build is **18/18 CTest passing**. A fresh connected
+  20-million-slice run still reaches the exact GetToc record gate at IOP
+  `0x1f0000` (`MADR=799844`, `BCR=8454148`, `CHCR=1090519552`), proving the new
+  MMIO routing introduces no earlier startup regression.
+
+- Host-to-local IMAGE uploads now reach PSMZ32, PSMZ24, PSMZ16, and PSMZ16S
+  through the existing independent Z swizzles. The 32/16-bit HWREG path shares
+  the checked raw-pixel writer with local copies, while Z24 uses the documented
+  five-RGB-pixels-per-qword packing and preserves its unused storage byte. Tests
+  exercise all four depth layouts at valid transfer dimensions.
+
+- Host-to-local and local-to-local GS transfer setup now validates BITBLTBUF
+  widths (including the narrower 1..32 encoded range), per-format TRXREG width,
+  and indexed-format start-X alignment before any image write or local copy can
+  occur. Existing IMAGE tests were converted from convenient but invalid small
+  rectangles to documented CT24/CT16/PSMT8/PSMT4/PSMT8H/PSMT4H dimensions.
+  A malformed indexed local copy now proves atomic rejection with VRAM intact.
+
+- GS `TRXDIR` now executes checked synchronous same-depth local-to-local transfers
+  across every implemented layout: CT32/Z32, CT24/Z24, CT16/CT16S/Z16/Z16S,
+  PSMT8/PSMT8H, and PSMT4/PSMT4HL/PSMT4HH. This includes all four
+  TRXPOS.DIR traversal orders needed to preserve intentional
+  overlapping copies. Source/destination depths and widths plus documented
+  width/destination-X alignments are validated; XDIR=3 terminates an active
+  transfer without fabricating work. The local-to-host FIFO remains an explicit
+  fault. Tests cover cross-layout conversions at 32/24/16/8/4 bits, mismatched
+  depth rejection, a one-pixel overlapping right shift, and deactivation.
+  The full Windows Release build remains **18/18 CTest passing**. A fresh
+  `hg_system_diagnostic --slices 20000000` run reaches the unchanged honest
+  external GetToc-record gate at IOP PC `0x1f0000`, with `MADR=799844`,
+  `BCR=8454148`, and `CHCR=1090519552`; no record was fabricated.
+
+- Sprite rasterization now follows the GS's fixed primitive attributes: shading
+  remains flat and antialiasing remains off even if IIP/AA1 bits are set. It no
+  longer reports a false unsupported boundary when the two queued vertex colors
+  differ, and a synthetic rectangle proves the drawing-kick vertex supplies the
+  flat color under both otherwise-inapplicable bits.
+
+- Deferred GS draws now snapshot the complete 0x80-register drawing environment
+  at each drawing kick, rather than consulting later texture, fog, test, blend,
+  frame, or depth state during rasterization. The rasterizer installs that
+  snapshot only for the draw and restores the live environment on success or
+  explicit failure. `TRXDIR` is also an ordering barrier that commits all prior
+  draws before host-to-local IMAGE data can alter shared frame, depth, texture,
+  or CLUT storage. End-to-end tests change FOGCOL and FRAME after a point kick,
+  then overwrite a later queued point through IMAGE and verify both orderings.
+
+- GS drawing kicks now honor `PRMODECONT.AC`: PRIM always supplies primitive
+  type, while attributes come from PRIM or PRMODE as selected. The resulting
+  context chooses the captured XYOFFSET, and the complete effective primitive
+  state travels with deferred draws into framebuffer blending. Tests cover both
+  AC modes, context selection, and opposing current-versus-captured ABE values,
+  closing a silent state-retiming bug when registers change before rasterization.
+
+- GS `TEX2_1/2` A+D writes now update the documented PSM/CBP/CPSM/CSM/CSA/CLD
+  subset of their corresponding `TEX0_1/2` state. TEX0-only base/width,
+  dimensions, component, and texture-function fields are preserved. Tests cover
+  both contexts and prove that a TEX2-only PSM change reaches actual texture
+  extraction, closing a silent stale-state path used by palette/format switches.
+
+- The read-only oracle helper can now repeatedly scan a cached non-executable
+  host-region map for the exact GetToc channel-3 descriptor and, on a hit,
+  immediately capture the detected guest MADR twice through a separately
+  supplied-module-verified IOP mapping. A fresh 60.109-second batch run found
+  CDVDMAN at guest `0x22904`, completed seven passes / 9,104,101,668 bytes, and
+  observed no raw descriptor; no candidate was written and PCSX2 was stopped.
+  This rejects further blind raw-triple scans for the current profile. The next
+  capture must obtain MADR from a same-stage guest-register/debugger observation.
+
+- GS line diamond clipping no longer depends on host `double`. Exact rational
+  enter/leave intervals now implement the included-start/excluded-end rule from
+  the original 12.4 coordinates, while the existing dominant-axis DDA remains
+  responsible for attributes. Forward, reversed, and fractional-endpoint 45°
+  cases verify identical half-open coverage. This removes a cross-host rounding
+  source before antialiased-line coverage is added.
+
+- Perspective STQ now works for varying-Q sprites, Line/LineStrip draws, and
+  triangles. The rasterizers compute `(sum(weight*S))/(sum(weight*Q))` and the
+  corresponding T ratio directly, cancelling the common interpolation
+  denominator and retaining exact signed mantissa/exponent arithmetic. Tests
+  distinguish varying-Q perspective division from affine shared-Q sampling and
+  exercise every supported multi-vertex primitive without host floating point.
+
+- FST-clear GS Line/LineStrip draws now support exact STQ sampling when both
+  vertices share Q. Signed dominant-axis weights preserve the existing DDA at
+  diamond-covered samples, including limited endpoint extrapolation, and feed
+  the same mantissa/exponent ratio used by sprites and triangles. Direct signed
+  extrapolation and two diagonal texels are tested. This shared-Q checkpoint is
+  superseded by the varying-Q perspective path above.
+
+- FST-clear GS triangles now support exact STQ sampling when all three vertices
+  share Q. Their existing integer coverage edge weights now also form weighted
+  S and T mantissa/exponent sums; the common barycentric denominator cancels
+  through Q division before the checked texture sampler. Tests cover three
+  distinct texels. This shared-Q checkpoint is superseded by the varying-Q
+  perspective path above.
+
+- FST-clear GS sprites now support exact STQ sampling when both vertices share
+  Q. The two rectangle axes interpolate S and T as exact signed mantissa/exponent
+  ratios, cancel the interpolation denominator through perspective division,
+  and feed the existing checked TEX0/CLAMP/TFX sampler without host floating
+  point. Tests cover direct positive and negative ratios, a four-texel 2x2
+  sprite. This shared-Q checkpoint is superseded by the varying-Q perspective
+  path above.
+
+- Textured GS points now accept FST-clear STQ coordinates. The point path derives
+  normalized `S/Q * width` and `T/Q * height` texels with exact IEEE-single bit
+  decomposition and integer ratios, explicitly rejecting non-finite values,
+  zero Q, invalid dimensions, and signed-coordinate overflow. Direct ratio edge
+  cases and an end-to-end 2x2 texture sample are covered; multi-vertex
+  perspective STQ is now covered by the checkpoint above.
+
+- GS draw vertices now retain the raw per-vertex `RGBAQ.Q` value alongside ST
+  and UV. PACKED STQ's GIF-Q update followed by RGBAQ and a vertex kick is
+  covered with a non-default `Q=2.0` bit pattern. This closes the state-loss gap
+  that enabled the perspective interpolation now implemented above.
+
+- GS Line/LineStrip varying attributes now extend from axis-aligned draws to
+  diagonal diamond traversal using the dominant-axis DDA parameter. Forward and
+  reversed 45-degree gradients verify Gouraud RGBA, depth, included start and
+  excluded endpoint; a diagonal FST line verifies two different texels.
+  Antialiasing remains the explicit line-coordinate boundary.
+
+- Axis-aligned GS Line/LineStrip draws now interpolate Gouraud RGBA, unsigned
+  depth, fog, and FST UV along the exact horizontal or vertical DDA parameter.
+  Tests cover horizontal and vertical color/depth gradients, fog gradients,
+  two distinct texture samples, endpoint exclusion, and explicit rejection of
+  a varying diagonal. Constant-attribute diagonal diamond coverage is unchanged.
+
+- GS triangle Z now varies barycentrically with coverage, UV, Gouraud color,
+  and fog instead of requiring identical endpoint depth. The exact unsigned
+  weighted sum is proven to fit 64 bits from the GS's 16-bit X/Y domain; tests
+  cover ordinary midpoints and a near-maximum-area triangle with `Z=0xffffffff`.
+
+- GS triangles now barycentrically interpolate Gouraud RGBA and fog with the
+  same integer edge weights used for FST UV and coverage. Tests verify exact
+  vertex and midpoint color/fog results. Flat triangles still use the original
+  drawing-kick vertex.
+
+- FST textured triangles now barycentrically interpolate unsigned 10.4 UV at
+  every covered pixel instead of accepting only identical endpoint UVs.
+  Winding normalization swaps both geometry and vertex attributes while flat
+  shading still uses the original drawing-kick vertex. Distinct 2x2 texels and
+  both winding orders are covered.
+
+- The GS sprite rasterizer now supports FST textured rectangles: it linearly
+  interpolates the two unsigned 10.4 UV endpoints over the original unclipped
+  rectangle axes, samples through the existing checked TEX0/CLAMP/TFX path, and
+  preserves the second vertex's depth and flat color. A four-texel 2x2 case
+  verifies both axes. Varying Gouraud color still faults.
+
+- Rejected the tempting but invalid assumption that native GetToc MADR
+  `0x000c3464` can be relocated with CDVDMAN's module base. A fresh 45-second
+  read-only oracle run at the derived guest `0x33c94` observed stable executable
+  code, not a TOC record. Original translated CDVDMAN shows channel-3 MADR is
+  loaded from request-descriptor field `+4`, so it is caller-provided.
+  `oracle_capture.py` now requires an explicit same-command-stage
+  `--iop-toc-offset` and never derives it from a module anchor.
+
+- Added a read-only `--locate-iop-toc-dma` oracle mode that searches
+  non-executable host mappings for the exact active channel-3
+  `BCR=0x00810004`/`CHCR=0x41000200` pair and validates the preceding MADR as an
+  aligned 2 MiB IOP range. A fresh post-boot snapshot scanned 1.40 GB and found
+  no persistent descriptor, proving this must be used at a debugger stop during
+  the original active command stage rather than after normal startup has passed it.
+  A second scan begun immediately after a fresh process launch covered 803.8 MB
+  during startup and also found none; both oracle processes were explicitly stopped.
+
+- The translated EE runtime now supports up to 64 simultaneous read-only PC
+  trace watches via repeated `--watch-ee-pc`. Each watch snapshots a bounded
+  64-instruction history with the indirect-target registers, arguments, return
+  address, stack/GP, and callee-saved state; an empty watch set adds only one
+  branch per translated instruction and never changes guest state. Five fresh
+  20-million-slice batches covered all 288 current unresolved EE indirect sites.
+  None executes before the external GetToc-record gate, establishing that target
+  discovery for those sites requires post-gate execution rather than more
+  pre-gate startup runs. Runtime and emitter tests cover watch deduplication,
+  snapshot contents, and generated instrumentation; all 18 CTest targets pass.
+
+- `SetGsCrt` (`0x02`) now records a validated interlace/display-mode/frame
+  request in explicit PCRTC state; it is no longer an analysis boundary or a
+  discarded display setup call. Invalid boolean fields and out-of-range mode
+  selectors fault. The authoritative EE scan is now 37,940 words / 295
+  boundaries (288 indirect, six syscalls, one exception return). Focused kernel
+  and startup tests pass.
+
+- The EE GS kernel boundary now implements `GsGetIMR`/`GsPutIMR`
+  (`0x70`/`0x71`) against explicit 64-bit privileged GS state rather than an
+  ignored write. The public put ABI leaves `v0` untouched; get returns the exact
+  stored value. The authoritative EE scan is now 37,938 words / 296 boundaries
+  (288 indirect, seven syscalls, one exception return). Focused kernel and
+  startup tests pass.
+
+- EE SIF kernel support now includes `SifDmaStat` (`0x76`) and the interrupt
+  aliases `isceSifSetDma`/`isceSifDmaStat` (`-0x77`/`-0x76`). The bounded native
+  profile tracks its active transfer ID, reports in-progress versus completed,
+  reuses the existing snapshotted packet submission, and rejects invalid IDs or
+  unsupported queueing. EE interrupt services now also include checked
+  `RemoveIntcHandler` (`0x11`), `DisableIntc` (`0x15`), and interrupt-context
+  `GetThreadId`/`iWakeupThread` (`-0x2f`/`-0x34`). The authoritative EE scan is
+  now 37,936 words / 297 boundaries (288 indirect, eight syscalls, one exception
+  return), with the IOP result unchanged at 55 all-module residuals. Focused
+  kernel/startup tests pass.
+
+- EE kernel startup now implements checked `StartThread` (`0x22`),
+  `ExitThread` (`0x23`), `ReferThreadStatus` (`0x30`), `WakeupThread` (`0x33`),
+  `CancelWakeupThread` (`0x35`), `SuspendThread` (`0x37`), `ResumeThread`
+  (`0x39`), `RotateThreadReadyQueue` (`0x2b`), and `GetMemorySize` (`0x7f`)
+  plus a bounded cooperative worker dispatcher.
+  A created worker receives the original entry, argument, GP, aligned stack top,
+  and a host-only completion sentinel in an isolated full EE CPU context. Ready
+  workers cannot run while the root thread owns the CPU; after an exit, the
+  highest-priority ready worker advances one translated instruction per service
+  call. Invalid IDs, repeated starts, interrupt-context calls, and exit without
+  a running thread fault explicitly. Status queries serialize the documented
+  0x30-byte thread record; wakeups release a waiting thread or increment its
+  bounded pending count; memory size comes from the runtime's actual RAM vector.
+  Wakeup behavior distinguishes sleep from semaphore waits and preserves the
+  documented WAIT/WAITSUSPEND/SUSPEND transitions; cancellation returns and
+  clears the previous wakeup count. Equal-priority rotation advances the
+  dispatch cursor and never schedules a worker while another thread owns the
+  CPU. These returning services reduce the EE inventory to 37,890 words / 303
+  boundaries (288 indirect, 14 syscall, one exception return). Kernel tests
+  cover start, ownership gating, context dispatch, exit, status, wakeup, memory
+  size, and root-context restoration. The Windows Release build and all 18 CTest
+  targets pass, and a fresh 20-million-slice connected run still reaches the
+  exact external GetToc-record boundary.
+
+- Four EE indirect call sites are now rooted solely from exact executable
+  pointers already present in the original file-backed image: callback wrappers
+  at `0x001009b0`, `0x001009e0`, and `0x00100a10`, plus the method descriptor
+  call at `0x001e6c34`. Runtime dispatch remains register-selected and any value
+  outside the configured sets still faults. The locally proven `StartThread`
+  selector (`0x22`) is also classified as returning for discovery only; its
+  unimplemented runtime service still faults explicitly. Together this opened
+  3,256 additional EE words (37,880 total) and leaves 308 explicit boundaries:
+  288 indirect transfers, 19 syscalls, and one exception return. The authoritative
+  IOP result remains 76,531 words / 534 isolated boundaries and 55 all-module
+  residuals. The pointer-candidate triage now suppresses already configured
+  sites, leaving zero genuinely new file-backed candidates instead of re-listing
+  the four resolved calls. Focused EE tooling tests pass (28 discovery/config
+  and one triage),
+  the Windows Release build succeeds, and all 18 CTest targets pass.
+
+- `oracle_capture.py` now has a bounded continuous GetToc-range monitor that
+  waits for a supplied-module anchor, retains only states confirmed by two
+  consecutive identical reads, caps unique output, and records final anchor
+  stability. Fresh 15-second (2.43 million reads) and 45-second (7.91 million
+  reads) PCSX2 memory-oracle runs observed only zeroing, allocator fill, and
+  request-metadata initialization at `0x000c3464`, including across an IOP
+  lifecycle relocation. Those repeatable hashes are explicitly rejected; no
+  captured state was admitted as a TOC record or copied into the repository.
+
+- Native trace watches now use bounded heap-backed storage and accept up to 64
+  sites, allowing all 56 then-current dynamic boundaries to be observed in one
+  20-million-slice startup run. Four executed before GetToc and yielded guarded
+  targets: LOADCORE `+0x076c` to EESYNC `+0x0080`, SIFCMD `+0x18b4` to LOADFILE
+  `+0x057c`, SIFCMD `+0x0804` to SIFCMD `+0x1264`, and MODLOAD `+0x2910` to
+  MODLOAD `+0x295c`. Unknown values still fault. The audit now has 55 residual
+  boundaries (52 dynamic transfers, two SECRMAN imports, and THREADMAN syscall
+  32) plus 193 BREAK traps. The external capture and hashes are recorded in
+  `docs/ORACLE.md`; no captured bytes entered the repository. The regenerated
+  Windows Release build, all 18 CTest targets, focused 19/19 IOP tooling tests,
+  and the unchanged GetToc-boundary startup run pass.
+
+- ROM MODLOAD syscall selector 12 is now a narrowly configured checked AOT
+  transfer matching the original `CpuInvokeInKmode` ABI: the function address
+  comes from `a0`, arguments shift from `a1`/`a2`/`a3`, and the caller's `ra`
+  remains the return path.  The planner accepts this only when the named site
+  decodes as `syscall` and the immediately preceding original instruction sets
+  `v0=12`; unsupported selectors still fault.  The audit now has 59 residual
+  boundaries (56 dynamic transfers, two SECRMAN authentication imports, and
+  THREADMAN syscall 32), 130 native adapters, and 193 defined BREAK traps.
+  Focused IOP tooling tests pass 19/19, the Windows Release build and all 18
+  CTest targets pass, and the 20-million-slice startup run still reaches the
+  exact external GetToc-record boundary.
+
+- Three further original-byte switches are now statically rooted: LIBSD
+  `+0x3470` (20 entries), MODHSYN `+0xb704` (14 entries), and ROM MODLOAD
+  `+0x14c8` (7 entries).  Each selector has an independently decoded bounds
+  check and every relocated table word resolves into its module's executable
+  sections.  The comprehensive audit now covers 76,532 IOP words with 60
+  residual boundaries (56 dynamic transfers, two SECRMAN authentication
+  imports, and two syscalls) plus 193 defined BREAK traps.  Focused IOP tests
+  pass 17/17, the Windows Release build and all 18 CTest targets pass, and a
+  fresh 20-million-slice connected run reaches the unchanged explicit GetToc
+  record boundary (`MADR=0x000c3464`, `BCR=0x00810004`,
+  `CHCR=0x41000200`).
+
+- The two remaining SECRMAN 1.3 ordinal-6 imports were traced through original
+  callers.  SIO2D forwards three caller arguments unchanged; MCMAN supplies a
+  port-like index, slot/context, and a prior helper result.  This confirms that
+  the boundary needs actual card/SIO2 authentication semantics, not merely a
+  statically discoverable function target.  It continues to fault explicitly
+  rather than fabricating authentication success.
+
+- `hg_system_diagnostic --dump-iop <external-path>` now writes an adjacent JSON
+  sidecar with the native fault PC, all 32 IOP GPRs, HI/LO, delayed-load state,
+  current thread, and virtual time.  This preserves the missing base-register
+  provenance needed to validate future mutable callback targets while keeping
+  both RAM and metadata outside the repository.  A fresh GetToc-boundary dump
+  was parsed successfully (`pc=0x1f0000`, 32 GPRs, exact 2 MiB RAM).  Watch
+  `0x000a9ca0` also retained a full 64-record history with the selected dynamic
+  target/base register set and exact `sp=0x001f8dc0`.  All 18 Windows Release
+  CTest targets pass.
+
+- A batched original-byte selector pass adds 19 independently bounded relocated
+  dispatches across MODHSYN, MODMIDI, LIBSD, CDVDMAN, THREADMAN, FILEIO,
+  TIMEMANI, and MCMAN.  All configured table entries are checked executable
+  targets.  MODHSYN `+0x9918` compiles only its six valid targets, preserving an
+  explicit fault for selector 10's non-code value.  The comprehensive audit now
+  covers 76,202 IOP words with 63 residual boundaries (59 dynamic transfers,
+  two SECRMAN authentication imports, and two syscalls) and 183 defined BREAK
+  traps.  Focused IOP tooling tests, the Windows Release build, and all 18 CTest
+  targets pass.  A fresh
+  20-million-slice connected run reaches the unchanged explicit GetToc-record
+  requirement.
+
+- MODLOAD's `+0x0bbc` indirect tail transfer is now rooted from its independently
+  decoded eight-entry, bounds-checked relocated read-only table at `+0x35b0`.
+  This expands the all-module audit to 72,415 IOP words.  It intentionally
+  exposes two additional runtime callbacks and the selector-12 syscall, leaving
+  76 residual boundaries (72 dynamic transfers, two SECRMAN authentication
+  imports, and two syscalls) plus 152 defined BREAK traps.  Focused IOP tooling
+  tests and all 18 Windows Release CTest targets pass.  A fresh 20-million-slice
+  connected diagnostic stops at the same explicit GetToc-record boundary.
+
+- A fresh comprehensive scan covers 34,624 EE words and 71,977 IOP words.
+  Module-qualified, executable-range-checked targets compile all 24 live IOMAN
+  operation sites for the native `tty`/`cdrom` driver set. The all-module
+  residual count falls from 97 to **75**: 71 dynamic transfers, two SECRMAN
+  authentication imports, and two syscalls. All 152 BREAK traps remain separate.
+  The exact compact inventory is in `docs/DECODING_SCAN.md`.
+- `hg_system_diagnostic --dump-iop <external-path>` writes exact native IOP RAM
+  on a startup fault only outside the repository. The GetToc-boundary dump
+  identified the original `tty` and `cdrom` descriptors and live operation
+  vectors; it is external runtime state, not committed input or emulator code.
+- After adding those guarded callback roots, the Windows Release suite is
+  **18/18 passing**. A fresh 20M-slice connected run reaches the unchanged honest
+  GetToc boundary at `MADR=0x000c3464`, `BCR=0x00810004`,
+  `CHCR=0x41000200`; the game does not open yet.
+
+- The checked GS IMAGE endpoint now accepts PSMCT16S's packed 16-bit payload
+  and the documented PSMT8H/PSMT4HL/PSMT4HH packed byte/nibble payloads, writing
+  only their CT32 high-byte/high-nibble lanes. Focused GIF coverage passes.
+- The documented startup bundle now contains 16 modules, including required
+  `rom_timemani`; it has 28,024 reachable IOP words. The original SIF, FILEIO,
+  CDVD, LOADFILE, and reboot diagnostics all pass, as does the full **18/18
+  Release CTest** batch. These are startup-path checks only, not playability
+  evidence.
+- A fresh 20M-slice run of that bundle reaches the original CDVD GetToc request
+  and explicitly stops for the required external 2,064-byte record:
+  `MADR=0x000c3464`, `BCR=0x00810004`, `CHCR=0x41000200`. No ISO-derived
+  replacement was accepted or generated.
+- A new bounded PCSX2 batch observation took two coherent, CDVDMAN-anchored IOP
+  maps after approximately 20 and 40 seconds. Their full-map hashes differ, but
+  both extracted GetToc candidates retain the previously rejected pre-command
+  hash. The records remain ineligible and the launched process was stopped.
+- `oracle_capture.py` now marks that recorded pre-command candidate hash as
+  rejected in its sidecar metadata instead of leaving it generically labeled as
+  a candidate. This records negative provenance without retaining captured data
+  and prevents accidental use as `--toc-record`; focused tool and CDVD tests
+  pass.
+- The 2 MiB module-anchored oracle mapping is IOP RAM only, not the CDVD MMIO
+  aperture. Prior similarly numbered RAM-offset values are therefore not used as
+  CDVD register evidence; future candidates require a separately valid hardware
+  register observation. This correction removes a false provenance signal rather
+  than synthesizing a transfer or decoder dependency.
+- GS LINE and LINESTRIP now rasterize their documented diamond coverage with
+  included start and excluded endpoint behavior for constant-attribute,
+  non-antialiased draws. Varying DDA attributes remain explicit faults; focused
+  horizontal/vertical endpoint and flat-color tests pass.
+- VIF1 now writes documented S-32/S-16/S-8 and V4-32/V4-16/V4-8/V4-5 UNPACK
+  forms into bounded VU1 data memory, including scalar replication, split
+  DMA-qword payloads, signed or unsigned expansion, masked/fill CYCLE behavior,
+  and FLG-relative TOPS destinations. V2/V3 forms are also accepted only when
+  their documented indeterminate components are explicitly masked, filled, or
+  preserved. This is data transport only: unguarded V2/V3 and MSCAL/VU execution
+  remain explicit faults.
+- COP2/VU0 macro-mode `VABS` now has an exact decoder match and selected-lane
+  raw-bit sign clearing, preserving destination lanes and NaN payloads without
+  host floating-point behavior. Macro arithmetic, flags, hazards, and every
+  non-modeled macro encoding remain explicit faults; focused decoder and AOT
+  translation checks pass.
+- V4 writes now implement normal, offset, and difference STMOD behavior whenever
+  the selected mask lane accepts input, including documented difference-mode Row
+  updates. Fill lanes still require Row/Col/preserve selectors because no input
+  exists to add.
+- VIF1 now preserves documented STROW/STCOL four-word state across split DMA
+  payloads, preparing the Row/Col data required by later masked/fill UNPACK.
+- VIF1 applies STMASK's documented input/Row/Col/preserve selectors to V4
+  UNPACK, including masked `CL < WL` fill cycles with their reduced payload
+  length. A fill slot requesting unavailable input faults explicitly.
+- VIF1 OFFSET now establishes the documented initial TOPS from BASE, allowing
+  checked FLG-relative UNPACK destinations before any unimplemented MSCAL
+  buffer toggle.
+- VIF1 now accepts documented MPG uploads into bounded VU1 MicroMem, retaining
+  split-DMA 64-bit instruction pairs without executing them. MSCAL-family
+  activation remains an explicit fault until a separate AOT VU1 path exists.
+- `analyze --triage` additionally coalesces each boundary by reason, decoded
+  mnemonic, and target register. This leaves the discovery graph untouched but
+  exposes repeated dispatch-table shapes as one work item, avoiding repeated
+  per-site investigation.
+- Its indirect-call queue also groups the two preceding decoded instructions.
+  This is read-only setup evidence, not target inference: it distinguishes
+  repeated pointer/table load shapes from other dynamic dispatch before a
+  representative caller is inspected.
+- The triage queue now separately identifies an indirect target loaded from a
+  base that was itself loaded from memory. This creates one bounded inspection
+  item for repeated table-dispatch chains while preserving every site and
+  refusing to infer any targets. Each class now supplies three deterministic
+  representative PCs for read-only inspection.
+- `iop-bundle` now separates guarded imports linked within the selected static
+  bundle from residual discovery boundaries. This avoids treating already
+  emitted provider links as missing work while preserving every unlinked import,
+  indirect transfer, and break as an explicit report item. The 16-module
+  startup bundle reports 332 guarded links and 82 residual boundaries (69
+  indirect transfers, 10 breaks, two syscalls, and one unprovided import);
+  the Release suite is **18/18 CTest passing**.
+- INTRMAN ordinal 8 is now an independently modeled `CpuDisableIntr` adapter.
+  It disables CPU interrupt delivery while preserving per-cause masks and
+  returns success; its public ABI declaration removes THREADMAN's former
+  unprovided-import boundary. The 16-module bundle now has 28,024 reachable
+  words and 81 residual boundaries (69 indirect transfers, 10 breaks, two
+  syscalls). The Release suite is **18/18 CTest passing**, and a fresh 20M-slice
+  diagnostic reaches the same explicit external GetToc-record boundary.
+- Bundle reports now group residual IOP boundaries by decoded mnemonic and
+  target register, with deterministic module/PC examples. The largest class is
+  57 `jalr $v0` sites; its representative IOMAN sequence loads an object from
+  `$a0+0x10` and then its `+4` callback field. This is runtime callback evidence,
+  not a static-target inference, so it remains an explicit boundary.
+- `hg.py vu-inspect --vu-program <external-raw-pairs>` now performs a strict,
+  build-time VU microprogram structural pass. It validates 64-bit pair alignment,
+  records I/E flags, and computes only documented lower-pipeline direct branch
+  edges, including their required one-pair delay slot, explicitly marking targets
+  or delay slots outside the supplied capture. No VU execution or interpreter
+  fallback exists. Synthetic pair/branch and CLI coverage pass, creating the
+  first AOT VU1 CFG foundation.
+- Decoder investigation is now batched: one `analyze --triage` pass regenerates
+  grouped EE boundary and setup-shape evidence (currently 307 boundaries across
+  34,624 reachable words), while `iop-bundle` supplies the equivalent IOP
+  grouping. The focused structural decoder checks and all 18 Release CTest
+  targets run in parallel; the latest complete batch passed in 1.68 seconds.
+- IOP bundle triage now also recovers a syscall selector only when its local
+  straight-line setup proves it. This keeps unresolved syscalls as faults while
+  separating their ABI work items without per-site manual decoding. The current
+  two boundary selectors are 32 in THREADMAN and 12 in MODLOAD.
+- `hg.py major-scan` now produces one ignored comprehensive inventory for the
+  configured EE image and all 28 configured IOP modules. Its current run covers
+  34,624 EE words (307 boundaries) and 69,638 IOP words (544 unresolved
+  boundaries plus 152 defined BREAK traps),
+  retaining every module/issue/opcode record plus compact priority groupings.
+  The leading IOP families are 152 BREAK sites, 93 indirect transfers, and
+  imports from THBASE (64), SYSCLIB (61), and LOADCORE (54); this is a worklist,
+  not an assumption that any boundary may be bypassed.
+- That same one-pass report now also runs all 28 configured modules through the
+  independent static-link planner once. It proves 664 guarded provider bindings,
+  records 129 native adapter sites, and leaves 97 explicit residual boundaries
+  (93 dynamic transfers and the
+  remaining unprovided imports/syscalls), while separately retaining all 152
+  BREAK traps by code; generated C++ is discarded and no boundary is treated as
+  a runtime fallback.
+- IOP BREAK is now emitted as a defined terminating guest trap carrying its
+  20-bit code instead of being mislabeled as an unsupported translation. The
+  all-module inventory groups 92 code-`0x1c00`, 57 code-`0x1800`, two
+  code-`0x400`, and one code-`0x7` traps. BREAK in a delay slot terminates before
+  either branch successor is discovered. Nothing continues past a trap.
+- The regenerated 16-module startup bundle passes all **18/18 Release CTest**
+  targets after the version-compatible linking and BREAK reclassification. A
+  fresh 20M-slice connected run again reaches the exact external GetToc record
+  boundary with `MADR=0x000c3464`, `BCR=0x00810004`, and `CHCR=0x41000200`.
+- SECRMAN 1.3 ordinals 4/5 now retain the documented memory-card command and
+  device-ID callback pointers, including checked null clearing. Authentication
+  ordinal 6 remains an explicit boundary until real SIO2/card behavior exists.
+  This removes two provider gaps without returning fabricated authentication.
+  The complete Windows Release batch remains **18/18 CTest passing**.
+- The all-module report now groups four decoded words around every indirect
+  transfer, normalizes architectural zero-shift NOPs, and separates target loads
+  through a loaded object base. The largest concrete families are 26
+  register-base `lw; nop; jalr`, 18 register-base tail `lw; nop; jr`, and 14
+  two-level IOMAN `lw; nop; jalr` callbacks; no target is inferred from a shape.
+- Executing the supplied LOADCORE linker against an otherwise identical import
+  table with its minor version lowered proved that a newer same-major export is
+  accepted. The static planner now mirrors that rule while retaining ambiguity,
+  newer-import, and major-version mismatches as faults. This links the bundled
+  SYSCLIB 1.4/SYSMEM 1.2 providers to six older-minor module imports and reduces
+  the all-module residual count from 257 to 251.
+- DMACMAN ordinals 33/34/35 now update only the documented DPCR/DPCR2 four-bit
+  priority/enable fields, including SIO2 channels 11/12. No SIO2 transfer is
+  fabricated: an unsupported endpoint still faults at transfer start. This removes
+  SIO2MAN's three configuration-import boundaries; focused IOP/runtime and tooling
+  checks pass.
+- The startup bundle recipe includes `rom_timemani`, which the original core
+  bootstrap queries before THREADMAN initialization. The prior omission caused
+  an early `unknown IOP module` diagnostic failure; the regenerated bundle
+  verifies this dependency through the original startup checks.
+- Indexed TEX0 palettes now accept CPSM=PSMCT16S in CSM1/CSM2, with the
+  existing CT16S swizzle rather than a linear or CT16 alias; synthetic CSM2
+  coverage passes.
+- TEX0 direct extraction now supports PSMT8H, PSMT4HL, and PSMT4HH by reading
+  their documented high-byte/high-nibble CT32 lanes and using the checked CLUT
+  route. Synthetic CSM2 palette cases cover all three formats.
+- The GS frame/depth pixel path and TEX0 direct-color extraction now support
+  PSMCT16S with its documented separate page block order; it retains CT16's
+  RGB5A1 formatting, dithering, masks, and destination-alpha behavior without
+  aliasing CT16 storage. Synthetic storage and normal depth commits pass.
+- The separate IOP MIPS-I AOT decoder/emitter/runtime now models `MTC0` to
+  CP0 Status, including LOADCORE's `mtc0 $zero,$12` form. Other CP0 writes
+  stay explicit faults. This removes LOADCORE's two unsupported opcode words,
+  expands its audited reachability from 1,730 to 1,777 words, and reduces its
+  boundaries from 13 to 12; direct state and emitter checks pass.
+- The GS frame path now applies PABE: when enabled, source alpha bit 7 gates
+  alpha blending per pixel while direct source writing remains active. Synthetic
+  enabled/disabled cases pass. The Release suite is **18/18 CTest passing**.
+- GS point and equal-fog triangle paths now apply the documented FOGCOL blend
+  after texture function and before pixel tests, retaining alpha. Varying
+  triangle fog still faults explicitly until DDA interpolation exists;
+  synthetic coefficient/point coverage passes.
+- PSMZ24 depth reads/writes now share the documented PSMZ32 physical layout
+  while retaining only low 24 depth bits and preserving the unused word byte.
+  PSMZ16 and PSMZ16S now use their documented distinct 8×4 block tables with
+  16-bit depth storage. Synthetic storage coverage passes. The Release suite
+  is **18/18 CTest passing**.
+- PSMCT16 now has a checked unmasked RGB5A1 frame/depth path: it applies the
+  signed DIMX `Y%4,X%4` dither offset before COLCLAMP/RGB5 conversion, applies
+  FBA to alpha bit 15, and expands destination alpha to the documented
+  `0x80`/zero blend values. Its special FBMSK relation now maps the documented
+  pre-conversion RGB/A bits to RGB5A1 precisely. The Release suite is **18/18
+  CTest passing**.
+- The GS pixel writer and normal depth path now support PSMCT24 alongside
+  PSMCT32. RGB24 preserves its unused local-memory upper byte, applies RGB
+  FBMSK/COLCLAMP, bypasses DATE as specified, and supplies destination alpha
+  `0x80` to blending. Synthetic masked and depth-commit cases pass; RGBA16,
+  dithering, and other frame formats still reject explicitly. The Release suite
+  is **18/18 CTest passing**.
+- GS now rasterizes flat, untextured, equal-depth TRIANGLE,
+  TRIANGLESTRIP, and TRIANGLEFAN draw events through the normal pixel path.
+  Its 12.4 edge test follows the documented top/left-inclusive and
+  bottom/right-exclusive rule after winding normalization; synthetic
+  side-sharing and strip cases pass. Identical FST/UV vertices may point-sample
+  one TEX0 texel; varying UV, STQ, fog, Gouraud color, and depth interpolation
+  still reject explicitly. The Release suite is **18/18 CTest passing**.
+- `hg.py analyze --triage` now turns the existing single discovery pass into a
+  deterministic, read-only grouped boundary queue (`out/analysis-triage.json`).
+  It records every site by reason and decoded mnemonic without a second decode,
+  inferred target, or fallback. The local executable run reports 286 unresolved
+  indirect transfers, 20 syscalls, and one exception return (307 total across
+  34,624 reachable words); its synthetic ordering/provenance check and the
+  Release suite are **18/18 CTest passing**.
+- Triage now additionally records a deliberately non-authoritative batch of
+  strictly adjacent `lw`/`lwu` initialized-file-pointer candidates before an
+  indirect transfer. These candidates never become targets or remove the
+  explicit boundary because guest code may mutate their storage; the current
+  executable has three. Synthetic evidence verifies the distinction.
+- GS now rasterizes its first rectangle primitive: untextured sprites with
+  documented second-vertex depth and flat draw-kick color use top/left-
+  inclusive, bottom/right-exclusive coverage, XYOFFSET, SCISSOR, and the
+  normal depth pixel path. Textured sprites are now supported, and IIP/AA1 are
+  correctly ignored as fixed flat/off sprite attributes; synthetic coverage
+  proves a 2x2 rectangle. The Release suite is **18/18 CTest passing**.
+- Primitive rasterization now honors the documented `SCANMSK` row-parity
+  control: modes 2 and 3 skip even and odd final framebuffer Y rows,
+  respectively, before TEST/frame/depth effects. Direct framebuffer writes and
+  transfers remain intentionally outside this primitive-only rule; synthetic
+  checks cover both masks.
+- The primitive pixel path now implements all documented alpha-test failure
+  outcomes after the subsequent destination-alpha and depth tests: KEEP,
+  FB_ONLY, ZB_ONLY, and RGBA32 RGB_ONLY (which becomes FB_ONLY in RGB24/16).
+  Synthetic tests prove the independent RGBA32 frame/depth effects; the Release
+  suite is **18/18 CTest passing**.
+- `State::rasterize_gs_draws()` now exposes pending GS draw submission through
+  the EE runtime and translates GS errors to guest faults. Empty queue behavior
+  is covered in runtime tests; the Release suite is **18/18 CTest passing**.
+- GS now has a bounded pending-draw submission queue. It preserves order and
+  advances only after successful rasterization, leaving an unsupported draw
+  at its queue position for explicit diagnosis. Synthetic queue drain/no-op
+  coverage passes; the Release suite is **18/18 CTest passing**.
+- A GS rasterizer dispatcher now submits completed point draws and explicitly
+  faults all other primitive types, preventing unsupported draws from being
+  silently retained or ignored. Synthetic coverage checks both dispatch and
+  fault behavior; the Release suite is **18/18 CTest passing**.
+- The first actual primitive rasterizer now handles GS points: closest-pixel
+  selection from 12.4 coordinates, XYOFFSET, inclusive SCISSOR, and the
+  PSMCT32/PSMZ32 normal pixel path. Textured points accept FST/UV and reject
+  unimplemented STQ explicitly. Synthetic draw and scissor cases pass; the
+  Release suite is **18/18 CTest passing**. Lines and interpolation remain
+  unfinished; triangle/sprite implementations currently cover only their
+  documented flat, untextured subsets.
+- The normal successful GS depth path now composes alpha/DATE pass, PSMZ32
+  comparison, PSMCT32 draw-pixel commit, and Z update. Synthetic GEQUAL and
+  GREATER cases prove failed depth leaves both buffers intact; the Release
+  suite is **18/18 CTest passing**. Selective alpha-failure FB/Z write policy,
+  remaining formats, and rasterization remain explicit work.
+- PSMZ32 depth reads/writes now use its documented distinct GS block order,
+  shared FRAME width, and ZMSK behavior. Synthetic coverage proves that Z32
+  does not alias the CT32 address at the same coordinate and preserves depth
+  under ZMSK; the Release suite is **18/18 CTest passing**. Integrating this
+  into full primitive depth/write policy and other Z formats remains work.
+- A composed PSMCT32 GS draw-pixel path now applies alpha-test failure policy,
+  DATE, optional PRIM.ABE blending, then the checked frame writer. Synthetic
+  coverage includes KEEP, RGB_ONLY, and DATE rejection; the Release suite is
+  **18/18 CTest passing**. Z-buffer effects, other frame formats, and actual
+  primitive rasterization remain explicit work.
+- The portable GS PSMCT32 frame-buffer writer now commits to swizzled local
+  memory after COLCLAMP/wrap conversion, FBA alpha correction, and FBMSK.
+  Synthetic coverage verifies both clamp/mask and lower-eight-bit paths; the
+  Release suite is **18/18 CTest passing**. PSMCT24/16, dithering, Z writes,
+  and primitive rasterization remain explicit work.
+- The GS TEST stage now has independently tested alpha, destination-alpha,
+  and depth predicates with every documented comparison mode represented.
+  RGB24's DATE bypass and prohibited ZTE=0 behavior are explicit. The Release
+  suite is **18/18 CTest passing**; alpha-failure write masks and final pixel
+  pipeline ordering remain unfinished.
+- TEX0 point sampling and its TFX/TCC texture function are now composed in a
+  single checked GS-side operation, including the active CLAMP context. The
+  synthetic path verifies REGION_REPEAT plus DECAL under both RGB and RGBA
+  TCC settings; the Release suite is **18/18 CTest passing**.
+- The portable GS ALPHA stage now implements documented A/B/C/D selector
+  blending with explicit signed `>>7` behavior and preserves RGB values until
+  the later frame-buffer write/clamp stage. Synthetic cases cover normal and
+  over-range results; the Release suite is **18/18 CTest passing**. Pixel
+  tests, dithering, and frame-buffer write semantics remain unfinished.
+- The portable GS texture-function stage now implements documented TEX0
+  MODULATE, DECAL, HIGHLIGHT, and HIGHLIGHT2 modes, including TCC's RGB/RGBA
+  alpha choice and the GS's `>>7` (0x80-unity) multiplication. Synthetic
+  coverage exercises every mode and alpha path; the Release suite is **18/18
+  CTest passing**. Host shader submission and the remaining pixel pipeline
+  are still unfinished.
+- Backend-neutral presentation now preserves each vertex's documented unsigned
+  10.4 UV coordinates and PRIM.FST selection alongside position/color. This
+  connects verified TEX0 point sampling to future host texture submission
+  without conflating UV with perspective STQ. Synthetic GIF coverage verifies
+  the values; the Release suite is **18/18 CTest passing**.
+- The portable GS texture path now point-samples TEX0 images through each
+  documented CLAMP mode (REPEAT, CLAMP, REGION_CLAMP, REGION_REPEAT) before
+  format, CLUT, and TEXA conversion results are consumed. Invalid resolved
+  coordinates fail explicitly. Synthetic GIF coverage exercises all four
+  modes; the Release suite is **18/18 CTest passing**. Bilinear/trilinear
+  filtering and game draw submission remain unfinished.
+- GS TEX0 extraction now applies the documented TEXA alpha conversion to
+  RGB24, direct RGBA16, and RGBA16 CLUT colors.  Synthetic coverage verifies
+  separate TA0/TA1 selection and AEM's transparent zero-RGB case, rather than
+  relying on an implicit opaque host alpha.  The full Release suite is
+  **18/18 CTest passing**. CSM1 palette-bank offsets remain an explicit fault
+  pending a fully specified temporary-CLUT implementation.
+- Startup SIF diagnostics now retain bounded full packet payloads and widened
+  IOP call snapshots, so one run distinguishes packet transport, RPC lookup,
+  and native service ordering without successive narrow probes.  That evidence
+  showed the EE's `SifBindRpc(0x80000592)` targets CDVDFSV, whereas the
+  independently registered LOADFILE server correctly has ID `0x80000006`.
+  The scheduler now bootstraps original CDVDMAN/CDVDFSV after FILEIO's original
+  server registration but before accepting the pending next SIF packet.  The
+  native `--verify-cdvd` diagnostic passes: original CD/DVD RPC server binding
+  completed through DMA.  This is startup-path evidence only, not an asset-read
+  or playability claim.
+- The same long-run diagnostic now progresses through the original reboot and
+  reaches CDVDMAN's exact GetToc DMA boundary (`MADR=0x000c3464`,
+  `BCR=0x00810004`, `CHCR=0x41000200`). Its SIF1 observer retains a 64-word
+  prefix and reports truncation without interrupting valid guest DMA, avoiding
+  a diagnostic-capacity fault during later startup traffic. No live oracle is
+  running; existing external candidates are explicitly pre-command-stage and
+  remain ineligible as `--toc-record` input.
+- A fresh bounded PCSX2 batch observation at approximately 16 and 27 CPU
+  seconds reproduced the same rejected `0x000c3464` candidate hash in two
+  independently module-anchored IOP captures; provenance is recorded in
+  `docs/ORACLE.md`. The batch process was stopped. Synthetic DMAC coverage now
+  proves that a 68-word valid SIF1 packet completes guest DMA while the
+  diagnostic retains only its 64-word prefix and records truncation. The
+  Release suite is again **18/18 CTest passing**.
+- The earlier OpenGL colored-triangle probe is superseded by the connected GS
+  local-memory/PCRTC scanout probe described in the latest checkpoint.
+- GS draw records now retain the active PRIM context's XYOFFSET register and
+  presentation performs the documented signed 12.4 offset subtraction before
+  host viewport conversion. The synthetic GIF/presentation test and the
+  one-frame OpenGL probe both pass with this coordinate origin in place.
+- A bounded, pure GIF packet decoder now accepts complete EOP-terminated
+  PACKED and REGLIST streams, preserves descriptor/payload order for the GS
+  layer, observes REGLIST odd-entry padding, and rejects truncated/trailing
+  data explicitly. State-only PACKED/REGLIST descriptors now commit PRIM,
+  RGBAQ, ST, UV, FOG, TEX0, CLAMP and A+D data; vertex-kick descriptors still
+  fault until the rasterizer exists. IMAGE payloads now reach checked PSMCT32, PSMCT24, PSMCT16,
+  PSMT8, and PSMT4 GS HWREG endpoints, based on the documented 4 MiB
+  page/block/column arrangements, byte/nibble lanes, and transfer packing.
+  Same-depth local-to-local copies between all implemented layouts honor
+  TRXPOS.DIR; local-to-host transfer still faults explicitly. Synthetic `gif_tests`
+  cover the documented format edges. Renderer-facing TEX0 extraction now also
+  supports PSMT8 and PSMT4 through documented CSM1 (CSA=0) layouts and CSM2
+  PSMCT16 placement (CBW/COU/COV and `CSA=0`); CSM1 palette-bank offsets and
+  other CLUT formats still fault explicitly.
+  The batched Windows suite is **53 Python / 18 CTest passing**; the current
+  independent EE analysis reaches **34,624 words** with **307** explicitly
+  recorded unresolved items.
+- The graphics transport now has a bounded GIF path that accepts split DMA
+  qwords, waits for a complete EOP packet, then decodes and commits it in order.
+  It preserves an incomplete suffix and explicitly rejects an over-capacity
+  packet; the connected channel-2 DMA endpoint feeds it.
+- The EE GIF DMAC channel now pumps checked normal and source-chain qwords into
+  that path and raises its completion status. Normal GIF packets are verified
+  through DMAC, EOP decode, and GS register commit in one synthetic test. MFIFO,
+  stall/interleave modes, tag-transfer data, VIF DIRECT, and VU XGKICK remain
+  explicit faults or unconnected work.
+- EE `State` now owns GS VRAM and its GIF path, and `State::pump_gif()` reads
+  checked RAM/scratchpad qwords through the channel-2 model. The normal-DMA
+  synthetic path verifies this actual runtime entry point.
+- Both native diagnostics now service channel-2 GIF DMA after each EE slice.
+  Startup does not yet submit GIF traffic before its current CDVD boundary, so
+  this is tested scheduling plumbing rather than visual output evidence.
+- The analyzer's conservative straight-line constant pass now proves syscall
+  service IDs in `v1`, including signed ABI numbers, rather than requiring an
+  immediately adjacent `addiu`. It follows only configured returning services;
+  the current executable report is 34,624 reachable words and **307** explicit
+  unresolved boundaries (286 indirect transfers, 20 syscalls, one exception
+  return), down from 346 before this decoding correction.
+- VIF1 now has a bounded normal/source-chain DMA endpoint. Its documented
+  DIRECT and DIRECTHL VIFcodes forward complete 128-bit units into the same
+  checked GIF PATH2 assembler, and both diagnostics service that endpoint after
+  EE slices. Synthetic tests cover split GIF completion through VIF1 and DMA
+  completion status. UNPACK, MPG, MSCAL and VU XGKICK remain explicit faults;
+  no VU work or draw behavior is fabricated.
+- GS PRIM now resets a bounded vertex queue, and packed/REGLIST/A+D XYZ2,
+  XYZF2, XYZ3 and XYZF3 writes retain the manual's vertex-kick versus
+  drawing-kick distinction. Completed primitive groups are recorded as raw
+  draw events for a future OpenGL stage; there is still no rasterizer, texture
+  sampling, clipping, depth, blend, or visual-output claim.
+- GIF descriptor handling now follows the distinct PACKED and REGLIST rules:
+  packed XYZ2/XYZF2 honor ADC when selecting no-draw XYZ3/XYZF3, while REGLIST
+  ignores PRE and treats A+D as its documented NOP. Synthetic tests cover both
+  boundaries, so no former fault is silently converted into a guessed write.
+- PACKED GIF Q is now explicit per-tag transport state: ST supplies Q to later
+  RGBAQ payloads in the same tag and every GIFtag resets it to the documented
+  1.0 value. A two-tag synthetic stream checks both the within-tag dependency
+  and reset edge.
+- VIF1 VIFcodes with the interrupt-control bit now fault explicitly until VIF
+  interrupt/stall delivery exists. Raw draw records retain all PRIM attribute
+  bits alongside per-vertex state, avoiding a later reconstruction shortcut.
+- TEX0 context 1/2 fields now drive checked CPU extraction of PSMCT32,
+  PSMCT24, and PSMCT16 images from the documented swizzled VRAM mapping into
+  portable RGBA buffers. Indexed CLUT formats are still explicit faults, not
+  approximated palettes.
+- A backend-neutral presentation conversion now turns completed GS primitive
+  records into ordered host point/line/triangle vertices while preserving PRIM
+  texture, Gouraud, alpha-blend, and context flags. It intentionally leaves
+  projection and raster behavior to the future OpenGL stage.
+- GIFtag PRE plus PACKED/REGLIST state descriptors commit to a bounded raw GS
+  register transport state. Primitive draw descriptors still fault explicitly,
+  so this is state transport—not a rendering claim.
+- EE `BREAK` trap slots are now recognized as defined terminating guest paths,
+  rather than unsupported decoding. AOT code preserves the trap code in an
+  explicit fault, and branch-likely CFG handling retains only its annulled
+  not-taken continuation. The own analyzer now reports **34624 reachable
+  words / 346 unresolved items** (25 fewer explicit unresolved items), and the
+  batched Windows suite is **51 Python / 18 CTest passing**. The full local
+  game-derived translation was regenerated and compiled, and its independent
+  `hg_diagnostic --verify-prefix` check passes.
+- The CDVD endpoint now has a strict, real completion route for the originally
+  requested GetToc DMA: `hg_system_diagnostic --toc-record <external-file>`
+  accepts exactly one 2064-byte hardware record and commits it through the
+  original channel-3 completion/IRQ path. It neither derives a TOC from ISO
+  user sectors nor invents one; omitting the external record remains a clear
+  fault. Synthetic IOP coverage proves the transfer data, descriptor completion,
+  and IRQ state, and the complete Windows validation suite is **51 Python / 18
+  CTest passing**.
+- The read-only oracle capture helper can now emit a separately hashed,
+  provenance-linked 2064-byte candidate from the original CDVDMAN DMA target
+  (`0x000c3464`) using `--iop-toc-candidate`. It still captures and revalidates
+  the full supplied-module-anchored IOP map first. The candidate is intentionally
+  not accepted as a TOC record until an independently established command stage
+  proves that the DMA has completed.
+- A batch-mode PCSX2 launch now reliably runs long enough for coherent, supplied
+  module-anchored captures. Two maps 15 seconds apart show an identical
+  `0x000c3464` candidate whose physical-format prefix is zero, so it is recorded
+  and rejected as pre-TOC state rather than fed to the runtime. This is stronger
+  negative provenance, not a synthetic completion.
+- The EE analyzer now follows an indirect `jr`/`jalr` only when its source
+  register is proven by a straight-line local constant calculation. Joins,
+  calls, memory loads, and unknown operations discard the candidate state. The
+  game’s reachable total remains **34624**/**346**, proving its listed indirect
+  transfers are not missed literal targets under this conservative rule.
+- COP2 macro-mode `VMOVE` and `VMR32` now decode only at their exact documented
+  encodings and execute as masked raw 32-bit vector-field transfers. Synthetic
+  translation coverage checks partial writes, field preservation, and VMR32's
+  y/z/w/x rotation. The own analysis remains **34624 reachable words** with
+  **346 explicit unresolved items**: these opcodes do not occur in currently
+  reachable code, so coverage did not silently change.
+- EE unaligned word/doubleword merge instructions (`LWL/LWR/SWL/SWR` and
+  `LDL/LDR/SDL/SDR`) now have checked AOT runtime implementations and synthetic
+  paired-transfer coverage. The current independent EE analysis reaches **34624
+  words** with **346 explicit unresolved items**. The higher unresolved count is
+  from newly reachable code after MMI `PADDUB`, not a silent fallback.
+- The bundled IOP build now includes original MODLOAD and LOADFILE, with the
+  independently decoded LOADFILE worker root at `entry + 0xc8`. Its original
+  entry creates the worker; it is not replaced by a host server implementation.
+  `--verify-loadfile` confirms its `0x80000006` server, handler, and queue record.
+- The original IOP reboot request is received through SIF DMA, validates the
+  supported IOPRP request, replaces checked IOP state, reruns original core/service
+  entries, and completes the renewed EE/IOP handshake. `--verify-reboot` passes.
+- A 20M-slice diagnostic now survives one original IOP reboot and reaches the
+  post-reboot EE LOADFILE bind wait at `0x0026c1e4`; the original LOADFILE server
+  record is present. The current native scheduler state still leaves that RPC
+  transaction unfinished; no server pointer or RPC reply is fabricated.
+- Windows MSVC and Ubuntu WSL/GCC both pass **17/17 CTest checks**, including
+  game prefix, SIF, FILEIO, CD/DVD, and reboot diagnostics. This is startup-path
+  evidence only; it does not establish playability or full cross-platform support.
+
+### Immediate next steps
+
+Current resume priority (2026-09-08): execute the regenerated CRI_ADXI stream
+completion callback, finish its original RPC request, then resume SNDDRV's
+handler/completion path. Preserve the paced input endpoint and validate its
+remaining hardware-policy assumptions; input buffering does not implement audio
+mixing, synthesis, or output. The preceding boundary's investigation was:
+implement the observed core-0 AutoDMA
+sound-input endpoint from independent evidence: 48 kHz consumption, per-channel
+512-short-word input areas split into 256-short-word halves, bounded source
+transfer and actual completion. Establish channel ordering and initial request
+phase before enabling it; an arbitrary delayed completion is not a sound-input
+implementation. Keep the explicit `0x00032140` fault until that endpoint exists,
+then resume CRI_ADXI RPC completion and SNDDRV startup. Sony SPU2 Overview pp10,
+28 and 55 plus supplied LIBSD `0x0003208c..0x00032140` are the starting evidence.
+The items below describe the older GetToc investigation;
+the real TOC provenance requirement remains open, while subsequent synthetic
+diagnostic runs have already advanced beyond its listed module-load boundaries.
+
+1. Acquire a coherent, provenance-verified GetToc DMA record at the original
+   pending CDVDMAN command stage via PCSX2's documented `-debugger` entry break
+   and an R3000 breakpoint after the post-reboot CDVDMAN base is known. The new
+   exact-frame monitor is a safe fallback, but 10,111 complete-map samples saw
+   no request frame. Existing candidate files predate that stage and must not be used.
+   Keep the 2064-byte record outside the repository, then validate it through
+   `hg_system_diagnostic --toc-record <external-file>`.
+2. Once the original worker submits its first verified `cdrom0:` operation,
+   resolve why MODLOAD helper `+0x28d8` yields `-2` after its two request-vector
+   callbacks; only its nonnegative path reaches device-operation transfer
+   `+0x22a4`. Then implement the corresponding real CD/DVD-backed open/read
+   path; do not pre-load a module or synthesize a successful RPC response. The
+   original request path and `-203` reply are now repeatable after a quarantined
+   diagnostic TOC completion.
+3. Exercise the CDVD N-command path from that original request before extending
+   its bounded one-record transport contract. Keep unsupported devices and
+   translations as explicit faults.
+
+### EE decoder progress (2026-09-05)
+
+- The own decoder/emitter now supports MMI `MFHI1` and `MFLO1`, which copy the
+  second EE multiply pipeline's 64-bit HI1/LO1 registers into a GPR. The behavior
+  comes from the EE Instruction Set Manual pp146–147, not an emulator. Synthetic
+  translation tests verify full 64-bit values; the original analysis expands by
+  17 reachable words and removes one explicit unsupported item.
+- MMI `PSUBW` is now a checked four-lane, modulo-32-bit 128-bit subtraction
+  (EE Instruction Set Manual p284). A synthetic case checks independent low/high
+  lanes and wraparound. It adds 55 reachable words and removes two more explicit
+  unsupported items, leaving **32201** words and **358** unresolved items.
+- COP1 `SUB.S` now routes through the existing checked EE FPU addition path with
+  the second source's sign bit inverted (the operation specified by the EE
+  Instruction Set Manual p377); it does not invoke host floating-point arithmetic.
+  A synthetic 3.5−1.25 case passes. It expands discovery to **32207** words;
+  the unresolved count remains **358** because its newly reachable continuation
+  exposes the separately unimplemented `MADD.S` boundary.
+- COP1 `MADD.S` and `MUL.S` are now implemented from the EE Instruction Set
+  Manual pp359/372 only for exactly representable normalized products. They use
+  integer mantissa arithmetic and the existing EE-style add/ACC state; discarded
+  product bits, zero/overflow-range products, and an overflow-form ACC still fault
+  explicitly rather than using host floats. Synthetic `80 * -0.5` and
+  `-16 + 80 * -0.5` checks pass. This extends the graph to **32260** words; the
+  newly reached `DIV.S` and additional dynamic calls make the recorded unresolved
+  count **362**, not a regression in supported behavior.
+- COP0 `MTC0`/`MFC0` register 6 (Wired) is now preserved as native EE state,
+  including the original startup `MTC0 $zero,$6` at `0x00275d48`; the synthetic
+  round trip passes. This is a register model only—TLB instructions and address
+  translation remain independently unsupported rather than becoming a no-op.
+  It expands discovery by 106 words to **32366** with the same **362** recorded
+  unresolved items.
+- COP1 `DIV.S`, `CVT.S.W`, `CVT.W.S`, `MOV.S`, `NEG.S`, `MADDA.S`, and `MSUB.S`
+  have been added from the EE Instruction Set Manual pp356–372. The conversion
+  paths use integer bit arithmetic (including documented CVT.W.S truncation and
+  clamp); exact multiply/divide paths refuse unverified rounding/range cases.
+  Tests cover exact quotient/product, ACC output, sign copy/toggle, conversion
+  truncation/clamp, and rejected inexact inputs. The static graph now reaches
+  **33132** words; newly exposed dynamic/control sites leave **363** explicit
+  unresolved items, all still faulting rather than silently executing.
+- COP1 `C.EQ.S`/`C.OLT.S` now write FCR31 condition bit23 using the manual's
+  no-NaN and signed-zero rules; `BC1F/T` and likely variants branch from that
+  state with normal delay-slot handling. Synthetic tests cover zero equality,
+  signed ordering, and a taken BC1T delay-slot transfer. This removes three
+  explicit items and reaches **33252** words with **360** unresolved items.
+- COP1 `SQRT.S` is now decoded only when its required `fs` field is zero (the
+  remaining operand is `ft`, and the result is `fd`, per the EE Instruction Set
+  Manual p376). Its portable implementation uses integer mantissas for exact
+  positive roots and preserves exponent-zero signed zero; inexact roots,
+  negative inputs, and exponent-255 cases remain explicit faults pending their
+  complete flag/result coverage. Decoder, FPU, and synthetic-translation tests
+  cover valid and rejected field encodings plus exact even/odd-exponent roots.
+  The analysis now reaches **33256** words with **359** explicit unresolved
+  items. Windows Release CTest passes **17/17**.
+- MMI `PADDUB` now implements all sixteen unsigned byte lanes with independent
+  saturation at `0xff` (EE Instruction Set Manual p168). This was the former
+  unsupported word at `0x00102390`; decoding it expands the static graph by
+  1,283 words and exposes 15 previously hidden explicit boundaries. Synthetic
+  tests cover all-low/all-high lanes and saturation; Windows Release CTest
+  remains **17/17**.
+- Trapping integer `SUB` now has its specified 32-bit signed behavior (EE
+  Instruction Set Manual p114): canonical word operands yield a sign-extended
+  result, while undefined noncanonical operands and integer overflow preserve
+  the destination and fault explicitly until EE exception dispatch exists. This
+  covers the former return-delay-slot opcode at `0x00102380`; normal and
+  overflow-preservation synthetic cases pass. The overall graph/issue totals
+  remain **34539**/**374**, because its newly executable continuation is an
+  already-accounted dynamic return boundary. Windows Release CTest is **17/17**.
+- COP2/VU0 now has a dedicated 32-register 128-bit vector-register transfer
+  foundation. `QMFC2`, `QMTC2`, and the EE-specific `SQC2` encoding move or
+  store full quadwords with checked EE RAM bounds; no VU arithmetic or
+  microprogram is implied. This independently resolves the former `QMFC2` at
+  `0x0010bfd8`, its paired `QMTC2`, and both reachable `SQC2` sites, extending
+  the graph to **34558** words and reducing explicit issues to **373**. Tests
+  cover both transfer directions and aligned-down two-half store behavior;
+  Windows Release CTest is **17/17**.
+- CP0 `TagLo` is now retained and transferred through checked `MFC0`/`MTC0`
+  register paths, covering the two former `MFC0 $v0,$28` boundaries in the
+  newly reached VU-adjacent code. This does not claim cache-tag operation
+  support: TagLo is preserved state only. The graph expands to **34624** words
+  and the explicit issue count falls to **371**; synthetic readback and all
+  Windows Release CTest checks (**17/17**) pass.
+- The reciprocal VU0 data-transfer instruction `LQC2` now loads a checked,
+  aligned 128-bit EE quadword into a vector register. Together with `SQC2`,
+  this establishes bidirectional VU0/EE memory movement without claiming VU
+  arithmetic or microprogram execution. Decoder and synthetic tests cover the
+  opcode plus an aligned-down round trip; the static totals remain
+  **34624**/**371** because no currently reachable path used LQC2. Windows
+  Release CTest remains **17/17**.
+- MMI `PSUBH` now supplies the remaining ordinary lane-subtract width: eight
+  independent modulo-16-bit subtractions over the full 128-bit GPR pair (EE
+  Instruction Set Manual p271). Synthetic coverage includes both halves and
+  wraparound; this is proactive family coverage, so the reachable totals remain
+  **34624**/**371**. Windows Release CTest remains **17/17**.
+- MMI `PSUBSB`, `PSUBSH`, and `PSUBSW` now complete the signed-saturating
+  subtract group (EE Instruction Set Manual pp272,274,276). Each lane clamps
+  independently to its signed byte, halfword, or word range; all halves and
+  both saturation directions are covered synthetically. This proactive family
+  work leaves the current reachable totals **34624**/**371** and Windows
+  Release CTest at **17/17**.
+- MMI `PADDUH` completes the unsigned-saturating add widths: eight halfword
+  lanes clamp independently at `0xffff` (EE Instruction Set Manual p170).
+  Synthetic all-lane saturation coverage passes; this proactive family work
+  does not alter the current **34624** reachable-word/**371** issue totals.
+  Windows Release CTest remains **17/17**.
+- MMI `PADDSB`, `PADDSH`, and `PADDSW` now complete signed-saturating integer
+  addition (EE Instruction Set Manual pp162,164,166). Byte, halfword, and word
+  lanes clamp independently in both directions; synthetic packed vectors prove
+  all three widths. The reachable totals remain **34624**/**371** and Windows
+  Release CTest is **17/17**.
+- Regenerating the local EE AOT source and running the connected 100M-slice
+  diagnostic reaches the unchanged explicit GetToc DMA boundary with the same
+  descriptor (`MADR=799844`, `BCR=8454148`, `CHCR=1090519552`). This confirms
+  the decoder extension did not alter the validated startup path.
+
+### Batched LOADFILE provenance (2026-09-05)
+
+- The AOT IOP entry loop now records a bounded, host-only PC/argument provenance
+  ring.  It reads the committed register file directly, so it cannot introduce a
+  MIPS-I load-delay hazard.  `hg_system_diagnostic` reports the ring alongside
+  the existing SIF and event rings, allowing a single long startup slice to
+  establish an entire original call chain without trace files or repeated probes.
+- One 100M-slice run shows the native `0x8000000a` LOADFILE request reaches its
+  original command-0 handler at `0x000d5150`, validates the request, and calls
+  MODLOAD export ordinal 7 at `0x000a94b0` with `a0=0x000d6d88`, the checked
+  guest-RAM string `cdrom0:\\MODULES\\SIO2MAN.IRX`.  The observed `-203` reply
+  is therefore downstream of RPC dispatch, request validation, and EE SIF0
+  completion.  The remaining boundary is the original MODLOAD/CDVD file path;
+  no semaphores, callbacks, or module-success results are fabricated.
+- The regenerated 16-module bundle remains at **27977 reachable words** and
+  the Windows Release build succeeds after the provenance change.  Re-run the
+  full CTest set after the next device-path implementation change.
+- `hg_system_diagnostic --slices 100000000 --stop-on-loadfile-error` now stops
+  at the first original `-203` reply (213 transport steps in the current
+  checkpoint) instead of overwriting the provenance with the remainder of the
+  diagnostic budget.  This is a diagnostic stop only; it does not alter guest
+  DMA, callback, or reply behavior.
+- `--watch-iop-pc 0xADDRESS` may be repeated for up to eight translated IOP
+  instructions. Each boundary retains its own provenance snapshot, including
+  across the checked reboot. Combined with the stop option, it replaces
+  edit/rebuild/re-run trace experiments with one bounded execution for related
+  hypotheses; without an explicit watch, the proven MODLOAD `0x000ab294`
+  mapping remains the default.
+- The same diagnostic now retains a 64-entry CDVD MMIO ledger (PC, direction,
+  register, width, value, repeat count). Consecutive identical polls coalesce,
+  preserving setup commands beside long waits. It is read-only provenance,
+  intended to establish a complete original command/status contract before
+  extending the mounted-media state machine.
+- The oracle helper now has an opt-in `--suspend` mode. It takes one coherent,
+  fingerprint-verified VM-read snapshot while PCSX2 is OS-suspended and resumes
+  it in `finally`; it never writes process or guest memory. This removes the
+  previous debugger-UI pause dependency and avoids repeated moving-target
+  captures when the next CDVD state observation is required.
+- Its first fresh-process exercise produced coherent EE snapshots before and
+  after a 30-second launch interval, but neither contained the full SIO2MAN path;
+  they are negative stage observations only. The initial RAM locator found several
+  mirrored verified EE mappings, so future captures must keep a selected base and
+  revalidate its three ELF fingerprints as the helper does.
+- `--locate-iop rom_cdvdman` now finds a unique, locally supplied unrelocated
+  CDVDMAN text anchor in PCSX2 data memory; `--iop-base … --iop-module rom_cdvdman`
+  captures and rechecks the complete 2 MiB map. A fresh observed map established
+  CDVDMAN at guest `0x22830`, but its `0x000c3464` buffer still held pre-TOC
+  request/allocator data. This rejects it as a TOC source without using captured
+  code or emulator implementation, and makes a later one-pass TOC capture routine.
+- The TOC DMA request is now guarded by the independently observed single-record
+  channel-3 descriptor (`CHCR=0x41000200`, `BCR=0x00810004`, aligned in-RAM
+  MADR), just as ReadDvd is. A malformed active descriptor explicitly faults;
+  it cannot turn into an arbitrary implicit transfer while the TOC payload remains
+  unresolved. The synthetic IOP test covers both the exact TOC request and this
+  rejection. Windows Release rebuild and CTest pass **17/17**, including the
+  connected CDVD, LOADFILE, reboot and tool checks.
+- A longer fresh PCSX2 launch made measurable progress but its coherent IOP maps
+  still contain no full `cdrom0:\\MODULES\\SIO2MAN.IRX` request and retain
+  pre-TOC data at `0x000c3464`. It is not a payload source; leave the tool ready
+  for a run that reaches the established native request boundary.
+- First ledger result: the failing request reaches CDVDMAN's `0x000b87ac`
+  polling loop, which reads drive-status register `0x1f40200a` as `0x00`.
+  Independent PS2 hardware documentation identifies `0x0a` as a mounted,
+  spun-up, paused drive (bits 1 and 3), so the native mounted-DVD profile now
+  initializes both current and sticky status to that state. The code will now
+  determine the next required transition; it still must not manufacture a
+  successful LOADFILE result or bypass the native poll.
+- That transition exposes original CDVDMAN N-command `0x09` with one zero byte
+  (GetToc). The native endpoint accepts only that exact observed shape and marks
+  it as a pending TOC DMA operation. Its native descriptor is now established:
+  `MADR=0x000c3464`, `BCR=0x00810004`, `CHCR=0x41000200`, the same 2064-byte
+  channel-3 shape as the guarded ReadDvd path. It explicitly faults at delivery
+  until the 1024-byte DVD TOC payload is independently captured or specified.
+  ReadDvd remains separately guarded as command `0x08` with eight parameters.
+- The stop-point shows registered original IOMAN drivers `cdrom` and `tty`; its
+  descriptor slots have already been released, so absence of a retained slot is
+  not evidence that the CD-ROM driver was unavailable.  A static-PC snapshot at
+  MODLOAD's actual `-203` construction instead proves the active chain:
+  CDVDMAN returns `-2` through IOMAN at `0x000a62fc`, then MODLOAD maps that
+  failure at `0x000ab294`. Later independent static inspection identifies
+  CDVDMAN `0x000b3de0` as the intentional `-2` return following its original
+  THREADMAN event operation, not a still-unknown device-state boundary. The
+  earlier LOADFILE-local error-path hypothesis was tested and rejected; no
+  local error value is fabricated. Current execution has advanced beyond this
+  historical checkpoint to the GetToc DMA gate described above.
+
+### CDVDFSV/LOADFILE follow-up (2026-09-05)
+
+- Tracing the original priority-80 CDVDFSV worker established that it calls
+  THREADMAN `ClearEventFlag` with its real event identifier and an AND mask
+  (`~0x4`) before calling original `WaitEventFlag`.  The prior translated
+  THREADMAN routine expected an unimplemented internal RAM event-object layout,
+  returned an error, and caused the worker to retry.
+- `clear_event_flag` is now a checked native THREADMAN boundary at offset
+  `0x324c`.  It rejects interrupt-context calls and applies the original
+  AND-mask operation to the checked event flag.  `tests/iop_tests.cpp` covers
+  masking and the interrupt-context rejection.
+- Before reboot, the worker now genuinely waits and the original LOADFILE
+  worker registers `0x80000006` at `0x000d6d38`.  After reboot, the diagnostic
+  still reaches the LOADFILE bind wait with all workers ready, but native IOP
+  CPU interrupts are false (`locked_thread=0`), so cooperative dispatch does
+  not begin.  Event diagnostics show flags `3=0x29` and no fabricated RPC
+  state.  A restart-time enable experiment did not survive subsequent original
+  startup code and was reverted.
+- Next: trace the exact post-reboot original path that leaves
+  `IopState::interrupts_enabled` false, including its suspend/resume token, and
+  establish whether the scheduler guard or the CPU-interrupt lifecycle is wrong
+  before changing either.
+
+### Post-reboot LOADFILE progression (2026-09-05)
+
+- Cooperative worker contexts now retain their own CPU-interrupt state.  A
+  masked worker may execute and block, but its status no longer leaks into the
+  dispatcher and suppresses completed IOP DMA callbacks.  A blocked masked
+  worker also releases scheduler ownership.
+- SIFMAN's observed control command sequence `0x40` then `0x20` is modeled as
+  a last-command register (not an OR latch), and an identical active SIF1 CHCR
+  write is accepted as an idempotent re-arm.  Changes to an active register
+  still fault.
+- Post-reboot channel-9/10 completions now dispatch original callbacks; system
+  event bit `0x800` reaches the original LOADFILE worker.  It registers and
+  receives its first real RPC request.  The handler's bounded 11-entry command
+  table at LOADFILE offset `0x1ca8` is emitted statically.
+- The request progresses through original MODLOAD worker roots `0xca0` and
+  `0x295c`, then reaches original CDVDMAN `0x000b39e0` (offset `0x19e0`), now
+  added as the next root.  No LOADFILE RPC response has been injected.
+- Windows MSVC CTest remains **17/17** after this progression.  The current
+  next boundary is a byte read of CD/DVD register `0x1f40200f` at original
+  CDVDMAN PC `0x000bbc00`, reached after root `0x19e0` expands.  It is not in
+  the implemented CD/DVD register subset; preserve the explicit fault until
+  the original command/status contract is established.  Do not substitute a
+  guessed ready/status value.
+
+### CD/DVD disk-type boundary (2026-09-05)
+
+- The faulting byte register `0x1f40200f` is the read-only CD/DVD disk-type
+  register, established from the approved register protocol reference and the
+  original CDVDMAN classifier at `0x000b9328`. That classifier recognizes
+  `0x14` as the PS2-DVD route. The checked local-dump profile now returns
+  `0x14`, with a synthetic alias-read test. It is explicitly a mounted-media
+  identity only: N commands, CDVD DMA and sector-read completion remain absent.
+- Original CDVDMAN subsequently writes its request error byte to `0x1f402006`;
+  native state retains that single byte for the original write/read flow. Error
+  meanings and device effects remain unsupported. The next expected boundary is
+  CDVD DMA-channel setup/transfer, not a fabricated request completion.
+- With those two register contracts implemented, the normal post-reboot
+  diagnostic reaches original CDVDMAN `0x000b8500`: it programs channel 3 from
+  its request descriptor and writes CHCR `0x41000200`. The native IOP DMAC
+  rejects it because only bounded SIF endpoints exist. This is now the correct
+  explicit blocker: a real CDVD DMA provider must read the local image into the
+  descriptor's RAM destination and complete the original interrupt path. The
+  supplied ISO is standard ECMA-119 at origin zero (the default `0x1800` is
+  specific to `DATA.CVM`). Channel 3's observed `0x41000200` CHCR arm is now
+  retained and guarded, without transfer or completion. Continue through the
+  original code to establish the subsequent CDVD command/data contract.
+- The arm advances past the former device fault, but the 20M-slice diagnostic
+  then remains in THREADMAN's original priority-8 dispatch worker (`0x000a9ba4`)
+  at queue traversal `0x000a3f90`, with queue root `0x000a54e0` and current
+  callback `0x000b8224`. That callback is a reachable runtime continuation not
+  yet emitted as a callable target. Its original bytes form a normal CDVDMAN
+  function at module offset `0x6224`, so it is added as the bounded static root
+  `cdvd_finish_request`. The regenerated bundle now emits `0x000b8224` and
+  reaches 27096 words; Windows CTest remains 17/17. The dispatch worker still
+  loops in the preceding queue-match traversal before invoking that callback,
+  so inspect the original queue record transition next; do not force a wakeup
+  or inject the callback result.
+- The queue root is BSS at `0x000a54e0`, still zero because the diagnostic had
+  linked THREADMAN exports without running its original module entry. A checked
+  entry attempt reaches unresolved `heaplib:4` at `0x000a4c10` before its list
+  setup, so that premature invocation is reverted to preserve the validated
+  baseline. Implement a real HEAPLIB provider before running the original
+  THREADMAN entry; do not synthesize its empty-list sentinel.
+
+### THREADMAN initialization dependencies (2026-09-05)
+
+- Public HEAPLIB declarations identify the first missing import as
+  `CreateHeap(heapblocksize, flag)` (ordinal4). The decoded original call is
+  `CreateHeap(0x800, 1)`. A bounded guest-RAM heap provider now implements
+  HEAPLIB ordinals4–8 (create/delete/allocate/free/free-size), with synthetic
+  allocation and invalid-handle tests. It uses no SDK implementation code.
+- The original THREADMAN entry now passes HEAPLIB and reaches INTRMAN's original
+  context-switch callback setters (ordinals28 and30). Native state retains the
+  validated guest callback addresses; their execution is still governed by the
+  cooperative scheduler rather than injected calls.
+- Linking the supplied original TIMEMANI provider advances THREADMAN setup to
+  its first timer device register access at original PC `0x000d74dc`, through
+  physical `0x1f8014a4` (Timer5 mode) through the IOP cached alias. The native
+  timer register banks now implement Timer0–5 count/mode/target storage,
+  mode-write counter reset and mode-read flag acknowledgement.
+- Original `DisableIntr(16, nullptr)` is now a checked mask transition. The
+  following original THREADMAN helpers at offsets `0x3e8` and `0x418` are static
+  roots. Its bootstrap call `ChangeThreadPriority(0, 126)` records explicit
+  bootstrap-thread state before native workers exist.
+- THREADMAN's original entry now runs during core initialization, with the
+  original TIMEMANI provider linked. The integrated 16-module bundle emits
+  **27844 reachable words**. `hg_system_diagnostic --verify-sif` and Windows
+  CTest both pass (**17/17**) through the original EE/IOP SIF handshake.
+- The original post-reboot dispatcher next called `CpuInvokeInKmode` (INTRMAN
+  ordinal14) with a translated THREADMAN callback. The native import adapter
+  validates that callback, shifts the public varargs argument registers and
+  transfers directly into its AOT code; it does not invoke host code or an
+  interpreter. A normal 20M-slice run now reaches its cooperative budget without
+  a new fault, with the original queue's `cdvd_finish_request` node populated
+  and ten original workers established. Timer progression/IRQ delivery and a
+  real CDVD transfer are still outstanding.
+- The CDVD boundary is now decomposed into independently tested states instead
+  of a long diagnostic probe: ReadDvd (`Ncmd0x08`) accepts exactly its decoded
+  8-byte little-endian LBA/count request; the active original descriptor
+  `CHCR=0x41000200`, `BCR=0x00810004` transfers exactly one 2064-byte DVD
+  record; the host reads only that checked sector from the configured local ISO;
+  and an original IRQ2 handler receives the completion. The record’s 12-byte
+  DVD prefix/trailer and local-image bounds are checked. The normal request has
+  not yet issued Ncmd0x08, so this endpoint is not claimed exercised by the
+  full startup run.
+- Timer progression now uses each timer's own fixed-point 36.864 MHz phase, so
+  prescaled timers do not lose fractions on one-microsecond cooperative slices.
+  A compare/overflow event sets the documented mode status bit and is delivered
+  only to a registered, unmasked original AOT handler. THREADMAN Timer5 IRQ16
+  now enters its static root at offset `0x5a2c`; its original callback programs
+  the next target rather than faulting. The 16-module bundle is **27975 reachable
+  words**. A 20M-slice startup pass reaches its budget after one reboot with
+  Timer5 count `0x103ed9df` and target `0x147689a9`; it does not establish exact
+  hardware timing beyond this observed native path. CTest is **17/17** on Windows.
+- Static/batched startup tracing now records the last 32 original IOP event
+  producer/consumer edges and each SIF0 DMA arm site. This avoided repeated
+  slice probes: a 100M-slice pass reached original MODLOAD return offset `0x2964`,
+  added as the verified root (`27977` reachable IOP words), then reached an exact
+  two-word SIF0 source tag at `0x000d6f80`. Its `count=2` and EE tag
+  `0x10000001` are now independently tested as a bounded payload shape.
+- The real path subsequently signals MODLOAD event 3 and transfers the two-word
+  LOADFILE reply, but the EE tag is non-final: EE SIF0 remains armed (`CHCR=0x184`)
+  with both waiting RPC semaphores unsignaled. The original SIFMAN producer that
+  armed channel 9 is PC `0x0009c810` (return `0x0009c6b0`). Do not convert this
+  CNT tag into a synthetic completion; trace its required final-tag/interrupt
+  transition next. Full Windows CTest remains **17/17**.
+- Follow-up packet history proves that each short LOADFILE payload is followed
+  by original SIFMAN's terminal 16-word tag (`IOP address 0x8009b000`, EE tag
+  `0x90000004`). Native EE SIF0 completion has occurred 16 times and its original
+  channel-5 callback at `0x0026f568` runs. The live request nevertheless returns
+  `0xffffff35` (`-203`) and leaves the original EE caller at `0x002702a4` waiting
+  on semaphore 8. Therefore the current blocker is the original LOADFILE
+  service-`0x8000000a` request/reply contract, not a DMA terminal-tag or callback
+  omission. Decode that service's request fields and only then add its missing
+  behavior; do not signal semaphore 8 from the transport layer.
+
+- Independent ELF/config/decoder/CFG/C++ emitter and native C++17 runtime work.
+  Current analysis: **32129 reachable words, 361 unresolved items**. Normal `jr ra` returns
+  are now separate `return_sites`; counts are not whole-game coverage percentages.
+- Full hash-checked native ELF loader, explicit BSS zeroing and SHA-256 implemented.
+  Synthetic tests validate malformed images, transactional rejection and digest vectors.
+- FPU addition handles exact alignment cases, signed zero, overflow/underflow and
+  FCR31 flags; discarded alignment bits deliberately fault pending oracle validation.
+  Added SYNC, LQ/SQ address masking, 64-bit/variable shifts, likely branches, MOVZ/MOVN.
+- `hg_diagnostic --verify-prefix` loads the ELF, verifies the original 66-instruction
+  register reset, poisons `[0x0047b200,0x01992000)`, runs the game's BSS clear and
+  verifies its first SetupThread arguments at 0x001001c8. Expected success exit 0.
+- `hg_diagnostic --boot` additionally enables independently written boot services:
+  SetupThread, SetupHeap, EndOfHeap, CreateSema and SetSyscall; custom handlers run
+  translated guest code with a native return gateway. No guest interpreter/JIT.
+- Native boot executes through kernel/library setup and constructors into SIF setup.
+  Standalone boot now reads real SIF registers and waits for an IOP partner.
+  **Original SIF RPC initialization completes on Windows and Linux**: two EE
+  commands, IOP reply, both DMA callbacks, event wakeups. `--verify-sif` checks
+  completion invariants. Default runner continues into RPC server discovery;
+  EE semaphore create/signal/wait/delete and reusable handles now work. Original FILEIO
+  heap server registration and EE RPC bind are verified on Windows (`--verify-services`).
+- New conservative callback analysis in `tools/hgtool/constants.py` follows declared
+  helper ABIs (array constructor a1/destructor a2) using proven local constants,
+  including delay slots. Unknown effects, joins and intervening calls kill constants.
+  Evidence is reported. Manual pointer-table hints resolve virtual slots; member
+  helper 0x00100b40 uses a three-word descriptor with negative word1 for direct calls.
+- New `runtime/include/hg/dmac.hpp`: D_STAT W1C status/mask toggles, channel register
+  masks, explicit SIF0 destination-chain input. `State::receive_sif0` transfers supplied
+  payload to checked RAM/SPR, supports cnt/end and tag interrupts. Unknown priority,
+  cnts/stall control, unrelated endpoints and active-register writes fault. Both SIF
+  directions now have bounded FIFO transport; CPU interrupt delivery remains partial. Undefined reset fields use zero
+  as native initialization policy. SifSetDChain (void ABI) arms receive, never completes it.
+- Explicit overlays: source 0x003eb8a8 -> 0x80076000 (0x740), 0x003ebfe8 ->
+  0x00082000 (0x28), and 0x003eaa70 -> 0x80075000 (0x330). Game performs copies;
+  compiled cases verify bytes first. Last patch handles syscall registrations 0x55-59.
+- Manual indirect pointer-table support reads bounded arrays from the checked ELF.
+  Startup constructor table [0x00469460,0x0046969c) contains 143 unique entries,
+  called at 0x00100b0c. Virtual targets are added only after native callsite/object
+  inspection; no automatic guessing. Native dump remains external in TEMP.
+- Added COP0 Status/EPC/ErrorEPC moves, EI/DI, no-delay ERET, integer DIV/DIVU,
+  MULT/MULTU and pipeline1 variants, MADD/MADDU variants, PMFHL.LW, LWC1/SWC1,
+  PSUBB and packed logical operations. Undefined division zero/noncanonical operands
+  fault. A signed/unsigned multiply selection bug was caught by synthetic tests
+  and fixed (never infer unsigned by checking whether "u" occurs in "mult").
+- Fixed CFG discovery of branch-likely with a trap slot: not-taken annulled path
+  remains reachable. Emitter faults invalid slots only on paths that execute them.
+- Boot services now also implement first EnableIntc, CreateThread (dormant metadata),
+  GetThreadId, ChangeThreadPriority without ready competitors, console settings
+  query/set. No running-worker scheduler yet. First enable returns 1; priority
+  success returns 0, both observed at original syscall return breakpoints.
+- Four timer banks implement registers and explicit bus-cycle advance. Reads of
+  active counters fault until a scheduler attaches a clock. INTC models request
+  latches, W1C acknowledgement and mask toggles; event delivery remains incomplete.
+- Native compatibility kernel data is explicitly synthesized in low 512 KiB RAM
+  when boot services initialize. Syscall table is at physical 0x10000, native gateway
+  addresses at 0xff000000 + id*4, guest callback return at 0xff001000. This is not
+  BIOS memory. Other low kernel accesses and unimplemented MMIO fault.
+- Last full Windows test run: **11 CTest targets passed at 20:04**, including new
+  asset volume/IRX inventory/relocation/inspector synthetic tests in the tools target.
+- Ubuntu 24.04 WSL2, GCC 13.3, Python 3.12.3, CMake 3.28: build and 11 tests passed (including distinct IOP AOT/loader tests).
+  Native boot stops at SAME SIF boundary and RAM+register JSON is byte/content identical
+  to Windows. RAM SHA256: 8382946378709a42bbef29c833751c3dc3dca3cb2bc82b4202b1aa82d9008d86.
+  Linux build: /home/johnn/.cache/haunting-build-linux; Linux snapshot prefix:
+  /home/johnn/.cache/hg-native-linux. This WSL clears /tmp between sessions: do not
+  build there. Installed Ubuntu g++, CMake, make, libglfw3-dev and libgl-dev plus dependencies.
+- OpenGL clear/readback/presentation smoke test passes Windows NVIDIA and Linux WSLg
+  Mesa 4.5 core (GLFW 3.3.10 distro package). No game graphics. macOS not tested.
+- `tools/hg.py assets`: independently indexed local CVM at origin 0x1800, 770093
+  blocks of 2048 bytes, 2425 files +207 directories. Metadata out/assets.json ignored.
+  Bounded reads/hashes only, no extraction. `/ADX00/AD_01.ADX;1` size3221504 SHA256
+  18a793e4598fb640e21b1c02b2c89904b3a93c93c6e6e0b2a8f7b355e7b24153.
+- `tools/hg.py modules`: all 12 local IRXs inspected, metadata out/modules.json ignored.
+  `--relocation-base 0x10000` independently dry-runs each module at that base (not a
+  linked layout). 13627 relocations: 1036 type2,4989 type4,3801 type5,3801 type6;
+  symbol indexes all0, HI16/LO16 always consecutive. No IOP execution/relocation at runtime.
+- IOP module placement: `config/iop_modules.toml` reserves [0,0x10000) and
+  [0x1f0000,0x200000), places12 standalone IRXs through0x92e90 plus16 embedded
+  reboot-image modules at0x94000..0xdd7a0. Manual roots are `{name,offset}` per module.
+  Current plan resolves643 exact-version local bindings,64 native ABI bindings and
+  leaves73 imports explicit. Native INTRMAN4/5/6/17/18 adapters are configured globally.
+  SYSCLIB and STDIO both export stdio1.3; ambiguous providers remain blocked, never chosen
+  by file order. No unresolved stub may become empty return.
+- Distinct IOP MIPS-I decoder/emitter/runtime implemented: 32-bit registers,2MiBRAM,
+  one-instruction pending loads, branch/slot timing. Hazard dependencies deliberately
+  fault pending PS2 validation; no devices/COP0/full arithmetic yet. `iop-emit` defaults
+  to MODMSIN at0x76000:191 reachablewords,3 imported-service boundaries.
+- `runtime/iop_image.cpp` validates module SHA256, segment bounds and original words
+  for generated relocation patches BEFORE changing RAM; fills BSS. No runtime decode.
+  `iop_source.py` and native region loader now verify whole-container AND member hashes,
+  with compiled slice bounds. No extraction. Synthetic tampering/bounds tests pass.
+  Integer MULT/MULTU/DIV/DIVU now implemented; undefined divide-zero/overflow results
+  explicitly fault. Signed arithmetic uses widened values and avoids host UB.
+- `hg_iop_diagnostic --verify-modmsin` passes FIVE original validation-function cases
+  on Windows AND Linux: null descriptor, valid descriptor, invalid tag, short entry,
+  null entry. Entry without flag stops at0x76364 intrman:17. Valid test descriptor tag
+  is2 (not0); pointed entry word must be>=8. These were decoded from the supplied module.
+- `tools/hg.py reboot` parses game-supplied IOPRP300.IMG without extraction:19entries,
+ 16embedded IRXs including SYSMEM,LOADCORE,SIFCMD,SIFMAN,THREADMAN,IOMAN,MODLOAD,
+ FILEIO,CDVDMAN,CDVDFSV,LOADFILE,TIMEMANI,ROMDRV,EESYNC,SYSCLIB,STDIO. This is the
+ source for missing IOP providers. ROMDIR at0 size320; EXTINFO at0x140 size608;
+ first ELF0x3a0. Final alignment padding is absent (file278305 vsaligned278320).
+- SYSCLIB now1463 reachablewords,2boundaries (break and loadcore import).
+  `--verify-sysclib --module "Haunting Ground (USA)/MODULES/IOPRP300.IMG"` executes
+  96 memcpy/memset/strlen cases successfully on Windows AND Linux (length0..64 and
+  misalignment with guard bytes), plus5 sprintf cases passed Windows; Linux formatting
+  cases not yet rerun individually. Explicit library/ordinal export lookup added.
+  Manual indirect hints support target offsets or relocated table offset/count;
+  thirteen formatting callbacks ->0x16b0 and121-entry table at0x18c0 decoded locally.
+  SIFCMD also compiled/loaded on both:1297 reachablewords,24boundaries; entry stops
+  at0x99b2c loadcore:12. Single-module builds still block all imports intentionally.
+  LOADCORE1725words: isolated original initialization0xcc..0xd8 plus boot-mode exports
+  12/13 pass5 cases Windows/Linux. No full module boot. ADD/ADDI/SUB overflow checks added.
+  `iop-audit` reports all28modules without overwriting generated source.
+- Current generated IOP source is a **5-module bundle: modmsin,rom_sysclib,rom_loadcore,
+  rom_sifcmd,rom_sifman**,5583reachablewords. `--verify-bundle --module
+  "Haunting Ground (USA)/MODULES"` passes Windows/Linux. It runs original LOADCORE linker
+  helper0x11d8 to patch SIFCMD imports; guarded imported calls then reach translated
+  LOADCORE. Static dispatch checks planned J word and unchanged ordinal delay word.
+  Bundle loader stages all writes before commit; synthetic late-file failure proves
+  destination RAM/registers unchanged. **All12 CTest targets pass Windows and Linux**.
+  Input root from common module directory; generated paths relative for portability.
+- `hg_system_diagnostic` combines EE and IOP AOT code with shared SIF state and
+  cooperative execution. Six-module bundle: MODMSIN, SYSCLIB, LOADCORE, SIFCMD,
+  SIFMAN, THREADMAN; **21500 reachable IOP words (before latest device-control table expansion)** after explicit native adapters.
+  Original LOADCORE initializes empty boot modes and links SIF imports. Original
+  SIFMAN/SIFCMD entries return; SIFCMD export4 publishes CMDINIT then waits for its
+  system event. Native EE transport initialization publishes only SIFINIT after
+  a real EE receive chain is armed. No synthetic command-ready flag or buffer address.
+  SIFCMD export14 calls export4, creates an RPC event, and sends the real reply.
+  `--verify-sif` verifies system event bits0x900, EE RPCINIT1, two submissions,
+  eight transport steps, empty FIFOs and rearmed EE receive.
+- Both transfer paths move actual qwords: IOP channel9 source tags -> bounded FIFO
+  -> EE channel5 destination chain; EE channel6 source tags -> reverse FIFO ->
+  IOP channel10 destination chain. Synthetic tests check payload/guard bytes,
+  backpressure, disarmed receivers and completion. Supported source tags are
+  cnt/next/ref/refe/end on EE and original SIFMAN tags on IOP (word-aligned).
+  IOP six-word replies retain preceding high lanes in the final qword, matching
+  the external oracle capture. One-/three-word fragments and short partial-only
+  packets still fault, as do unsupported modes and active channel mutations.
+- Native system event ID1 stores actual bits; THREADMAN adapters provide its query,
+  create, set and cooperative AND wait. Full THREADMAN startup/thread scheduling is not implemented.
+  SIFCMD command/IRQ pointers from original initialization are manual function roots.
+  Both IOP and EE DMA dispatch save/restore CPU state and run original AOT callbacks.
+  IOP IRQ43 initialization options0x200 are retained; only the observed subset is used.
+  EE negative iSifSetDChain is permitted only inside its native interrupt context.
+- `--start-sif` is still an isolated IOP diagnostic with flags initially clear; use
+  `hg_system_diagnostic` for connected startup. Both generated translation libraries
+  are compiled once and reused across diagnostic executables to reduce build time.
+- Native cache adapters at LOADCOREoffset1bf0/1cf4 provide coherent-memory fences
+  and independent epochs. MFC0 supports processor ID only with one-instruction delay.
+  Native hardware probe profile: PRId0x1f,1f801450read1,1d000060read0; observations
+  and external register capture provenance in ORACLE.md. Only identical config writes
+  accepted; unknown device semantics fault.
+- All14 CTest targets passed Windows and Linux at22:05, including original heap
+  server binding and the native worker context/interrupt-ownership checks. HG_SIF_BOOTSTRAP_TESTS
+  needs the six-module handshake bundle; new HG_FILEIO_BOOTSTRAP_TESTS requires the
+  ten-module startup bundle listed in README. `--verify-services` passed Windows:
+  actual original FILEIO heap server registration and EE bind via DMA, no injected reply.
+- Added native cooperative IOP workers (`iop_thread.hpp`): full register/load-delay
+  context switching, priority selection, round robin among equals, interrupt-disabled
+  ownership, sleep/wake, timed waits. Native diagnostic clock advances1us per slice;
+  this is compatibility timing, not an inferred PS2 cycle rate. Worker stacks reserve
+  [0x1f1000,0x200000), separate from existing bootstrap/interrupt stacks. Create/start,
+  thread ID/status/priority and single-waiter semaphore services are explicit adapters.
+  FILEIO creates its two initial workers and a third file-request worker itself.
+- Since22:05 baseline, Windows startup additionally completes original CDVDMAN entry
+  and starts CDVDFSV's bootstrap plus3 RPC workers. Linux has not yet tested these
+  latest additions. DMA channel3 configuration exists; starting its data transfer still
+  faults. Native dmacman4/5/6/8/9/14/15 bind register get/set only; no completion shortcut.
+- Added LWL/LWR/SWL/SWR, including documented MIPS-I merge forwarding from a
+  preceding pending load. Synthetic consecutive pairs pass all4alignments with
+  guarded stores. Other load hazards still fault. BCD RTC command8 returns native
+  UTC startup snapshot; command5 copies sticky status; command03:00 reports explicit
+  native1.0.0 compatibility profile. Other drive commands fault. No real disc reads yet.
+- Event waits now suspend workers and let lower-priority producers run. ModesAND/OR
+  plusCLEAR supported; original THREADMAN0xa14b8 clears all bits after result capture.
+  Native test covers priority dependency and OR+CLEAR. Multi-waiter clearing order
+  has not been verified; avoid claiming complete IOP scheduler compatibility.
+- Original IOMAN initializes its tables and built-in device; unsupported CD/DVD device
+  operations still return the original missing-driver result. FILEIO retries that worker.
+  Native bounded console implements %s/%d/%u/%x/%c/%%; other conversions fault.
+  Explicit library_providers selects rom_stdio for stdio1.3 (duplicate supplied exports).
+- EE SifGetReg reads shared hardware/software state. SifSetReg supports software
+  IDs0..2. SifSetDma accepts a single aligned command descriptor (attr0x44,size16..112),
+  snapshots padded payload into native kernel data at0x60000, constructs real tags,
+  and arms channel6. Busy native submission capacity returns0; IDs are independent.
+  Cooperative instruction stepping after SIF initialization ensures peripherals run
+  between consecutive submissions. No completion is manufactured.
+- CACHE DHWBIN orders coherent stores and tracks epochs. Native RAM aliases
+  0x20000000/0x30000000 cover only32MiB. Game-used0x20000000 cache writeback is an
+  explicit native compatibility policy; hardware manual leaves that case undefined.
+- PCSX2 v2.6.3 is paused at **0x0026c5a8**, RPC-ready SifSetReg return (id0x80000002,
+  value1, v0=1). External `sif-first-dma-20260904.p2s` and `sif-rpc-ready-20260904.p2s`
+  capture only memory observations; paths/hashes in ORACLE.md. No captured code used.
+  Earlier AddDmacHandler return3 is an opaque ID (native first DMA ID1). SIF setup
+  observed v0/a0=0x184; public void ABI confirms constructed CHAIN/TIE/STR setup.
+  MMIO memory view shows ?? and is not evidence. OSD breakpoint 0x0026c258 disabled;
+  0x001001cc,0x0026bee8,0x0026c038,0x0026c588 still enabled. No image saved.
+- Read-only `tools/oracle_capture.py` finds guest RAM via three local ELF fingerprints.
+  It excludes executable pages and writes captures ONLY outside repository.
+  Verified main RAM mapping in this process: PID 4080, host base 0x7ff670000000.
+  Re-locate after restart/process change! RAM has page-sized/protection-split regions.
+- Oracle capture:
+  `C:/Users/johnn/AppData/Local/Temp/haunting-oracle/ee-ram-20260904T231224539237Z.bin`
+  with adjacent JSON metadata, SHA-256
+  `b79ae856c5d8fa068f2cb8233c53097696685ca68a4ca6504c060ccf709a1b3f`.
+  Observed v0=0x01ffed60, t1=0x01ff7000 after SetupThread. Args at 0x019709c0:
+  argc=1, first argv pointer=args+68, null next pointer, launch path matching SYSTEM.CNF.
+  Runtime CONSTRUCTS the ABI block; it does not embed the memory capture.
+- No images saved. Game/BIOS/emulator source untouched; PCSX2 session and breakpoint
+  changed for observations. No commits/publication.
+
+### LOADFILE/SIFRPC completion bookkeeping checkpoint (2026-09-06)
+- Independently decoded ROM SIFCMD `rpc_call_request` at relocated `0x00099264`
+  preserves the incoming call packet into the selected server record: packet `+0x14`
+  -> server `+0x20`, packet `+0x1c` -> server `+0x1c`, packet `+0x20` -> server `+0x24`,
+  packet `+0x24` -> server `+0x0c`, packet `+0x28/+0x2c/+0x30` -> server
+  `+0x28/+0x2c/+0x30`, and packet `+0x10` -> server `+0x34`.
+- The strongest original call-completion path is relocated `0x00099914..0x000999d8`.
+  It allocates a completion packet, copies server `+0x1c` into completion `+0x1c`,
+  writes command marker `0x8000000a` at completion `+0x20`, and tests server `+0x30`.
+  When that field is nonzero it retries SIFCMD send `0x00098580` with command
+  `0x80000008`, a 64-byte completion packet, optional result source/size, and the
+  EE result destination from server `+0x28` until the send succeeds.
+- The same routine then builds actual DMA descriptors: optional RPC result data goes
+  to server `+0x28`; the 64-byte completion packet goes to server `+0x20`. Therefore
+  these fields are transaction metadata, not native semaphore shortcuts.
+- EE-side call construction around `0x002701d4..0x00270218` explicitly writes the
+  outbound packet `+0x30` gate before sending command `0x8000000a`. The next task is
+  to identify the exact high-level call argument represented by that saved register,
+  compare it with the observed LOADFILE request, and then inspect only the native
+  state transition that could lose/corrupt it. Do not patch the transport or force
+  the EE semaphore.
+- No runtime behavior change was made from this checkpoint because the missing or
+  corrupt transition has not yet been proven. No tests/builds were run in this step.
+
+## Key decisions
+- Conservative traversal instead of linear scanning: the ELF is stripped and has
+  one nonempty RWX load segment mixing code/data. File-backed bytes: 3,650,048;
+  virtual base: 0x00100000; memory size: 25,763,840; entry: 0x00100008.
+- Compile generated C++ ahead of time; switch dispatch selects compiled addresses,
+  never runtime-decoded guest opcodes. Optimize into larger basic blocks later.
+- Fail at unsupported behavior; no interpreter, fake syscalls or success no-ops.
+- GLFW is pinned to official 3.4 commit
+  `7b6aead9fb88b3623e3b3725ebb42670cbe4c579`; optional fetch stays in ignored build/.
+
+## Constraints & preferences
+- Read AGENTS.md and root SKILL.md before work; apply its fenced briefing format
+  for a requested handoff. Keep this file concrete and future-agent-readable.
+- OpenGL only for graphics backend. Windows and Linux are targets; other OS support
+  depends on toolchain/GLFW/OpenGL. Linux WSL2/WSLg is tested; macOS is not.
+- No ps2recomp, including its discovery output. PCSX2 may supply memory observations
+  only; independently derive behavior and document provenance in docs/SOURCES.md.
+- Temporary files outside repo; any necessary temporary images inside repo go only
+  in `UNEEDED images/`. Preserve the user's spelling. Do not add game/BIOS data to Git.
+
+## Superseded historical notes
+
+The following retained notes document earlier milestones only. They are not the
+current plan; use **Immediate next steps** above, whose first gate is the
+provenance-verified external GetToc record.
+
+1. Continue the original LOADFILE RPC transaction and semaphore release. The game
+   now reaches post-reboot LOADFILE bind/wait processing (EE WaitSema at0x26c1e4).
+   Server0x80000006 must come from the original LOADFILE worker; inspect real
+   packets/server records and add only the required original service paths. Do not
+   force the semaphore, bind, or reply.
+2. IOP reboot is verified on Windows and Linux: the original SIFCMD dispatcher
+   receives0x80000003, the checked IOP image replaces fresh IOP state, original
+   services restart, EESYNC runs, and the EE/IOP RPC handshake is renewed.
+   `--verify-reboot` covers that milestone. The current 15-module bundle adds
+   MODLOAD and LOADFILE; LOADFILE's original worker at entry+0xc8 is explicitly rooted.
+3. EE LDL/LDR/SDL/SDR and LWL/LWR/SWL/SWR now have paired-transfer tests. DMA
+   control/priority/interleave/ring/stall registers follow the EE manual. All17
+   checks pass on Windows and Linux; default runner accepts up to50000000 slices.
+
+1. Continue the actual IOP reboot lifecycle. Default connected runner now receives
+   command0x80000003 through the original SIFCMD dispatcher and native registered
+   callback at reserved gateway0x1f0030. Exact request: mode0,
+   `rom0:UDNL cdrom0:\MODULES\IOPRP300.IMG;1`. It explicitly stops after receipt;
+   no reset completion or BOOTEND flag is fabricated. Implement checked image
+   loading, fresh IOP service state and real bootstrap before signaling readiness.
+   The original dispatcher clears the size byte BEFORE copying the callback packet
+   (0x98740); native request validation expects this consumed header.
+   Both platforms passed all15 tests through original CD/DVD RPC server binding.
+   Windows additionally returns from the first CD/DVD init RPC, removes DMA handlers
+   and reaches reboot. Latest native reboot-callback tests/build need validation.
+   Current bundle: modmsin rom_sysclib rom_loadcore rom_sifcmd rom_sifman rom_threadman
+   rom_fileio rom_stdio rom_ioman rom_sysmem rom_cdvdman rom_cdvdfsv (22057 words).
+   EE SifSetDma now handles raw payload+command pairs transactionally; original first
+   CD/DVD call uses4-byte payload and64-byte command. Semaphores/DMA callback handles
+   are reusable. DisableDmac0x17, RemoveDmacHandler0x13 and idle SifStopDma0x6b work.
+   Mid-packet SifStopDma faults. Hardware SifSetReg1..4 updates actual shared address/
+   flag state; native return policy is submitted value (original reboot ignores it).
+   GCC generated libraries now use -O1 in Release by default via
+   HG_FAST_TRANSLATION_BUILDS; disable for later optimization. Latest Linux15-test
+   session36600 completed successfully; no build currently running.
+   Keep `--verify-sif`, `--verify-services`, `--verify-cdvd` passing. Default200000
+   slices is insufficient; use --slices20000000 (with a space), max50000000.
+2. Validate thread scheduling and timer clock when required. Created worker entry
+   0x0026cea0 is configured; worker remains dormant. ConsoleSettings defaults to
+   English, 4:3, RGB, SPDIF on, UTC; original timezone field was 270 (not embedded).
+3. Expand syscall/interrupt/scheduling services only with real state transitions;
+   semaphore blocking, negative syscalls, full COP0, DMA/VU and IOP remain unfinished.
+4. Extend compiled synthetic tests/game-prefix checks. Windows and Linux are now
+   verified through the current boundary; keep their states comparable as runtime changes.
+5. Continue graphics/platform roadmap in docs/ARCHITECTURE.md. No game renderer yet.
+
+## Watch out for
+- Startup uses **PADDUW** (MMI op 28, function 40, subop 16), not PXOR. Initial
+  zero-input-only reasoning hid a misidentification; corrected against manual p172
+  and guarded by nonzero/saturating tests. Actual PXOR is function 9/subop 19 (p285).
+- Do not infer every word in a load segment/function range is executable. Manual
+  function end is a traversal stop boundary, not a sandbox preventing outgoing calls.
+- No complete architectural exceptions/MMIO/TLB, full kernel/IOP or native asset/CVM service,
+  VU/DMA/VIF/GIF/GS, audio, input or saves. Boot-service subset is not a complete OS.
+- PowerShell inline Python with nested escaped quotes failed; use single-quoted
+  here-strings for multiline Python. `python` is 3.11.9, while CMake found Python
+  3.14.4; both passed tools tests. CMake is installed but not on this shell's PATH.
+- Reference PDF is in `%TEMP%/hg-ee-instruction-manual.pdf`, and temporary pypdf
+  dependencies in `%TEMP%/hg-python-deps`. Pip needed `--no-user --target` because
+  local pip defaults conflict with --target. PDF text may need ASCII replacement
+  when printed through this Windows console. These are not build dependencies.
+
+## Relevant files and commands
+- `README.md`: ordinary portable setup/build instructions and config examples.
+- `config/haunting_ground_us.toml`: dump identity and manual discovery hints.
+- `out/analysis.json`, `out/listing.txt`, `out/translated.cpp`: ignored, regenerable.
+- `runtime/diagnostic.cpp`: game-prefix/boot verification; `runtime/kernel.cpp`: boot ABI; `runtime/opengl_host.cpp`:
+  GL host smoke test; `tests/`: redistributable synthetic tests.
+- `docs/SOURCES.md`: references/provenance; `docs/ARCHITECTURE.md`: staged roadmap.
+
+PowerShell from the root (existing configured build):
+
+```powershell
+python tools/hg.py emit
+$hgCmake = 'C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'
+$hgCtest = 'C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/ctest.exe'
+& $hgCmake --build build --config Release -j 4
+& $hgCtest --test-dir build -C Release --output-on-failure
+& ./build/Release/hg_opengl_host.exe --frames 3
+& ./build/Release/hg_diagnostic.exe --verify-prefix
+```
+
+Initial configure used `-G "Visual Studio 18 2026" -A x64 -DHG_FETCH_GLFW=ON`
+and `-DHG_TRANSLATED_SOURCE=C:/Users/johnn/Documents/ChatGPT/Haunting/out/translated.cpp`.
+
+## Oracle UI access (current session)
+Computer-use skill was read along with guidance/API/confirmations. Its tools are
+available through discovered `tools.mcp__node_repl__js` in functions.exec.
+Initialize `globalThis.sky` via `await import('@oai/sky')`. Persistent node bindings:
+`oracle` main window (returned id 4850048), `debuggerWindow` (id 2625870), latest
+`os` and `ds` states. Reobserve before ANY input; coordinates/indexes are ephemeral.
+`sky.list_windows()` returns currently targetable objects; use them, never fake handles.
+Accessibility index clicks on Qt modal fields failed as unavailable. Screenshot-backed
+clicks work; click editable fields explicitly and inspect focus before typing. Never
+save screenshots (automatically displayed). Main menu System/Reset restarts paused;
+press debugger Run to reach breakpoint again. User allowed memory oracle use.
+
+Read-only capture example (only if current PID/base still fingerprint-valid):
+```powershell
+python tools/oracle_capture.py --pid 4080 --locate
+python tools/oracle_capture.py --pid 4080 --base 0x7ff670000000 --out "$env:TEMP/haunting-oracle" --note 'describe exact paused state'
+```
+
+## Earlier oracle ABI observation
+At 18:42, original paused at independently selected PC 0x0026bee8 immediately
+following first EnableIntc syscall. GPR v0=1, a0=11, v1=0xffffffffb000f010.
+Native first enable returns 1 and updates mask; repeated enable deliberately faults
+until its return ABI is validated. No screenshot file saved, no new RAM capture.
+Popup input requires get_window_state and screenshotId click in the SAME node call;
+use popup screenshot[1] coordinates relative to that popup. IDs from previous calls
+can be rejected as unknown. Avoid copying incidental debugger disassembly.
+
+## Current diagnostic artifacts
+`runtime/diagnostic.cpp --dump-state` writes external RAM+JSON on boot boundary.
+Latest files: `%TEMP%/haunting-oracle/native-current.ram` and `.json` (overwritten
+for each diagnostic run, native execution only). `tools/hgtool/inspect.py` checks
+image identity, shows own-decoded PC/caller windows and possible a0 object table.
+New original capture: `%TEMP%/haunting-oracle/ee-ram-20260904T234911830789Z.bin`,
+SHA-256 cbd783d57bc43e67a58bfe1c810838e0ed3c5a58ea50de8fa47c7f049a0bac05.
+See docs/ORACLE.md for detailed settings and ABI observations.
+
+## IOP build commands
+```powershell
+python tools/hg.py iop-emit --iop-module modmsin
+& $hgCmake -S . -B build "-DHG_IOP_SOURCE=C:/Users/johnn/Documents/ChatGPT/Haunting/out/iop-translated.cpp"
+& $hgCmake --build build --config Release -j 4
+& ./build/Release/hg_iop_diagnostic.exe --verify-modmsin
+```
+Linux cache was configured with HG_IOP_SOURCE pointing to the same source through
+/mnt/c/Users/johnn/Documents/ChatGPT/Haunting/out/iop-translated.cpp.
+
+### SNDDRV completion transport checkpoint (2026-09-06)
+- The active `cdrom0:\\MODULES\\SNDDRV.IRX` LOADFILE request is now proven to
+  return from the MODLOAD helper, re-enter the LOADFILE worker, reach the SIFRPC
+  completion builder at relocated `0x00099914`, and take its real completion-send
+  branch because LOADFILE server `0x000d6d20 + 0x30 == 1`.
+- At relocated `0x0009995c` the same request prepares command `0x80000008` with
+  completion packet `0x0009b000`; the SIFCMD sender returns nonzero DMA ID
+  `0x00440002` at `0x00099964`. The worker/completion-builder path is therefore
+  no longer the leading stall hypothesis.
+- EE still waits at `0x0026c1e4` on semaphore 10 for client `0x0198cbc0`; retained
+  EE completion snapshots only show earlier completions on semaphore 9. The
+  remaining gap is between accepted IOP SIF0 completion DMA and EE completion
+  dispatch/semaphore signaling.
+- `runtime/system_diagnostic.cpp` now captures the first event-time SIF0 record
+  whose payload is command `0x80000008` for client `0x0198cbc0`, including its
+  tag, payload, EE destination memory and EE SIF0 channel/status state. This is
+  diagnostic-only and does not alter guest-visible transport behavior.
+- `runtime/include/hg/iop_dmac.hpp` now zero-fills partial SIF0 source fragments before
+  enqueue so retained lanes from prior chunks cannot bleed into the completion payload.
+  This replaces the prior `source_lanes` reuse on `words < 4`, which could preserve a
+  stale status word as the final payload value at EE side. This fix is scoped to
+  transport copy semantics and keeps the same SIF0 completion path and channel
+  behavior. The next step is to rerun the focused `--verify-loadfile`/sif capture
+  to confirm destination payloads remain `0x8000000a` and wake semaphore 10.
+- Next: run the 30-million-slice synthetic-TOC diagnostic and use this snapshot to
+  determine whether the active completion reached EE RAM intact. If it did, trace
+  EE command dispatch into `0x0026fa60`; if it did not, narrow the channel-9/FIFO/
+  EE destination-chain transition. The synthetic TOC remains diagnostic-only.
+
+### Post-LOADFILE SNDDRV RPC checkpoint (2026-09-06)
+- The former semaphore-10 LOADFILE stall is resolved with real transport. A focused
+  15-million-slice connected run records SIFMAN completion ID `0x10b80002` while
+  EE semaphore 10 is active at virtual time 14943752; LOADFILE's worker returns to
+  its original RpcLoop rather than remaining at MODLOAD `0xa9ef8`.
+- IOP scheduling now normally advances one translated worker instruction per host
+  slice. Only while SIF0 source DMA is armed does the connected diagnostic give the
+  sender a bounded 64-instruction quantum to reach its original wait, followed by
+  one lower-priority dispatch before asynchronous SIF service. This preserves the
+  observed blocking window without globally multiplying scheduler cost. Synthetic
+  worker tests cover the block/handoff behavior.
+- EE `SifSetDma` now accepts the observed single raw descriptor profile (`attr=0`,
+  nonzero word-multiple size through 4096) in addition to terminal RPC command
+  descriptors. The original startup transfer `0x0219715c0 -> 0x000884c0`, size
+  `0x80`, completes through the real SIF1 receiver; raw transfers leave the IOP
+  destination channel armed because they request neither remote END nor output IRQ.
+  The kernel test covers the 0x80-byte raw transfer and completion state. All 18
+  Windows Release CTest targets passed after these runtime changes.
+- SNDDRV's original first RPC handler is now an explicit AOT root at module
+  `+0xa7b4` (runtime `0x857b4`), proven by the original registration sequence at
+  `0x85448..0x8544c`. The full generated IOP bundle contains 24 modules and 68,417
+  reachable words.
+- A 30-million-slice connected trace proves SNDDRV workers registered both service
+  records: queue/server `0x92da8/0x92dc0` has ID `0x77777777`, handler `0x857b4`,
+  buffer `0x91480`; queue/server `0x92e04/0x92e1c` has ID `0x77777778`, handler
+  `0x86018`, buffer `0x8fc80`. EE executes both post-bind checks at `0x2202c0` and
+  `0x220318`, so missing registration is no longer the leading hypothesis.
+- At the 30-million-slice boundary EE is later back in the common SIFRPC wait at
+  `0x26c1e4` on semaphore 10 while server `0x77777777` contains active client
+  `0x019756c0`. The next boundary is therefore the first real SNDDRV RPC
+  request/handler/completion path, not `SifBindRpc`. Trace the request function,
+  execution through `0x857b4`, and completion command before changing behavior.
+
+Current read-only metric investigation: original1beef0 waits on interrupt flags
+and a counter incremented by1beda0, registered for cause2. It waits for a delta
+of2. This is display synchronization evidence, not a verified completed-frame
+counter. Provenance in docs/SOURCES.md. Do not alter it to inflate host FPS.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PSMT8 test plan extension: gs_gpu_tests dependency fixtures cover narrow spans, cross-page spans and IMAGE writes against queued inputs/outputs/disjoint memory; dirty test backup added with gpu-test-manifest.json.
+
+
+
+
+FPU prototype3M differential cases passed. /O1 random~5% faster,close cancellation~52%,bounded normal exponents~6%;synthetic only. Integrated bounded bit scan with MSVC/GNU/portable fallback and frozen reference3M+12240edge cases. Next full focused build and original replay.
+
+Next measured readback lead: display_image currently calls const vram.data() and synchronizes all4MiB. CT32/24 and CT16/16S display tiles use64x32/64x64 pages,base2048aligned. A separately tested read_span/page-pointer table could synchronize only rectangle pages,including coordinate and VRAM wrapping,coalescing physical runs. Not implemented;finish current FPU comparison first.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

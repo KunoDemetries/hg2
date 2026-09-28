@@ -32,8 +32,23 @@ def poll_loops(code):
     return found
 
 
+def read_reg(index):
+    """Resolve a decoded scalar register at translation time."""
+    if not 0 <= index < 32:
+        raise ValueError('invalid static EE register index')
+    return f's.gpr[{index}].lo' if index else 'std::uint64_t(0)'
+
+
+def write_reg(index, value):
+    if not 0 <= index < 32:
+        raise ValueError('invalid static EE register index')
+    # A discarded destination must still evaluate loads/device reads and faults.
+    # Scalar writes leave the upper 64 bits and the stored zero register intact.
+    return f's.gpr[{index}].lo = {value};' if index else f'(void)std::uint64_t({value});'
+
+
 def straight(i):
-    a, b = f's.r({i.rs})', f's.r({i.rt})'
+    a, b = read_reg(i.rs), read_reg(i.rt)
     immediate = f'{i.immediate & 0xffffffffffffffff}ull'
     uimm = i.word & 65535
     n = i.name
@@ -53,6 +68,8 @@ def straight(i):
         return f's.compare_halfwords({i.rd},{i.rs},{i.rt});'
     if n in ('pextlb','pextub'):
         return f's.extend_bytes({i.rd},{i.rs},{i.rt},{str(n=="pextub").lower()});'
+    if n in ('pextlw','pextuw'):
+        return f's.extend_words({i.rd},{i.rs},{i.rt},{str(n=="pextuw").lower()});'
     if n == 'qfsrv':
         return f's.funnel_quad({i.rd},{i.rs},{i.rt});'
     if n in ('psllh','psrlh','psrah'):
@@ -62,13 +79,13 @@ def straight(i):
     if n == 'pmfhl.lw':
         return f'if({i.rd}) s.gpr[{i.rd}]={{std::uint32_t(s.lo)|(std::uint64_t(std::uint32_t(s.hi))<<32),std::uint32_t(s.lo1)|(std::uint64_t(std::uint32_t(s.hi1))<<32)}};'
     if n in ('mfhi1','mflo1'):
-        return f's.w({i.rd}, s.{"hi1" if n=="mfhi1" else "lo1"});'
+        return write_reg(i.rd, f's.{"hi1" if n=="mfhi1" else "lo1"}')
     if n in ('mult','multu','mult1','multu1','madd','maddu','madd1','maddu1'):
         unsigned = n in ('multu','multu1','maddu','maddu1')
         return f's.multiply_word({i.rd},{i.rs},{i.rt},{str(unsigned).lower()},{str(n.endswith("1")).lower()},{str(n.startswith("madd")).lower()});'
     if n in ('movz','movn'):
         condition = '==' if n == 'movz' else '!='
-        return f'if ({b} {condition} 0) s.w({i.rd}, {a});'
+        return f'if ({b} {condition} 0) ' + write_reg(i.rd, a)
     if n in ('pand','por','pxor','pnor'):
         return f's.plogic({i.rd},{i.rs},{i.rt},{["pand","por","pxor","pnor"].index(n)});'
     if n in ('paddh', 'psubb', 'psubh', 'psubw', 'psubsb', 'psubsh', 'psubsw', 'paddsb', 'paddsh', 'paddsw', 'padduw', 'padduh', 'paddub'):
@@ -84,13 +101,13 @@ def straight(i):
     if n == 'mtc1':
         return f's.fpr[{i.rd}] = std::uint32_t({b});'
     if n == 'mfc1':
-        return f's.w({i.rt}, hg::sx32(s.fpr[{i.rd}]));'
+        return write_reg(i.rt, f'hg::sx32(s.fpr[{i.rd}])')
     if n == 'qmfc2':
         return f's.qmfc2({i.rt}, {i.rd});'
     if n == 'qmtc2':
         return f's.qmtc2({i.rt}, {i.rd});'
     if n == 'cfc2':
-        return f's.w({i.rt}, hg::sx32(s.vu_control_read({i.rd})));'
+        return write_reg(i.rt, f'hg::sx32(s.vu_control_read({i.rd}))')
     if n == 'ctc2':
         return f's.vu_control_write({i.rd}, std::uint32_t({b}));'
     if n == 'vabs':
@@ -99,10 +116,19 @@ def straight(i):
         return f's.vmove({i.rt}, {i.rd}, {i.rs & 15});'
     if n == 'vmr32':
         return f's.vmr32({i.rt}, {i.rd}, {i.rs & 15});'
-    if n in ('vmul','vaddbc'):
-        return f's.vu_arithmetic({i.sa}, {i.rd}, {i.rt}, {i.rs & 15}, {str(n=="vmul").lower()}, {i.word & 3});'
+    if n in ('vftoi0','vftoi4','vftoi12','vftoi15','vitof0','vitof4','vitof12','vitof15'):
+        return f's.vu_convert({i.rt}, {i.rd}, {i.rs & 15}, {int(n[5:])}, {str(n.startswith("vitof")).lower()});'
+    if n in ('vmul','vaddbc','vsubbc'):
+        broadcast=(8+(i.word&3)) if n=='vsubbc' else (i.word&3)
+        return f's.vu_arithmetic({i.sa}, {i.rd}, {i.rt}, {i.rs & 15}, {str(n=="vmul").lower()}, {broadcast});'
     if n == 'vmulbc':
         return f's.vu_arithmetic({i.sa}, {i.rd}, {i.rt}, {i.rs & 15}, true, {8+(i.word & 3)});'
+    if n in ('vmulabc', 'vmaddabc', 'vmaddbc'):
+        operation = {'vmulabc': 'multiply_accumulator', 'vmaddabc': 'add_accumulator',
+                     'vmaddbc': 'add_vector'}[n]
+        destination = i.sa if n == 'vmaddbc' else 0
+        return (f's.vu_broadcast_product({destination}, {i.rd}, {i.rt}, {i.rs & 15}, '
+                f'{i.word & 3}, hg::VuBroadcastProduct::{operation});')
     if n == 'vaddq':
         return f's.vu_arithmetic({i.sa}, {i.rd}, 0, {i.rs & 15}, false, 4);'
     if n == 'vsqrt':
@@ -124,7 +150,7 @@ def straight(i):
     if n == 'ctc1':
         return f's.fpu.write_control(std::uint32_t({b}));'
     if n == 'cfc1':
-        return f's.w({i.rt}, hg::sx32(s.fpu.control));'
+        return write_reg(i.rt, 'hg::sx32(s.fpu.control)')
     if n in ('adda.s', 'add.s'):
         return f's.add_float({i.rd}, {i.rt}, {i.sa}, {str(n == "adda.s").lower()});'
     if n == 'sub.s':
@@ -149,8 +175,12 @@ def straight(i):
         return f's.compare_float({i.rd}, {i.rt}, {str(n=="c.olt.s").lower()});'
     if n == 'madd.s':
         return f's.madd_float({i.rd}, {i.rt}, {i.sa});'
+    if n == 'mula.s':
+        return f's.mula_float({i.rd}, {i.rt});'
     if n == 'madda.s':
         return f's.madda_float({i.rd}, {i.rt});'
+    if n == 'msuba.s':
+        return f's.msuba_float({i.rd}, {i.rt});'
     if n == 'msub.s':
         return f's.msub_float({i.rd}, {i.rt}, {i.sa});'
     if n == 'sync':
@@ -162,11 +192,11 @@ def straight(i):
     if n in ('ei','di'):
         return f's.set_interrupts({str(n=="ei").lower()});'
     if n.startswith('mfc0_'):
-        return f's.w({i.rt}, hg::sx32(s.cp0_{n[5:]}));'
+        return write_reg(i.rt, f'hg::sx32(s.cp0_{n[5:]})')
     if n.startswith('mtc0_'):
         return f's.cp0_{n[5:]}=std::uint32_t({b});'
     if n == 'lui':
-        return f's.w({i.rt}, hg::sx32({uimm}u << 16));'
+        return write_reg(i.rt, f'hg::sx32({uimm}u << 16)')
     values = {
         'addiu': f'hg::sx32(std::uint32_t({a} + {immediate}))',
         'daddiu': f'{a} + {immediate}',
@@ -174,7 +204,7 @@ def straight(i):
         'slti': f'hg::signed_less({a}, {immediate})', 'sltiu': f'{a} < {immediate}',
     }
     if n in values:
-        return f's.w({i.rt}, {values[n]});'
+        return write_reg(i.rt, values[n])
     values = {
         'sll': f'hg::sx32(std::uint32_t({b}) << {i.sa})',
         'srl': f'hg::sx32(std::uint32_t({b}) >> {i.sa})',
@@ -194,7 +224,7 @@ def straight(i):
         'slt': f'hg::signed_less({a}, {b})', 'sltu': f'{a} < {b}', 'mfhi': 's.hi', 'mflo': 's.lo',
     }
     if n in values:
-        return f's.w({i.rd}, {values[n]});'
+        return write_reg(i.rd, values[n])
     address = f'std::uint32_t({a} + {immediate})'
     if n == 'lwc1':
         return f's.fpr[{i.rt}]=std::uint32_t(s.load_scalar<4,false>({address}));'
@@ -215,7 +245,7 @@ def straight(i):
              'lw': (4, True), 'lwu': (4, False), 'ld': (8, False)}
     if n in loads:
         size, sign = loads[n]
-        return f's.w({i.rt}, s.load_scalar<{size},{str(sign).lower()}>({address}));'
+        return write_reg(i.rt, f's.load_scalar<{size},{str(sign).lower()}>({address})')
     if n in {'sb', 'sh', 'sw', 'sd'}:
         size = {'sb': 1, 'sh': 2, 'sw': 4, 'sd': 8}[n]
         return f's.store_scalar<{size}>({address}, {b});'
@@ -226,9 +256,14 @@ def straight(i):
     return f'throw hg::Fault(s.pc, "{n} instruction 0x{i.word:08x}");'
 
 
-def emit(code, image_hash, overlays=()):
+def emit(code, image_hash, overlays=(), vu1_image=None, vu1_programs=()):
     waits=poll_loops(code)
     dma_waits=dma_poll_loops(code)
+    vu_lines=[]
+    if vu1_programs:
+        if vu1_image is None:raise ValueError('VU1 AOT emission requires the source ELF image')
+        from .vu_emit import emit_vu1
+        vu_lines=emit_vu1(vu1_image,vu1_programs)
     def overlay_at(pc):
         return any(o['address']<=pc<o['address']+o['size'] for o in overlays)
     ranges=[]
@@ -240,11 +275,18 @@ def emit(code, image_hash, overlays=()):
            '// HG-DIAG-001: instruction history is optional at build time; watches require it.',
            '#ifndef HG_EE_INSTRUCTION_TRACE', '#define HG_EE_INSTRUCTION_TRACE 1', '#endif',
            'bool hg::compiled_ee_instruction_trace() {return HG_EE_INSTRUCTION_TRACE!=0;}',
-           f'const char* hg::compiled_image_sha256() {{ return "{image_hash}"; }}',
-           'void hg::configure_compiled_image(hg::State& s) { s.kernel_code_regions = {' + ','.join(ranges) + '}; }',
+           f'const char* hg::compiled_image_sha256() {{ return "{image_hash}"; }}']
+    if vu_lines:
+        out += ['#include "hg/vu_xyz.hpp"','#include "hg/vu_matrix.hpp"']
+        out += ['namespace { void run_vu1_aot(hg::Vif1Path&,std::uint16_t,hg::GifPath&,hg::GsRegisterState&); }']
+    configure='void hg::configure_compiled_image(hg::State& s) { s.kernel_code_regions = {' + ','.join(ranges) + '};'
+    if vu_lines:configure+=' s.vif1.vu1_executor=&run_vu1_aot;'
+    configure+=' }'
+    out += [configure,
            '#if defined(_MSC_VER)', '#define HG_AOT_NOINLINE __declspec(noinline)',
            '#elif defined(__GNUC__)', '#define HG_AOT_NOINLINE __attribute__((noinline))',
            '#else', '#define HG_AOT_NOINLINE', '#endif', 'namespace {']
+    out += vu_lines
     page=None;pages=[]
     fallback='default: --budget; if constexpr(HG_EE_INSTRUCTION_TRACE)s.trace_pc(); if (hg::return_from_kernel(s)) break; throw hg::Fault(s.pc, "address has no static translation");'
     for pc, i in sorted(code.items()):
@@ -257,15 +299,15 @@ def emit(code, image_hash, overlays=()):
         out += ['if(!budget)return true; --budget; if constexpr(HG_EE_INSTRUCTION_TRACE)s.trace_pc();']
         if pc in dma_waits and not any(overlay_at(p) for p in range(pc,dma_waits[pc][1]+4,4)):
             load,end=dma_waits[pc]
-            out += [f'if(cooperative && s.r({load.rt})==1) {{',
-                    f'const auto address=std::uint32_t(s.r({load.rs})+{load.immediate&0xffffffffffffffff}ull);',
+            out += [f'if(cooperative && {read_reg(load.rt)}==1) {{',
+                    f'const auto address=std::uint32_t({read_reg(load.rs)}+{load.immediate&0xffffffffffffffff}ull);',
                     f'bool watched=false;for(const auto& w:s.trace_watches)watched|=w.pc>=0x{pc:x}u && w.pc<=0x{end:x}u;',
                     'if(!watched && ((address==0x1000b000u && (s.dmac.channels[3].chcr&0x100)) || (address==0x1000b400u && (s.dmac.channels[4].chcr&0x100))))return false;',
                     '}']
         if pc in waits and not any(overlay_at(p) for p in range(pc,waits[pc][1]+4,4)):
             load,end=waits[pc];size=1 if load.name in ('lb','lbu') else 4
-            out += [f'if(cooperative && s.r({load.rt})==0) {{',
-                    f'const auto address=std::uint32_t(s.r({load.rs})+{load.immediate&0xffffffffffffffff}ull);',
+            out += [f'if(cooperative && {read_reg(load.rt)}==0) {{',
+                    f'const auto address=std::uint32_t({read_reg(load.rs)}+{load.immediate&0xffffffffffffffff}ull);',
                     f'bool watched=false;for(const auto& w:s.trace_watches)watched|=w.pc>=0x{pc:x}u && w.pc<=0x{end:x}u;',
                     f'if(!watched && address%{size}==0 && std::uint64_t(address)+{size}<=s.ram.size() && s.load(address,{size},false)==0) return false;',
                     '}']
@@ -286,7 +328,7 @@ def emit(code, image_hash, overlays=()):
             continue
         slot = code.get(pc + 4)
         invalid_slot = slot is None or slot.control or slot.name in ('sync','syscall')
-        a, b = f's.r({i.rs})', f's.r({i.rt})'
+        a, b = read_reg(i.rs), read_reg(i.rt)
         if i.name in ('jr', 'jalr'):
             out += [f'const auto target = std::uint32_t({a});']
         elif i.name in ('j', 'jal'):
@@ -303,7 +345,7 @@ def emit(code, image_hash, overlays=()):
                     f'const auto target = taken ? 0x{i.target:08x}u : 0x{pc + 8:08x}u;']
         if i.name in ('jal', 'jalr'):
             rd = 31 if i.name == 'jal' else i.rd
-            out += [f's.w({rd}, hg::sx32(0x{pc + 8:08x}u));']
+            out += [write_reg(rd, f'hg::sx32(0x{pc + 8:08x}u)')]
         if i.likely:
             out += ['if (taken) {']
         out += [f's.pc = 0x{pc + 4:08x}u;']
@@ -335,3 +377,67 @@ def emit(code, image_hash, overlays=()):
             'void hg::run(hg::State& s,std::uint64_t budget){run_pages(s,budget,false);}',
             'void hg::run_burst(hg::State& s,std::uint64_t budget){run_pages(s,budget,true);}']
     return '\n'.join(out) + '\n'
+
+
+def emit_shards(code, image_hash, overlays=(), vu1_image=None, vu1_programs=(),
+                pages_per_shard=32):
+    """Split the existing EE output into stable native translation units.
+
+    emit() remains the single-source correctness baseline used by synthetic
+    tests. This preserves those generated page bodies byte-for-byte, but moves
+    groups of guest 4 KiB pages into separate C++ files. The small main source
+    keeps image metadata, VU1 code and the checked page dispatcher. Stable
+    address-based grouping means adding a root normally rewrites only shards
+    whose generated code actually changed.
+    """
+    if not isinstance(pages_per_shard, int) or pages_per_shard < 1:
+        raise ValueError('pages_per_shard must be a positive integer')
+    generated=emit(code,image_hash,overlays,vu1_image,vu1_programs)
+    lines=generated.splitlines()
+    starts=[n for n,line in enumerate(lines)
+            if line.startswith('HG_AOT_NOINLINE bool page_')]
+    if not starts:
+        return generated,{}
+    run_index=next((n for n,line in enumerate(lines)
+                    if line.startswith('void run_pages(')),None)
+    if run_index is None or run_index<=starts[-1]:
+        raise ValueError('generated EE page layout is malformed')
+    pages=[]
+    for n,start in enumerate(starts):
+        end=starts[n+1] if n+1<len(starts) else run_index
+        name=lines[start].split('page_',1)[1].split('(',1)[0]
+        pages.append((int(name,16),lines[start:end]))
+    prefix=lines[:starts[0]]
+    namespace_index=max((n for n,line in enumerate(prefix) if line=='namespace {'),
+                        default=-1)
+    if namespace_index<0:
+        raise ValueError('generated EE anonymous namespace is missing')
+    declarations=[f'bool page_{page:x}(hg::State&,std::uint64_t&,bool);'
+                  for page,_ in pages]
+    main_lines=(prefix[:namespace_index]+declarations+
+                prefix[namespace_index:]+lines[run_index:])
+    shard_header=[
+        '// Generated from the user-local ELF. Do not redistribute.',
+        f'// SHA-256: {image_hash}',
+        '#include "hg/image.hpp"',
+        '// HG-DIAG-001: instruction history is optional at build time; watches require it.',
+        '#ifndef HG_EE_INSTRUCTION_TRACE',
+        '#define HG_EE_INSTRUCTION_TRACE 1',
+        '#endif',
+        '#if defined(_MSC_VER)',
+        '#define HG_AOT_NOINLINE __declspec(noinline)',
+        '#elif defined(__GNUC__)',
+        '#define HG_AOT_NOINLINE __attribute__((noinline))',
+        '#else',
+        '#define HG_AOT_NOINLINE',
+        '#endif',
+    ]
+    grouped={}
+    for page,body in pages:
+        group=page//pages_per_shard
+        grouped.setdefault(group,[]).extend(body)
+    shards={
+        f'translated-shard-{group:04x}.cpp':'\n'.join(shard_header+body)+'\n'
+        for group,body in sorted(grouped.items())
+    }
+    return '\n'.join(main_lines)+'\n',shards
