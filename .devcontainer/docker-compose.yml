@@ -1,0 +1,85 @@
+# The devcontainer. Compose rather than a plain image because the game dump is
+# mounted from a path that differs per machine, and compose reads .env for it.
+# .env lives at the top of the repository; devcontainer.json's initializeCommand
+# links it beside this file before any of this runs. See .env.example.
+#
+# An unset variable falls back to a path that exists and holds nothing, so the
+# container still comes up and the tools report a missing dump explicitly.
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity
+    init: true
+
+    environment:
+      HG_GAME_DIR: ${HG_GAME_DIR:-}
+
+    volumes:
+      - ..:/workspaces/hg2:cached
+
+      # **The user's own dump.** This project ships no game data; SLUS_210.75,
+      # DATA.CVM and MODULES/ are consumed at build/run time. Mounted at its own
+      # path so one value in .env is correct on the host and in here alike.
+      # post-create.sh links `Haunting Ground (USA)` in the workspace to it,
+      # which is the tools' default location. Read-only by default: the dump is
+      # an input, never an output (AGENTS.md).
+      - ${HG_GAME_DIR:-/var/empty}:${HG_GAME_DIR:-/var/empty}:${HG_MOUNT_MODE:-ro}
+
+      # The desktop session, so hg_game / hg_opengl_host can open a window in
+      # here. GLFW picks Wayland or X11 from what it can reach.
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/${WAYLAND_DISPLAY:-wayland-0}:/run/user/0/wayland-0
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/pipewire-0:/run/user/0/pipewire-0
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/pulse/native:/run/user/0/pulse/native
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+      # **Gamepads.** GLFW reads joysticks through evdev, not the display socket.
+      # The directory is bound so a pad plugged in later appears.
+      - /dev/input:/dev/input
+      - /run/udev:/run/udev:ro
+
+      # Shell history across rebuilds.
+      - hg2-bashhistory:/commandhistory
+
+      # **No credential is bound in from the host.** No ~/.ssh, no ~/.gitconfig,
+      # no Claude login: each of those is a volume the container owns and you
+      # fill in once, from inside. A key generated or pasted in here stays here
+      # and survives a rebuild, and a host key is never exposed to anything
+      # running in the container. The one exception is your skills directory,
+      # below, which is read-only and holds no secret.
+      #
+      # git's global config is a volume too, and containerEnv points
+      # GIT_CONFIG_GLOBAL into it -- which is also what makes the copy of the
+      # host's ~/.gitconfig that the Dev Containers extension drops in inert.
+      # Set your identity once, in here:
+      #     git config --global user.name  "..."
+      #     git config --global user.email "..."
+      - hg2-ssh:/root/.ssh
+      - hg2-gitconfig:/root/.config/git
+      # Claude Code's credentials, settings and per-project history.
+      - hg2-claude:/root/.claude
+      # Your own skills, read-only, over the volume above. Docker mounts the
+      # shorter path first, so this lands inside the volume.
+      - ${HOME}/.claude/skills:/root/.claude/skills:ro
+
+    # The GPU, for the OpenGL host. Without it Mesa falls back to llvmpipe.
+    devices:
+      - /dev/dri:/dev/dri
+    # Docker denies character devices it was not given; 13 is the input major
+    # (evdev and joystick nodes). Without it every gamepad open is EPERM.
+    device_cgroup_rules:
+      - "c 13:* rmw"
+
+    # gdb needs SYS_PTRACE to attach.
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+      - label=disable
+
+volumes:
+  hg2-bashhistory:
+  hg2-ssh:
+  hg2-gitconfig:
+  hg2-claude:
