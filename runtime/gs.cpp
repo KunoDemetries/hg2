@@ -910,9 +910,13 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
        (sprite_destination<=2||sprite_destination==10||sprite_destination==49)&&frame_width&&vram.size()==1024*1024&&
        last_x<=std::int32_t(frame_width)&&
        std::uint64_t(frame_width)*((last_y+31)/32)*32<=1024*1024&&
-       std::uint64_t(last_x-first_x)*(last_y-first_y)>=4096&&
+       // Small PSMT8/PSMT4 sprites measured cheaper on the GPU than a CPU
+       // fallback's flush/readback; other classes keep the batching threshold.
+       (std::uint64_t(last_x-first_x)*(last_y-first_y)>=4096||
+        (textured&&(sprite_source==0x13||sprite_source==0x14)))&&
        (!textured||(texture_width&&tw<=10&&th<=10&&
-         (sprite_source<=2||sprite_source==10||sprite_source==27||sprite_source==49)))) {
+         (sprite_source<=2||sprite_source==10||sprite_source==0x13||sprite_source==0x14||
+          sprite_source==27||sprite_source==49)))) {
         std::array<GsSpriteAxis,2048> columns,rows;
         std::array<std::uint32_t,256> palette{};
         const auto lower=[](std::int32_t fixed){const auto shifted=std::int64_t(fixed)-8;
@@ -922,12 +926,19 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
         const auto destination_address=sprite_destination==2?psmct16_word:
             sprite_destination==10?psmct16s_word:sprite_destination==49?psmz32_word:psmct32_word;
         const auto texture_base=std::uint32_t(tex0&16383)*64;
+        // PSMT8/PSMT4 addresses are not separable, so their axes carry wrapped
+        // texel coordinates and the backend applies the same swizzle per texel.
+        const bool indexed_source=sprite_source==0x13||sprite_source==0x14;
         bool valid=true;
-        if(textured&&sprite_source==27) {
-            valid=((tex0>>51)&15)==0&&!(tex0&(1ull<<55))&&((tex0>>56)&31)==0;
-            for(unsigned i=0;i<256&&valid;++i){
-                valid=clut_valid[i]&&clut_valid[i+256];
-                palette[i]=std::uint32_t(clut[i])|(std::uint32_t(clut[i+256])<<16);
+        if(textured&&(sprite_source==27||indexed_source)) {
+            // Same scope as DrawTexture: CT32 CLUT, CSM1; PSMT4 selects CSA<16.
+            const bool four=sprite_source==0x14;
+            valid=four?(((tex0>>51)&31)==0&&((tex0>>56)&31)<16):((tex0>>51)&0x3ff)==0;
+            const auto clut_base=four?unsigned((tex0>>56)&15)*16:0u,entries=four?16u:256u;
+            for(unsigned i=0;i<entries&&valid;++i){
+                const auto entry=clut_base+i;
+                valid=clut_valid[entry]&&clut_valid[entry+256];
+                palette[i]=std::uint32_t(clut[entry])|(std::uint32_t(clut[entry+256])<<16);
             }
         }
         try {
@@ -938,6 +949,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
                 c.fraction=linear?std::uint32_t(std::int64_t(fixed)-8-std::int64_t(u)*16):0u;
                 const auto address=[&](std::int32_t sample){
                     const auto wrapped=gs_wrap_texture_coordinate(sample,1u<<tw,unsigned(clamp&3),min_u,max_u);
+                    if(indexed_source)return wrapped;
                     return source_address(0,texture_width,wrapped,0)|
                         ((sprite_source==2||sprite_source==10)?((wrapped&8u)<<28):0u);};
                 c.source0=address(u);c.source1=c.fraction?address(u+1):c.source0;
@@ -953,6 +965,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
                 r.fraction=linear?std::uint32_t(std::int64_t(fixed)-8-std::int64_t(v)*16):0u;
                 const auto address=[&](std::int32_t sample){
                     const auto wrapped=gs_wrap_texture_coordinate(sample,1u<<th,unsigned((clamp>>2)&3),min_v,max_v);
+                    if(indexed_source)return wrapped;
                     return (source_address(texture_base,texture_width,0,wrapped)-(sprite_source==49?1536u:0u))&0xfffffu;};
                 r.source0=address(v);r.source1=r.fraction?address(v+1):r.source0;
             }
@@ -968,7 +981,8 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
             job.first_x=unsigned(first_x);job.first_y=unsigned(first_y);job.frame_width=frame_width;
             job.zbase=std::uint32_t(zbuf&511)*2048;job.zformat=zpsm;job.z=second.z;
             job.test=test;job.dimx=value[0x44];job.dither=(value[0x45]&1)!=0;job.zwrite=!(zbuf&(1ull<<32));
-            if(textured&&sprite_source==27)job.palette=palette.data();
+            if(textured&&(sprite_source==27||indexed_source))job.palette=palette.data();
+            job.texture_base=texture_base;job.texture_width=texture_width;
             if(gs_sprite_accelerator->render(job,vram))return true;
         }
     }
@@ -1300,8 +1314,10 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
             if(((frame>>24)&63)!=0||zformat>1||vram.size()!=1024*1024||(value[0x22]&3))return false;
             if((test&0x4000)||!(test&0x10000)||((test>>17)&3)==0)return false;
             if((test&1)&&(((test>>1)&7)!=7||((test>>12)&3)!=0))return false;
-            if(textured&&(format!=0&&format!=0x13&&format!=0x1b))return false;
-            if(textured&&(!((tex0>>14)&63)||(format!=0&&((tex0>>51)&0x3ff))))return false;
+            if(textured&&(format!=0&&format!=0x13&&format!=0x14&&format!=0x1b))return false;
+            // CT32 CLUT, CSM1; PSMT4 may select CSA<16 (same scope as DrawTexture).
+            if(textured&&(!((tex0>>14)&63)||(format==0x14?(((tex0>>51)&31)||((tex0>>56)&31)>=16):
+               (format!=0&&((tex0>>51)&0x3ff)))))return false;
             if(textured&&(((clamp&3)==2&&((clamp>>4)&1023)>((clamp>>14)&1023))||
                (((clamp>>2)&3)==2&&((clamp>>24)&1023)>((clamp>>34)&1023))))return false;
             if(draw.prim_state&64)for(unsigned s=0;s<8;s+=2)if(((alpha>>s)&3)==3)return false;
@@ -1341,9 +1357,13 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
                     else if(std::uint64_t(n)/q>0x7fffffffull)return false;
                 }
             }
-            if(format!=0)for(unsigned i=0;i<256;++i){
-                if(!clut_valid[i]||!clut_valid[i+256])return false;
-                job.palette[i]=std::uint32_t(clut[i])|(std::uint32_t(clut[i+256])<<16);
+            if(format!=0){
+                const auto clut_base=format==0x14?unsigned((tex0>>56)&15)*16:0u,entries=format==0x14?16u:256u;
+                for(unsigned i=0;i<entries;++i){
+                    const auto entry=clut_base+i;
+                    if(!clut_valid[entry]||!clut_valid[entry+256])return false;
+                    job.palette[i]=std::uint32_t(clut[entry])|(std::uint32_t(clut[entry+256])<<16);
+                }
             }
             }
             d[0]=std::uint32_t(pa.x);d[1]=std::uint32_t(pa.y);d[2]=std::uint32_t(pb.x);d[3]=std::uint32_t(pb.y);

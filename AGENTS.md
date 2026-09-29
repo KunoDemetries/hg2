@@ -125,7 +125,8 @@ before acting; dated historical notes do not override newer verified state.
   not replace it in the relaxed native-renderer baseline.
 - `tools/hg_build_provenance.py`: HG-DIAG-028 post-link source/configuration and
   executable hash manifest. Fixed frames verification fails before native launch
-  if inputs or the isolated executable do not match the Release build manifest.
+  if inputs or the isolated executable do not match the Release build manifest
+  (Windows `build/Release` or a single-config tree such as `build/linux`).
   A source-only revert or a test-only build is not a current game executable.
   Manifest hashing is outside native timing; inspect intended machine-code changes
   separately and regenerate after emitter/config changes before building.

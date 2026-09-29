@@ -37,6 +37,14 @@ uint sample_texel(int sx,int sy){
         uint pixel=((x&1u)+(x&6u)*2u+(row&1u)*2u)^((row&2u)*4u);
         uint address=(d(20)+((x>>7)+(y>>6)*(d(21)>>7))*2048u+block*64u+column*16u+pixel)&0xfffffu;
         texel=(mem[address]>>((((y&2u)>>1)|((x&8u)>>2))*8u))&255u;
+    }else if(d(22)==20u){
+        // PSMT4: same layout as GsRegisterState::psmt4_word; CSA applied host-side.
+        uint bx=(x>>5)&3u,by=(y>>4)&7u,column=(y&15u)>>2;
+        uint block=(bx&1u)*2u+(bx&2u)*4u+(by&1u)+(by&2u)*2u+(by&4u)*4u;
+        uint row=(y&3u)^((column&1u)*2u);
+        uint pixel=((x&1u)+(x&6u)*2u+(row&1u)*2u)^((row&2u)*4u);
+        uint address=(d(20)+((x>>7)+(y>>7)*(d(21)>>7))*2048u+block*64u+column*16u+pixel)&0xfffffu;
+        texel=(mem[address]>>((((y&2u)>>1)|((x&24u)>>2))*4u))&15u;
     }else{
         texel=mem[address32(d(20),d(21),x,y)];
         if(d(22)==0)return texel;

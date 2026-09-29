@@ -1,6 +1,52 @@
 #include "hg/vif.hpp"
 
 namespace hg {
+// HG-DIAG-089: comparison switch for tests only; production keeps the fast path.
+bool vif1_generic_unpack_only=false;
+namespace {
+// Straight-line UNPACK for the common case (no RGBA5, CL>=WL, every mask
+// selector zero). Same vector order, fault point, sign/zero extension, STMOD
+// row arithmetic and V2/V3 indeterminate-lane marking as the generic loop.
+template<unsigned Bits,unsigned Fields,bool Scalar>
+void unpack_linear(Vif1Path& v,const std::uint8_t* source,std::size_t vectors,std::size_t destination,
+                   std::size_t cl,std::size_t wl,bool zero_extend) {
+    constexpr unsigned bytes=Bits/8,unit=Scalar?bytes:Fields*bytes;
+    for(std::size_t n=0;n<vectors;++n,source+=unit) {
+        const auto vector=destination+cl*(n/wl)+n%wl;
+        if(vector>=1024)throw std::runtime_error("VIF1 UNPACK exceeds VU1 data memory");
+        auto defined=v.vu_mem_defined[vector];
+        for(unsigned field=0;field!=4;++field) {
+            if(!Scalar&&field>=Fields){defined&=std::uint8_t(~(1u<<field));continue;}
+            const auto* at=source+(Scalar?0:field*bytes);
+            std::uint32_t value=at[0];
+            if constexpr(Bits>=16)value|=std::uint32_t(at[1])<<8;
+            if constexpr(Bits==32)value|=(std::uint32_t(at[2])<<16)|(std::uint32_t(at[3])<<24);
+            if constexpr(Bits!=32)if(!zero_extend){constexpr auto sign=std::uint32_t(1)<<(Bits-1);value=(value^sign)-sign;}
+            if(v.mode){value+=v.row[field];if(v.mode==2)v.row[field]=value;}
+            v.vu_mem[vector*4+field]=value;defined|=std::uint8_t(1u<<field);
+        }
+        v.vu_mem_defined[vector]=defined;
+    }
+}
+bool try_unpack_linear(Vif1Path& v,unsigned format,const std::uint8_t* source,std::size_t vectors,
+                       std::size_t destination,std::size_t cl,std::size_t wl,bool zero_extend) {
+    switch(format) {
+    case 0x0:unpack_linear<32,1,true>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x1:unpack_linear<16,1,true>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x2:unpack_linear<8,1,true>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x4:unpack_linear<32,2,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x5:unpack_linear<16,2,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x6:unpack_linear<8,2,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x8:unpack_linear<32,3,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0x9:unpack_linear<16,3,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0xa:unpack_linear<8,3,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0xc:unpack_linear<32,4,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0xd:unpack_linear<16,4,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    case 0xe:unpack_linear<8,4,false>(v,source,vectors,destination,cl,wl,zero_extend);return true;
+    default:return false;
+    }
+}
+}
 // Kept out of the common VU/EE header so parser-only changes do not rebuild
 // all translated game code. Command semantics remain in their original order.
 void Vif1Path::process_pending(GifPath& gif,GsRegisterState& gs) {
@@ -60,6 +106,10 @@ void Vif1Path::process_pending(GifPath& gif,GsRegisterState& gs) {
                 const std::size_t bytes=(input_vectors*unit_bytes+3)&~std::size_t(3);
                 if(pending.size()-cursor<4+bytes)break;
                 std::size_t data=cursor+4;
+                if(!rgba5&&cl>=wl&&(!masked||!mask)&&!vif1_generic_unpack_only&&
+                   try_unpack_linear(*this,format,pending.data()+data,vectors,destination,cl,wl,(immediate&(1u<<14))!=0)) {
+                    cursor+=4+bytes;continue;
+                }
                 const auto extend=[&](std::uint32_t value) {
                     if(bits==32)return value;
                     if(immediate&(1u<<14))return value;

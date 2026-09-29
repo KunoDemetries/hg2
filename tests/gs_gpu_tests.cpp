@@ -28,13 +28,15 @@ int main(int argc,char** argv) {
             const bool untextured=variant>=96;
             hg::GsRegisterState cpu;cpu.ensure_vram();
             for(unsigned i=0;i<cpu.vram.size();++i)cpu.vram[i]=i*0x97a54321u+(i>>9);
-            const unsigned format=variant%3==0?0:variant%3==1?0x13:0x1b,wrap=(variant/3)%4;
+            const unsigned format=variant%3==0?0:variant%3==1?((variant&64)?0x14:0x13):0x1b,wrap=(variant/3)%4;
             cpu.value[0x4c]=(2ull<<16)|((variant&32)?511:0)|((variant&64)?0x00f00f00ull<<32:0);
             cpu.value[0x4e]=32|((variant&1)?1ull<<24:0)|((variant&8)?1ull<<32:0);
             cpu.value[0x47]=0x10000|((1ull+(variant%3))<<17)|((variant&4)?15:0);
             cpu.value[0x40]=(127ull<<16)|(95ull<<48);
             cpu.value[6]=8192ull|(2ull<<14)|(std::uint64_t(format)<<20)|(7ull<<26)|(7ull<<30)|
-                ((variant&16)?0:1ull<<34)|(std::uint64_t(variant%4)<<35);
+                ((variant&16)?0:1ull<<34)|(std::uint64_t(variant%4)<<35)|(format==0x14?std::uint64_t(variant&15)<<56:0);
+            // PSMT4 pages are 128x128: use a 256x256 texture with two pages per row.
+            if(format==0x14)cpu.value[6]=(cpu.value[6]&~((63ull<<14)|(15ull<<26)|(15ull<<30)))|(4ull<<14)|(8ull<<26)|(8ull<<30);
             cpu.value[0x14]=(variant&1)?0x60:0;
             cpu.value[8]=wrap|(std::uint64_t(wrap)<<2)|(7ull<<4)|(95ull<<14)|(3ull<<24)|(79ull<<34);
             cpu.value[0x46]=variant&1;cpu.value[0x49]=(variant>>1)&1;cpu.value[0x4a]=(variant>>2)&1;
@@ -74,6 +76,7 @@ int main(int argc,char** argv) {
             accelerated.rasterize_pending_draws();hg::gs_triangle_accelerator=nullptr;hg::gs_sprite_accelerator=nullptr;
             if(cpu.vram!=accelerated.vram)throw std::runtime_error("GPU triangle differential mismatch case "+std::to_string(variant));
             if(untextured&&!triangle_counter.accepted)throw std::runtime_error("Untextured triangle test did not exercise GPU");
+            if(format==0x14&&!untextured&&!triangle_counter.accepted)throw std::runtime_error("PSMT4 triangle test did not exercise GPU "+std::to_string(variant));
             ++cases;
             if(variant%96<8) {
                 // Follow one GPU batch with a different texture/frame mapping,
@@ -138,7 +141,7 @@ int main(int argc,char** argv) {
             if(cpu.vram!=accelerated.vram)throw std::runtime_error("sprite wave dependency mismatch");
             ++cases;
         }
-        const unsigned source_formats[]={0,1,2,10,27,49,255},destination_formats[]={0,1,2,10,49};
+        const unsigned source_formats[]={0,1,2,10,0x13,0x14,27,49,255},destination_formats[]={0,1,2,10,49};
         for(auto source_format:source_formats)for(auto destination_format:destination_formats)for(unsigned variant=0;variant<16;++variant) {
             hg::GsRegisterState cpu;cpu.ensure_vram();
             for(unsigned i=0;i<cpu.vram.size();++i)cpu.vram[i]=i*0x97a54321u+(i>>9);
@@ -148,7 +151,12 @@ int main(int argc,char** argv) {
             cpu.value[0x47]=0x10000|((1ull+variant%3)<<17)|((variant&4)?0x4000:0)|((variant&8)?0x8000:0);
             cpu.value[0x40]=std::uint64_t(variant)|(119ull<<16)|(3ull<<32)|(103ull<<48);
             cpu.value[6]=8192ull|(2ull<<14)|(std::uint64_t(source_format==255?0:source_format)<<20)|
-                (7ull<<26)|(7ull<<30)|((variant&2)?0:1ull<<34)|(std::uint64_t(variant%4)<<35);
+                (7ull<<26)|(7ull<<30)|((variant&2)?0:1ull<<34)|(std::uint64_t(variant%4)<<35)|
+                (source_format==0x14?std::uint64_t(variant&15)<<56:0);
+            const bool wide_indexed=(source_format==0x13||source_format==0x14)&&(variant&4);
+            // Multi-page PSMT8/PSMT4 layouts, including an odd page count per row.
+            if(wide_indexed)cpu.value[6]=(cpu.value[6]&~((63ull<<14)|(15ull<<26)|(15ull<<30)))|
+                (std::uint64_t((variant&8)?6:8)<<14)|(9ull<<26)|(9ull<<30);
             cpu.value[0x14]=(variant&1)?0x60:0;const auto wrap=variant%4;
             cpu.value[8]=wrap|(std::uint64_t(wrap)<<2)|(7ull<<4)|(95ull<<14)|(3ull<<24)|(79ull<<34);
             cpu.value[0x3b]=0x39|(0xc7ull<<32)|((variant&4)?0x8000:0);
@@ -162,6 +170,9 @@ int main(int argc,char** argv) {
             draw.vertices[0].x=3;draw.vertices[0].y=9;draw.vertices[0].uv=24|(40u<<16);
             draw.vertices[1].x=1997;draw.vertices[1].y=1741;draw.vertices[1].uv=1991|(1737u<<16);
             draw.vertices[1].rgba=0xc19357ef;draw.vertices[1].z=0x519ca731u*(variant+1);
+            if(wide_indexed)draw.vertices[1].uv=7000|(6000u<<16);
+            // Below the generic 4096-pixel threshold; PSMT8/PSMT4 remain GPU-eligible.
+            if((source_format==0x13||source_format==0x14)&&variant==3){draw.vertices[1].x=643;draw.vertices[1].y=649;}
             if(variant&8){std::swap(draw.vertices[0].uv,draw.vertices[1].uv);}
             cpu.draws.push_back(draw);auto accelerated=cpu;const auto accepted_before=counted.accepted;
             cpu.rasterize_pending_draws();hg::gs_sprite_accelerator=&counted;
@@ -186,7 +197,7 @@ int main(int argc,char** argv) {
                     throw std::runtime_error("GPU sprite alias fallback mismatch "+name);
                 ++cases;
             }
-            if(source_format==27&&variant==0) {
+            if((source_format==27||source_format==0x13||source_format==0x14)&&variant==0) {
                 auto fault=accelerated;fault.draws.clear();fault.retired_draw_count=0;fault.rasterized_draw_count=0;
                 fault.clut_valid.fill(false);fault.draws.push_back(draw);auto reference=fault;
                 std::string cpu_error,gpu_error;

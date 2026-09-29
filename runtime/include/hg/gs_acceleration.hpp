@@ -20,6 +20,8 @@ struct GsSpriteJob {
     std::uint64_t test=0x30000,dimx=0;
     bool dither=false,zwrite=false;
     const std::uint32_t* palette=nullptr;
+    // PSMT8/PSMT4 sources: axes hold wrapped texel coordinates instead of addresses.
+    std::uint32_t texture_base=0,texture_width=0;
 };
 struct GsSpriteAccelerator {
     virtual ~GsSpriteAccelerator()=default;

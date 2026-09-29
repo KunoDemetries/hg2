@@ -1,3 +1,11 @@
+## HG-DIAG-028 single-config provenance layouts - 2026-09-29
+
+`tools/hg_build_provenance.py` also validates single-config Release trees (`build/<dir>/hg_game.build.json`, e.g. the Linux Ninja build) by selecting the manifest whose recorded executable matches the isolated binary. `build.ninja` joins the recorded inputs. Still outside native timing and fail-closed on any stale input, missing manifest or mismatched executable.
+
+## HG-DIAG-089 VIF1 UNPACK straight-line fast path - retained 2026-09-29
+
+Source: `runtime/vif.cpp` (`unpack_linear`, `try_unpack_linear`, `vif1_generic_unpack_only`). Default on for every non-RGBA5 UNPACK with CL>=WL whose mask selectors are all zero (unmasked, or masked with MASK=0). It is templated on width/field count/scalar and keeps the generic loop's vector order, out-of-range fault point and text, USN sign/zero extension, STMOD offset/difference ROW updates and V2/V3 indeterminate-lane marking. Every other UNPACK uses the unchanged generic loop. `vif1_generic_unpack_only` is a test-only comparison switch (default false, one load per UNPACK), declared only in `tests/gif_tests.cpp`. No guest clock, ordering or fault change. Evidence: 4000 randomized packets (all formats including RGBA5, fill cycles, masks, modes, TOPS, near-limit destinations) compare VU memory, defined masks, ROW, pending bytes and fault text against the generic loop; a sign-extension mutation fails. Fixed Linux gameplay33M: exact retained state and 864 writers; user instructions 322.54G -> 319.29G (-1.0%). Retain while its differential test passes.
+
 ## HG-DIAG-088 exact XYZ lane ADD/SUB SIMD reuse - restored, performance not yet retained
 
 The bounded production candidate routed only mask14 XYZ `add_vector` operations through a conservative helper that reused exact `try_fpu_add4`; invalid indices, undefined XYZ sources and unsupported host arithmetic returned before mutation to the original scalar path. Candidate build/tests passed, fixed33M replay reached864 original writers with zero unexpected/lost/caller failures, and verifier `c44e1685cc864a1c970a0c69e93a2ce5` preserved every retained frame/EE/GS/VU/RTC-normalized IOP digest at10.9755428FPS (10.8044644/11.1521262).
@@ -730,6 +738,20 @@ state equal except RTC.896 GPU/CPU checks pass both modes. All5888 observed alia
 rejections now accelerated with the bounded independent-halfword proof above.
 No guest-state substitute; flags remain opt-in/default off. Readback still1.894s;
 whole-console fidelity and30updates/s unproved. This supersedes pending status.
+
+HG-DIAG-016 PSMT8/PSMT4 source expansion (2026-09-29): same opt-in activation.
+FST PSMT8 (CT32 CLUT, CSM1, CSA=0) and PSMT4 (CT32 CLUT, CSM1, CSA<16) sprites,
+exactly the CPU `DrawTexture` scope, reach the GPU sprite shader. Axes carry
+wrapped texel coordinates, and the shader applies the `psmt8_word`/`psmt4_word`
+page/block/column/lane swizzle to a draw-time CLUT snapshot. Read pages cover the
+texel bounding box in whole texture pages. Any unloaded palette entry, wrap
+fault or alias still uses the CPU path with its explicit faults. This class alone
+is admitted below the 4096-pixel batching threshold. 1159/1159/1367 GPU/CPU cases
+pass (sprite, resident, resident+triangles), including multi-page/odd-TBW
+layouts, nonzero PSMT4 CSA and CLUT faults. A stride mutation is caught. Fixed
+Linux gameplay33M replay: exact retained frame/EE/GS/VU/RTC-normalized IOP state,
+864 writers; user instructions 384.03G -> 323.89G (-15.7%). A temporary scratch
+fallback-reason probe (never committed) produced the ranking; see PROGRESS.
 
 HG-DIAG-017 exact upload suppression: gl_gs.cpp retains4MiB host mirror with
 per-page validity after transfer, invalidated by GPU writes or owner changes.

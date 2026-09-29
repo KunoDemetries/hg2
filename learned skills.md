@@ -1,3 +1,11 @@
+## HG-LEARN-074 — Rank CPU raster fallback by first rejecting GPU gate and include flush/readback time
+
+A per-draw classifier that records the first GPU admission gate a CPU-fallback primitive fails, with bbox pixels and host time from the flush through the CPU loop, found that two unsupported texture formats (PSMT4/PSMT8 FST sprites, ~580 draws) cost more wall time than 70K+ other fallbacks. Porting the exact CPU `DrawTexture` scope into the GPU sprite shader, using wrapped texel coordinates instead of separable addresses, cut Linux user instructions by 15.7% with exact replay state. Keep the probe out of the tree; record its ranking in PROGRESS. On an iGPU, `readback_ns` is dominated by waiting for queued GPU work. Removing one class of readback, such as presentation, only moves the wait to the next sync point.
+
+### HG-FAIL-053 — GPU self-texel feedback triangles repeat HG-LEARN-046 without CPU savings
+
+An exact per-tile GPU path for the proven same-pixel PSMT8H feedback class (flagged job reading its own frame byte) passed 64 new differential cases and exact replay state, but Linux user instructions were flat (-0.02%) because the scalar fallback already uses the collapsed direct-byte path. Windows previously measured this move slower. Do not revisit without new evidence that the scalar path, not batching, dominates.
+
 ## HG-LEARN-073 — On a noisy host, compare user-mode retired instructions, then locate hot paths with LBR stacks
 
 On the Linux dev container (i3-1315U, `powersave`, P-cores capped at 1.2 GHz), identical fixed gameplay33M runs vary by ±10% in both FPS and `cpu_core/cycles/u`. `cpu_core/instructions/u` repeats to within 0.01% (382.749B and 382.724B). Pin the run with `taskset -c 2` (a P-core) and use `perf stat -e cpu_core/instructions/u`. That verdict is deterministic for CPU-work changes. Confirm a positive result with wall-clock pairs on a quieter host, because instructions ignore cache and memory stalls. For hot-path structure, `perf record -e cpu_core/cycles/u --call-graph lbr` works in the container without frame pointers or extra capabilities. Driving the replay through `hg_runtime_verifier.verify_frames` with only the Windows-layout provenance check bypassed keeps every writer, fault and state-digest check. Evidence: 2026-09-28 session, `~/hg-evidence/st-*`.
