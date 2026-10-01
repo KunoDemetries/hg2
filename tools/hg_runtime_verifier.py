@@ -221,11 +221,13 @@ def normalized_iop_digest(data: bytes) -> dict[str, Any]:
     """Mask only independently documented RTC payload bytes; retain raw evidence."""
     if len(data) != 2 * 1024 * 1024:
         raise ValueError("IOP capture must be exactly 2 MiB")
-    offsets = (0xBFCD1, 0xBFCD2, 0xBFCD3)
+    # ReadRTC payload written at 0xBFCD0: status, sec, min, hour, pad, day, month, year
+    # (runtime/system_diagnostic.cpp host clock). Status and pad stay hashed.
+    offsets = (0xBFCD1, 0xBFCD2, 0xBFCD3, 0xBFCD5, 0xBFCD6, 0xBFCD7)
     values = [data[offset] for offset in offsets]
-    for value, limit in zip(values, (59, 59, 23)):
+    for value, (low, high) in zip(values, ((0, 59), (0, 59), (0, 23), (1, 31), (1, 12), (0, 99))):
         decimal = (value >> 4) * 10 + (value & 15)
-        if (value & 15) > 9 or (value >> 4) > 9 or decimal > limit:
+        if (value & 15) > 9 or (value >> 4) > 9 or not low <= decimal <= high:
             raise ValueError("documented IOP RTC field is not valid BCD time")
     normalized = bytearray(data)
     for offset in offsets:
@@ -234,7 +236,7 @@ def normalized_iop_digest(data: bytes) -> dict[str, Any]:
         "sha256": hashlib.sha256(normalized).hexdigest(),
         "masked_offsets": [f"0x{offset:x}" for offset in offsets],
         "original_bytes": values,
-        "scope": "all IOP bytes except independently identified RTC seconds/minutes/hours",
+        "scope": "all IOP bytes except independently identified RTC time and date fields",
     }
 
 

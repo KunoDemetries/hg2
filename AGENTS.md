@@ -178,6 +178,10 @@ before acting; dated historical notes do not override newer verified state.
   Bounded pointer runs require independent extent/live-use verification; never auto-root them.
 - `config/haunting_ground_us.toml`: executable identity, manual functions/targets, pointer tables and static overlays.
 - `runtime/include/hg/`: portable state, memory, FPU, timers, INTC and DMA/SIF0 primitives, including checked EE word/doubleword unaligned merges.
+- `runtime/device_thread.cpp` / `device_link.hpp`: host device threads (VIF1+VU1 stage,
+  GIF+GS+GL stage) fed by ordered SPSC rings from the EE thread; joins only at guest
+  observations; IMR/CSR/BUSDIR mirror; `--sync-devices`/`HG_SYNC_DEVICES=1` fallback.
+  `tests/device_thread_tests.cpp` checks sync equivalence. HG-LEARN-076.
 - `runtime/include/hg/iop_dmac.hpp` / `sif_link.hpp`: bounded bidirectional DMA and shared transport state.
 - `runtime.hpp` / `dmac.hpp`: connected normal scratchpad DMA channels8/9;
   checked RAM spans,14-bit SADR wrap and channel completion. toSPR also supports

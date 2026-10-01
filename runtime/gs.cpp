@@ -107,6 +107,7 @@ void GsRegisterState::read_clut_source(std::array<std::uint32_t,256>& source,uns
 }
 
 void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState& gs) {
+    if(forward) {track_forward(low);forward->forward_qword(low,high);return;}
     const auto offset=pending.size();
     pending.resize(offset+16);
     for(unsigned i=0;i!=8;++i) {
@@ -122,6 +123,17 @@ void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState&
         }
         pending.erase(pending.begin(),pending.begin()+*packet_size);
     }
+}
+
+void GifPath::submit_words(const std::uint32_t* words,std::size_t qwords,GsRegisterState& gs) {
+    if(forward) {
+        for(std::size_t n=0;n<qwords;++n)track_forward(std::uint64_t(words[n*4])|(std::uint64_t(words[n*4+1])<<32));
+        forward->forward_words(words,qwords);
+        return;
+    }
+    for(std::size_t n=0;n<qwords;++n,words+=4)
+        submit_qword(std::uint64_t(words[0])|(std::uint64_t(words[1])<<32),
+                     std::uint64_t(words[2])|(std::uint64_t(words[3])<<32),gs);
 }
 
 bool GsRegisterState::write_image_psmt8_fast(std::uint64_t low,std::uint64_t high) {

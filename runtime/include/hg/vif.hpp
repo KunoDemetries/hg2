@@ -663,7 +663,7 @@ struct Vif1Path {
         vu1_executor(*this,entry,gif,gs);
     }
     void xgkick(unsigned is,GifPath& gif,GsRegisterState& gs) {
-        if(!gif.pending.empty())throw std::runtime_error("VU1 XGKICK requires idle bounded GIF packet state");
+        if(!gif.packet_idle())throw std::runtime_error("VU1 XGKICK requires idle bounded GIF packet state");
         auto vector=std::size_t(vu1.read_vi(is));
         if(vector>=1024)throw std::runtime_error("VU1 XGKICK starts outside VU1 data memory");
         bool expect_tag=true,eop=false;
@@ -687,13 +687,21 @@ struct Vif1Path {
             default:return 0xfu; // Preserve strict validation for unsupported forms.
             }
         };
+        // Validated qwords reach the GIF in order as one block; a validation
+        // fault first submits the already-validated prefix, as qword-at-a-time
+        // submission would have.
+        const auto first=vector;
+        std::size_t submitted=0;
+        const auto flush=[&](std::size_t upto) {
+            if(upto>submitted){gif.submit_words(vu_mem.data()+(first+submitted)*4,upto-submitted,gs);submitted=upto;}
+        };
         for(std::size_t count=0;vector<1024;++vector,++count) {
             const auto base=vector*4;
             const auto low=std::uint64_t(vu_mem[base])|(std::uint64_t(vu_mem[base+1])<<32);
             const auto high=std::uint64_t(vu_mem[base+2])|(std::uint64_t(vu_mem[base+3])<<32);
             const auto defined=unsigned(vu_mem_defined[vector]);
             if(expect_tag) {
-                if(defined!=0x0f)throw std::runtime_error("VU1 XGKICK reads undefined GIF tag");
+                if(defined!=0x0f){flush(count);throw std::runtime_error("VU1 XGKICK reads undefined GIF tag");}
                 const auto nloop=std::size_t(low&0x7fffu);
                 eop=(low&(1ull<<15))!=0;
                 format=unsigned((low>>58)&3u);
@@ -716,13 +724,13 @@ struct Vif1Path {
                         if(second!=0xf)required|=0xc;
                     }
                 }
-                if((defined&required)!=required)
-                    throw std::runtime_error("VU1 XGKICK reads undefined data required by GIF descriptor");
+                if((defined&required)!=required) {
+                    flush(count);throw std::runtime_error("VU1 XGKICK reads undefined data required by GIF descriptor");
+                }
             }
-            gif.submit_qword(low,high,gs);
             if(expect_tag) {
                 if(!entries_remaining) {
-                    if(eop) {if(gif.pending.empty())return;throw std::runtime_error("VU1 XGKICK EOP tag left incomplete GIF state");}
+                    if(eop) {flush(count+1);if(gif.packet_idle())return;throw std::runtime_error("VU1 XGKICK EOP tag left incomplete GIF state");}
                     expect_tag=true;
                 } else expect_tag=false;
                 continue;
@@ -731,9 +739,10 @@ struct Vif1Path {
             entries_remaining-=consumed;entry_index+=consumed;
             if(!entries_remaining) {
                 expect_tag=true;
-                if(eop) {if(gif.pending.empty())return;throw std::runtime_error("VU1 XGKICK EOP payload left incomplete GIF state");}
+                if(eop) {flush(count+1);if(gif.packet_idle())return;throw std::runtime_error("VU1 XGKICK EOP payload left incomplete GIF state");}
             }
         }
+        flush(vector-first);
         throw std::runtime_error("VU1 XGKICK packet exceeds VU1 data memory");
     }
     void submit_qword(std::uint64_t low,std::uint64_t high,GifPath& gif,GsRegisterState& gs) {

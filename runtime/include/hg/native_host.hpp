@@ -21,6 +21,9 @@ struct NativeHost {
     std::function<bool(HostInput&)> input;
     std::function<void(unsigned,unsigned,std::vector<std::uint32_t>&&)> present;
     std::function<void(const std::string&)> stopped;
+    // Optional: make the GS OpenGL context current on (true) / release it from
+    // (false) the calling thread, so a host device thread can own GS work.
+    std::function<void(bool)> gs_context;
 };
 int run_native_game(int argc,char** argv,NativeHost* host=nullptr);
 }

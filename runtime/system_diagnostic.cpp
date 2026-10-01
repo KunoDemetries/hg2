@@ -17,6 +17,9 @@
 #include "hg/host_pacing.hpp"
 #include "hg/host_wait.hpp"
 #include "hg/execution_clock.hpp"
+#include "hg/device_thread.hpp"
+#include "hg/gs_acceleration.hpp"
+#include <sstream>
 #include <iostream>
 #include <ctime>
 #include <fstream>
@@ -246,7 +249,7 @@ void invoke_iop(hg::IopState& s,std::uint32_t entry,std::uint32_t a0=0,std::uint
 }
 }
 int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
-    bool profile_enabled=false,profile_gs=false;
+    bool profile_enabled=false,profile_gs=false,sync_devices=false;
     bool realtime=false;
     bool issue_slot_clock=false;
     bool verify=false,verify_services=false,verify_loadfile=false,verify_cdvd=false,verify_reboot=false,stop_on_loadfile_error=false;
@@ -350,6 +353,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
         }
         else if(arg=="--profile")profile_enabled=true;
         else if(arg=="--profile-gs")profile_gs=true;
+        else if(arg=="--sync-devices")sync_devices=true;
         else if(arg=="--realtime")realtime=true;
         else if(arg=="--clock-profile" && n+1<argc) {
             const std::string value=argv[++n];
@@ -413,6 +417,30 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
         }
     }
     hg::State ee;hg::EeDmaInterruptDispatcher ee_dma_interrupt;hg::EeIntcInterruptDispatcher ee_intc_interrupt;hg::DisplayTiming display_timing;hg::IopState iop;iop.sif=ee.sif;
+    // Host device thread (device_link.hpp). Declared after `ee` so it always
+    // drains and stops before the state it owns is destroyed.
+    struct DeviceOwner {
+        hg::State& ee;hg::NativeHost* host;
+        std::unique_ptr<hg::DeviceLink> link;bool moved_context=false;
+        std::exception_ptr stop() {
+            if(!link)return nullptr;
+            auto failure=link->stop();ee.device=nullptr;link.reset();
+            if(moved_context){host->gs_context(true);moved_context=false;}
+            return failure;
+        }
+        // Exit-path diagnostics read device state directly afterwards.
+        void stop_reporting(const char* already) {
+            const auto failure=stop();
+            if(!failure)return;
+            try {std::rethrow_exception(failure);}
+            catch(const std::exception& e) {if(!already||std::string(e.what())!=already)std::cerr<<"Device thread failure: "<<e.what()<<'\n';}
+            catch(...) {std::cerr<<"Device thread failure: unknown\n";}
+        }
+        void post_or_run(std::function<void()> work) {
+            if(link)link->post(std::move(work));else work();
+        }
+        ~DeviceOwner() {stop();}
+    } device_owner{ee,host};
     ee.gs.profile_raster=profile_gs;
     const auto report_gs_profile=[&] {
         if(!profile_gs)return;
@@ -1007,21 +1035,23 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                 }
                 frame_probe.last_host=now;frame_probe.last_guest_us=iop.virtual_time_us;frame_probe.last_vblank=vblank;
                 frame_probe.last_caller=frame_probe.active_caller;
-                const auto rasterized=ee.gs.rasterized_draw_count,retired=ee.gs.retired_draw_count;
-                if(frame_probe.have_gs) {
-                    if(ee.gs.privileged_dispfb!=frame_probe.last_dispfb)++frame_probe.dispfb_changes;
-                    if(ee.gs.privileged_display!=frame_probe.last_display)++frame_probe.display_changes;
-                    if(rasterized>=frame_probe.last_rasterized) {
-                        const auto delta=rasterized-frame_probe.last_rasterized;
-                        frame_probe.raster_delta+=delta;if(delta)++frame_probe.raster_advanced_boundaries;
-                    } else ++frame_probe.raster_resets;
-                    if(retired>=frame_probe.last_retired) {
-                        const auto delta=retired-frame_probe.last_retired;
-                        frame_probe.retired_delta+=delta;if(delta)++frame_probe.retired_advanced_boundaries;
-                    } else ++frame_probe.retired_resets;
-                }
-                frame_probe.last_dispfb=ee.gs.privileged_dispfb;frame_probe.last_display=ee.gs.privileged_display;
-                frame_probe.last_rasterized=rasterized;frame_probe.last_retired=retired;frame_probe.have_gs=true;
+                device_owner.post_or_run([&] {
+                    const auto rasterized=ee.gs.rasterized_draw_count,retired=ee.gs.retired_draw_count;
+                    if(frame_probe.have_gs) {
+                        if(ee.gs.privileged_dispfb!=frame_probe.last_dispfb)++frame_probe.dispfb_changes;
+                        if(ee.gs.privileged_display!=frame_probe.last_display)++frame_probe.display_changes;
+                        if(rasterized>=frame_probe.last_rasterized) {
+                            const auto delta=rasterized-frame_probe.last_rasterized;
+                            frame_probe.raster_delta+=delta;if(delta)++frame_probe.raster_advanced_boundaries;
+                        } else ++frame_probe.raster_resets;
+                        if(retired>=frame_probe.last_retired) {
+                            const auto delta=retired-frame_probe.last_retired;
+                            frame_probe.retired_delta+=delta;if(delta)++frame_probe.retired_advanced_boundaries;
+                        } else ++frame_probe.retired_resets;
+                    }
+                    frame_probe.last_dispfb=ee.gs.privileged_dispfb;frame_probe.last_display=ee.gs.privileged_display;
+                    frame_probe.last_rasterized=rasterized;frame_probe.last_retired=retired;frame_probe.have_gs=true;
+                });
             }
         };
         const auto report_original_frame_candidate=[&](const char* stage) {
@@ -1035,7 +1065,8 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
             const auto guest_span=frame_probe.last_guest_us>=frame_probe.first_guest_us?
                 double(frame_probe.last_guest_us-frame_probe.first_guest_us)/1000000.0:0.0;
             const auto intervals=frame_probe.writes>1?frame_probe.writes-1:0;
-            std::cerr<<"Original frame candidate stage="<<stage
+            std::ostringstream line;
+            line<<"Original frame candidate stage="<<stage
                 <<" writes="<<frame_probe.writes<<" interval_writes="<<interval_writes
                 <<" interval_host_seconds="<<interval_seconds
                 <<" interval_hz="<<(interval_seconds?double(interval_writes)/interval_seconds:0.0)
@@ -1047,18 +1078,22 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                 <<" vblank_delta2="<<frame_probe.vblank_delta_two<<" vblank_other="<<frame_probe.vblank_delta_other
                 <<" caller_mismatches="<<frame_probe.caller_mismatches<<" object_mismatches="<<frame_probe.object_mismatches
                 <<" invalid_stack="<<frame_probe.invalid_stack
+                <<" guest_first_us="<<frame_probe.first_guest_us<<" guest_last_us="<<frame_probe.last_guest_us
+                <<" vblank_first="<<frame_probe.first_vblank<<" vblank_last="<<frame_probe.last_vblank
+                <<" object=0x"<<std::hex<<frame_probe.object<<" word=0x"<<frame_probe.watched_word
+                <<" caller=0x"<<frame_probe.first_caller<<" last_caller=0x"<<frame_probe.last_caller<<std::dec;
+            // Display/raster fields belong to the device thread when one runs.
+            device_owner.post_or_run([&frame_probe,&ee,text=std::move(line).str()] {
+            std::cerr<<text
                 <<" dispfb_changes="<<frame_probe.dispfb_changes<<" display_changes="<<frame_probe.display_changes
                 <<" raster_advanced_boundaries="<<frame_probe.raster_advanced_boundaries
                 <<" retired_advanced_boundaries="<<frame_probe.retired_advanced_boundaries
                 <<" raster_delta="<<frame_probe.raster_delta<<" retired_delta="<<frame_probe.retired_delta
                 <<" raster_resets="<<frame_probe.raster_resets<<" retired_resets="<<frame_probe.retired_resets
-                <<" guest_first_us="<<frame_probe.first_guest_us<<" guest_last_us="<<frame_probe.last_guest_us
-                <<" vblank_first="<<frame_probe.first_vblank<<" vblank_last="<<frame_probe.last_vblank
-                <<" object=0x"<<std::hex<<frame_probe.object<<" word=0x"<<frame_probe.watched_word
-                <<" caller=0x"<<frame_probe.first_caller<<" last_caller=0x"<<frame_probe.last_caller
-                <<" pmode=0x"<<ee.gs.privileged_pmode
+                <<std::hex<<" pmode=0x"<<ee.gs.privileged_pmode
                 <<" dispfb=0x"<<ee.gs.privileged_dispfb[0]<<",0x"<<ee.gs.privileged_dispfb[1]
                 <<" display=0x"<<ee.gs.privileged_display[0]<<",0x"<<ee.gs.privileged_display[1]<<std::dec<<'\n';
+            });
             frame_probe.report_started=true;frame_probe.report_host=now;frame_probe.report_writes=frame_probe.writes;
         };
         hg::HostPlaybackPacer host_pacer(playback_start);
@@ -1088,6 +1123,21 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
         std::cerr<<"Execution clock profile: "<<(issue_slot_clock?"experimental issue-slots":"legacy diagnostic")<<'\n';
         std::cerr<<"Host playback: "<<(realtime?"real time (10ms checks, 100ms catch-up bound)":"unlimited")<<'\n';
         if(realtime)std::cerr<<"Host wait backend: "<<host_waiter.backend()<<'\n';
+        // The device thread needs the GS OpenGL context when accelerators exist.
+        // Diagnostics that observe device state per call keep the synchronous path.
+        // HG_SYNC_DEVICES=1 keeps the synchronous path for comparison runs whose
+        // command line is fixed (the replay verifier); --sync-devices elsewhere.
+        if(const char* value=std::getenv("HG_SYNC_DEVICES"))sync_devices=sync_devices||std::string(value)=="1";
+        if(!sync_devices && vu1_capture.prefix.empty() && !profile_gs && !(profile_enabled && !realtime) &&
+           (!hg::gs_sprite_accelerator || (host && host->gs_context))) {
+            std::function<void(bool)> context;
+            if(hg::gs_sprite_accelerator){host->gs_context(false);context=host->gs_context;device_owner.moved_context=true;}
+            device_owner.link=hg::start_device_thread(ee.vif1,ee.gif,ee.gs,std::move(context));
+            ee.device=device_owner.link.get();
+            ee.device->imr=ee.gs.privileged_imr;ee.device->csr_events=ee.gs.privileged_csr_events;
+            ee.device->busdir=ee.gs.privileged_busdir;
+            std::cerr<<"Host device thread: VIF1/VU1/GIF/GS\n";
+        }
         for(unsigned slice=0;slice<slices;++slice) {
             // HG-DIAG-005: GS reset restores device defaults. Re-arm this
             // host-only observer at the next quantum; counters are since reset.
@@ -1150,7 +1200,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                     <<" max_late_us="<<pacing_max_late_us<<" rebases="<<host_pacer.rebases()<<'\n';
             }
             if((host||!preview_file.empty()) && ((!issue_slot_clock && slice%1000000==0) || preview_due)) {
-                publish_preview();preview_due=false;
+                device_owner.post_or_run([&]{publish_preview();});preview_due=false;
             }
             if(slice==next_input_slice) {
                 apply_input(input_events[input_event_cursor].command,slice);
@@ -1186,12 +1236,16 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
             };
             pulse_button(left_at,0x0080,1,"Left");
             pulse_button(cross_at,0x4000,6,"Cross");
-            if(checkpoint_every && slice%checkpoint_every==0)
-                std::cerr<<"Checkpoint slice="<<std::dec<<slice<<" EE=0x"<<std::hex<<ee.pc
-                         <<" IOP=0x"<<iop.pc<<" VIF1_CHCR=0x"<<ee.dmac.channels[1].chcr
-                         <<" GIF_CHCR=0x"<<ee.dmac.channels[2].chcr<<std::dec
-                         <<" GS_draws="<<ee.gs.draws.size()<<" rasterized="<<ee.gs.rasterized_draw_count
-                         <<" retired="<<ee.gs.retired_draw_count<<'\n';
+            if(checkpoint_every && slice%checkpoint_every==0) {
+                std::ostringstream line;
+                line<<"Checkpoint slice="<<std::dec<<slice<<" EE=0x"<<std::hex<<ee.pc
+                    <<" IOP=0x"<<iop.pc<<" VIF1_CHCR=0x"<<ee.dmac.channels[1].chcr
+                    <<" GIF_CHCR=0x"<<ee.dmac.channels[2].chcr<<std::dec;
+                device_owner.post_or_run([&ee,text=line.str()] {
+                    std::cerr<<text<<" GS_draws="<<ee.gs.draws.size()<<" rasterized="<<ee.gs.rasterized_draw_count
+                             <<" retired="<<ee.gs.retired_draw_count<<'\n';
+                });
+            }
             profile_slice.mark(1);
             iop.virtual_time_us+=clock_tick.microseconds;
             if(clock_tick.microseconds) {
@@ -1208,7 +1262,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
             display_timing.configure(ee.gs.crtc_configured,ee.gs.crtc_interlace,ee.gs.crtc_mode,ee.gs.crtc_frame);
             display_timing.advance_us(clock_tick.microseconds,[&](bool start){
                 ee.intc.raise(start?2:3);
-                if(start){ee.gs.privileged_csr_events|=8;ee.sync_gs_interrupt();iop.signal_vblank_start();}
+                if(start){ee.gs_raise_csr_events(8);iop.signal_vblank_start();}
                 if(start && issue_slot_clock && (host||!preview_file.empty())) {
                     const auto now=std::chrono::steady_clock::now();
                     if(now>=next_preview){preview_due=true;next_preview=now+std::chrono::milliseconds(16);}
@@ -1453,7 +1507,12 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
             // of preview reads, in original submission order. This functional
             // quantum does not model the pixel pipeline's exact latency.
             try {
-                if(profile_enabled && !realtime && ee.gs.pending_draw_index()<ee.gs.draws.size()) {
+                if(ee.device) {
+                    // Same position in the submitted sequence as the synchronous
+                    // call; skipped only when nothing reached the device since.
+                    if(ee.device->raster_due){ee.device->push(hg::DeviceKind::rasterize,0,0);ee.device->raster_due=false;}
+                    if(!(slice&7))ee.device->publish();
+                } else if(profile_enabled && !realtime && ee.gs.pending_draw_index()<ee.gs.draws.size()) {
                     const auto started=std::chrono::steady_clock::now();
                     raster_profile_draws+=ee.gs.rasterize_pending_draws();
                     raster_host_ns+=std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -1806,6 +1865,14 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                     throw hg::IopFault(iop.pc,"original FILEIO did not start its two workers");
                 iop.current_thread=0;fileio_started=true;iop.restore_cpu(bootstrap_cpu);iop.release_thread_stack(nested_stack,0x2000);
 
+            }
+        }
+        if(ee.device) {
+            std::cerr<<"Host device thread joins="<<ee.device->joins<<" unmasked_interrupt_joins="<<ee.device->unmasked_interrupt_joins<<'\n';
+            if(const auto failure=device_owner.stop()) {
+                try {std::rethrow_exception(failure);}
+                catch(const hg::Fault&) {throw;}
+                catch(const std::runtime_error& e) {throw hg::Fault(ee.pc,e.what());}
             }
         }
         if(realtime)std::cout<<"Host pacing: waits="<<pacing_waits<<" requested_us="<<pacing_requested_us
@@ -2241,7 +2308,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                 std::cout<<"  native call a0=0x"<<std::hex<<t.context.gpr[4]<<" a1=0x"<<t.context.gpr[5]<<" a2=0x"<<t.context.gpr[6]<<" a3=0x"<<t.context.gpr[7]<<std::dec<<'\n';
         }
         return 2;
-    }catch(const hg::IopFault& e){if(host&&host->stopped)host->stopped(e.what());dump_iop_state();if(spu2_wav){spu2_wav->finalize();report_spu2_capture();}
+    }catch(const hg::IopFault& e){device_owner.stop_reporting(nullptr);if(host&&host->stopped)host->stopped(e.what());dump_iop_state();if(spu2_wav){spu2_wav->finalize();report_spu2_capture();}
         const auto trace_count=std::min(iop.pc_trace_cursor,iop.pc_trace.size());
         for(std::size_t n=0;n<trace_count;++n) {
             const auto& r=iop.pc_trace[(iop.pc_trace_cursor+iop.pc_trace.size()-trace_count+n)%iop.pc_trace.size()];
@@ -2265,7 +2332,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
             std::cerr<<" SMFLAG=0x"<<iop.sif->sub_flags<<'\n';
         }
     }
-    catch(const hg::Fault& e){if(host&&host->stopped)host->stopped(e.what());dump_iop_state();if(spu2_wav){spu2_wav->finalize();report_spu2_capture();}std::cerr<<"EE stopped at 0x"<<std::hex<<e.pc<<": "<<e.what()
+    catch(const hg::Fault& e){device_owner.stop_reporting(e.what());if(host&&host->stopped)host->stopped(e.what());dump_iop_state();if(spu2_wav){spu2_wav->finalize();report_spu2_capture();}std::cerr<<"EE stopped at 0x"<<std::hex<<e.pc<<": "<<e.what()
         <<"; v0=0x"<<ee.r(2)<<" a0=0x"<<ee.r(4)<<" a1=0x"<<ee.r(5)<<" a2=0x"<<ee.r(6)
         <<" t0=0x"<<ee.r(8)<<" sp=0x"<<ee.r(29)<<" ra=0x"<<ee.r(31)<<'\n';
         std::cerr<<"EE fault scheduler current="<<std::dec<<ee.boot.current_thread<<" interrupt="<<ee.boot.in_interrupt
@@ -2284,7 +2351,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
         if(std::uint32_t(ee.r(3))==0x77 && ee.r(5)<=4 && ee.r(4)+ee.r(5)*16<=ee.ram.size())
             for(unsigned n=0;n<ee.r(5);++n){std::cerr<<"DMA descriptor "<<n;for(unsigned j=0;j<4;++j)std::cerr<<" 0x"<<std::hex<<ee.load(std::uint32_t(ee.r(4))+n*16+j*4,4,false);std::cerr<<'\n';}
     }
-    catch(const std::exception& e){if(host&&host->stopped)host->stopped(e.what());if(spu2_wav){try{spu2_wav->finalize();report_spu2_capture();}catch(...) {}}std::cerr<<e.what()<<'\n';}
+    catch(const std::exception& e){device_owner.stop_reporting(e.what());if(host&&host->stopped)host->stopped(e.what());if(spu2_wav){try{spu2_wav->finalize();report_spu2_capture();}catch(...) {}}std::cerr<<e.what()<<'\n';}
     report_speaker("fault");
     return 2;
 }

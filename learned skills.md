@@ -1,3 +1,23 @@
+### HG-LEARN-076 - Coarse EE / device thread split is exact and faster when joins are rare
+
+Measure the join budget first (HG-DIAG-090: only GIF STAT reads observed device state in gameplay). Then give whole device subsystems to host threads, fed by an ordered SPSC ring of the synchronous inputs, and join only at guest observations. Unlike HG-FAIL-041 (one handoff per VU activation), this kept every digest identical and raised gameplay FPS from ~3.4 to 4.4-6.0 on Linux. Splitting VIF1/VU1 from GIF/GS needs only a GIF packet-boundary proxy (`gif_packet_size` rules) for XGKICK's idle check. Answering transport reads at the VIF1/VU1 stage avoids draining GS work. Judge by gameplay FPS with interleaved sync controls (`HG_SYNC_DEVICES=1`), not whole-run wall, which is real-time paced.
+
+### HG-FAIL-056 - Two-field same-pair SQ snapshots instead of whole-Vu1State copies gave no gain
+
+The emitter copies all of `Vu1State` (~1.8 KB) for each same-pair SQ whose source VF the upper op writes (20 ordinary sites plus the fused program-1 loop). Capturing only `vf[fs]`/`vf_defined[fs]` passed 81920 compiled comparisons against the old whole-state form (a defined-bit mutation was caught), but replay instructions were 318.62G -> 318.72G with cycles in noise: GCC already turns the copy into a few wide moves. Reverted. The test-only differential switch idea is reusable if SQ emission changes again.
+
+### HG-FAIL-055 - GCC -O2 for the generated main/VU unit did not help on Linux
+
+Mirroring the MSVC /O2 main-unit override for GCC (`out/translated.cpp` at -O2, shards kept -O1) passed the exact replay but gave 317.94G -> 317.26G instructions (-0.2%) with user cycles 96.5G -> 98.7G, and a 6-minute rebuild. Reverted. The GCC build keeps -O1 for all generated units.
+
+### HG-FAIL-054 - Packed XYZ product/MADD in `vu_xyz.cpp` repeated HG-FAIL-019 on Linux
+
+Routing `vu_xyz_multiply_acc`/`vu_xyz_madd` through the exact four-lane `try_fpu_product4`/`try_fpu_madd4` (W computed, never published) passed 196608 differential state/fault comparisons and the exact replay, but instructions went 318.62G -> 317.94G (-0.2%) with flat cycles. A scratch microbenchmark had shown 3x per call, but its random operands mispredicted scalar branches; the game's operands are predictable. Do not size VU helper changes with random-operand microbenchmarks. Samples inside these helpers are spread evenly, not concentrated in the arithmetic.
+
+## HG-LEARN-075 - Submit GL compute work when it is queued, not when it is read back
+
+A resident GPU renderer that dispatches compute work but defers readback must call `glFlush()` after dispatching. Without it, Mesa (iris) keeps the batch on the CPU until the next `glGetBufferSubData`, so the GPU starts only at the sync point and the CPU waits for the whole batch. Adding `glFlush()` at the end of each resident `flush()` cut replay readback wait from 8.75 s to 1.70 s (wall -7%) with unchanged instructions and exact state. To find sync costs, attribute each readback to its caller stack (scratch `backtrace` probe) instead of removing one sync class, which only moves the wait (HG-LEARN-074).
+
 ## HG-LEARN-074 — Rank CPU raster fallback by first rejecting GPU gate and include flush/readback time
 
 A per-draw classifier that records the first GPU admission gate a CPU-fallback primitive fails, with bbox pixels and host time from the flush through the CPU loop, found that two unsupported texture formats (PSMT4/PSMT8 FST sprites, ~580 draws) cost more wall time than 70K+ other fallbacks. Porting the exact CPU `DrawTexture` scope into the GPU sprite shader, using wrapped texel coordinates instead of separable addresses, cut Linux user instructions by 15.7% with exact replay state. Keep the probe out of the tree; record its ranking in PROGRESS. On an iGPU, `readback_ns` is dominated by waiting for queued GPU work. Removing one class of readback, such as presentation, only moves the wait to the next sync point.

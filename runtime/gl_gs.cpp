@@ -388,6 +388,9 @@ public:
         }
         barrier(0x00000200); // GL_BUFFER_UPDATE_BARRIER_BIT: subsequent CPU buffer readback.
         gl.bind_buffer(storage,buffers[0]);
+        // Resident work is only read back at a later coherence point; submit it
+        // now so the GPU overlaps guest execution instead of starting at the wait.
+        if(resident)glFlush();
         if(resident){gpu_dirty|=queued_writes;cpu_dirty&=~queued_writes;uploaded_valid&=~queued_writes;}
         else for(unsigned page=0;page<512;) {
             if(!queued_writes[page]){++page;continue;}

@@ -148,6 +148,7 @@ int main(int argc,char** argv) {
         if(gpu_sprites) {
             gpu_window=glfwCreateWindow(16,16,"GS worker",nullptr,window);
             if(!gpu_window)throw std::runtime_error("Cannot create OpenGL4.3 GS worker context");
+            host.gs_context=[&](bool current){glfwMakeContextCurrent(current?gpu_window:nullptr);};
         }
         worker=std::thread([&] {
             std::unique_ptr<hg::GsSpriteAccelerator> accelerator;

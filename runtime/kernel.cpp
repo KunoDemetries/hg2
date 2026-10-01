@@ -373,10 +373,10 @@ static void native_kernel_call(State& s,std::uint32_t number) {
         return; // void ABI
     }
     if(number==0x70) {
-        s.w(2,s.gs.privileged_imr);return;
+        s.w(2,s.gs_imr());return;
     }
     if(number==0x71) {
-        s.gs.privileged_imr=s.r(4);s.sync_gs_interrupt();return; // public void ABI
+        s.gs_put_imr(s.r(4));return; // public void ABI
     }
     if(number==0x76) {
         const auto id=std::uint32_t(s.r(4));
