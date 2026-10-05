@@ -42,13 +42,6 @@ if [ -z "$DEVCONTAINER_CLI" ]; then
 	fi
 fi
 
-# Compose 2.3x+/5.x builds through buildx bake, which refuses the Dockerfile the
-# devcontainer CLI generates under /tmp (outside the build context) unless an
-# fs.read entitlement is granted: "additional privileges requested: pass
-# --allow=fs.read=...". This turns off only that check, for this build; it
-# reads a file the CLI itself just wrote. Your own value wins if set.
-export BUILDX_BAKE_ENTITLEMENTS_FS=${BUILDX_BAKE_ENTITLEMENTS_FS:-0}
-
 $DEVCONTAINER_CLI up --workspace-folder .
 $DEVCONTAINER_CLI exec --workspace-folder . bash .devcontainer/enable-plugins.sh >&2
 

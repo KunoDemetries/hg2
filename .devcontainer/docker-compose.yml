@@ -7,9 +7,12 @@
 # container still comes up and welcome.sh reports the missing dump explicitly.
 services:
   dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Built from Dockerfile by initialize.sh on the host, not here: the dev
+    # container tooling's own compose build is refused by current buildx bake
+    # (see initialize.sh). `never` so a missing image is an error, not a pull
+    # of whatever someone else published under this name.
+    image: hg2-devcontainer:latest
+    pull_policy: never
     command: sleep infinity
     init: true
 
