@@ -262,8 +262,10 @@ before acting; dated historical notes do not override newer verified state.
 - `tools/hg.py iop-audit` / `iop-bundle`: all-module discovery audit and combined static IOP builds.
 - `tools/hg.py reboot`: read-only inventory of embedded modules in the game's IOPRP image.
 - `.devcontainer/`: Debian trixie Linux dev container (CMake/Ninja/GCC/clang,
-  GLFW/Mesa, Claude Code). Root `.env` (gitignored, `HG_GAME_DIR`) mounts the
-  user's dump read-only at its own path; post-create links `Haunting Ground (USA)`.
+  GLFW/Mesa, gdb/perf, Claude Code). Root `.env` (gitignored, `HG_GAME_DIR`) mounts
+  the user's dump read-only at its own path; post-create links `Haunting Ground (USA)`.
+  Builds go to `build/linux`; container builds run inside via podman (no docker
+  socket). Notices are in `welcome.sh`; start without VS Code via `claude.sh`.
   No host credentials are bound: ssh, git config and Claude state are volumes.
 - `tests/`: synthetic, redistributable instruction/ELF tests; no game bytes.
 - `out/`: ignored local reports and game-derived generated C++.

@@ -42,5 +42,25 @@ if [ -z "$DEVCONTAINER_CLI" ]; then
 	fi
 fi
 
+# Compose 2.3x+/5.x builds through buildx bake, which refuses the Dockerfile the
+# devcontainer CLI generates under /tmp (outside the build context) unless an
+# fs.read entitlement is granted: "additional privileges requested: pass
+# --allow=fs.read=...". This turns off only that check, for this build; it
+# reads a file the CLI itself just wrote. Your own value wins if set.
+export BUILDX_BAKE_ENTITLEMENTS_FS=${BUILDX_BAKE_ENTITLEMENTS_FS:-0}
+
 $DEVCONTAINER_CLI up --workspace-folder .
+$DEVCONTAINER_CLI exec --workspace-folder . bash .devcontainer/enable-plugins.sh >&2
+
+# What still needs doing and how to work in here (welcome.sh). post-create's
+# output never gets this far -- it is in the build log above, and a reused
+# container does not run it at all. To stderr so `claude -p` output stays clean.
+# When there is a to-do and a person at the terminal, wait: Claude's UI would
+# otherwise push it out of view straight away.
+status=0
+$DEVCONTAINER_CLI exec --workspace-folder . bash .devcontainer/welcome.sh >&2 || status=$?
+if [ "$status" = 10 ] && [ -t 0 ] && [ -t 2 ]; then
+	read -r -p "Press Enter to start Claude... " _ >&2 || true
+fi
+
 exec $DEVCONTAINER_CLI exec --workspace-folder . claude "$@"

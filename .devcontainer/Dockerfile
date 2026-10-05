@@ -1,6 +1,6 @@
 # The devcontainer image: the toolchain README.md's Requirements asks for, the
 # desktop libraries that let hg_game / hg_opengl_host open a window in here, and
-# Claude Code.
+# podman for container builds, and Claude Code.
 #
 # Nothing PS2-related is in this image -- no BIOS, emulator, dump or generated
 # source. Those are the user's local inputs (AGENTS.md) and are mounted or
@@ -58,6 +58,29 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 		gdb less procps sudo bash-completion openssh-client ripgrep linux-perf \
 	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# **Container builds work in here, with podman** -- the project builds none
+# today, but anything that calls `docker build`/`docker run` later works
+# unchanged (podman-docker is the `docker` command). There is no docker socket:
+# handing one in would give the container the host's daemon. Podman runs as this
+# container's root, which the rootless host daemon maps to you, so nested builds
+# get no more than you have. docker-compose.yml supplies what it needs
+# (SYS_ADMIN inside our user namespace, seccomp unconfined for pivot_root/keyctl,
+# a storage volume); the config below covers what a container cannot do:
+#  - netns=host: netavark cannot create bridges (netlink EPERM); builds and
+#    runs share this container's network instead.
+#  - cgroups=disabled: /sys/fs/cgroup is read-only in here.
+#  - keyring=false: session keyrings are denied.
+#  - short names resolve on Docker Hub, as `FROM debian:trixie` does in Docker.
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+	&& apt-get install -y --no-install-recommends \
+		podman podman-docker crun uidmap \
+	&& apt-get clean && rm -rf /var/lib/apt/lists/* \
+	&& printf '%s\n' '[containers]' 'netns = "host"' 'cgroups = "disabled"' 'keyring = false' \
+		'[engine]' 'cgroup_manager = "cgroupfs"' > /etc/containers/containers.conf \
+	&& printf '%s\n' 'unqualified-search-registries = ["docker.io"]' 'short-name-mode = "permissive"' \
+		> /etc/containers/registries.conf.d/50-docker-hub.conf \
+	&& touch /etc/containers/nodocker
+
 # XDG_RUNTIME_DIR for root; docker-compose.yml binds the host sockets into it.
 # Created here so it has the 0700 the spec requires.
 RUN mkdir -p /run/user/0/pulse && chmod 700 /run/user/0
@@ -98,7 +121,30 @@ ENV DISABLE_INSTALLATION_CHECKS=1
 RUN mkdir -p /root/.ssh /root/.config/git /root/.claude \
 	&& chmod 700 /root/.ssh
 
+# HTTP(S) remotes need a password or token on every push unless a credential
+# helper keeps it. git's default `store` file, /root/.git-credentials, is on no
+# volume and is gone after a rebuild; `cache` is memory only. Store it in the
+# gitconfig volume instead, so you log in once. System config (the image), so it
+# needs no setup. Plain text, mode 0600, never leaves the volume; no keyring (no
+# session D-Bus).
+RUN git config --system credential.helper 'store --file /root/.config/git/credentials'
+
 RUN mkdir -p /commandhistory && touch /commandhistory/.bash_history
 ENV HISTFILE=/commandhistory/.bash_history
+
+# The to-do list and command reference (welcome.sh) in every interactive
+# terminal -- post-create output only reaches a creation log nobody reads. The
+# whole thing the first time in a container, only the to-do items after that.
+# Non-interactive shells (`devcontainer exec claude`, lifecycle hooks) skip it.
+RUN cat >> /root/.bashrc <<'SH'
+
+if [[ $- == *i* ]] && [ -f /workspaces/hg2/.devcontainer/welcome.sh ]; then
+	if [ -e /tmp/.welcome-shown ]; then
+		bash /workspaces/hg2/.devcontainer/welcome.sh --brief
+	else
+		bash /workspaces/hg2/.devcontainer/welcome.sh; touch /tmp/.welcome-shown
+	fi
+fi
+SH
 
 ENV DEVCONTAINER=true

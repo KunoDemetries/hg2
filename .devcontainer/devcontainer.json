@@ -67,6 +67,8 @@
   // link to. Both paths are gitignored by the `*.env` rule.
   "initializeCommand": "bash -c '[ -f .env ] && ln -sfn ../.env .devcontainer/.env || true'",
 
+  // Setup actions only. What you need to read is in welcome.sh, which claude.sh
+  // and every new terminal show -- this hook's output only reaches a log.
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "waitFor": "postCreateCommand"
 }

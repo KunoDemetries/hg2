@@ -4,7 +4,7 @@
 # links it beside this file before any of this runs. See .env.example.
 #
 # An unset variable falls back to a path that exists and holds nothing, so the
-# container still comes up and the tools report a missing dump explicitly.
+# container still comes up and welcome.sh reports the missing dump explicitly.
 services:
   dev:
     build:
@@ -42,19 +42,24 @@ services:
       # Shell history across rebuilds.
       - hg2-bashhistory:/commandhistory
 
+      # Podman's images and layers. A volume, because overlay cannot stack on
+      # this container's own overlay root; on a volume it is native overlay (no
+      # fuse) and survives rebuilds.
+      - hg2-containers:/var/lib/containers
+
       # **No credential is bound in from the host.** No ~/.ssh, no ~/.gitconfig,
       # no Claude login: each of those is a volume the container owns and you
       # fill in once, from inside. A key generated or pasted in here stays here
       # and survives a rebuild, and a host key is never exposed to anything
-      # running in the container. The one exception is your skills directory,
-      # below, which is read-only and holds no secret.
+      # running in the container. The exceptions are your skills and installed
+      # plugins, below, which are read-only and hold no secret.
       #
       # git's global config is a volume too, and containerEnv points
       # GIT_CONFIG_GLOBAL into it -- which is also what makes the copy of the
       # host's ~/.gitconfig that the Dev Containers extension drops in inert.
-      # Set your identity once, in here:
-      #     git config --global user.name  "..."
-      #     git config --global user.email "..."
+      # HTTP(S) push credentials are stored here too (credentials, set up by
+      # the Dockerfile's credential.helper), so they survive rebuilds as well.
+      # welcome.sh says how to set your identity and signing key, once.
       - hg2-ssh:/root/.ssh
       - hg2-gitconfig:/root/.config/git
       # Claude Code's credentials, settings and per-project history.
@@ -62,6 +67,16 @@ services:
       # Your own skills, read-only, over the volume above. Docker mounts the
       # shorter path first, so this lands inside the volume.
       - ${HOME}/.claude/skills:/root/.claude/skills:ro
+      # Your installed plugins, read-only, the same way: install and update them
+      # on the host. Mounted twice because installed_plugins.json and
+      # known_marketplaces.json record absolute host paths -- the host path makes
+      # those resolve, the /root one is where CLAUDE_CONFIG_DIR looks for the
+      # manifests. enable-plugins.sh enables each in this container's settings.
+      - ${HOME}/.claude/plugins:/root/.claude/plugins:ro
+      - ${HOME}/.claude/plugins:${HOME}/.claude/plugins:ro
+      # Plugins' own persistent state (CLAUDE_PLUGIN_DATA) must be writable, and
+      # is the container's, never the host's.
+      - hg2-claude-plugindata:/root/.claude/plugins/data
 
     # The GPU, for the OpenGL host. Without it Mesa falls back to llvmpipe.
     devices:
@@ -71,8 +86,14 @@ services:
     device_cgroup_rules:
       - "c 13:* rmw"
 
-    # gdb needs SYS_PTRACE to attach.
+    # **Podman, so container builds work in here** (Dockerfile). The host
+    # daemon is rootless: these apply inside the user namespace it gives us,
+    # never to the host. SYS_ADMIN is for podman's mounts and namespaces;
+    # seccomp=unconfined because the default profile still denies crun's
+    # pivot_root and keyctl. No docker socket, no --privileged.
     cap_add:
+      - SYS_ADMIN
+      # gdb needs SYS_PTRACE to attach to a native replay.
       - SYS_PTRACE
     security_opt:
       - seccomp=unconfined
@@ -80,6 +101,8 @@ services:
 
 volumes:
   hg2-bashhistory:
+  hg2-containers:
   hg2-ssh:
   hg2-gitconfig:
   hg2-claude:
+  hg2-claude-plugindata:
