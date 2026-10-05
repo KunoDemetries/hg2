@@ -278,9 +278,11 @@ def emit(code, image_hash, overlays=(), vu1_image=None, vu1_programs=()):
            f'const char* hg::compiled_image_sha256() {{ return "{image_hash}"; }}']
     if vu_lines:
         out += ['#include "hg/vu_xyz.hpp"','#include "hg/vu_matrix.hpp"']
-        out += ['namespace { void run_vu1_aot(hg::Vif1Path&,std::uint16_t,hg::GifPath&,hg::GsRegisterState&); }']
+        out += ['#include "hg/vu1_spec.hpp"']
+        out += ['namespace { void run_vu1_aot(hg::Vif1Path&,std::uint16_t,hg::GifPath&,hg::GsRegisterState&);',
+                'hg::Vu1SpecInfo vu1_aot_spec_info(const hg::Vif1Path&,std::uint16_t); }']
     configure='void hg::configure_compiled_image(hg::State& s) { s.kernel_code_regions = {' + ','.join(ranges) + '};'
-    if vu_lines:configure+=' s.vif1.vu1_executor=&run_vu1_aot;'
+    if vu_lines:configure+=' s.vif1.vu1_executor=&run_vu1_aot; hg::vu1_spec_info_query=&vu1_aot_spec_info;'
     configure+=' }'
     out += [configure,
            '#if defined(_MSC_VER)', '#define HG_AOT_NOINLINE __declspec(noinline)',

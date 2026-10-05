@@ -1511,7 +1511,7 @@ int hg::run_native_game(int argc,char** argv,hg::NativeHost* host) {
                     // Same position in the submitted sequence as the synchronous
                     // call; skipped only when nothing reached the device since.
                     if(ee.device->raster_due){ee.device->push(hg::DeviceKind::rasterize,0,0);ee.device->raster_due=false;}
-                    if(!(slice&7))ee.device->publish();
+                    ee.device->publish();
                 } else if(profile_enabled && !realtime && ee.gs.pending_draw_index()<ee.gs.draws.size()) {
                     const auto started=std::chrono::steady_clock::now();
                     raster_profile_draws+=ee.gs.rasterize_pending_draws();

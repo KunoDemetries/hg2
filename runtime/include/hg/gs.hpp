@@ -1073,7 +1073,10 @@ struct GifPath {
     // by the same rules as gif_packet_size, so packet_idle() equals pending.empty()
     // of the real path at the same point in the stream.
     GifForward* forward=nullptr;
-    bool forward_in_packet=false,forward_expect_tag=true,forward_eop=false;
+    // The boundary tracker below also finds packet ends on the real path, so a
+    // packet is walked once when complete instead of on every qword. After a
+    // packet application faults, the path rescans `pending` as before until empty.
+    bool forward_in_packet=false,forward_expect_tag=true,forward_eop=false,rescan_pending=false;
     std::uint64_t forward_remaining=0;
     bool packet_idle() const {return forward?!forward_in_packet:pending.empty();}
     void track_forward(std::uint64_t low) {
@@ -1102,7 +1105,7 @@ struct GifPath {
     void write_control(std::uint32_t value) {
         if(value!=1)throw std::runtime_error("unsupported GIF CTRL stop/restart operation");
         // Reset the GIF transport/parser, not the receiving GS registers/VRAM.
-        pending.clear();
+        pending.clear();rescan_pending=false;
         forward_in_packet=false;forward_expect_tag=true;forward_eop=false;forward_remaining=0;
     }
     static constexpr std::size_t max_pending = 8 * 1024 * 1024 + 16;

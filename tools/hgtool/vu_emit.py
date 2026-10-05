@@ -48,7 +48,7 @@ def _lower(pair):
     if name=='xtop':
         return [f'v.vu1.write_vi({fields["it"]},std::uint16_t(v.top));']
     if name=='fcset':
-        return [f'v.vu1.clip=0x{fields["imm24"]:06x}u;']
+        return [f'v.vu1.fcset(0x{fields["imm24"]:06x}u);']
     if name=='fcand':
         return [f'v.vu1.fcand(0x{fields["imm24"]:06x}u);']
     if name=='lq':
@@ -505,6 +505,8 @@ def _body_lines(pairs,entries,optimize_readiness=False,optimize_vi_readiness=Tru
             readiness=_VFReadinessProof(optimize_vi_readiness=optimize_vi_readiness)
         pair=by_address[pc]
         out.append(f'L_{pc:04x}: {{')
+        # Registers this block writes, for the speculative VU1 commit merge.
+        if pc in leaders:out += ['    '+line for line in _written_lines(by_address,pc,leaders)]
         if optimize_static_loop and pc in leaders:
             out += ['    '+line for line in _static_transform_loop(by_address,pc,leaders)]
         out += ['    '+line for line in _pair_lines(pair,readiness)]
@@ -530,6 +532,119 @@ def _body_lines(pairs,entries,optimize_readiness=False,optimize_vi_readiness=Tru
         previous=None if pair.end or pair.lower_name in _BRANCHES else pc
         if previous is None:readiness=None
     return out
+
+
+_LIVENESS_UPPER={'nop','clip','add','addaw','addq','addx','addy','addz','addw','addi','sub','subq','subx','suby','subz','subw',
+                 'ftoi0','ftoi4','ftoi12','ftoi15','itof0','itof4','itof12','itof15','madd','madday','maddaz','maddax','maddaw',
+                 'maddx','maddy','maddz','maddw','maddq','maddi','maxx','maxy','maxz','maxw','minii','mul','mulax','mulay','mulaz',
+                 'mulaw','mulq','muli','mulx','muly','mulz','mulw'}
+_EFU={'erleng','eleng','esqrt','ersqrt','esum','ersadd','esadd','eatan','eatanxy','eatanxz','eexp','esin','ercpr'}
+# Speculation misc bits (runtime/include/hg/vu1_spec.hpp): VI1-15 at their
+# index, ACC X..W at 16..19, I at 20, the Q group at 21 and the P group at 22.
+_SPEC_ACC=16;_SPEC_I=20;_SPEC_Q=21;_SPEC_P=22
+
+
+def _lanes(reg,mask):
+    # Field masks use bit3=X ... bit0=W; result bit reg*4+lane, lane 0=X.
+    return sum(1<<(reg*4+lane) for lane in range(4) if mask&(8>>lane))
+
+
+def _acc_lanes(mask,shift=_SPEC_ACC):
+    return sum(1<<(shift+lane) for lane in range(4) if mask&(8>>lane))
+
+
+def _spec_pair(pair):
+    """(VF lanes read, misc read, VF lanes written, misc written) of one pair."""
+    reads,writes,vi_reads,vi_writes=_pipeline_accesses(pair)
+    vf_read=0;vf_written=0;misc_read=0;misc_written=0
+    for reg,mask in reads.items():vf_read|=_lanes(reg,mask)
+    for reg,mask in writes.items():vf_written|=_lanes(reg,mask)
+    for reg in vi_reads:misc_read|=1<<reg
+    for reg in vi_writes:misc_written|=1<<reg
+    u=pair.upper_name;dest=pair.upper_fields.get('dest',0)
+    if u not in _LIVENESS_UPPER:
+        vf_read|=((1<<128)-1)&~15;misc_read|=(1<<21)-2
+    if u.startswith(('madd','msub')):misc_read|=_acc_lanes(dest)
+    if u.startswith(('mula','adda','suba','madda','msuba')):misc_written|=_acc_lanes(dest)
+    if u.endswith('i') and not u.startswith(('itof','ftoi')):misc_read|=1<<_SPEC_I
+    if pair.lower_is_immediate:misc_written|=1<<_SPEC_I
+    else:
+        n=pair.lower_name
+        if n in {'div','sqrt','rsqrt'}:misc_written|=1<<_SPEC_Q
+        if n in _EFU:misc_written|=1<<_SPEC_P
+    return vf_read,misc_read,vf_written,misc_written
+
+
+def _successors(by_address,pc):
+    pair=by_address[pc]
+    if pair.end:return []
+    if pair.lower_name in _BRANCHES:
+        return [pair.branch_target]+([pc+16] if pair.lower_name!='b' else [])
+    return [pc+8]
+
+
+def _node(by_address,pc):
+    return [pc]+([pc+8] if by_address[pc].end or by_address[pc].lower_name in _BRANCHES else [])
+
+
+def _spec_live_in(pairs,entries):
+    """Per entry: (VF lanes, misc bits) that some path may read before writing.
+
+    Misc covers VI, ACC lanes and I. Over-approximation is safe for
+    speculation validation."""
+    by_address={pair.address:pair for pair in pairs}
+    reachable=_reachable(pairs,entries)
+    effects={}
+    for pc in reachable:
+        gen_vf=gen_misc=kill_vf=kill_misc=0
+        for address in _node(by_address,pc):
+            vf_read,misc_read,vf_written,misc_written=_spec_pair(by_address[address])
+            # Both slots of a pair read before either writes (Sony VU manual 3.4).
+            gen_vf|=vf_read&~kill_vf;gen_misc|=misc_read&~kill_misc
+            kill_vf|=vf_written;kill_misc|=misc_written
+        mask=~((1<<_SPEC_Q)|(1<<_SPEC_P))
+        effects[pc]=(gen_vf,gen_misc&mask,kill_vf,kill_misc&mask)
+    every=((1<<128)-1)&~15
+    live={pc:(0,0) for pc in reachable}
+    changed=True
+    while changed:
+        changed=False
+        for pc in reachable:
+            out_vf=out_misc=0
+            for successor in _successors(by_address,pc):
+                vf,misc=live.get(successor,(0,0));out_vf|=vf;out_misc|=misc
+            gen_vf,gen_misc,kill_vf,kill_misc=effects[pc]
+            value=((gen_vf|(out_vf&~kill_vf))&every,(gen_misc|(out_misc&~kill_misc))&~1)
+            if value!=live[pc]:live[pc]=value;changed=True
+    # Q/P inputs are detected at runtime (Vu1State::spec_old_q_read/p_read).
+    return {entry:live[entry] for entry in entries}
+
+
+def _live_in_vf(pairs,entries):
+    return {entry:value[0] for entry,value in _spec_live_in(pairs,entries).items()}
+
+
+def _block_written(by_address,pc,leaders):
+    """VF lanes and misc bits written by the straight-line block entered at pc."""
+    vf=misc=0;address=pc
+    while address in by_address:
+        pair=by_address[address]
+        for member in [address]+([address+8] if pair.end or pair.lower_name in _BRANCHES else []):
+            _,_,vf_written,misc_written=_spec_pair(by_address[member])
+            vf|=vf_written;misc|=misc_written
+        if pair.end or pair.lower_name in _BRANCHES:break
+        address+=8
+        if address in leaders:break
+    return vf,misc
+
+
+def _written_lines(by_address,pc,leaders):
+    vf,misc=_block_written(by_address,pc,leaders)
+    lines=[]
+    if vf&(2**64-1):lines.append(f'v.vu1.spec_written_vf[0]|=0x{vf&(2**64-1):x}ull;')
+    if vf>>64:lines.append(f'v.vu1.spec_written_vf[1]|=0x{vf>>64:x}ull;')
+    if misc:lines.append(f'v.vu1.spec_written_misc|=0x{misc:x}u;')
+    return lines
 
 
 def emit_vu1(image,programs):
@@ -562,9 +677,22 @@ def emit_vu1(image,programs):
         out += ['    '+line for line in _body_lines(pairs,program['entries'],optimize_readiness=True,optimize_vi_readiness=False,optimize_static_loop=True)]
         out.append('}')
         dispatch.append((symbol,fn,program['name']))
+        live=_spec_live_in(pairs,program['entries'])
+        out.append(f'static hg::Vu1SpecInfo {symbol}_spec_info(std::uint16_t entry) {{')
+        for entry in program['entries']:
+            vf,misc=live[entry]
+            out.append(f'    if(entry==0x{entry:04x}u)return {{0x{vf&(2**64-1):016x}ull,0x{vf>>64:016x}ull,0x{misc:08x}u,true}};')
+        out.append('    return {};')
+        out.append('}')
     out.append('void run_vu1_aot(hg::Vif1Path& v,std::uint16_t entry,hg::GifPath& gif,hg::GsRegisterState& gs) {')
     for symbol,fn,name in dispatch:
         out.append(f'    if({symbol}_matches(v)) {{{fn}(v,entry,gif,gs);return;}} // {name}')
     out.append('    throw std::runtime_error("VU1 AOT entry/program identity has no static translation; entry="+std::to_string(entry));')
+    out.append('}')
+    # Static live-in set of an activation; known=false for unknown programs/entries.
+    out.append('hg::Vu1SpecInfo vu1_aot_spec_info(const hg::Vif1Path& v,std::uint16_t entry) {')
+    for symbol,fn,name in dispatch:
+        out.append(f'    if({symbol}_matches(v))return {symbol}_spec_info(entry);')
+    out.append('    return {};')
     out.append('}')
     return out

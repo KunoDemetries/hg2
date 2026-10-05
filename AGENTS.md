@@ -182,6 +182,16 @@ before acting; dated historical notes do not override newer verified state.
   GIF+GS+GL stage) fed by ordered SPSC rings from the EE thread; joins only at guest
   observations; IMR/CSR/BUSDIR mirror; `--sync-devices`/`HG_SYNC_DEVICES=1` fallback.
   `tests/device_thread_tests.cpp` checks sync equivalence. HG-LEARN-076.
+- `runtime/include/hg/vu1_spec.hpp` / `device_thread.cpp` `VuJob`: opt-in speculative
+  parallel VU1 activations (`HG_VU_WORKERS=N`, best measured N=3 on 8 CPUs; default
+  off). Workers run the same AOT programs on snapshots; stage B commits in order,
+  validating lane-granular memory reads (`Vu1AccessLog`), emitter live-in VF/VI/ACC/I
+  (`vu1_aot_spec_info`), consumed clip bits, Q/P and readiness, else re-executes
+  exactly. Transport reads/calls drain jobs (fault ordering). HG-LEARN-077.
+- `GifPath::submit_words` / `track_forward`: GIF packet boundaries are tracked per
+  qword and complete packets applied once, from the caller's block when possible;
+  `Vif1Path::pending_need` skips re-parsing incomplete VIF commands. Faults and
+  injected `pending` bytes fall back to the original rescanning behavior.
 - `runtime/include/hg/iop_dmac.hpp` / `sif_link.hpp`: bounded bidirectional DMA and shared transport state.
 - `runtime.hpp` / `dmac.hpp`: connected normal scratchpad DMA channels8/9;
   checked RAM spans,14-bit SADR wrap and channel completion. toSPR also supports

@@ -1,3 +1,15 @@
+### HG-FAIL-058 - Bigger VU1 speculation window and spinning workers did not help a saturated host
+
+With ~2100 VU1 activations per gameplay frame, raising the in-flight window from 7 to 12/20 or letting workers spin 50/200 us before sleeping did not raise FPS (200 us spin cost ~8% from hyperthread contention). Workers looked ~45% busy, but the 8 logical CPUs (2 HT P-cores, 4 E-cores) already carry EE, VIF/VU, GS and worker threads. Once total busy time is near the host's real core capacity, reduce work per activation rather than adding parallelism.
+
+### HG-FAIL-057 - Stopping the bottleneck stage from stealing VU1 jobs made it slower
+
+A profile showed ~50% of stage B (the busiest device thread) in VU arithmetic from jobs it stole from workers, so B looked like it was doing the workers' job instead of parsing VIF. Forbidding steals (B runs only the job it must wait for) cut FPS from 9.25-9.52 to 8.77-8.95 with 3 workers. B steals only when its ring is empty or it must wait for a commit, so that time was idle. Measure idle and wait directly (HG-DIAG-091 per-interval counters, `/proc/<pid>/task/*/stat` CPU deltas) before treating a hot profile entry on a spinning/stealing thread as a bottleneck.
+
+### HG-LEARN-077 - Speculative parallel VU1 activations need lane-granular read and write sets
+
+Running VU1 batch activations on worker threads from predicted start state and committing them in order, with exact sequential re-execution on any input mismatch, kept every replay digest identical. Gameplay FPS went from 6.61 to 8.70 with 3 workers on 8 logical CPUs (2 workers: 7.90; 1: none; 4-5 workers: 7.2-7.4, oversubscribed). Inputs must be precise or the jobs re-execute. Vector-granular reads made 103k of 155k jobs re-execute, because the double-buffered programs SQ.xyz and then read the same vector. Lane bits that exclude lanes the activation already wrote cut this to 439 re-executions (154.6k valid). Write sets must also be per lane (partial SQ, V2/V3/masked UNPACK), or the merge corrupts VU memory (`s-w2g`). Clip/Q/P inputs are tracked dynamically (only bits FCAND consumed; Q/P only if an old value was read); static liveness covers VF/VI/ACC/I. Test the dependency logic in a synthetic stream where it is the only reason to re-execute. In the dense stream other reasons hid both mutations. Evidence: `~/hg-evidence/l-w2a`, `l-f{1,2,3}-w*`.
+
 ### HG-LEARN-076 - Coarse EE / device thread split is exact and faster when joins are rare
 
 Measure the join budget first (HG-DIAG-090: only GIF STAT reads observed device state in gameplay). Then give whole device subsystems to host threads, fed by an ordered SPSC ring of the synchronous inputs, and join only at guest observations. Unlike HG-FAIL-041 (one handoff per VU activation), this kept every digest identical and raised gameplay FPS from ~3.4 to 4.4-6.0 on Linux. Splitting VIF1/VU1 from GIF/GS needs only a GIF packet-boundary proxy (`gif_packet_size` rules) for XGKICK's idle check. Answering transport reads at the VIF1/VU1 stage avoids draining GS work. Judge by gameplay FPS with interleaved sync controls (`HG_SYNC_DEVICES=1`), not whole-run wall, which is real-time paced.

@@ -106,6 +106,21 @@ void GsRegisterState::read_clut_source(std::array<std::uint32_t,256>& source,uns
     }
 }
 
+namespace {
+void apply_gif_packet(const std::uint8_t* bytes,std::size_t size,GsRegisterState& gs) {
+    if constexpr(stream_gif_packets)apply_complete_gif_packet(bytes,size,gs);
+    else {
+        const auto packet=decode_gif_packet(bytes,size);
+        apply_gif_register_transfers(packet,gs);
+    }
+}
+#if (defined(__BYTE_ORDER__)&&__BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__)||defined(_M_X64)||defined(_M_IX86)||defined(_M_ARM64)
+constexpr bool host_little_endian=true;
+#else
+constexpr bool host_little_endian=false;
+#endif
+}
+
 void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState& gs) {
     if(forward) {track_forward(low);forward->forward_qword(low,high);return;}
     const auto offset=pending.size();
@@ -115,13 +130,26 @@ void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState&
         pending[offset+8+i]=std::uint8_t(high>>(i*8));
     }
     if(pending.size()>max_pending)throw std::runtime_error("GIF packet exceeds bounded path capacity");
+    const auto apply=[&](std::size_t packet_size){apply_gif_packet(pending.data(),packet_size,gs);};
+    // Bytes placed in pending other than by this path (tests) were not tracked.
+    if(offset&&!forward_in_packet)rescan_pending=true;
+    if(!rescan_pending) {
+        // gif_packet_size rules, one qword at a time: pending ends exactly at the
+        // packet end when the tracker leaves the packet.
+        track_forward(low);
+        if(forward_in_packet)return;
+        rescan_pending=true;
+        apply(pending.size());
+        pending.clear();rescan_pending=false;
+        return;
+    }
     while(const auto packet_size=gif_packet_size(pending.data(),pending.size())) {
-        if constexpr(stream_gif_packets)apply_complete_gif_packet(pending.data(),*packet_size,gs);
-        else {
-            const auto packet=decode_gif_packet(pending.data(),*packet_size);
-            apply_gif_register_transfers(packet,gs);
-        }
+        apply(*packet_size);
         pending.erase(pending.begin(),pending.begin()+*packet_size);
+    }
+    if(pending.empty()) {
+        rescan_pending=false;
+        forward_in_packet=false;forward_expect_tag=true;forward_eop=false;forward_remaining=0;
     }
 }
 
@@ -131,9 +159,24 @@ void GifPath::submit_words(const std::uint32_t* words,std::size_t qwords,GsRegis
         forward->forward_words(words,qwords);
         return;
     }
-    for(std::size_t n=0;n<qwords;++n,words+=4)
-        submit_qword(std::uint64_t(words[0])|(std::uint64_t(words[1])<<32),
-                     std::uint64_t(words[2])|(std::uint64_t(words[3])<<32),gs);
+    const auto low=[&](std::size_t n){return std::uint64_t(words[n*4])|(std::uint64_t(words[n*4+1])<<32);};
+    const auto high=[&](std::size_t n){return std::uint64_t(words[n*4+2])|(std::uint64_t(words[n*4+3])<<32);};
+    if constexpr(!host_little_endian) {
+        for(std::size_t n=0;n<qwords;++n)submit_qword(low(n),high(n),gs);
+        return;
+    }
+    // Same as submit_qword per qword: a packet starting with pending empty is
+    // tracked in the caller's buffer and applied from it when complete; an
+    // incomplete suffix (or a faulting packet) is left in pending as before.
+    const auto* bytes=reinterpret_cast<const std::uint8_t*>(words);
+    for(std::size_t n=0;n<qwords;) {
+        if(!pending.empty()||rescan_pending){submit_qword(low(n),high(n),gs);++n;continue;}
+        const auto start=n,limit=std::min(qwords,start+max_pending/16);
+        while(n<limit) {track_forward(low(n));++n;if(!forward_in_packet)break;}
+        if(forward_in_packet){pending.assign(bytes+start*16,bytes+n*16);continue;}
+        try {apply_gif_packet(bytes+start*16,(n-start)*16,gs);}
+        catch(...) {pending.assign(bytes+start*16,bytes+n*16);rescan_pending=true;throw;}
+    }
 }
 
 bool GsRegisterState::write_image_psmt8_fast(std::uint64_t low,std::uint64_t high) {

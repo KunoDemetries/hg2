@@ -4,6 +4,8 @@
 #include "hg/runtime.hpp"
 #include "hg/device_thread.hpp"
 #include "hg/gif.hpp"
+#include "hg/vu1_spec.hpp"
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -244,6 +246,171 @@ void ordered_closures() {
 }
 }
 
+// Speculative VU1 activations (HG_VU_WORKERS): a synthetic program declaring its
+// written registers like the AOT emitter. Batches depend on the init matrix (VF1),
+// on clip history from the previous batch, sometimes on a shared memory counter
+// written by the previous batch, and kick a GIF packet; DIRECT packets interleave.
+constexpr std::uint32_t spec_fault_marker=0x0000dead;
+void spec_executor(hg::Vif1Path& v,std::uint16_t entry,hg::GifPath& gif,hg::GsRegisterState& gs) {
+    auto& u=v.vu1;
+    if(!entry) {
+        u.spec_written_vf[0]|=0xf0;
+        u.advance_pipeline(1);u.load_qword(v.vu_mem,v.vu_mem_defined,1,0,0,15);u.produced_vf(1,15);
+        u.fcset(0);u.tpc=8;return;
+    }
+    u.spec_written_vf[0]|=0xfff00f00ull;
+    u.spec_written_misc|=(1u<<1)|(1u<<2)|(1u<<3)|(1u<<hg::vu1_spec_q_bit);
+    u.advance_pipeline(1);u.write_vi(2,std::uint16_t(v.top));u.produced_vi(2,1);
+    u.advance_pipeline(1);u.require_vi(2);
+    u.load_qword(v.vu_mem,v.vu_mem_defined,2,2,0,15);u.produced_vf(2,15);
+    u.advance_pipeline(1);u.require_vf(2,15);u.require_vf(1,15);
+    for(unsigned lane=0;lane<4;++lane)u.write_vf(2,lane,u.read_vf(2,lane)+u.read_vf(1,lane));
+    u.produced_vf(2,15);
+    // Clip history: VF7.x exceeds |w| when the input's x is odd.
+    for(unsigned lane=0;lane<4;++lane)u.write_vf(7,lane,lane==3?0x3f800000u:(lane==0&&(u.read_vf(2,0)-u.read_vf(1,0))&1)?0x40000000u:0x3f000000u);
+    u.produced_vf(7,15);u.advance_pipeline(4);u.require_vf(7,15);
+    u.clip_test(7,7);
+    u.fcand(0x000fff);u.produced_vi(1,1);u.advance_pipeline(1);u.require_vi(1);
+    u.write_vi(3,u.read_vi(1));u.produced_vi(3,1);
+    if(u.read_vf(2,1)&1) { // Shared counter in vector 200 (memory dependency chain).
+        u.spec_written_misc|=1u<<4;
+        u.load_integer(v.vu_mem,v.vu_mem_defined,4,0,200,8);
+        u.produced_vi(4,4);u.advance_pipeline(1);u.require_vi(4);
+        u.write_vi(4,std::uint16_t(u.read_vi(4)+1));u.produced_vi(4,1);
+        u.store_integer(v.vu_mem,v.vu_mem_defined,4,0,200,8);
+    }
+    // Partial-lane traffic on shared vector 300: SQ.xyz here, V3 UNPACKs in the stream.
+    if(u.read_vf(2,1)&2) {
+        u.spec_written_vf[0]|=0xf00000000ull;
+        u.load_qword(v.vu_mem,v.vu_mem_defined,8,0,300,15);u.produced_vf(8,15);
+    }
+    if(u.read_vf(2,1)&8)u.store_qword(v.vu_mem,v.vu_mem_defined,2,0,300,14);
+    u.wait_q();u.divide(2,1,0,3);
+    u.store_qword(v.vu_mem,v.vu_mem_defined,2,2,1,15);
+    const std::uint64_t tag=1ull|(1ull<<15)|(1ull<<60);
+    const std::uint64_t data=(std::uint64_t(u.read_vi(3)+u.read_vi(4)*2u)<<32)|u.read_vf(2,0);
+    for(unsigned lane=0;lane<4;++lane) {
+        u.write_vf(5,lane,lane==0?std::uint32_t(tag):lane==1?std::uint32_t(tag>>32):lane==2?0xeu:0u);
+        u.write_vf(6,lane,lane==0?std::uint32_t(data):lane==1?std::uint32_t(data>>32):lane==2?0x62u:0u);
+    }
+    u.produced_vf(5,15);u.produced_vf(6,15);
+    u.advance_pipeline(4);u.require_vf(5,15);u.require_vf(6,15);
+    u.store_qword(v.vu_mem,v.vu_mem_defined,5,2,2,15);
+    u.store_qword(v.vu_mem,v.vu_mem_defined,6,2,3,15);
+    u.write_vi(1,std::uint16_t(v.top+2));u.produced_vi(1,1);u.advance_pipeline(1);u.require_vi(1);
+    v.xgkick(1,gif,gs);
+    if(u.read_vf(2,2)-u.read_vf(1,2)==spec_fault_marker)throw std::runtime_error("synthetic VU1 fault");
+    u.tpc=(u.read_vf(2,1)&4)?0x08:0x10; // MSCNT continuation varies.
+}
+hg::Vu1SpecInfo spec_info(const hg::Vif1Path&,std::uint16_t entry) {
+    if(!entry)return {0,0,0,true}; // Init: no inputs; runs inline when jobs are in flight.
+    if(entry!=8&&entry!=0x10)return {};
+    return {0xf0,0,0,true};
+}
+std::vector<std::uint32_t> spec_stream(bool faulting) {
+    std::vector<std::uint32_t> w{0x01000404u,0x03000020u,0x02000040u};
+    const auto unpack=[&](std::uint32_t code,std::array<std::uint32_t,4> v){w.push_back(code);w.insert(w.end(),v.begin(),v.end());};
+    unpack(0x6c0100c8u,{0,0,0,0});
+    for(unsigned k=0;k<40;++k) {
+        if(k%9==0) {unpack(0x6c010000u,{k*7u,3u,k,0x3f800000u});w.push_back(0x14000000u);}
+        const auto clip_bits=(k%4==3||k%6==1)?2u*k+1u:2u*k; // Some batches leave nonzero clip history.
+        unpack(0x6c018000u,{clip_bits,((k%3==0)?1u:2u)|((k%7==5)?4u:0u)|((k%5==2)?8u:0u),faulting&&k==23?spec_fault_marker:k,0x3f800000u});
+        w.push_back(k%9==0||k%5==2?0x14000001u:0x17000000u); // MSCAL or MSCNT.
+        if(k%5==3){w.push_back(0x6801012cu);w.insert(w.end(),{k,k+1,k+2});} // UNPACK V3-32 to 300.
+        if(k%4==1) { // DIRECT A+D LABEL write between kicks.
+            while(w.size()%4!=3)w.push_back(0);
+            w.push_back(0x50000002u);
+            const std::uint64_t tag=1ull|(1ull<<15)|(1ull<<60);
+            w.insert(w.end(),{std::uint32_t(tag),std::uint32_t(tag>>32),0xeu,0u,0x1000u+k,0xffffffffu,0x62u,0u});
+        }
+    }
+    return pad_to_qwords(w);
+}
+void speculative_vu1() {
+    for(const bool faulting:{false,true})for(const char* workers:{"1","2","3"}) {
+        setenv("HG_VU_WORKERS",workers,1);
+        const auto saved=hg::vu1_spec_info_query;
+        hg::vu1_spec_info_query=&spec_info;
+        Pair p;
+        p.both([&](hg::State& s){s.vif1.vu1_executor=&spec_executor;});
+        // The device thread captured the executor at start; restart it with the synthetic one.
+        p.link->stop();p.link=hg::start_device_thread(p.dev->vif1,p.dev->gif,p.dev->gs,{});p.dev->device=p.link.get();
+        unsetenv("HG_VU_WORKERS");
+        const auto words=spec_stream(faulting);
+        p.both([&](hg::State& s){put_words(s,source,words);start(s,1,std::uint32_t(words.size()/4));});
+        const auto expected=fault_text([&]{while(p.sync->pump_vif1()){}});
+        CHECK(fault_text([&]{while(p.dev->pump_vif1()){}}).empty());
+        const auto reported=fault_text([&]{p.dev->load(0x10003c00u,4,false);});
+        CHECK(reported==expected);
+        CHECK(faulting!=expected.empty());
+        if(faulting)p.link->stop();
+        else compare_device_state(p);
+        const auto& a=p.sync->vif1;const auto& b=p.dev->vif1;
+        CHECK(a.vu_mem==b.vu_mem && a.vu_mem_defined==b.vu_mem_defined);
+        const auto& x=a.vu1;const auto& y=b.vu1;
+        CHECK(x.vf==y.vf && x.vf_defined==y.vf_defined && x.vi==y.vi && x.acc==y.acc && x.acc_defined==y.acc_defined);
+        CHECK(x.clip==y.clip && x.status==y.status && x.mac==y.mac && x.q==y.q && x.i==y.i && x.p==y.p);
+        CHECK(x.pending_q==y.pending_q && x.pending_p==y.pending_p && x.q_pending==y.q_pending && x.p_pending==y.p_pending);
+        CHECK(x.q_cycles_remaining==y.q_cycles_remaining && x.p_cycles_remaining==y.p_cycles_remaining && x.tpc==y.tpc);
+        CHECK(x.issue_cycle==y.issue_cycle && x.vf_ready==y.vf_ready && x.vi_ready==y.vi_ready);
+        CHECK(p.sync->gs.privileged_label_id==p.dev->gs.privileged_label_id);
+        CHECK(p.sync->gif.pending==p.dev->gif.pending);
+        hg::vu1_spec_info_query=saved;
+    }
+}
+
+// Lane-granular memory inputs: even batches SQ.xyzw vector 400, odd batches
+// SQ.xyz it and then LQ.xyzw, so only W comes from the in-flight predecessor.
+// Each batch records the loaded VF9 in its own vector; no other dependencies.
+void spec_lane_executor(hg::Vif1Path& v,std::uint16_t,hg::GifPath&,hg::GsRegisterState&) {
+    auto& u=v.vu1;
+    u.spec_written_vf[0]|=0xf00f000f00ull;
+    u.spec_written_misc|=(1u<<2)|(1u<<5);
+    u.advance_pipeline(1);u.write_vi(2,std::uint16_t(v.top));u.produced_vi(2,1);
+    u.advance_pipeline(1);u.require_vi(2);
+    u.load_qword(v.vu_mem,v.vu_mem_defined,2,2,0,15);u.produced_vf(2,15);
+    u.advance_pipeline(4);u.require_vf(2,15);
+    for(unsigned lane=0;lane<4;++lane)u.write_vf(10,lane,lane==3?u.read_vf(2,1)*7u+1u:u.read_vf(2,lane));
+    u.produced_vf(10,15);u.advance_pipeline(4);u.require_vf(10,15);
+    u.store_qword(v.vu_mem,v.vu_mem_defined,10,0,400,(u.read_vf(2,0)&1)?14:15);
+    u.load_qword(v.vu_mem,v.vu_mem_defined,9,0,400,15);u.produced_vf(9,15);
+    u.write_vi(5,std::uint16_t(500+u.read_vf(2,1)));u.produced_vi(5,1);
+    u.advance_pipeline(4);u.require_vf(9,15);u.require_vi(5);
+    u.store_qword(v.vu_mem,v.vu_mem_defined,9,5,0,15);
+    u.tpc=8;
+}
+hg::Vu1SpecInfo spec_lane_info(const hg::Vif1Path&,std::uint16_t entry) {
+    if(entry!=8)return {};
+    return {0,0,0,true};
+}
+void speculative_vu1_partial_lanes() {
+    for(const char* workers:{"1","2","3"}) {
+        setenv("HG_VU_WORKERS",workers,1);
+        const auto saved=hg::vu1_spec_info_query;
+        hg::vu1_spec_info_query=&spec_lane_info;
+        Pair p;
+        p.both([&](hg::State& s){s.vif1.vu1_executor=&spec_lane_executor;});
+        p.link->stop();p.link=hg::start_device_thread(p.dev->vif1,p.dev->gif,p.dev->gs,{});p.dev->device=p.link.get();
+        unsetenv("HG_VU_WORKERS");
+        std::vector<std::uint32_t> w{0x01000404u,0x03000020u,0x02000040u};
+        for(unsigned k=0;k<64;++k) {
+            w.push_back(0x6c018000u);w.insert(w.end(),{k,k,k*3u,0x3f800000u});
+            w.push_back(0x14000001u);
+        }
+        const auto words=pad_to_qwords(w);
+        p.both([&](hg::State& s){put_words(s,source,words);start(s,1,std::uint32_t(words.size()/4));});
+        const auto expected=fault_text([&]{while(p.sync->pump_vif1()){}});
+        CHECK(expected.empty());
+        CHECK(fault_text([&]{while(p.dev->pump_vif1()){}}).empty());
+        CHECK(fault_text([&]{p.dev->load(0x10003c00u,4,false);}).empty());
+        compare_device_state(p);
+        const auto& a=p.sync->vif1;const auto& b=p.dev->vif1;
+        CHECK(a.vu_mem==b.vu_mem && a.vu_mem_defined==b.vu_mem_defined);
+        CHECK(a.vu1.vf==b.vu1.vf && a.vu1.vi==b.vu1.vi);
+        hg::vu1_spec_info_query=saved;
+    }
+}
+
 int main() {
     masked_and_unmasked_signal();
     path3_and_registers();
@@ -252,6 +419,8 @@ int main() {
     ordered_closures();
     proxy_packet_boundaries();
     xgkick_blocks();
+    speculative_vu1();
+    speculative_vu1_partial_lanes();
     if(failures){std::cerr<<failures<<" device thread checks failed\n";return 1;}
     std::cout<<"Device thread tests passed\n";
     return 0;

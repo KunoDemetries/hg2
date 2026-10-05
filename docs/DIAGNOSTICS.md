@@ -57,9 +57,25 @@ The authorized successor used one persistent consumer, fixed32MiB byte ring, fix
 ## HG-DIAG-081 external native CPU sampling - captured, no runtime probe retained
 
 Location: external Visual Studio VSDiagnostics CPUUsageHigh sampling session and external map symbolizer under %TEMP%; no project source probe, no generated-code change, default inactive. Purpose: rank native host PCs during the original gameplay33m replay after WPR policy rejected sampling. Guest-state, clocks, output and fault effects: none intended; high-rate host sampling overhead unknown, so sampled replay throughput is invalid for FPS qualification. Capture: Project Link job38c616eb, PID16112, %TEMP%/hg-vu-native-full-high-20260927.diagsession and hg-vu-native-full-high-dump.txt. Last ETL12.0M..16.5167M us holds18,803 target samples, approximately the slow final interval but without an exact original-slice alignment marker. Top exclusive symbols: VIF process_pending848, XYZ prepare<false>741, exact AVX2 fused transform638, VU arithmetic_q517, multiply_vector429, GIF decode304, GL masked_write283, CPU triangle raster240. The ETL lacked a target loader image; module base was cross-matched to exact instruction PCs from an earlier same-executable trace with an explicit loader event. Do not interpret exclusive samples as inclusive caller cost or calibrated wall seconds. Retention criterion: keep only external evidence and this summary; no profiler running and no source instrumentation retained. Next use only for a broad architecture decision with exact fault/order/readback proof.
+## HG-DIAG-093 speculative VU1 scheduler event trace - ACTIVE (temporary)
+
+`runtime/device_thread.cpp` (`DeviceThread::note`/`dump_trace`): a 64-entry ring of dispatch (D), MSCNT prediction (M), in-order (S) and commit (C) events with entry, TPC, MicroMem generation and flags, dumped to stderr only when a VU1 activation faults under `HG_VU_WORKERS`. Located the MSCNT committed-TPC bug (prediction visible to commits made inside dispatch). Guest state, ordering and faults unaffected; cost: one small struct store per scheduler event while speculation is enabled (not measured separately). Remove once speculative VU1 is accepted and stable.
+
+## HG-DIAG-092 VU1 speculation feasibility probe - completed; wrapper removed, hooks productized
+
+The temporary `probe_vu1` executor wrapper in `runtime/system_diagnostic.cpp` (env `HG_VU_SPEC_PROBE`) was removed by restoring the file from `~/hg-backups/vuspec-probe-20261001/` (publish-every-slice change retained). Results (`~/hg-evidence/h-probe2`, sync replay, 155,000 activations, 42,977 init entries): with init entries modelled inline, memory and live-VF checks passed for every eligible batch at 1-3 uncommitted predecessors; clip matched 82/74/68%, status 97%, relative timing 81/69/61%; all checks 79/67/60%. Disabled hook cost was within noise (`h-off1` 6.573 FPS vs 6.306/6.612). Its hooks became production speculation support (see HG-LEARN-077): `Vu1AccessLog` (vector reads, lane writes) and `Vu1State::access_log`, `Vu1UnpackLog`/`vif1_unpack_log` (thread-local, per-lane value/definedness), `vu1_spec_info_query` and emitted `vu1_aot_spec_info` (static live-in VF lanes, VI, ACC, I), per-block `spec_written_*` masks, Q/P freshness and clip-history tracking in `Vu1State`.
+
+## HG-DIAG-095 VU1 worker spin-before-sleep - completed and removed
+
+Temporary env `HG_VU_SPIN_US` in `runtime/device_thread.cpp` (workers polled the job queue before sleeping; dispatch signalled only sleeping workers). No guest-state effect. 50 us: 9.385/9.370 vs 0: 9.471/9.254 FPS; 200 us: 8.375/8.851 (hyperthread contention). Rejected and removed.
+
+## HG-DIAG-094 VU1 job-stealing A/B switch - completed and removed
+
+Temporary env `HG_VU_STEAL=0` in `runtime/device_thread.cpp`: stage B ran only the VU1 job it waited for (if still queued) and never stole jobs while idle. No guest-state effect (job execution is identical wherever it runs). Result: slower (w3 8.947/8.774 vs default 9.250/9.522 FPS, exact digests), so stealing stays and the switch was removed.
+
 ## HG-DIAG-091 host device-stage wait counters - ACTIVE (retained, cheap)
 
-`runtime/device_thread.cpp`. Steady-clock reads only around waits/idle periods (joins, ring-full, stage idle); counters printed every 2 s (at joins) and at stop only when env `HG_DEVICE_STATS=1`. No guest state, ordering, clock or fault effect. Cost when disabled: a few clock reads per idle period/join (unmeasured, small). Remove or keep once device-thread tuning is finished.
+`runtime/device_thread.cpp`. Steady-clock reads only around waits/idle periods (joins, ring-full, stage idle); counters printed every 2 s at joins, every 0.5 s at transport reads, and at stop, only when env `HG_DEVICE_STATS=1`. With stats on, `b_job_wait_s` (in the `VU1 speculation` line) times stage B's pause/yield waiting on VU1 workers in `wait_job`/`b_idle`; when disabled this is one branch per spin. `b_inline_s`/`b_steal_s` likewise time inline init activations and stolen jobs on stage B (stats only). No guest state, ordering, clock or fault effect. Cost when disabled: a few clock reads per idle period/join (unmeasured, small). Remove or keep once device-thread tuning is finished.
 
 ## HG-DIAG-090 EE/device overlap budget model - completed and removed
 

@@ -60,7 +60,48 @@ struct Vu1MemoryWriteTracker {
     }
 };
 
+// Host speculation (vu1_spec.hpp): optional per-activation VU1 data-memory
+// access log. Reads are per 128-bit vector (bit vector); writes are per 32-bit
+// lane (bit vector*4+lane, lane 0=X). Null by default; no guest-state effect.
+struct Vu1AccessLog {
+    // Both masks: bit vector*4+lane (lane0=X ... lane3=W).
+    std::array<std::uint64_t,64> reads{};
+    std::array<std::uint64_t,64> writes{};
+    // lanes: bit0=X ... bit3=W. A lane this activation already wrote is not an input.
+    void read(std::size_t vector,unsigned lanes) {
+        const auto shift=(vector&15)*4;
+        reads[vector>>4]|=(std::uint64_t(lanes&15)<<shift)&~writes[vector>>4];
+    }
+    // dest uses the VU field mask: bit3=X ... bit0=W.
+    void write(std::size_t vector,unsigned dest) {
+        std::uint64_t lanes=0;
+        for(unsigned lane=0;lane<4;++lane)if(dest&(8u>>lane))lanes|=std::uint64_t(1)<<lane;
+        writes[vector>>4]|=lanes<<((vector&15)*4);
+    }
+};
+// VIF1 UNPACK lanes since a dispatch: value written, or definedness changed.
+struct Vu1UnpackLog {
+    std::array<std::uint64_t,64> value{},defined{};
+    void lane(std::size_t vector,unsigned lane,bool wrote_value) {
+        const auto bit=std::uint64_t(1)<<((vector&15)*4+lane);
+        if(wrote_value)value[vector>>4]|=bit;
+        defined[vector>>4]|=bit;
+    }
+};
+
 struct Vu1State {
+    Vu1AccessLog* access_log=nullptr;
+    // Host speculation bookkeeping (vu1_spec.hpp): registers written by
+    // executed AOT blocks, and whether a Q/P value from before this activation's
+    // own result was read. Never architectural state and never read by VU code.
+    std::array<std::uint64_t,2> spec_written_vf{};
+    std::uint32_t spec_written_misc=0;
+    bool spec_q_fresh=true,spec_p_fresh=true,spec_old_q_read=false,spec_old_p_read=false;
+    // Clip history: CLIP shifts so far (saturating at 4), FCSET seen, and the
+    // bits of the incoming clip flag (original positions) an FCAND depended on.
+    std::uint8_t spec_clip_shifts=0;
+    bool spec_clip_set=false;
+    std::uint32_t spec_clip_old_read=0;
     std::array<std::array<std::uint32_t,4>,32> vf{};
     // One bit per lane (bit0=X ... bit3=W). Existing register contents remain
     // conservatively defined; VIF can explicitly introduce documented
@@ -86,11 +127,11 @@ struct Vu1State {
     HG_VU_INLINE void advance_pipeline(std::uint64_t cycles) {
         issue_cycle+=cycles;
         if(q_pending) {
-            if(cycles>=q_cycles_remaining){q=pending_q;q_pending=false;q_cycles_remaining=0;}
+            if(cycles>=q_cycles_remaining){q=pending_q;q_pending=false;q_cycles_remaining=0;spec_q_fresh=true;}
             else q_cycles_remaining-=unsigned(cycles);
         }
         if(p_pending) {
-            if(cycles>=p_cycles_remaining){p=pending_p;p_pending=false;p_cycles_remaining=0;}
+            if(cycles>=p_cycles_remaining){p=pending_p;p_pending=false;p_cycles_remaining=0;spec_p_fresh=true;}
             else p_cycles_remaining-=unsigned(cycles);
         }
     }
@@ -183,7 +224,7 @@ struct Vu1State {
     void tick_q() {
         if(!q_pending)return;
         if(q_cycles_remaining && --q_cycles_remaining)return;
-        q=pending_q;q_pending=false;
+        q=pending_q;q_pending=false;spec_q_fresh=true;
     }
     void wait_q() {
         if(q_pending)advance_pipeline(q_cycles_remaining);
@@ -191,10 +232,10 @@ struct Vu1State {
     void tick_p() {
         if(!p_pending)return;
         if(p_cycles_remaining && --p_cycles_remaining)return;
-        p=pending_p;p_pending=false;
+        p=pending_p;p_pending=false;spec_p_fresh=true;
     }
     void wait_p() {
-        if(p_pending){p=pending_p;p_cycles_remaining=0;p_pending=false;}
+        if(p_pending){p=pending_p;p_cycles_remaining=0;p_pending=false;spec_p_fresh=true;}
     }
     void erleng(unsigned source) {
         // VU1 EFU is single-issue. Starting another EFU operation stalls until
@@ -211,6 +252,7 @@ struct Vu1State {
         p_cycles_remaining=24;p_pending=true;
     }
     void move_from_p(unsigned destination,unsigned dest) {
+        if(!spec_p_fresh)spec_old_p_read=true;
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane))write_vf(destination,lane,p);
     }
     void divide(unsigned fs,unsigned ft,unsigned fsf,unsigned ftf) {
@@ -374,6 +416,7 @@ struct Vu1State {
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane)) {acc[lane]=values[lane];acc_defined|=std::uint8_t(1u<<lane);}
     }
     void arithmetic_q(unsigned destination,unsigned source,unsigned dest,bool multiply) {
+        if(!spec_q_fresh)spec_old_q_read=true;
         std::array<std::uint32_t,4> values{};
         std::array<bool,4> underflow{},overflow{};
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane)) {
@@ -398,8 +441,19 @@ struct Vu1State {
             if(float_less(value,negative_w))next|=1u<<(lane*2+1);
         }
         clip=((clip<<6)|next)&0x00ffffffu;
+        if(spec_clip_shifts<4)++spec_clip_shifts;
     }
-    void fcand(std::uint32_t immediate) {write_vi(1,(clip&(immediate&0x00ffffffu))?1:0);}
+    void fcand(std::uint32_t immediate) {
+        const auto mask=immediate&0x00ffffffu;
+        if(!spec_clip_set) {
+            // The result depends on incoming bits only if no newer masked bit is set.
+            const auto shift=6u*spec_clip_shifts;
+            const auto incoming=spec_clip_shifts>=4?0u:(0x00ffffffu<<shift)&0x00ffffffu;
+            if(!(clip&mask&~incoming))spec_clip_old_read|=(mask&incoming)>>shift;
+        }
+        write_vi(1,(clip&mask)?1:0);
+    }
+    void fcset(std::uint32_t immediate) {clip=immediate&0x00ffffffu;spec_clip_set=true;}
     void load_qword(const std::array<std::uint32_t,4096>& memory,
                     const std::array<std::uint8_t,1024>& memory_defined,unsigned ft,unsigned is,
                     std::int32_t immediate,unsigned dest) {
@@ -407,6 +461,7 @@ struct Vu1State {
         const auto vector=std::int32_t(read_vi(is))+immediate;
         if(vector<0||vector>=1024)throw std::runtime_error("VU1 LQ exceeds VU1 data memory");
         if(!ft)return; // VF00 is architecturally constant.
+        if(access_log)access_log->read(std::size_t(vector),((dest>>3)&1)|((dest>>1)&2)|((dest<<1)&4)|((dest<<3)&8));
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane)) {
             vf[ft][lane]=memory[std::size_t(vector)*4+lane];
             const auto bit=std::uint8_t(1u<<lane);
@@ -420,6 +475,7 @@ struct Vu1State {
         if(fs>=vf.size()||is>=vi.size())throw std::runtime_error("VU1 SQ register index exceeds register file");
         const auto vector=std::int32_t(read_vi(is))+immediate;
         if(vector<0||vector>=1024)throw std::runtime_error("VU1 SQ exceeds VU1 data memory");
+        if(access_log)access_log->write(std::size_t(vector),dest);
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane)) {
             const auto bit=std::uint8_t(1u<<lane);
             const auto index=std::size_t(vector)*4+lane;
@@ -440,6 +496,7 @@ struct Vu1State {
         if(it>=vi.size()||is>=vi.size())throw std::runtime_error("VU1 ISW register index exceeds VI file");
         const auto vector=std::int32_t(read_vi(is))+immediate;
         if(vector<0||vector>=1024)throw std::runtime_error("VU1 ISW exceeds VU1 data memory");
+        if(access_log)access_log->write(std::size_t(vector),dest);
         for(unsigned lane=0;lane!=4;++lane)if(dest&(8u>>lane)) {
             const auto index=std::size_t(vector)*4+lane;
             memory[index]=read_vi(it);
@@ -455,6 +512,7 @@ struct Vu1State {
         const auto vector=std::int32_t(read_vi(is))+immediate;
         if(vector<0||vector>=1024)throw std::runtime_error("VU1 ILW exceeds VU1 data memory");
         const unsigned lane=dest==8?0:dest==4?1:dest==2?2:3;
+        if(access_log)access_log->read(std::size_t(vector),1u<<lane);
         if(!(memory_defined[std::size_t(vector)]&(1u<<lane)))
             throw std::runtime_error("VU1 ILW reads undefined VU1 data memory");
         write_vi(it,std::uint16_t(memory[std::size_t(vector)*4+lane]));
@@ -507,6 +565,11 @@ inline void merge_vu1_overlap_memory(
 // bodies supplied by the generated translation; unknown programs remain faults.
 struct Vif1Path {
     std::vector<std::uint8_t> pending;
+    // Host-only: when process_pending last returned normally, its first
+    // incomplete command needed `pending_need` bytes and pending held
+    // `pending_checked` bytes. Appends below that need cannot change its
+    // result, so submit skips the re-parse. Any other change invalidates it.
+    std::size_t pending_need=0,pending_checked=std::size_t(-1);
     // Physical byte phase of pending[0]. TTE contributes only a DMAtag's upper
     // 64 bits at phase 8, so a retained VIF command can cross a discontinuity
     // between ordinary qword data (next phase 0) and transferred tag bytes.
@@ -575,7 +638,7 @@ struct Vif1Path {
     Vif1Path() {vu_mem_defined.fill(0x0fu);}
     static bool register_contains(std::uint32_t address) {return address>=0x10003c00u && address<0x10003e00u;}
     void reset_interface() {
-        pending.clear();pending_phase=0;pending_phase_breaks.clear();row={};column={};
+        pending.clear();pending_checked=std::size_t(-1);pending_phase=0;pending_phase_breaks.clear();row={};column={};
         cycle=offset=base=itops=itop=tops=top=mode=mark=mask=error_mask=0;
         host_vu_pending=host_vu_running=host_vu_stalled=false;host_vu_entry=0;
         dbf=false;
@@ -584,6 +647,7 @@ struct Vif1Path {
         // VU memories are separate storage, not part of the VIF FIFO reset.
     }
     void write_register(std::uint32_t address,std::uint32_t value) {
+        pending_checked=std::size_t(-1);
         if(address==0x10003c30u) {mark=value&0xffffu;mark_detected=false;return;}
         if(address==0x10003c10u) {
             if(value!=1)throw std::runtime_error("unsupported VIF1 FBRST stall/control operation");
@@ -696,6 +760,7 @@ struct Vif1Path {
             if(upto>submitted){gif.submit_words(vu_mem.data()+(first+submitted)*4,upto-submitted,gs);submitted=upto;}
         };
         for(std::size_t count=0;vector<1024;++vector,++count) {
+            if(vu1.access_log)vu1.access_log->read(vector,15u);
             const auto base=vector*4;
             const auto low=std::uint64_t(vu_mem[base])|(std::uint64_t(vu_mem[base+1])<<32);
             const auto high=std::uint64_t(vu_mem[base+2])|(std::uint64_t(vu_mem[base+3])<<32);
@@ -752,6 +817,9 @@ struct Vif1Path {
         for(unsigned i=0;i!=8;++i) {
             pending[offset+i]=std::uint8_t(low>>(i*8));
             pending[offset+8+i]=std::uint8_t(high>>(i*8));
+        }
+        if(offset==pending_checked&&pending.size()<pending_need&&pending.size()<=max_pending) {
+            pending_checked=pending.size();return;
         }
         process_pending(gif,gs);
     }
