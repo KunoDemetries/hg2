@@ -7,6 +7,7 @@
 #include <cstring>
 #include <iostream>
 
+namespace hg {extern bool vif1_generic_unpack_only;} // HG-DIAG-089 comparison switch
 #define CHECK(x) do { if (!(x)) { std::cerr << "Failed line " << __LINE__ << ": " << #x << '\n'; return 1; } } while (0)
 
 static void put64(std::uint8_t* bytes, std::size_t offset, std::uint64_t value) {
@@ -1229,6 +1230,55 @@ int main() {
         hg::Vif1Path rgba5;
         rgba5.submit_qword(std::uint64_t(0x6f010001u)|(std::uint64_t(0xfc1fu)<<32),0,gif,gs);
         CHECK(rgba5.vu_mem[4]==0xf8 && rgba5.vu_mem[5]==0 && rgba5.vu_mem[6]==0xf8 && rgba5.vu_mem[7]==0x80);
+        { // HG-DIAG-089: straight-line UNPACK equals the generic loop, faults included.
+            std::uint64_t seed=0x9e3779b97f4a7c15ull;
+            const auto next=[&]{seed^=seed<<13;seed^=seed>>7;seed^=seed<<17;return seed;};
+            const unsigned formats[]={0,1,2,4,5,6,8,9,10,12,13,14,15};
+            unsigned fast_cases=0;
+            for(unsigned trial=0;trial<4000;++trial) {
+                const auto format=formats[next()%13];const bool masked=next()%3==0;
+                const unsigned bits=format==15?16:(format%4==0)?32:(format%4==1)?16:8;
+                const unsigned fields=format<=2?1:format==15?1:format/4+1;
+                std::uint32_t cycle=std::uint32_t(next()%4?((next()%4+1)<<8)|(next()%4+1):next()&0xffff);
+                const unsigned vectors=unsigned(next()%(next()%4?16:256))+1;
+                const unsigned address=unsigned(next()%(next()%8?900:1024));
+                const auto code=std::uint32_t(0x60u|(masked?0x10u:0u)|format)<<24|((vectors&255)<<16)|
+                    (next()%4==0?0x4000u:0)|(next()%4==0?0x8000u:0)|address;
+                auto cl=std::size_t(cycle&0xff),wl=std::size_t(cycle>>8);if(!cl)cl=256;if(!wl)wl=256;
+                const auto inputs=cl>=wl?vectors:cl*(vectors/wl)+std::min<std::size_t>(vectors%wl,cl);
+                const auto payload=((inputs*(format==15?2:fields*bits/8))+3)&~std::size_t(3);
+                std::vector<std::uint8_t> bytes(4+payload);
+                std::memcpy(bytes.data(),&code,4);
+                for(std::size_t i=4;i<bytes.size();++i)bytes[i]=std::uint8_t(next());
+                while(bytes.size()%16)bytes.push_back(0);
+                hg::Vif1Path paths[2];
+                const auto mask=next()%2?std::uint32_t(next()):0u;const auto mode=unsigned(next()%3);
+                std::array<std::uint32_t,4> row{},column{};for(auto& value:row)value=std::uint32_t(next());
+                for(auto& value:column)value=std::uint32_t(next());
+                const auto tops=unsigned(next()%1024);
+                for(auto& path:paths) {
+                    path.cycle=cycle;path.mask=mask;path.mode=mode;path.row=row;path.column=column;path.tops=tops;
+                    for(unsigned i=0;i<4096;++i)path.vu_mem[i]=i*0x2545f491u;
+                    for(unsigned i=0;i<1024;++i)path.vu_mem_defined[i]=std::uint8_t(i&15);
+                }
+                std::string errors[2];
+                for(unsigned which=0;which<2;++which) {
+                    hg::vif1_generic_unpack_only=which==1;
+                    try {
+                        for(std::size_t at=0;at<bytes.size();at+=16) {
+                            std::uint64_t low,high;std::memcpy(&low,bytes.data()+at,8);std::memcpy(&high,bytes.data()+at+8,8);
+                            paths[which].submit_qword(low,high,gif,gs);
+                        }
+                    } catch(const std::runtime_error& e){errors[which]=e.what();}
+                }
+                hg::vif1_generic_unpack_only=false;
+                CHECK(errors[0]==errors[1]);
+                CHECK(paths[0].vu_mem==paths[1].vu_mem && paths[0].vu_mem_defined==paths[1].vu_mem_defined);
+                CHECK(paths[0].row==paths[1].row && paths[0].pending==paths[1].pending);
+                fast_cases+=format!=15&&cl>=wl&&(!masked||!mask)&&errors[0].empty();
+            }
+            CHECK(fast_cases>800);
+        }
         hg::Vif1Path tops; tops.base=20; tops.consume_state(0x02,30);
         CHECK(tops.top==20 && tops.tops==20 && tops.offset==30 && !tops.dbf);
         tops.submit_qword(std::uint64_t(0x6e018004u)|(std::uint64_t(0x04030201u)<<32),0,gif,gs);
@@ -2032,7 +2082,7 @@ int main() {
             hg::GsRegisterState gs;gs.ensure_vram();
             for(unsigned n=0;n<gs.vram.size();++n)gs.vram[n]=0xb3729401u+n*2654435761u;
             gs.value[0x4c+context]=(wrap?511ull:0ull)|(2ull<<16)|(1ull<<24)|(std::uint64_t(mask)<<32);
-            gs.value[0x4e+context]=1ull<<32;
+            gs.value[0x4e + context]=1ull<<32;
             gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
             gs.value[0x40+context]=9ull|(94ull<<16)|(7ull<<32)|(44ull<<48);
             gs.value[6+context]=(wrap?16370ull:0ull)|(2ull<<14)|(6ull<<26)|(5ull<<30)|(1ull<<34);
@@ -2065,7 +2115,7 @@ int main() {
             for(unsigned n=0;n<gs.vram.size();++n)gs.vram[n]=0x7963c15bu+n*2654435761u;
             for(unsigned n=0;n<512;++n){gs.clut[n]=std::uint16_t(n*197+93);gs.clut_valid[n]=true;}
             gs.value[0x4c+context]=(2ull<<16)|(std::uint64_t(scenario&2?0x00aa5500u:0u)<<32);
-            gs.value[0x4e+context]=1ull<<32;gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
+            gs.value[0x4e + context]=1ull<<32;gs.value[0x47+context]=0x30000;gs.value[0x46]=1;
             gs.value[0x40+context]=(31ull<<16)|(15ull<<48);
             gs.value[6+context]=(alias?0ull:16370ull)|(3ull<<14)|(0x14ull<<20)|
                 (5ull<<26)|(4ull<<30)|(1ull<<34)|(std::uint64_t((scenario>>3)&3)<<35)|(std::uint64_t(csa)<<56);

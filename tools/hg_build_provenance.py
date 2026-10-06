@@ -58,8 +58,10 @@ def input_paths(repo: Path, build: Path) -> list[Path]:
         for item in base.rglob("*"):
             if item.is_file() and item.suffix.lower() in suffixes:
                 files.add(item)
-    # Generated project files retain actual per-source Release overrides and links.
+    # Generated project files retain actual per-source Release overrides and links
+    # (Visual Studio projects, or the Ninja build file on other hosts).
     files.update(build.glob("hg*.vcxproj"))
+    files.update(build.glob("build.ninja"))
     for item in files:
         _under(item, repo)
     return sorted(files, key=lambda item: item.relative_to(repo).as_posix())
@@ -105,13 +107,26 @@ def record_build(repo: Path, build: Path, exe: Path, configuration: str) -> Path
     return destination
 
 
-def validate_build(repo: Path, exe: Path, evidence_dir: Path | None = None) -> dict[str, Any]:
-    """The Project Link fixed verifier uses only this configured Release build."""
-    repo, exe = repo.resolve(), exe.resolve()
+def manifest_candidates(repo: Path) -> list[tuple[Path, Path]]:
+    """(manifest, expected build root) pairs for the configured Release layouts:
+    the Visual Studio multi-config tree and single-config trees such as build/linux."""
     build = repo / "build"
-    manifest_path = build / "Release/hg_game.exe.build.json"
-    if not manifest_path.is_file():
+    pairs = [(build / "Release/hg_game.exe.build.json", build)]
+    pairs += [(path, path.parent) for path in sorted(build.glob("*/hg_game.build.json"))]
+    return [(path, root) for path, root in pairs if path.is_file()]
+
+
+def validate_build(repo: Path, exe: Path, evidence_dir: Path | None = None) -> dict[str, Any]:
+    """The Project Link fixed verifier uses only a configured Release build."""
+    repo, exe = repo.resolve(), exe.resolve()
+    candidates = manifest_candidates(repo)
+    if not candidates:
         raise BuildProvenanceError("missing post-link build manifest; rebuild hg_game before measuring FPS")
+    # Prefer the manifest recording this exact binary; otherwise the first one
+    # reports the mismatch below. Every check still applies to the chosen tree.
+    executable = digest(exe) if exe.is_file() else None
+    manifest_path, build = next(((path, root) for path, root in candidates
+                                 if json.loads(path.read_bytes()).get("executable") == executable), candidates[0])
     _under(manifest_path, repo)
     raw = manifest_path.read_bytes()
     manifest = json.loads(raw)

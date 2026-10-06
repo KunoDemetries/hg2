@@ -16,6 +16,7 @@
 #include "hg/gs.hpp"
 #include "hg/vif.hpp"
 #include "hg/sif_link.hpp"
+#include "hg/device_link.hpp"
 
 namespace hg {
 struct Fault : std::runtime_error {
@@ -130,6 +131,8 @@ struct State {
     GsRegisterState gs;
     GifPath gif;
     Vif1Path vif1;
+    // Non-null only while a host device thread owns gif/vif1/gs (device_link.hpp).
+    DeviceLink* device=nullptr;
     std::shared_ptr<SifLink> sif=std::make_shared<SifLink>();
     std::uint32_t cp0_status=0x70010001;
     std::uint32_t cp0_epc=0, cp0_error_epc=0, cp0_wired=0, cp0_tag_lo=0;
@@ -239,7 +242,54 @@ struct State {
         if(chain)dmac.spr_input_packet=false;
         return true;
     }
-    void sync_gs_interrupt() {if(gs.interrupt_pending())intc.raise(0);}
+    void sync_gs_interrupt() {
+        if(device) {
+            // Device work can raise only SIGNAL/FINISH. If IMR masks both, the
+            // EE-side mirror holds every bit that can be pending; otherwise use
+            // the real state after all previously submitted work completes.
+            if((~device->imr>>8)&3) {
+                ++device->unmasked_interrupt_joins;device_join();
+                if(gs.interrupt_pending())intc.raise(0);
+            } else if(device->csr_events&~std::uint32_t(device->imr>>8)&0x1f)intc.raise(0);
+            return;
+        }
+        if(gs.interrupt_pending())intc.raise(0);
+    }
+    void device_join() {
+        try {device->join();}
+        catch(const Fault&) {throw;}
+        catch(const std::runtime_error& e) {throw Fault(pc,e.what());}
+    }
+    // Same validation, mirror updates and ordering as GsRegisterState::write_privileged.
+    void device_write_privileged(std::uint32_t address,std::uint64_t data) {
+        if(address%16)throw std::runtime_error("invalid GS privileged register address");
+        switch((address&0x1000u)|(address&0x3f0u)) {
+        case 0x000:case 0x020:case 0x070:case 0x080:case 0x090:case 0x0a0:case 0x0e0:break;
+        case 0x1000:
+            if(data&(1ull<<8))throw std::runtime_error("unimplemented GS CSR FLUSH");
+            if(data&(1ull<<9)) {
+                device->run_sync([&]{gs.write_privileged(address,data);});
+                device->imr=gs.privileged_imr;device->csr_events=gs.privileged_csr_events;
+                device->busdir=gs.privileged_busdir;return;
+            }
+            device->csr_events&=~(std::uint32_t(data)&0x1f);break;
+        case 0x1010:device->imr=data;break;
+        case 0x1040:if(data&~1ull)throw std::runtime_error("invalid GS BUSDIR value");device->busdir=data;break;
+        default:throw std::runtime_error("unimplemented GS privileged register write");
+        }
+        device->push(DeviceKind::gs_privileged,address,data);
+    }
+    void gs_raise_csr_events(std::uint32_t bits) {
+        if(device){device->csr_events|=bits;device->push(DeviceKind::gs_csr_events,bits,0);}
+        else gs.privileged_csr_events|=bits;
+        sync_gs_interrupt();
+    }
+    std::uint64_t gs_imr() const {return device?device->imr:gs.privileged_imr;}
+    void gs_put_imr(std::uint64_t value) {
+        if(device){device->imr=value;device->push(DeviceKind::gs_imr,0,value);}
+        else gs.privileged_imr=value;
+        sync_gs_interrupt();
+    }
     bool pump_ipu_output() {
         auto& c=dmac.channels[3];
         if(!dmac.enabled(3) || !(c.chcr&0x100))return false;
@@ -290,7 +340,11 @@ struct State {
                 SifLink::Quad result{};
                 for(unsigned n=0;n<8;++n) {result.low|=std::uint64_t(p[n])<<(n*8);result.high|=std::uint64_t(p[n+8])<<(n*8);}
                 return result;
-            }, [this](const SifLink::Quad& quad) {gif.submit_qword(quad.low,quad.high,gs);sync_gs_interrupt();return true;});
+            }, [this](const SifLink::Quad& quad) {
+                if(device)device->push(DeviceKind::gif_qword,0,quad.low,quad.high);
+                else gif.submit_qword(quad.low,quad.high,gs);
+                sync_gs_interrupt();return true;
+            });
         } catch(const std::runtime_error& e) {throw Fault(pc,e.what());}
     }
     std::size_t rasterize_gs_draws() {
@@ -310,8 +364,15 @@ struct State {
                 SifLink::Quad result{};
                 for(unsigned n=0;n<8;++n) {result.low|=std::uint64_t(p[n])<<(n*8);result.high|=std::uint64_t(p[n+8])<<(n*8);}
                 return result;
-            },[this](const SifLink::Quad& quad) {vif1.submit_qword(quad.low,quad.high,gif,gs);sync_gs_interrupt();return true;},
-              [this](std::uint64_t high) {vif1.submit_dma_tag(high,gif,gs);sync_gs_interrupt();return true;});
+            },[this](const SifLink::Quad& quad) {
+                if(device)device->push(DeviceKind::vif_qword,0,quad.low,quad.high);
+                else vif1.submit_qword(quad.low,quad.high,gif,gs);
+                sync_gs_interrupt();return true;
+            },[this](std::uint64_t high) {
+                if(device)device->push(DeviceKind::vif_tag,0,high);
+                else vif1.submit_dma_tag(high,gif,gs);
+                sync_gs_interrupt();return true;
+            });
         } catch(const std::runtime_error& e) {throw Fault(pc,e.what());}
     }
     void w(unsigned i, std::uint64_t v) { if (i) gpr.at(i).lo = v; }
@@ -647,12 +708,18 @@ struct State {
         if(address>=0x02000000u) {
         if(address==0x10003020u) {
             if(size!=4)throw Fault(pc,"GIF STAT requires 32-bit access");
-            try {return gif.read_status(vif1.path3_masked,gs.privileged_busdir!=0);}
+            try {
+                if(device)return device->read_transport_register(address,device->busdir!=0);
+                return gif.read_status(vif1.path3_masked,gs.privileged_busdir!=0);
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Vif1Path::register_contains(address)) {
             if(size!=4)throw Fault(pc,"VIF1 registers require 32-bit access");
-            try {const auto v=vif1.read_register(address);return sign?sx32(v):v;}
+            try {
+                const auto v=device?device->read_transport_register(address,false):vif1.read_register(address);
+                return sign?sx32(v):v;
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Ipu::register_contains(address)) {
@@ -661,7 +728,7 @@ struct State {
         }
         if(GsRegisterState::privileged_contains(address)) {
             if(size!=8)throw Fault(pc,"GS privileged registers require 64-bit LD/SD width");
-            try{return gs.read_privileged(address);}
+            try{if(device)device->join();return gs.read_privileged(address);}
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Dmac::contains(address)) {
@@ -690,12 +757,20 @@ struct State {
         if(address>=0x02000000u) {
         if(address==0x10003000u) {
             if(size!=4)throw Fault(pc,"GIF CTRL requires 32-bit access");
-            try {gif.write_control(std::uint32_t(value));return;}
+            try {
+                if(device)device->push(DeviceKind::gif_control,0,std::uint32_t(value));
+                else gif.write_control(std::uint32_t(value));
+                return;
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Vif1Path::register_contains(address)) {
             if(size!=4)throw Fault(pc,"VIF1 registers require 32-bit access");
-            try {vif1.write_register(address,std::uint32_t(value));return;}
+            try {
+                if(device)device->push(DeviceKind::vif_register,address,std::uint32_t(value));
+                else vif1.write_register(address,std::uint32_t(value));
+                return;
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Ipu::register_contains(address)) {
@@ -704,7 +779,11 @@ struct State {
         }
         if(GsRegisterState::privileged_contains(address)) {
             if(size!=8)throw Fault(pc,"GS privileged registers require 64-bit LD/SD width");
-            try {gs.write_privileged(address,value);sync_gs_interrupt();return;}
+            try {
+                if(device)device_write_privileged(address,value);
+                else gs.write_privileged(address,value);
+                sync_gs_interrupt();return;
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Dmac::contains(address)) {
@@ -778,7 +857,11 @@ struct State {
         }
         if(physical_address(address)==0x10005000u) {
             const auto value=reg?gpr.at(reg):Register{};
-            try {vif1.submit_qword(value.lo,value.hi,gif,gs);sync_gs_interrupt();return;}
+            try {
+                if(device)device->push(DeviceKind::vif_qword,0,value.lo,value.hi);
+                else vif1.submit_qword(value.lo,value.hi,gif,gs);
+                sync_gs_interrupt();return;
+            }
             catch(const std::runtime_error& e){throw Fault(pc,e.what());}
         }
         if(Ipu::input_fifo_contains(physical_address(address))) {

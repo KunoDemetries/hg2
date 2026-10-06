@@ -47,7 +47,7 @@ inline std::bitset<512> gs_raster_write_pages(const GsRegisterState& gs,unsigned
     if(context>1||gs.vram.size()!=1024*1024||left<0||top<0||right>2048||bottom>2048)
         return pages.set();
     if(left>=right||top>=bottom)return pages;
-    const auto frame=gs.value[0x4c+context],zbuf=gs.value[0x4e+context];
+    const auto frame=gs.value[0x4c+context],zbuf=gs.value[0x4e + context];
     const auto width=unsigned((frame>>16)&63)*64;
     const auto fp=unsigned((frame>>24)&63),zp=unsigned((zbuf>>24)&15);
     if(!width||(fp!=0&&fp!=1&&fp!=2&&fp!=10&&fp!=0x31)||

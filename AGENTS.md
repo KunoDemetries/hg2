@@ -125,7 +125,8 @@ before acting; dated historical notes do not override newer verified state.
   not replace it in the relaxed native-renderer baseline.
 - `tools/hg_build_provenance.py`: HG-DIAG-028 post-link source/configuration and
   executable hash manifest. Fixed frames verification fails before native launch
-  if inputs or the isolated executable do not match the Release build manifest.
+  if inputs or the isolated executable do not match the Release build manifest
+  (Windows `build/Release` or a single-config tree such as `build/linux`).
   A source-only revert or a test-only build is not a current game executable.
   Manifest hashing is outside native timing; inspect intended machine-code changes
   separately and regenerate after emitter/config changes before building.
@@ -177,6 +178,20 @@ before acting; dated historical notes do not override newer verified state.
   Bounded pointer runs require independent extent/live-use verification; never auto-root them.
 - `config/haunting_ground_us.toml`: executable identity, manual functions/targets, pointer tables and static overlays.
 - `runtime/include/hg/`: portable state, memory, FPU, timers, INTC and DMA/SIF0 primitives, including checked EE word/doubleword unaligned merges.
+- `runtime/device_thread.cpp` / `device_link.hpp`: host device threads (VIF1+VU1 stage,
+  GIF+GS+GL stage) fed by ordered SPSC rings from the EE thread; joins only at guest
+  observations; IMR/CSR/BUSDIR mirror; `--sync-devices`/`HG_SYNC_DEVICES=1` fallback.
+  `tests/device_thread_tests.cpp` checks sync equivalence. HG-LEARN-076.
+- `runtime/include/hg/vu1_spec.hpp` / `device_thread.cpp` `VuJob`: opt-in speculative
+  parallel VU1 activations (`HG_VU_WORKERS=N`, best measured N=3 on 8 CPUs; default
+  off). Workers run the same AOT programs on snapshots; stage B commits in order,
+  validating lane-granular memory reads (`Vu1AccessLog`), emitter live-in VF/VI/ACC/I
+  (`vu1_aot_spec_info`), consumed clip bits, Q/P and readiness, else re-executes
+  exactly. Transport reads/calls drain jobs (fault ordering). HG-LEARN-077.
+- `GifPath::submit_words` / `track_forward`: GIF packet boundaries are tracked per
+  qword and complete packets applied once, from the caller's block when possible;
+  `Vif1Path::pending_need` skips re-parsing incomplete VIF commands. Faults and
+  injected `pending` bytes fall back to the original rescanning behavior.
 - `runtime/include/hg/iop_dmac.hpp` / `sif_link.hpp`: bounded bidirectional DMA and shared transport state.
 - `runtime.hpp` / `dmac.hpp`: connected normal scratchpad DMA channels8/9;
   checked RAM spans,14-bit SADR wrap and channel completion. toSPR also supports
@@ -246,6 +261,14 @@ before acting; dated historical notes do not override newer verified state.
 - `tools/hg.py iop-emit`: separate MIPS-I AOT path; `runtime/iop_*.cpp` supplies checked module loading/diagnostics.
 - `tools/hg.py iop-audit` / `iop-bundle`: all-module discovery audit and combined static IOP builds.
 - `tools/hg.py reboot`: read-only inventory of embedded modules in the game's IOPRP image.
+- `.devcontainer/`: Debian trixie Linux dev container (CMake/Ninja/GCC/clang,
+  GLFW/Mesa, gdb/perf, Claude Code). Root `.env` (gitignored, `HG_GAME_DIR`) mounts
+  the user's dump read-only at its own path; post-create links `Haunting Ground (USA)`.
+  Builds go to `build/linux`; container builds run inside via podman (no docker
+  socket). `initialize.sh` builds the image on the host with plain `docker build`
+  (the tooling's compose/bake build is refused). Notices are in `welcome.sh`;
+  start without VS Code via `claude.sh`.
+  No host credentials are bound: ssh, git config and Claude state are volumes.
 - `tests/`: synthetic, redistributable instruction/ELF tests; no game bytes.
 - `out/`: ignored local reports and game-derived generated C++.
 - `build/`: ignored native build products.

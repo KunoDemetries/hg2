@@ -1057,22 +1057,62 @@ inline void apply_gif_register_transfers(const GifPacket& packet, GsRegisterStat
 
 // A GIF path accepts DMA qwords without assuming packet alignment. Complete
 // packets are decoded and committed in order; a bounded suffix remains queued.
+// Host device-thread hand-off (device_thread.cpp): receives GIF qwords in order.
+struct GifForward {
+    virtual void forward_qword(std::uint64_t low,std::uint64_t high)=0;
+    // Little-endian 32-bit words, four per qword.
+    virtual void forward_words(const std::uint32_t* words,std::size_t qwords)=0;
+protected:
+    ~GifForward()=default;
+};
+
 struct GifPath {
     std::vector<std::uint8_t> pending;
+    // When set, this path is a proxy on the VIF1/VU1 host thread: qwords go to
+    // the GS thread's real GifPath and only packet boundaries are tracked here,
+    // by the same rules as gif_packet_size, so packet_idle() equals pending.empty()
+    // of the real path at the same point in the stream.
+    GifForward* forward=nullptr;
+    // The boundary tracker below also finds packet ends on the real path, so a
+    // packet is walked once when complete instead of on every qword. After a
+    // packet application faults, the path rescans `pending` as before until empty.
+    bool forward_in_packet=false,forward_expect_tag=true,forward_eop=false,rescan_pending=false;
+    std::uint64_t forward_remaining=0;
+    bool packet_idle() const {return forward?!forward_in_packet:pending.empty();}
+    void track_forward(std::uint64_t low) {
+        // gif_packet_size rules: tags until an EOP tag's data are complete.
+        if(forward_expect_tag) {
+            const auto nloop=low&0x7fffu;const bool eop=(low&(1ull<<15))!=0;
+            forward_in_packet=true;
+            if(!nloop) {if(eop)forward_in_packet=false;}
+            else {
+                const auto format=unsigned((low>>58)&3u);
+                const auto encoded_nreg=(low>>60)&0xfu,nreg=encoded_nreg?encoded_nreg:16;
+                forward_remaining=format>=2?nloop:format==0?nloop*nreg:(nloop*nreg+1)/2;
+                forward_expect_tag=false;forward_eop=eop;
+            }
+        } else if(--forward_remaining==0) {
+            forward_expect_tag=true;
+            if(forward_eop)forward_in_packet=false;
+        }
+    }
     std::uint32_t read_status(bool vif_path3_masked,bool reverse) const {
         // Complete packets are committed synchronously. A retained suffix is
         // not a hardware FIFO and has no independently modeled active path.
-        if(!pending.empty())throw std::runtime_error("GIF STAT during incomplete packet requires path/FIFO modeling");
+        if(!packet_idle())throw std::runtime_error("GIF STAT during incomplete packet requires path/FIFO modeling");
         return (vif_path3_masked?2u:0u)|(reverse?0x1000u:0u);
     }
     void write_control(std::uint32_t value) {
         if(value!=1)throw std::runtime_error("unsupported GIF CTRL stop/restart operation");
         // Reset the GIF transport/parser, not the receiving GS registers/VRAM.
-        pending.clear();
+        pending.clear();rescan_pending=false;
+        forward_in_packet=false;forward_expect_tag=true;forward_eop=false;forward_remaining=0;
     }
     static constexpr std::size_t max_pending = 8 * 1024 * 1024 + 16;
 
     void submit_qword(std::uint64_t low, std::uint64_t high, GsRegisterState& gs);
+    // Same as submit_qword for each qword in order (four little-endian words each).
+    void submit_words(const std::uint32_t* words, std::size_t qwords, GsRegisterState& gs);
 };
 
 } // namespace hg

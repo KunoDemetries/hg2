@@ -106,7 +106,23 @@ void GsRegisterState::read_clut_source(std::array<std::uint32_t,256>& source,uns
     }
 }
 
+namespace {
+void apply_gif_packet(const std::uint8_t* bytes,std::size_t size,GsRegisterState& gs) {
+    if constexpr(stream_gif_packets)apply_complete_gif_packet(bytes,size,gs);
+    else {
+        const auto packet=decode_gif_packet(bytes,size);
+        apply_gif_register_transfers(packet,gs);
+    }
+}
+#if (defined(__BYTE_ORDER__)&&__BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__)||defined(_M_X64)||defined(_M_IX86)||defined(_M_ARM64)
+constexpr bool host_little_endian=true;
+#else
+constexpr bool host_little_endian=false;
+#endif
+}
+
 void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState& gs) {
+    if(forward) {track_forward(low);forward->forward_qword(low,high);return;}
     const auto offset=pending.size();
     pending.resize(offset+16);
     for(unsigned i=0;i!=8;++i) {
@@ -114,13 +130,52 @@ void GifPath::submit_qword(std::uint64_t low,std::uint64_t high,GsRegisterState&
         pending[offset+8+i]=std::uint8_t(high>>(i*8));
     }
     if(pending.size()>max_pending)throw std::runtime_error("GIF packet exceeds bounded path capacity");
+    const auto apply=[&](std::size_t packet_size){apply_gif_packet(pending.data(),packet_size,gs);};
+    // Bytes placed in pending other than by this path (tests) were not tracked.
+    if(offset&&!forward_in_packet)rescan_pending=true;
+    if(!rescan_pending) {
+        // gif_packet_size rules, one qword at a time: pending ends exactly at the
+        // packet end when the tracker leaves the packet.
+        track_forward(low);
+        if(forward_in_packet)return;
+        rescan_pending=true;
+        apply(pending.size());
+        pending.clear();rescan_pending=false;
+        return;
+    }
     while(const auto packet_size=gif_packet_size(pending.data(),pending.size())) {
-        if constexpr(stream_gif_packets)apply_complete_gif_packet(pending.data(),*packet_size,gs);
-        else {
-            const auto packet=decode_gif_packet(pending.data(),*packet_size);
-            apply_gif_register_transfers(packet,gs);
-        }
+        apply(*packet_size);
         pending.erase(pending.begin(),pending.begin()+*packet_size);
+    }
+    if(pending.empty()) {
+        rescan_pending=false;
+        forward_in_packet=false;forward_expect_tag=true;forward_eop=false;forward_remaining=0;
+    }
+}
+
+void GifPath::submit_words(const std::uint32_t* words,std::size_t qwords,GsRegisterState& gs) {
+    if(forward) {
+        for(std::size_t n=0;n<qwords;++n)track_forward(std::uint64_t(words[n*4])|(std::uint64_t(words[n*4+1])<<32));
+        forward->forward_words(words,qwords);
+        return;
+    }
+    const auto low=[&](std::size_t n){return std::uint64_t(words[n*4])|(std::uint64_t(words[n*4+1])<<32);};
+    const auto high=[&](std::size_t n){return std::uint64_t(words[n*4+2])|(std::uint64_t(words[n*4+3])<<32);};
+    if constexpr(!host_little_endian) {
+        for(std::size_t n=0;n<qwords;++n)submit_qword(low(n),high(n),gs);
+        return;
+    }
+    // Same as submit_qword per qword: a packet starting with pending empty is
+    // tracked in the caller's buffer and applied from it when complete; an
+    // incomplete suffix (or a faulting packet) is left in pending as before.
+    const auto* bytes=reinterpret_cast<const std::uint8_t*>(words);
+    for(std::size_t n=0;n<qwords;) {
+        if(!pending.empty()||rescan_pending){submit_qword(low(n),high(n),gs);++n;continue;}
+        const auto start=n,limit=std::min(qwords,start+max_pending/16);
+        while(n<limit) {track_forward(low(n));++n;if(!forward_in_packet)break;}
+        if(forward_in_packet){pending.assign(bytes+start*16,bytes+n*16);continue;}
+        try {apply_gif_packet(bytes+start*16,(n-start)*16,gs);}
+        catch(...) {pending.assign(bytes+start*16,bytes+n*16);rescan_pending=true;throw;}
     }
 }
 
@@ -875,7 +930,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
     // Reduce the existing pixel pipeline only when its tests always pass,
     // depth is masked and blending is disabled. RGB24 preserves the high
     // byte and ignores FBA. Keep live texture reads and row-major writes.
-    const auto frame=value[0x4c+context],test=value[0x47+context],zbuf=value[0x4e+context];
+    const auto frame=value[0x4c+context],test=value[0x47+context],zbuf=value[0x4e + context];
     const auto frame_width=std::uint32_t((frame>>16)&0x3f)*64;
     const auto zpsm=unsigned((zbuf>>24)&15);
     const bool direct_rgb24=((frame>>24)&63)==1 && frame_width &&
@@ -910,9 +965,13 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
        (sprite_destination<=2||sprite_destination==10||sprite_destination==49)&&frame_width&&vram.size()==1024*1024&&
        last_x<=std::int32_t(frame_width)&&
        std::uint64_t(frame_width)*((last_y+31)/32)*32<=1024*1024&&
-       std::uint64_t(last_x-first_x)*(last_y-first_y)>=4096&&
+       // Small PSMT8/PSMT4 sprites measured cheaper on the GPU than a CPU
+       // fallback's flush/readback; other classes keep the batching threshold.
+       (std::uint64_t(last_x-first_x)*(last_y-first_y)>=4096||
+        (textured&&(sprite_source==0x13||sprite_source==0x14)))&&
        (!textured||(texture_width&&tw<=10&&th<=10&&
-         (sprite_source<=2||sprite_source==10||sprite_source==27||sprite_source==49)))) {
+         (sprite_source<=2||sprite_source==10||sprite_source==0x13||sprite_source==0x14||
+          sprite_source==27||sprite_source==49)))) {
         std::array<GsSpriteAxis,2048> columns,rows;
         std::array<std::uint32_t,256> palette{};
         const auto lower=[](std::int32_t fixed){const auto shifted=std::int64_t(fixed)-8;
@@ -922,12 +981,19 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
         const auto destination_address=sprite_destination==2?psmct16_word:
             sprite_destination==10?psmct16s_word:sprite_destination==49?psmz32_word:psmct32_word;
         const auto texture_base=std::uint32_t(tex0&16383)*64;
+        // PSMT8/PSMT4 addresses are not separable, so their axes carry wrapped
+        // texel coordinates and the backend applies the same swizzle per texel.
+        const bool indexed_source=sprite_source==0x13||sprite_source==0x14;
         bool valid=true;
-        if(textured&&sprite_source==27) {
-            valid=((tex0>>51)&15)==0&&!(tex0&(1ull<<55))&&((tex0>>56)&31)==0;
-            for(unsigned i=0;i<256&&valid;++i){
-                valid=clut_valid[i]&&clut_valid[i+256];
-                palette[i]=std::uint32_t(clut[i])|(std::uint32_t(clut[i+256])<<16);
+        if(textured&&(sprite_source==27||indexed_source)) {
+            // Same scope as DrawTexture: CT32 CLUT, CSM1; PSMT4 selects CSA<16.
+            const bool four=sprite_source==0x14;
+            valid=four?(((tex0>>51)&31)==0&&((tex0>>56)&31)<16):((tex0>>51)&0x3ff)==0;
+            const auto clut_base=four?unsigned((tex0>>56)&15)*16:0u,entries=four?16u:256u;
+            for(unsigned i=0;i<entries&&valid;++i){
+                const auto entry=clut_base+i;
+                valid=clut_valid[entry]&&clut_valid[entry+256];
+                palette[i]=std::uint32_t(clut[entry])|(std::uint32_t(clut[entry+256])<<16);
             }
         }
         try {
@@ -938,6 +1004,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
                 c.fraction=linear?std::uint32_t(std::int64_t(fixed)-8-std::int64_t(u)*16):0u;
                 const auto address=[&](std::int32_t sample){
                     const auto wrapped=gs_wrap_texture_coordinate(sample,1u<<tw,unsigned(clamp&3),min_u,max_u);
+                    if(indexed_source)return wrapped;
                     return source_address(0,texture_width,wrapped,0)|
                         ((sprite_source==2||sprite_source==10)?((wrapped&8u)<<28):0u);};
                 c.source0=address(u);c.source1=c.fraction?address(u+1):c.source0;
@@ -953,6 +1020,7 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
                 r.fraction=linear?std::uint32_t(std::int64_t(fixed)-8-std::int64_t(v)*16):0u;
                 const auto address=[&](std::int32_t sample){
                     const auto wrapped=gs_wrap_texture_coordinate(sample,1u<<th,unsigned((clamp>>2)&3),min_v,max_v);
+                    if(indexed_source)return wrapped;
                     return (source_address(texture_base,texture_width,0,wrapped)-(sprite_source==49?1536u:0u))&0xfffffu;};
                 r.source0=address(v);r.source1=r.fraction?address(v+1):r.source0;
             }
@@ -968,7 +1036,8 @@ bool GsRegisterState::rasterize_sprite(const GsDraw& draw) {
             job.first_x=unsigned(first_x);job.first_y=unsigned(first_y);job.frame_width=frame_width;
             job.zbase=std::uint32_t(zbuf&511)*2048;job.zformat=zpsm;job.z=second.z;
             job.test=test;job.dimx=value[0x44];job.dither=(value[0x45]&1)!=0;job.zwrite=!(zbuf&(1ull<<32));
-            if(textured&&sprite_source==27)job.palette=palette.data();
+            if(textured&&(sprite_source==27||indexed_source))job.palette=palette.data();
+            job.texture_base=texture_base;job.texture_width=texture_width;
             if(gs_sprite_accelerator->render(job,vram))return true;
         }
     }
@@ -1291,7 +1360,7 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
     --first_covered_y;
     if(gs_triangle_accelerator&&(!textured||(!fst&&perspective.ready))&&!(draw.prim_state&(1u<<5))) {
         const auto submit=[&] {
-            const auto frame=value[0x4c+context],zbuf=value[0x4e+context],test=value[0x47+context];
+            const auto frame=value[0x4c+context],zbuf=value[0x4e + context],test=value[0x47+context];
             const auto tex0=value[6+context],clamp=value[8+context],alpha=value[0x42+context];
             const auto width=unsigned((frame>>16)&63)*64,format=unsigned((tex0>>20)&63);
             const auto zformat=unsigned((zbuf>>24)&15);
@@ -1300,8 +1369,10 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
             if(((frame>>24)&63)!=0||zformat>1||vram.size()!=1024*1024||(value[0x22]&3))return false;
             if((test&0x4000)||!(test&0x10000)||((test>>17)&3)==0)return false;
             if((test&1)&&(((test>>1)&7)!=7||((test>>12)&3)!=0))return false;
-            if(textured&&(format!=0&&format!=0x13&&format!=0x1b))return false;
-            if(textured&&(!((tex0>>14)&63)||(format!=0&&((tex0>>51)&0x3ff))))return false;
+            if(textured&&(format!=0&&format!=0x13&&format!=0x14&&format!=0x1b))return false;
+            // CT32 CLUT, CSM1; PSMT4 may select CSA<16 (same scope as DrawTexture).
+            if(textured&&(!((tex0>>14)&63)||(format==0x14?(((tex0>>51)&31)||((tex0>>56)&31)>=16):
+               (format!=0&&((tex0>>51)&0x3ff)))))return false;
             if(textured&&(((clamp&3)==2&&((clamp>>4)&1023)>((clamp>>14)&1023))||
                (((clamp>>2)&3)==2&&((clamp>>24)&1023)>((clamp>>34)&1023))))return false;
             if(draw.prim_state&64)for(unsigned s=0;s<8;s+=2)if(((alpha>>s)&3)==3)return false;
@@ -1341,9 +1412,13 @@ bool GsRegisterState::rasterize_triangle(const GsDraw& draw) {
                     else if(std::uint64_t(n)/q>0x7fffffffull)return false;
                 }
             }
-            if(format!=0)for(unsigned i=0;i<256;++i){
-                if(!clut_valid[i]||!clut_valid[i+256])return false;
-                job.palette[i]=std::uint32_t(clut[i])|(std::uint32_t(clut[i+256])<<16);
+            if(format!=0){
+                const auto clut_base=format==0x14?unsigned((tex0>>56)&15)*16:0u,entries=format==0x14?16u:256u;
+                for(unsigned i=0;i<entries;++i){
+                    const auto entry=clut_base+i;
+                    if(!clut_valid[entry]||!clut_valid[entry+256])return false;
+                    job.palette[i]=std::uint32_t(clut[entry])|(std::uint32_t(clut[entry+256])<<16);
+                }
             }
             }
             d[0]=std::uint32_t(pa.x);d[1]=std::uint32_t(pa.y);d[2]=std::uint32_t(pb.x);d[3]=std::uint32_t(pb.y);

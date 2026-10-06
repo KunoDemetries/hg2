@@ -1,3 +1,51 @@
+### HG-FAIL-058 - Bigger VU1 speculation window and spinning workers did not help a saturated host
+
+With ~2100 VU1 activations per gameplay frame, raising the in-flight window from 7 to 12/20 or letting workers spin 50/200 us before sleeping did not raise FPS (200 us spin cost ~8% from hyperthread contention). Workers looked ~45% busy, but the 8 logical CPUs (2 HT P-cores, 4 E-cores) already carry EE, VIF/VU, GS and worker threads. Once total busy time is near the host's real core capacity, reduce work per activation rather than adding parallelism.
+
+### HG-FAIL-057 - Stopping the bottleneck stage from stealing VU1 jobs made it slower
+
+A profile showed ~50% of stage B (the busiest device thread) in VU arithmetic from jobs it stole from workers, so B looked like it was doing the workers' job instead of parsing VIF. Forbidding steals (B runs only the job it must wait for) cut FPS from 9.25-9.52 to 8.77-8.95 with 3 workers. B steals only when its ring is empty or it must wait for a commit, so that time was idle. Measure idle and wait directly (HG-DIAG-091 per-interval counters, `/proc/<pid>/task/*/stat` CPU deltas) before treating a hot profile entry on a spinning/stealing thread as a bottleneck.
+
+### HG-LEARN-077 - Speculative parallel VU1 activations need lane-granular read and write sets
+
+Running VU1 batch activations on worker threads from predicted start state and committing them in order, with exact sequential re-execution on any input mismatch, kept every replay digest identical. Gameplay FPS went from 6.61 to 8.70 with 3 workers on 8 logical CPUs (2 workers: 7.90; 1: none; 4-5 workers: 7.2-7.4, oversubscribed). Inputs must be precise or the jobs re-execute. Vector-granular reads made 103k of 155k jobs re-execute, because the double-buffered programs SQ.xyz and then read the same vector. Lane bits that exclude lanes the activation already wrote cut this to 439 re-executions (154.6k valid). Write sets must also be per lane (partial SQ, V2/V3/masked UNPACK), or the merge corrupts VU memory (`s-w2g`). Clip/Q/P inputs are tracked dynamically (only bits FCAND consumed; Q/P only if an old value was read); static liveness covers VF/VI/ACC/I. Test the dependency logic in a synthetic stream where it is the only reason to re-execute. In the dense stream other reasons hid both mutations. Evidence: `~/hg-evidence/l-w2a`, `l-f{1,2,3}-w*`.
+
+### HG-LEARN-076 - Coarse EE / device thread split is exact and faster when joins are rare
+
+Measure the join budget first (HG-DIAG-090: only GIF STAT reads observed device state in gameplay). Then give whole device subsystems to host threads, fed by an ordered SPSC ring of the synchronous inputs, and join only at guest observations. Unlike HG-FAIL-041 (one handoff per VU activation), this kept every digest identical and raised gameplay FPS from ~3.4 to 4.4-6.0 on Linux. Splitting VIF1/VU1 from GIF/GS needs only a GIF packet-boundary proxy (`gif_packet_size` rules) for XGKICK's idle check. Answering transport reads at the VIF1/VU1 stage avoids draining GS work. Judge by gameplay FPS with interleaved sync controls (`HG_SYNC_DEVICES=1`), not whole-run wall, which is real-time paced.
+
+### HG-FAIL-056 - Two-field same-pair SQ snapshots instead of whole-Vu1State copies gave no gain
+
+The emitter copies all of `Vu1State` (~1.8 KB) for each same-pair SQ whose source VF the upper op writes (20 ordinary sites plus the fused program-1 loop). Capturing only `vf[fs]`/`vf_defined[fs]` passed 81920 compiled comparisons against the old whole-state form (a defined-bit mutation was caught), but replay instructions were 318.62G -> 318.72G with cycles in noise: GCC already turns the copy into a few wide moves. Reverted. The test-only differential switch idea is reusable if SQ emission changes again.
+
+### HG-FAIL-055 - GCC -O2 for the generated main/VU unit did not help on Linux
+
+Mirroring the MSVC /O2 main-unit override for GCC (`out/translated.cpp` at -O2, shards kept -O1) passed the exact replay but gave 317.94G -> 317.26G instructions (-0.2%) with user cycles 96.5G -> 98.7G, and a 6-minute rebuild. Reverted. The GCC build keeps -O1 for all generated units.
+
+### HG-FAIL-054 - Packed XYZ product/MADD in `vu_xyz.cpp` repeated HG-FAIL-019 on Linux
+
+Routing `vu_xyz_multiply_acc`/`vu_xyz_madd` through the exact four-lane `try_fpu_product4`/`try_fpu_madd4` (W computed, never published) passed 196608 differential state/fault comparisons and the exact replay, but instructions went 318.62G -> 317.94G (-0.2%) with flat cycles. A scratch microbenchmark had shown 3x per call, but its random operands mispredicted scalar branches; the game's operands are predictable. Do not size VU helper changes with random-operand microbenchmarks. Samples inside these helpers are spread evenly, not concentrated in the arithmetic.
+
+## HG-LEARN-075 - Submit GL compute work when it is queued, not when it is read back
+
+A resident GPU renderer that dispatches compute work but defers readback must call `glFlush()` after dispatching. Without it, Mesa (iris) keeps the batch on the CPU until the next `glGetBufferSubData`, so the GPU starts only at the sync point and the CPU waits for the whole batch. Adding `glFlush()` at the end of each resident `flush()` cut replay readback wait from 8.75 s to 1.70 s (wall -7%) with unchanged instructions and exact state. To find sync costs, attribute each readback to its caller stack (scratch `backtrace` probe) instead of removing one sync class, which only moves the wait (HG-LEARN-074).
+
+## HG-LEARN-074 — Rank CPU raster fallback by first rejecting GPU gate and include flush/readback time
+
+A per-draw classifier that records the first GPU admission gate a CPU-fallback primitive fails, with bbox pixels and host time from the flush through the CPU loop, found that two unsupported texture formats (PSMT4/PSMT8 FST sprites, ~580 draws) cost more wall time than 70K+ other fallbacks. Porting the exact CPU `DrawTexture` scope into the GPU sprite shader, using wrapped texel coordinates instead of separable addresses, cut Linux user instructions by 15.7% with exact replay state. Keep the probe out of the tree; record its ranking in PROGRESS. On an iGPU, `readback_ns` is dominated by waiting for queued GPU work. Removing one class of readback, such as presentation, only moves the wait to the next sync point.
+
+### HG-FAIL-053 — GPU self-texel feedback triangles repeat HG-LEARN-046 without CPU savings
+
+An exact per-tile GPU path for the proven same-pixel PSMT8H feedback class (flagged job reading its own frame byte) passed 64 new differential cases and exact replay state, but Linux user instructions were flat (-0.02%) because the scalar fallback already uses the collapsed direct-byte path. Windows previously measured this move slower. Do not revisit without new evidence that the scalar path, not batching, dominates.
+
+## HG-LEARN-073 — On a noisy host, compare user-mode retired instructions, then locate hot paths with LBR stacks
+
+On the Linux dev container (i3-1315U, `powersave`, P-cores capped at 1.2 GHz), identical fixed gameplay33M runs vary by ±10% in both FPS and `cpu_core/cycles/u`. `cpu_core/instructions/u` repeats to within 0.01% (382.749B and 382.724B). Pin the run with `taskset -c 2` (a P-core) and use `perf stat -e cpu_core/instructions/u`. That verdict is deterministic for CPU-work changes. Confirm a positive result with wall-clock pairs on a quieter host, because instructions ignore cache and memory stalls. For hot-path structure, `perf record -e cpu_core/cycles/u --call-graph lbr` works in the container without frame pointers or extra capabilities. Driving the replay through `hg_runtime_verifier.verify_frames` with only the Windows-layout provenance check bypassed keeps every writer, fault and state-digest check. Evidence: 2026-09-28 session, `~/hg-evidence/st-*`.
+
+### HG-FAIL-052 — Compiler inlining/optimization level alone does not reduce VU helper cost
+
+Compiling the GCC main unit (VU1 AOT programs) at `-O2` instead of `-O1` cut whole-replay user instructions by 0.4%. Force-inlining twelve `Vu1State` helpers (arithmetic_q, multiply_vector, add_vector, convert_integer/fixed, lane/broadcast/ACC variants, clip_test, load/store_qword) so emitted constant register indices and masks could fold cut them by 1.2% (379.1B vs 383.4B) and doubled full rebuild time. Neither produced a measurable FPS change, and exact retained state held in both. The helpers' cost is the checked soft-float, flag and definedness work itself, not call overhead or constant masks. Do not retry optimization-level or inlining changes for VU helpers; reduce the work that is executed (for example flag liveness or proven-defined lanes) instead.
+
 ## HG-LEARN-072 — Severe host drift requires adjacent reversal before judging an optimization
 
 HG-DIAG-088 initially looked like a large regression only when compared with a nonadjacent clean13.5107FPS sample: the exact-state candidate measured10.9755FPS. Byte-restoring the three changed files and rebuilding immediately produced an exact-state adjacent clean control of only10.4785FPS, making the candidate ~4.74% faster instead. Therefore do not classify a candidate from an older clean sample when the host has drifted materially. Preserve correctness first, use the closest exact-restored control, and if the apparent gain/loss matters retain it only after a second close candidate/control repeat. Scope: fixed33M Haunting Ground workload; production088 remains restored because the positive result is not yet repeated.
@@ -904,3 +952,7 @@ The candidate preserved the established frame/EE/GS/VU/normalized-IOP hashes and
 ### HG-FAIL-044 - Exact CPU micro-optimizations inside the qualified drift band are not wins
 
 Two low-level candidates preserved the fixed gameplay verifier but failed to clear current host variance. IOP straight-line switch fallthrough kept every original dispatch budget/trace/load-delay boundary and measured12.963275FPS. Replacing IPU/GIF/VIF1/SIF1 source-qword byte assembly with portable native64-bit loads passed runtime/translation/VU tests and exact retained state, but measured13.005903FPS. Adjacent clean qualified runs span12.913251..13.083097FPS. Both candidates were restored byte-exactly. Do not stack tiny dispatch/load changes whose only evidence sits inside that band; target a measured cost large enough to produce a repeatable paired gain.
+
+### HG-LEARN-054 - Keep source portable to GCC/Clang pp-number and target-attribute rules
+
+MSVC accepts `0x4e+context`, but GCC/Clang lex it as one invalid preprocessing number because hex digit `e` followed by `+`/`-` looks like an exponent. Put spaces around `+`/`-` after any hex literal ending in `e`/`E` (grep `0[xX][0-9a-fA-F]*[eE][+-]`). GCC lambdas also do not inherit a surrounding `__attribute__((target("avx2")))`, so always-inline AVX2 helpers called from lambdas fail to inline; compile AVX2-only, CPU-guarded dispatch files with per-file `-mavx2` (mirroring MSVC `/arch:AVX2`). Evidence: 2026-09-28 Debian trixie GCC build of the base runtime and full `hg_game`.

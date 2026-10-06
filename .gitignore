@@ -1,8 +1,12 @@
 /emu/
-/Haunting Ground (USA)/
+# No trailing slash: post-create.sh may make this a symlink to the dump.
+/Haunting Ground (USA)
 /UNEEDED images/
 /build/
 /out/
 __pycache__/
 *.pyc
 .venv/
+
+# The devcontainer mount configuration (paths on your own machine).
+*.env

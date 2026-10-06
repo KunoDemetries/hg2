@@ -94,16 +94,25 @@ class FinalFrameTests(unittest.TestCase):
 
 
 class IopDigestTests(unittest.TestCase):
-    def test_only_documented_rtc_bytes_are_masked(self):
+    RTC = (0xBFCD1, 0xBFCD2, 0xBFCD3, 0xBFCD5, 0xBFCD6, 0xBFCD7)
+
+    def rtc_data(self, values=(0x00, 0x00, 0x00, 0x01, 0x01, 0x00)):
         data = bytearray(2 * 1024 * 1024)
+        for offset, value in zip(self.RTC, values):
+            data[offset] = value
+        return data
+
+    def test_only_documented_rtc_bytes_are_masked(self):
+        data = self.rtc_data()
         a = normalized_iop_digest(data)
-        for offset, value in zip((0xBFCD1, 0xBFCD2, 0xBFCD3), (0x59, 0x42, 0x23)):
+        values = (0x59, 0x42, 0x23, 0x30, 0x09, 0x26)
+        for offset, value in zip(self.RTC, values):
             data[offset] = value
         b = normalized_iop_digest(data)
         self.assertEqual(a["sha256"], b["sha256"])
-        self.assertEqual(b["original_bytes"], [0x59, 0x42, 0x23])
-        self.assertEqual(data[0xBFCD1:0xBFCD4], bytes((0x59, 0x42, 0x23)))
-        for offset in (0, 0xBFCD0, 0xBFCD4, len(data)-1):
+        self.assertEqual(b["original_bytes"], list(values))
+        self.assertEqual(data[0xBFCD5:0xBFCD8], bytes((0x30, 0x09, 0x26)))
+        for offset in (0, 0xBFCD0, 0xBFCD4, 0xBFCD8, len(data)-1):
             data[offset] ^= 1
             self.assertNotEqual(b["sha256"], normalized_iop_digest(data)["sha256"])
             data[offset] ^= 1
@@ -111,8 +120,9 @@ class IopDigestTests(unittest.TestCase):
     def test_bad_size_and_non_bcd_fields_rejected(self):
         with self.assertRaises(ValueError):
             normalized_iop_digest(bytes(100))
-        for offset, value in ((0xBFCD1, 0x60), (0xBFCD2, 0x1A), (0xBFCD3, 0x24), (0xBFCD3, 0xFF)):
-            data = bytearray(2 * 1024 * 1024); data[offset] = value
+        for offset, value in ((0xBFCD1, 0x60), (0xBFCD2, 0x1A), (0xBFCD3, 0x24), (0xBFCD3, 0xFF),
+                              (0xBFCD5, 0x00), (0xBFCD5, 0x32), (0xBFCD6, 0x13), (0xBFCD6, 0x00), (0xBFCD7, 0xA0)):
+            data = self.rtc_data(); data[offset] = value
             with self.assertRaises(ValueError):
                 normalized_iop_digest(data)
 

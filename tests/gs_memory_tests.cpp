@@ -29,7 +29,7 @@ int main(){
         for(unsigned seed=0;seed<8;++seed) {
             const unsigned context=seed&1;
             gs.value[0x4c+context]=base|(std::uint64_t(width/64)<<16)|(std::uint64_t(fp)<<24);
-            gs.value[0x4e+context]=((base+17)&511)|(std::uint64_t(zp)<<24);
+            gs.value[0x4e + context]=((base+17)&511)|(std::uint64_t(zp)<<24);
             const int left=int((seed*293)%2048),top=int((seed*457)%2048);
             const int right=std::min(2048,left+137),bottom=std::min(2048,top+131);
             const auto pages=hg::gs_raster_write_pages(gs,context,left,top,right,bottom);

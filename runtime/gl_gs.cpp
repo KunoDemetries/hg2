@@ -58,6 +58,25 @@ uint texel(uint address){
     if(extra.x==27u)return data[other.y+(bits>>24)];
     return bits;
 }
+// PSMT8/PSMT4: same page/block/column/lane layout as psmt8_word/psmt4_word.
+uint indexed_texel(uint x,uint y){
+    uint base=data[other.y+256u],width=data[other.y+257u],column=(y&15u)>>2,block,address,index;
+    uint row=(y&3u)^((column&1u)*2u);
+    uint pixel=((x&1u)+(x&6u)*2u+(row&1u)*2u)^((row&2u)*4u);
+    if(extra.x==19u){
+        uint bx=(x>>4)&7u,by=(y>>4)&3u;
+        block=(bx&1u)+(bx&2u)*2u+(bx&4u)*4u+(by&1u)*2u+(by&2u)*4u;
+        address=(base+((x>>7)+(y>>6)*(width>>7))*2048u+block*64u+column*16u+pixel)&0xfffffu;
+        index=(mem[address]>>((((y&2u)>>1)|((x&8u)>>2))*8u))&255u;
+    }else{
+        uint bx=(x>>5)&3u,by=(y>>4)&7u;
+        block=(bx&1u)*2u+(bx&2u)*4u+(by&1u)+(by&2u)*2u+(by&4u)*4u;
+        address=(base+((x>>7)+(y>>7)*(width>>7))*2048u+block*64u+column*16u+pixel)&0xfffffu;
+        index=(mem[address]>>((((y&2u)>>1)|((x&24u)>>2))*4u))&15u;
+    }
+    return data[other.y+index];
+}
+uint fetch(uint r,uint c){return extra.x==19u||extra.x==20u?indexed_texel(c,r):texel(r+c);}
 uint zaddress(uint x,uint y){
     uint bx=(x>>3)&7u,by=(y>>3)&3u;
     uint block=((bx&1u)+(bx&2u)*2u+(bx&4u)*4u+(by&1u)*2u+(by&2u)*4u)^24u;
@@ -67,11 +86,11 @@ void pixel(uvec2 xy){
     uvec4 col=read4(job_base+24+xy.x*4),row=read4(job_base+24+(shape.x+xy.y)*4);uint a=col.w,b=row.w;
     uint src=shape.z;
     if((state.x&32u)==0){
-    src=texel(row.x+col.x);
+    src=fetch(row.x,col.x);
     if(a!=0||b!=0){
-        uint c1=a!=0?texel(row.x+col.y):0u;
-        uint c2=b!=0?texel(row.y+col.x):0u;
-        uint c3=a!=0&&b!=0?texel(row.y+col.y):0u;
+        uint c1=a!=0?fetch(row.x,col.y):0u;
+        uint c2=b!=0?fetch(row.y,col.x):0u;
+        uint c3=a!=0&&b!=0?fetch(row.y,col.y):0u;
         uint w0=(16u-a)*(16u-b),w1=a*(16u-b),w2=(16u-a)*b,w3=a*b;
         uint rb=(src&0x00ff00ffu)*w0+(c1&0x00ff00ffu)*w1+(c2&0x00ff00ffu)*w2+(c3&0x00ff00ffu)*w3;
         uint ga=((src>>8)&0x00ff00ffu)*w0+((c1>>8)&0x00ff00ffu)*w1+((c2>>8)&0x00ff00ffu)*w2+((c3>>8)&0x00ff00ffu)*w3;
@@ -160,7 +179,7 @@ class Accelerator final:public GsSpriteAccelerator,public GsTriangleAccelerator 
     std::vector<std::uint32_t> masked_index;
     std::uint64_t masked_words=0,masked_batches=0;
     GLint base_location=-1;
-    std::array<std::uint32_t,24+4096*4+256> job_data{};
+    std::array<std::uint32_t,24+4096*4+258> job_data{};
     struct Command {GLuint offset,width,height;};
     std::vector<Command> commands;
     std::vector<std::uint32_t> queued_data;
@@ -369,6 +388,9 @@ public:
         }
         barrier(0x00000200); // GL_BUFFER_UPDATE_BARRIER_BIT: subsequent CPU buffer readback.
         gl.bind_buffer(storage,buffers[0]);
+        // Resident work is only read back at a later coherence point; submit it
+        // now so the GPU overlaps guest execution instead of starting at the wait.
+        if(resident)glFlush();
         if(resident){gpu_dirty|=queued_writes;cpu_dirty&=~queued_writes;uploaded_valid&=~queued_writes;}
         else for(unsigned page=0;page<512;) {
             if(!queued_writes[page]){++page;continue;}
@@ -397,9 +419,22 @@ public:
         const auto mark=[](std::bitset<512>& set,std::uint32_t lo,std::uint32_t hi) {
             for(auto page=lo/2048;page<=hi/2048;++page)set.set(page&511);
         };
+        const bool indexed=!(job.flags&32)&&(job.source_format==0x13||job.source_format==0x14);
+        if(indexed) {
+            // Axes are wrapped texel coordinates; mark every whole texture page
+            // covering their bounding box (PSMT8 pages 128x64, PSMT4 128x128).
+            std::uint32_t min_v=0xffffffffu,max_v=0;
+            for(unsigned y=0;y<job.height;++y){const auto& r=job.rows[y];
+                min_v=std::min({min_v,r.source0,r.source1});max_v=std::max({max_v,r.source0,r.source1});}
+            const auto page_height=job.source_format==0x13?64u:128u,pages_per_row=job.texture_width/128;
+            for(auto py=min_v/page_height;py<=max_v/page_height;++py)for(auto px=min_s/128;px<=max_s/128;++px) {
+                const auto first=job.texture_base+(px+py*pages_per_row)*2048;
+                mark(reads,first,first+2047);
+            }
+        }
         for(unsigned y=0;y<job.height;++y) {
             const auto& r=job.rows[y];
-            if(!(job.flags&32)) {
+            if(!(job.flags&32)&&!indexed) {
                 mark(reads,r.source0+min_s,r.source0+max_s);
                 if(r.fraction)mark(reads,r.source1+min_s,r.source1+max_s);
             }
@@ -447,8 +482,9 @@ public:
         std::memcpy(job_data.data()+24,job.columns,job.width*16);
         std::memcpy(job_data.data()+24+job.width*4,job.rows,job.height*16);
         const auto palette_offset=24+(job.width+job.height)*4;
-        const auto words=palette_offset+(job.palette?256:0);
+        const auto words=palette_offset+(job.palette?(indexed?258:256):0);
         if(job.palette)std::memcpy(job_data.data()+palette_offset,job.palette,256*4);
+        if(indexed){job_data[palette_offset+256]=job.texture_base;job_data[palette_offset+257]=job.texture_width;}
         if((queued_vram&&queued_vram!=vram)||queued_data.size()+words>1024*1024||commands.size()>=256)flush();
         job_data[21]=GLuint(queued_data.size()+palette_offset);
         queued_vram=vram;queued_writes|=writes;queued_reads|=reads;
@@ -479,7 +515,7 @@ public:
         const std::uint64_t clamp=d[25]|(std::uint64_t(d[26])<<32);
         const auto maxx=coordinate_max(unsigned(clamp&3),d[23],unsigned((clamp>>4)&1023),unsigned((clamp>>14)&1023));
         const auto maxy=coordinate_max(unsigned((clamp>>2)&3),d[24],unsigned((clamp>>24)&1023),unsigned((clamp>>34)&1023));
-        const unsigned xs=d[22]==0x13?7:6,ys=d[22]==0x13?6:5;
+        const unsigned xs=(d[22]==0x13||d[22]==0x14)?7:6,ys=d[22]==0x14?7:d[22]==0x13?6:5;
         mark(reads,d[20],d[20]+((maxx>>xs)+(maxy>>ys)*(d[21]>>xs))*2048+2047);
         }
         const auto writes=frames|((d[15]&128)?depths:std::bitset<512>{});

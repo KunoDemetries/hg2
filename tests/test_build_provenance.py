@@ -99,6 +99,23 @@ class BuildProvenanceTests(unittest.TestCase):
         with self.assertRaisesRegex(BuildProvenanceError, "newer than linked"):
             record_build(self.repo, self.build, self.exe, "Release")
 
+    def test_single_config_tree_manifest_is_selected_by_executable(self):
+        linux = self.build / "linux"
+        linux.mkdir()
+        (linux / "CMakeCache.txt").write_text("single-config cache\n")
+        (linux / "build.ninja").write_text("ninja rules\n")
+        exe = linux / "hg_game"
+        exe.write_bytes(b"different synthetic native executable")
+        with contextlib.redirect_stdout(io.StringIO()):
+            record_build(self.repo, linux, exe, "Release")
+        isolated = self.evidence / "hg_game"
+        isolated.write_bytes(exe.read_bytes())
+        self.assertEqual(validate_build(self.repo, isolated)["status"], "matched")
+        self.assertEqual(validate_build(self.repo, self.isolated)["status"], "matched")
+        (linux / "build.ninja").write_text("changed per-source flags\n")
+        with self.assertRaisesRegex(BuildProvenanceError, "build.ninja"):
+            validate_build(self.repo, isolated)
+
     def test_fixed_verifier_does_not_launch_stale_binary(self):
         self.manifest.unlink()
         recordings = self.evidence / "recordings.json"

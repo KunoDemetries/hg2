@@ -72,6 +72,7 @@ inline GifPacket decode_gif_packet(const std::uint8_t* bytes, std::size_t size) 
     if (!complete_size) throw std::runtime_error("truncated GIF packet");
     if (*complete_size != size) throw std::runtime_error("trailing GIF packet data");
     GifPacket packet;
+    packet.transfers.reserve(size / 16); // Capacity hint: one transfer per qword (REGLIST may use two).
     std::size_t offset = 0;
     bool done = false;
     bool reset_q_pending = true;

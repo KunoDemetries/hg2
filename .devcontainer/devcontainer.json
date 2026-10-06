@@ -1,0 +1,73 @@
+{
+  "name": "hg2",
+
+  // Compose rather than a bare image, because the game dump is mounted from a
+  // path that differs on every machine and .env is how that is said once. Copy
+  // .env.example (top of the repository) to .env and fill it in.
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspaces/hg2",
+  "shutdownAction": "stopCompose",
+
+  // Root, matching the rootless host daemon: container root maps to the host
+  // user, so files written into the bind-mounted tree stay owned by you. The
+  // Wayland and PipeWire binds go to /run/user/0 to match.
+  "remoteUser": "root",
+  "containerUser": "root",
+
+  "containerEnv": {
+    // Where docker-compose.yml put the desktop sockets. The name is fixed
+    // because the bind renames whatever the host calls its socket to wayland-0.
+    "XDG_RUNTIME_DIR": "/run/user/0",
+    "WAYLAND_DISPLAY": "wayland-0",
+    "DISPLAY": "${localEnv:DISPLAY}",
+
+    // HG_GAME_DIR is NOT here. It comes from .env, which compose reads, so
+    // docker-compose.yml sets it in its `environment:` block.
+
+    // git's global config lives on a volume (docker-compose.yml), not in the
+    // container's filesystem and not copied from the host. This is what points
+    // git at it -- and it is also what makes the Dev Containers extension's own
+    // copy of the host ~/.gitconfig irrelevant, which matters because that copy
+    // names a signing key at a host path that does not exist in here and every
+    // commit then dies with "Couldn't load public key".
+    //
+    // Your identity and your key are yours to put in, once, from inside the
+    // container. They persist across rebuilds because the volume does.
+    "GIT_CONFIG_GLOBAL": "/root/.config/git/config",
+
+    // Keep all Claude Code state (credentials, .claude.json, projects/) in the
+    // one volume, so a rebuild does not ask for a login again.
+    "CLAUDE_CONFIG_DIR": "/root/.claude"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-python.python",
+        "tamasfe.even-better-toml",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        // A Linux build directory of its own, so it never shares a CMake cache
+        // with a Windows/MSVC build under build/.
+        "cmake.buildDirectory": "${workspaceFolder}/build/linux",
+        "cmake.generator": "Ninja",
+        "clangd.arguments": ["--compile-commands-dir=${workspaceFolder}/build/linux"],
+        "C_Cpp.intelliSenseEngine": "disabled"
+      }
+    }
+  },
+
+  // **Runs on the host, before the container exists.** Links .env beside the
+  // compose file and builds the image with a plain `docker build` -- see
+  // initialize.sh for why the tooling's own build is not used.
+  "initializeCommand": "bash .devcontainer/initialize.sh",
+
+  // Setup actions only. What you need to read is in welcome.sh, which claude.sh
+  // and every new terminal show -- this hook's output only reaches a log.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "waitFor": "postCreateCommand"
+}

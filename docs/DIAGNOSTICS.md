@@ -1,3 +1,11 @@
+## HG-DIAG-028 single-config provenance layouts - 2026-09-29
+
+`tools/hg_build_provenance.py` also validates single-config Release trees (`build/<dir>/hg_game.build.json`, e.g. the Linux Ninja build) by selecting the manifest whose recorded executable matches the isolated binary. `build.ninja` joins the recorded inputs. Still outside native timing and fail-closed on any stale input, missing manifest or mismatched executable.
+
+## HG-DIAG-089 VIF1 UNPACK straight-line fast path - retained 2026-09-29
+
+Source: `runtime/vif.cpp` (`unpack_linear`, `try_unpack_linear`, `vif1_generic_unpack_only`). Default on for every non-RGBA5 UNPACK with CL>=WL whose mask selectors are all zero (unmasked, or masked with MASK=0). It is templated on width/field count/scalar and keeps the generic loop's vector order, out-of-range fault point and text, USN sign/zero extension, STMOD offset/difference ROW updates and V2/V3 indeterminate-lane marking. Every other UNPACK uses the unchanged generic loop. `vif1_generic_unpack_only` is a test-only comparison switch (default false, one load per UNPACK), declared only in `tests/gif_tests.cpp`. No guest clock, ordering or fault change. Evidence: 4000 randomized packets (all formats including RGBA5, fill cycles, masks, modes, TOPS, near-limit destinations) compare VU memory, defined masks, ROW, pending bytes and fault text against the generic loop; a sign-extension mutation fails. Fixed Linux gameplay33M: exact retained state and 864 writers; user instructions 322.54G -> 319.29G (-1.0%). Retain while its differential test passes.
+
 ## HG-DIAG-088 exact XYZ lane ADD/SUB SIMD reuse - restored, performance not yet retained
 
 The bounded production candidate routed only mask14 XYZ `add_vector` operations through a conservative helper that reused exact `try_fpu_add4`; invalid indices, undefined XYZ sources and unsupported host arithmetic returned before mutation to the original scalar path. Candidate build/tests passed, fixed33M replay reached864 original writers with zero unexpected/lost/caller failures, and verifier `c44e1685cc864a1c970a0c69e93a2ce5` preserved every retained frame/EE/GS/VU/RTC-normalized IOP digest at10.9755428FPS (10.8044644/11.1521262).
@@ -49,6 +57,30 @@ The authorized successor used one persistent consumer, fixed32MiB byte ring, fix
 ## HG-DIAG-081 external native CPU sampling - captured, no runtime probe retained
 
 Location: external Visual Studio VSDiagnostics CPUUsageHigh sampling session and external map symbolizer under %TEMP%; no project source probe, no generated-code change, default inactive. Purpose: rank native host PCs during the original gameplay33m replay after WPR policy rejected sampling. Guest-state, clocks, output and fault effects: none intended; high-rate host sampling overhead unknown, so sampled replay throughput is invalid for FPS qualification. Capture: Project Link job38c616eb, PID16112, %TEMP%/hg-vu-native-full-high-20260927.diagsession and hg-vu-native-full-high-dump.txt. Last ETL12.0M..16.5167M us holds18,803 target samples, approximately the slow final interval but without an exact original-slice alignment marker. Top exclusive symbols: VIF process_pending848, XYZ prepare<false>741, exact AVX2 fused transform638, VU arithmetic_q517, multiply_vector429, GIF decode304, GL masked_write283, CPU triangle raster240. The ETL lacked a target loader image; module base was cross-matched to exact instruction PCs from an earlier same-executable trace with an explicit loader event. Do not interpret exclusive samples as inclusive caller cost or calibrated wall seconds. Retention criterion: keep only external evidence and this summary; no profiler running and no source instrumentation retained. Next use only for a broad architecture decision with exact fault/order/readback proof.
+## HG-DIAG-093 speculative VU1 scheduler event trace - ACTIVE (temporary)
+
+`runtime/device_thread.cpp` (`DeviceThread::note`/`dump_trace`): a 64-entry ring of dispatch (D), MSCNT prediction (M), in-order (S) and commit (C) events with entry, TPC, MicroMem generation and flags, dumped to stderr only when a VU1 activation faults under `HG_VU_WORKERS`. Located the MSCNT committed-TPC bug (prediction visible to commits made inside dispatch). Guest state, ordering and faults unaffected; cost: one small struct store per scheduler event while speculation is enabled (not measured separately). Remove once speculative VU1 is accepted and stable.
+
+## HG-DIAG-092 VU1 speculation feasibility probe - completed; wrapper removed, hooks productized
+
+The temporary `probe_vu1` executor wrapper in `runtime/system_diagnostic.cpp` (env `HG_VU_SPEC_PROBE`) was removed by restoring the file from `~/hg-backups/vuspec-probe-20261001/` (publish-every-slice change retained). Results (`~/hg-evidence/h-probe2`, sync replay, 155,000 activations, 42,977 init entries): with init entries modelled inline, memory and live-VF checks passed for every eligible batch at 1-3 uncommitted predecessors; clip matched 82/74/68%, status 97%, relative timing 81/69/61%; all checks 79/67/60%. Disabled hook cost was within noise (`h-off1` 6.573 FPS vs 6.306/6.612). Its hooks became production speculation support (see HG-LEARN-077): `Vu1AccessLog` (vector reads, lane writes) and `Vu1State::access_log`, `Vu1UnpackLog`/`vif1_unpack_log` (thread-local, per-lane value/definedness), `vu1_spec_info_query` and emitted `vu1_aot_spec_info` (static live-in VF lanes, VI, ACC, I), per-block `spec_written_*` masks, Q/P freshness and clip-history tracking in `Vu1State`.
+
+## HG-DIAG-095 VU1 worker spin-before-sleep - completed and removed
+
+Temporary env `HG_VU_SPIN_US` in `runtime/device_thread.cpp` (workers polled the job queue before sleeping; dispatch signalled only sleeping workers). No guest-state effect. 50 us: 9.385/9.370 vs 0: 9.471/9.254 FPS; 200 us: 8.375/8.851 (hyperthread contention). Rejected and removed.
+
+## HG-DIAG-094 VU1 job-stealing A/B switch - completed and removed
+
+Temporary env `HG_VU_STEAL=0` in `runtime/device_thread.cpp`: stage B ran only the VU1 job it waited for (if still queued) and never stole jobs while idle. No guest-state effect (job execution is identical wherever it runs). Result: slower (w3 8.947/8.774 vs default 9.250/9.522 FPS, exact digests), so stealing stays and the switch was removed.
+
+## HG-DIAG-091 host device-stage wait counters - ACTIVE (retained, cheap)
+
+`runtime/device_thread.cpp`. Steady-clock reads only around waits/idle periods (joins, ring-full, stage idle); counters printed every 2 s at joins, every 0.5 s at transport reads, and at stop, only when env `HG_DEVICE_STATS=1`. With stats on, `b_job_wait_s` (in the `VU1 speculation` line) times stage B's pause/yield waiting on VU1 workers in `wait_job`/`b_idle`; when disabled this is one branch per spin. `b_inline_s`/`b_steal_s` likewise time inline init activations and stolen jobs on stage B (stats only). No guest state, ordering, clock or fault effect. Cost when disabled: a few clock reads per idle period/join (unmeasured, small). Remove or keep once device-thread tuning is finished.
+
+## HG-DIAG-090 EE/device overlap budget model - completed and removed
+
+Temporary host-only probe (`runtime/include/hg/diag090.hpp`, hooks in `runtime.hpp` `load` for GIF STAT/GS privileged/INTC reads, `gs.hpp` SIGNAL/FINISH writes, `system_diagnostic.cpp` VU1 executor wrapper, top-level rasterize, `display_image`, `pump_gif` loop). Activated only by env `HG_DIAG090`; no guest-state, clock, ordering, rendering or fault effects. It timed device work and simulated a two-thread schedule (thread A: EE/IOP/DMA/VIF transport; thread B: VU1 execution + GS rasterize + display image) joining at guest observations of device state. Instrumented replay `~/hg-evidence/diag090` qualified (864 writers, all digests and normalized IOP identical to `st-base3`; 344.81G instructions, 100.4 s, instrumented FPS invalid). Whole run (98.95 s): VU1 executor 11.00 s / 155,247 calls, rasterize 3.40 s, display 3.16 s / 1720, pump_gif 2.23 s; joins: GS privileged read 1, GIF STAT 875, INTC 0, SIGNAL/FINISH writes 0. Heavy last 20.59 s: VU1 9.43 s / 134,592 calls, rasterize 0.50 s, display 0.19 s, pump_gif 0.13 s; only 64 GIF STAT joins (0.25 s simulated wait); simulated two-thread wall 10.69 s = 1.93x (1.92x also moving pump_gif to B). Report `~/hg-backups/diag090-20261001/report.txt`, probe source archived there as `diag090.hpp.probe`. All three files restored byte-exact (manifest.txt). No 090 code remains.
+
 ## HG-DIAG-080 complete GIF packet class census - completed and removed
 
 Temporary host-only counters in runtime/include/hg/gs.hpp, runtime/gs.cpp and runtime/system_diagnostic.cpp. Default null pointer; armed only unpaced --profile31M..33M. No guest state, clocks, rendering, transfer order, interrupts, pixels, faults or input changes; active counting cost unknown and instrumented rate is not FPS evidence. Original replay7bee2f3b reached33M/864 original writers/no fault. Among152,526 completed packets:95,762 plain,50,224 CLUT-write-only (49,564 actual reload packets),3,240 IMAGE-only and3,300 transfer-control/HWREG-only, zero event-write packets. Payload totals285,600,224 bytes overall and107,879,040 IMAGE packet bytes. This rejects IMAGE-only/no-load-palette worker admission as a route around most joins, without proving all CLUT work must synchronize in a different architecture. Source files byte-restored to manifest %TEMP%/hg-diag080-preedit-20260927/manifest.txt; forced clean rebuild6b44db1b and fixed verifier9e5f8b50 passed at13.12060FPS with established state. Probe archive %TEMP%/hg-diag080-probe-20260927; full evidence in PROGRESS. No080 code remains.
@@ -730,6 +762,20 @@ state equal except RTC.896 GPU/CPU checks pass both modes. All5888 observed alia
 rejections now accelerated with the bounded independent-halfword proof above.
 No guest-state substitute; flags remain opt-in/default off. Readback still1.894s;
 whole-console fidelity and30updates/s unproved. This supersedes pending status.
+
+HG-DIAG-016 PSMT8/PSMT4 source expansion (2026-09-29): same opt-in activation.
+FST PSMT8 (CT32 CLUT, CSM1, CSA=0) and PSMT4 (CT32 CLUT, CSM1, CSA<16) sprites,
+exactly the CPU `DrawTexture` scope, reach the GPU sprite shader. Axes carry
+wrapped texel coordinates, and the shader applies the `psmt8_word`/`psmt4_word`
+page/block/column/lane swizzle to a draw-time CLUT snapshot. Read pages cover the
+texel bounding box in whole texture pages. Any unloaded palette entry, wrap
+fault or alias still uses the CPU path with its explicit faults. This class alone
+is admitted below the 4096-pixel batching threshold. 1159/1159/1367 GPU/CPU cases
+pass (sprite, resident, resident+triangles), including multi-page/odd-TBW
+layouts, nonzero PSMT4 CSA and CLUT faults. A stride mutation is caught. Fixed
+Linux gameplay33M replay: exact retained frame/EE/GS/VU/RTC-normalized IOP state,
+864 writers; user instructions 384.03G -> 323.89G (-15.7%). A temporary scratch
+fallback-reason probe (never committed) produced the ranking; see PROGRESS.
 
 HG-DIAG-017 exact upload suppression: gl_gs.cpp retains4MiB host mirror with
 per-page validity after transfer, invalidated by GPU writes or owner changes.
